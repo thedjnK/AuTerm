@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2016-2017 Laird
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: UwxEscape.h
 **

@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2015-2017 Laird
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: main.cpp
 **

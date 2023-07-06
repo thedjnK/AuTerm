@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2016-2018 Laird
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: UwxErrorCode.h
 **

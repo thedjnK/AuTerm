@@ -1,8 +1,8 @@
     #include <windows.h>
 
     VS_VERSION_INFO     VERSIONINFO
-    FILEVERSION         1, 16, 0, 0
-    PRODUCTVERSION      1, 16, 0, 0
+    FILEVERSION         0, 1, 0, 0
+    PRODUCTVERSION      0, 1, 0, 0
     FILEFLAGSMASK       0x3fL
     FILEFLAGS           0
     FILEOS              VOS_NT_WINDOWS32
@@ -17,16 +17,16 @@
         BEGIN
             BLOCK   "040904b0"
             BEGIN
-                VALUE   "CompanyName",      "Laird Connectivity\0"
-                VALUE   "FileDescription",  "UwTerminalX\0"
-                VALUE   "FileVersion",      "1.16.0.0\0"
-                VALUE   "InternalName",     "UwTerminalX\0"
-                VALUE   "LegalCopyright",   "Copyright 2015-2022 Laird Connectivity\0"
-                VALUE   "OriginalFilename", "UwTerminalX.exe\0"
-                VALUE   "ProductName",      "UwTerminalX\0"
-                VALUE   "ProductVersion",   "1.16.0.0\0"
+                VALUE   "CompanyName",      "thedjnK\0"
+                VALUE   "FileDescription",  "AuTerm\0"
+                VALUE   "FileVersion",      "0.1.0.0\0"
+                VALUE   "InternalName",     "AuTerm\0"
+                VALUE   "LegalCopyright",   "Copyright 2023 thedjnK\0"
+                VALUE   "OriginalFilename", "AuTerm.exe\0"
+                VALUE   "ProductName",      "AuTerm\0"
+                VALUE   "ProductVersion",   "0.1.0.0\0"
             END
         END
     END
 
-    IDI_ICON1               ICON    DISCARDABLE     "images\\UwTerminal32.ico"
+    IDI_ICON1               ICON    DISCARDABLE     "images\\AuTerm32.ico"

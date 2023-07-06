@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2016-2018 The Qt Company with modifications by Laird
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: LrdCodeEditor.h
 **

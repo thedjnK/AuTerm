@@ -1,5 +1,5 @@
-UwTerminalX uses the Qt framework version 5, which is licensed under the GPLv3 (not including later versions).
-UwTerminalX uses and may be linked statically to various other libraries including Xau, XCB, expat, fontconfig, zlib, bz2, harfbuzz, freetype, udev, dbus, icu, unicode, UPX. The licenses for these libraries are provided below:
+AuTerm uses the Qt framework version 5, which is licensed under the GPLv3 (not including later versions).
+AuTerm uses and may be linked statically to various other libraries including Xau, XCB, expat, fontconfig, zlib, bz2, harfbuzz, freetype, udev, dbus, icu, unicode, UPX. The licenses for these libraries are provided below:
 
 
 

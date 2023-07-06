@@ -1,5 +1,5 @@
-#UwTerminalX Qt project qmake file
-#By default all components are built for Github UwTerminalX releases
+#AuTerm Qt project qmake file
+#By default all components are built for Github AuTerm releases
 
 #Uncomment to exclude building automation form
 #DEFINES += "SKIPAUTOMATIONFORM"
@@ -9,15 +9,13 @@
 #DEFINES += "SKIPSCRIPTINGFORM=1"
 #Uncomment to exclude building speed test functionality
 #DEFINES += "SKIPSPEEDTEST=1"
-#Uncomment to exclude BL654 USB autorun escape functionality
-#DEFINES += "SKIPUSBRECOVERY=1"
 #Uncomment to resolve IP address from hostname prior to making web request
 #DEFINES == "RESOLVEIPSEPARATELY=1"
 
 
-QT       += core gui widgets serialport network
+QT       += core gui widgets serialport
 
-TARGET = UwTerminalX
+TARGET = AuTerm
 TEMPLATE = app
 
 SOURCES += main.cpp\
@@ -39,7 +37,7 @@ FORMS    += \
     UwxMainWindow.ui
 
 RESOURCES += \
-    UwTerminalXImages.qrc
+    AuTermImages.qrc
 
 #Automation form
 !contains(DEFINES, SKIPAUTOMATIONFORM) {
@@ -68,34 +66,13 @@ RESOURCES += \
     FORMS += UwxErrorCode.ui
 }
 
-#BL654 USB dongle autorun recovery
-!contains(DEFINES, SKIPUSBRECOVERY) {
-    #Linux libraries
-    unix:!macx: LIBS += -lusb-1.0
-    unix:!macx: LIBS += -lftdi1
-
-    #Windows libraries
-    !contains(QMAKESPEC, g++) {
-        #MSVC build for windows
-        contains(QT_ARCH, i386) {
-            #32-bit windows
-            win32: LIBS += -L$$PWD/FTDI/Win32/ -lftd2xx
-        } else {
-            #64-bit windows
-            win32: LIBS += -L$$PWD/FTDI/Win64/ -lftd2xx
-        }
-
-        HEADERS  += FTDI/ftd2xx.h
-    }
-}
-
 #Windows application version information
 win32:RC_FILE = version.rc
 
 #Windows application icon
-win32:RC_ICONS = images/UwTerminal32.ico
+win32:RC_ICONS = images/AuTerm32.ico
 
 #Mac application icon
-ICON = MacUwTerminalXIcon.icns
+ICON = MacAuTermIcon.icns
 
 DISTFILES +=
