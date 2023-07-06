@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2016-2018 Laird
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: UwxScripting.h
 **
@@ -99,7 +99,7 @@ public:
         PopupMessage *pmNewHandle
         );
     void
-    SetUwTerminalXVersion(
+    SetAuTermVersion(
         const QString strVersion
         );
     void
@@ -203,7 +203,7 @@ private:
     QTimer mtmrPauseTimer; //Timer used for wait commands
     QTextBlock mtbExecutionBlock; //Holds the current execution block from the editor
     bool mbIsRunning; //Set to true if the script is running
-    QString mstrUwTerminalXVersion; //String containing the UwTerminalX version
+    QString mstrAuTermVersion; //String containing the AuTerm version
     bool mbWaitingForReceive; //Set to true if waiting in a receive data command for data to arrive
     QByteArray mbaMatchData; //Buffer containing data that is matched against data received from the module (awating a match)
     QByteArray mbaRecvData; //Buffer containing data received from the module (awating a match)

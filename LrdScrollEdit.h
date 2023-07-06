@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: LrdScrollEdit.h
 **

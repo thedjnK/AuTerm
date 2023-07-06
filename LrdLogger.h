@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2015-2018 Laird
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: LrdLogger.h
 **

@@ -3,12 +3,11 @@
         <file>images/EmptyCircle.png</file>
         <file>images/GreenCircle.png</file>
         <file>images/RedCircle.png</file>
-        <file>images/UwTerminal16.ico</file>
-        <file>images/UwTerminal32.ico</file>
-        <file>images/UwTerminal16.png</file>
-        <file>images/UwTerminal32.png</file>
         <file>images/MinusIcon.png</file>
         <file>images/PlusIcon.png</file>
-        <file>certificates/UwTerminalX_new.crt</file>
+        <file>images/AuTerm16.ico</file>
+        <file>images/AuTerm16.png</file>
+        <file>images/AuTerm32.ico</file>
+        <file>images/AuTerm32.png</file>
     </qresource>
 </RCC>

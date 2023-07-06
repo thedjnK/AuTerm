@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: UwxMainWindow.h
 **
@@ -148,7 +148,7 @@ const qint8 MaxDevNameSize                      = 18;      //Size (in characters
 const qint16 AutoBaudTimeout                    = 1200;    //Time (in ms) to wait before checking the next baud rate when automatically detecting the module's baud rate
 const qint16 XCompATIRespTimeout                = 1200;    //Time (in ms) to wait to get a version response from an XCompiler before killing the process
 //Constants for default config values
-const QString DefaultLogFile                    = "UwTerminalX.log";
+const QString DefaultLogFile                    = "AuTerm.log";
 const bool DefaultLogMode                       = 0;
 const bool DefaultLogEnable                     = 0;
 const QString DefaultCompilerDir                = "compilers/";

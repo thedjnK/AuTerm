@@ -1,7 +1,7 @@
 /******************************************************************************
 ** Copyright (C) 2016-2018 Laird
 **
-** Project: UwTerminalX
+** Project: AuTerm
 **
 ** Module: UwxScripting.cpp
 **
@@ -464,7 +464,7 @@ UwxScripting::ExportToStringPlayer(
                 QTextStream tsDataStream(&fileExport);
 
                 //Output header
-                tsDataStream << "//Exported from UwTerminalX v" << mstrUwTerminalXVersion << " Scripting on " << QDate::currentDate().toString("dd/MM/yyyy") << " @ " << QTime::currentTime().toString("hh:mm") << "\r\n\r\nSET vPort \"0\" //Change to the port number to send/receive data on\r\nDECLARE vWaitTime\r\nSET vWaitTime \"5000\" //Change to the desired maximum wait time for each receive event in ms\r\n\r\n";
+                tsDataStream << "//Exported from AuTerm v" << mstrAuTermVersion << " Scripting on " << QDate::currentDate().toString("dd/MM/yyyy") << " @ " << QTime::currentTime().toString("hh:mm") << "\r\n\r\nSET vPort \"0\" //Change to the port number to send/receive data on\r\nDECLARE vWaitTime\r\nSET vWaitTime \"5000\" //Change to the desired maximum wait time for each receive event in ms\r\n\r\n";
 
                 //Go through each block in the editor
                 QTextBlock tbCurrentBlock = ui->edit_Script->document()->firstBlock();
@@ -698,7 +698,7 @@ UwxScripting::on_btn_Help_clicked(
     )
 {
     //Display help
-    QString strMessage = "UwTerminalX Scripting: This is a simple scripting language for sending/receiving data and waiting for specific periods of time. Each line must begin directly with a valid command and the parameter for that command. Commands are:\r\n    >  Send data out\r\n    <  Wait to receive data\r\n    ~  Wait for a period (in ms)\r\n    // A null-operation comment (used for describing the code)\r\n\r\nValid commands will be highlighed in red and comments in green. Use the check button (yellow warning icon) to check for syntax errors in a script before running it.\r\n\r\nTo the left side of the editor are individual line colours which will change to indicate the following:\r\n    Red:   Syntax error with line (compile failed)\r\n    Green: Currently executing line\r\n    Black: Script execution failed on this line";
+    QString strMessage = "AuTerm Scripting: This is a simple scripting language for sending/receiving data and waiting for specific periods of time. Each line must begin directly with a valid command and the parameter for that command. Commands are:\r\n    >  Send data out\r\n    <  Wait to receive data\r\n    ~  Wait for a period (in ms)\r\n    // A null-operation comment (used for describing the code)\r\n\r\nValid commands will be highlighed in red and comments in green. Use the check button (yellow warning icon) to check for syntax errors in a script before running it.\r\n\r\nTo the left side of the editor are individual line colours which will change to indicate the following:\r\n    Red:   Syntax error with line (compile failed)\r\n    Green: Currently executing line\r\n    Black: Script execution failed on this line";
     mFormAuto->SetMessage(&strMessage);
     mFormAuto->show();
 }
@@ -706,12 +706,12 @@ UwxScripting::on_btn_Help_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxScripting::SetUwTerminalXVersion(
+UwxScripting::SetAuTermVersion(
     const QString strVersion
     )
 {
     //Update version string
-    mstrUwTerminalXVersion = strVersion;
+    mstrAuTermVersion = strVersion;
 }
 
 //=============================================================================
