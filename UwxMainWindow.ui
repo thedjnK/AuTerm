@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
+    <width>727</width>
     <height>470</height>
    </rect>
   </property>
@@ -83,7 +83,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>1</number>
         </property>
         <property name="elideMode">
          <enum>Qt::ElideNone</enum>
@@ -145,34 +145,6 @@
               </item>
               <item>
                <widget class="Line" name="line">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_16">
-                <property name="text">
-                 <string>Download Tx Left:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="Line" name="line_2">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_TermTxLeft">
-                <property name="text">
-                 <string>0</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="Line" name="line_4">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
                 </property>
@@ -855,6 +827,217 @@
             <property name="spacing">
              <number>3</number>
             </property>
+            <item row="1" column="1" colspan="2">
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>170</width>
+                <height>160</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>500</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>Terminal</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <property name="spacing">
+                <number>1</number>
+               </property>
+               <property name="leftMargin">
+                <number>2</number>
+               </property>
+               <property name="topMargin">
+                <number>2</number>
+               </property>
+               <property name="rightMargin">
+                <number>2</number>
+               </property>
+               <property name="bottomMargin">
+                <number>2</number>
+               </property>
+               <item>
+                <layout class="QFormLayout" name="formLayout">
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetDefaultConstraint</enum>
+                 </property>
+                 <property name="fieldGrowthPolicy">
+                  <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                 </property>
+                 <property name="labelAlignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                 <property name="horizontalSpacing">
+                  <number>2</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>2</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="3" column="0">
+                  <widget class="QRadioButton" name="radio_LCRLF">
+                   <property name="text">
+                    <string>\r\n</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QRadioButton" name="radio_LLF">
+                   <property name="text">
+                    <string>\n</string>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QRadioButton" name="radio_LCR">
+                   <property name="text">
+                    <string>\r</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QGridLayout" name="gridLayout_16">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                </layout>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="check_ShowCLRF">
+                 <property name="toolTip">
+                  <string>Enable this to escape various characters (CR will show as \r, LF will show as \n and Tab will show as \t).</string>
+                 </property>
+                 <property name="text">
+                  <string>Escape CR/LF/Tab</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="check_LineSeparator">
+                 <property name="toolTip">
+                  <string>When enabled, pressing shit+enter in the terminal will create a line separator allowing for multiple lines to be sent when enter is pressed. If disabled then shift+enter will behave the same as pressing enter and send the line.</string>
+                 </property>
+                 <property name="text">
+                  <string>Shift+enter line seperator</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="check_EnableSSL">
+                 <property name="toolTip">
+                  <string>Enable this to use HTTPS (SSL) when communicating with AuTerm server (when updating or compiling applications), otherwise uses plaintext HTTP.</string>
+                 </property>
+                 <property name="text">
+                  <string>Enable SSL</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="check_EnableTerminalSizeSaving">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable this to save and restore terminal window size on opening/closing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Save terminal size</string>
+                 </property>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QGridLayout" name="gridLayout_17">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="edit_Title">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>20</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="inputMethodHints">
+                    <set>Qt::ImhDigitsOnly</set>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="maxLength">
+                    <number>32</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_45">
+                   <property name="text">
+                    <string>Title:</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
             <item row="1" column="0">
              <widget class="QGroupBox" name="groupBox_6">
               <property name="sizePolicy">
@@ -1277,7 +1460,7 @@
                </sizepolicy>
               </property>
               <property name="title">
-               <string>Misc</string>
+               <string/>
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -1296,584 +1479,14 @@
                 <number>2</number>
                </property>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_7">
-                 <property name="spacing">
-                  <number>4</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>2</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>2</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>2</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>2</number>
-                 </property>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_5">
-                   <property name="spacing">
-                    <number>2</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>2</number>
-                   </property>
-                   <item>
-                    <widget class="QCheckBox" name="check_PreXCompRun">
-                     <property name="font">
-                      <font>
-                       <family>Arial</family>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Run program  </string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QRadioButton" name="radio_XCompPre">
-                     <property name="font">
-                      <font>
-                       <family>Arial</family>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Before</string>
-                     </property>
-                     <attribute name="buttonGroup">
-                      <string notr="true">buttonGroup</string>
-                     </attribute>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QRadioButton" name="radio_XCompPost">
-                     <property name="font">
-                      <font>
-                       <family>Arial</family>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>After</string>
-                     </property>
-                     <attribute name="buttonGroup">
-                      <string notr="true">buttonGroup</string>
-                     </attribute>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_PreXCompText">
-                     <property name="font">
-                      <font>
-                       <family>Arial</family>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>XCompile</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_3">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_PreXCompInfo">
-                   <property name="font">
-                    <font>
-                     <family>Arial</family>
-                     <pointsize>8</pointsize>
-                    </font>
-                   </property>
-                   <property name="midLineWidth">
-                    <number>50</number>
-                   </property>
-                   <property name="text">
-                    <string>This allows you to run a program/batch/bash file before/after a smartBASIC file is XCompiled/downloaded. %1 will be replaced with the sb/uwc file when the execution takes place.</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="wordWrap">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="check_PreXCompFail">
-                   <property name="text">
-                    <string>Run program even if XCompile fails</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout">
-                   <property name="spacing">
-                    <number>3</number>
-                   </property>
-                   <item>
-                    <widget class="QLineEdit" name="edit_PreXCompFilename">
-                     <property name="inputMask">
-                      <string/>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="placeholderText">
-                      <string>Pre/Post-XCompile Execution</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="btn_PreXCompSelect">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>26</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>...</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QVBoxLayout" name="verticalLayout_10">
-                   <property name="spacing">
-                    <number>2</number>
-                   </property>
-                   <property name="leftMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>1</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>1</number>
-                   </property>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_14">
-                     <property name="spacing">
-                      <number>2</number>
-                     </property>
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>0</number>
-                     </property>
-                     <item>
-                      <widget class="QPushButton" name="btn_Local_XCompilers">
-                       <property name="text">
-                        <string>Local XCompilers</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QCheckBox" name="check_OnlineXComp">
-                       <property name="text">
-                        <string>Online XCompile</string>
-                       </property>
-                       <property name="checked">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="btn_OnlineXComp_Supported">
-                       <property name="text">
-                        <string>Cloud XCompilers</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_OnlineXCompInfo">
-                     <property name="font">
-                      <font>
-                       <family>Arial</family>
-                       <pointsize>8</pointsize>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>XCompile Info Message</string>
-                     </property>
-                     <property name="scaledContents">
-                      <bool>false</bool>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                     </property>
-                     <property name="wordWrap">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <spacer name="verticalSpacer_5">
+                <spacer name="horizontalSpacer_12">
                  <property name="orientation">
-                  <enum>Qt::Vertical</enum>
+                  <enum>Qt::Horizontal</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>20</width>
-                   <height>10</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="1" column="1" colspan="2">
-             <widget class="QGroupBox" name="groupBox_2">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>170</width>
-                <height>160</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>500</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="title">
-               <string>Terminal</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_2">
-               <property name="spacing">
-                <number>1</number>
-               </property>
-               <property name="leftMargin">
-                <number>2</number>
-               </property>
-               <property name="topMargin">
-                <number>2</number>
-               </property>
-               <property name="rightMargin">
-                <number>2</number>
-               </property>
-               <property name="bottomMargin">
-                <number>2</number>
-               </property>
-               <item>
-                <layout class="QFormLayout" name="formLayout">
-                 <property name="sizeConstraint">
-                  <enum>QLayout::SetDefaultConstraint</enum>
-                 </property>
-                 <property name="fieldGrowthPolicy">
-                  <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                 </property>
-                 <property name="labelAlignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="horizontalSpacing">
-                  <number>2</number>
-                 </property>
-                 <property name="verticalSpacing">
-                  <number>2</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>2</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item row="0" column="0">
-                  <widget class="QRadioButton" name="radio_LCR">
-                   <property name="text">
-                    <string>CR</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QRadioButton" name="radio_LLF">
-                   <property name="text">
-                    <string>LF</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QRadioButton" name="radio_LCRLF">
-                   <property name="text">
-                    <string>CR LF</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QRadioButton" name="radio_LLFCR">
-                   <property name="text">
-                    <string>LF CR</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QGridLayout" name="gridLayout_16">
-                 <property name="spacing">
-                  <number>2</number>
-                 </property>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="edit_FWRH">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>20</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>40</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="inputMethodHints">
-                    <set>Qt::ImhDigitsOnly</set>
-                   </property>
-                   <property name="text">
-                    <string>50</string>
-                   </property>
-                   <property name="maxLength">
-                    <number>3</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_15">
-                   <property name="text">
-                    <string>AT+FWRH Line Size:</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_ConfirmClear">
-                 <property name="toolTip">
-                  <string>Enable this in order to confirm clearing the filesystem or resetting the module configuration to factory settings.</string>
-                 </property>
-                 <property name="text">
-                  <string>Confirm module clearing</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_SkipDL">
-                 <property name="toolTip">
-                  <string>Enable this to skip displaying the commands sent/received to the module when downloading a file to it.</string>
-                 </property>
-                 <property name="text">
-                  <string>Skip download display</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_ShowFileSize">
-                 <property name="toolTip">
-                  <string>Enable this to see the filesize of compiled applications.</string>
-                 </property>
-                 <property name="text">
-                  <string>Show application filesize</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_CheckLicense">
-                 <property name="text">
-                  <string>Check license on download</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_ShowCLRF">
-                 <property name="toolTip">
-                  <string>Enable this to escape various characters (CR will show as \r, LF will show as \n and Tab will show as \t).</string>
-                 </property>
-                 <property name="text">
-                  <string>Escape CR/LF/Tab</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_LineSeparator">
-                 <property name="toolTip">
-                  <string>When enabled, pressing shit+enter in the terminal will create a line separator allowing for multiple lines to be sent when enter is pressed. If disabled then shift+enter will behave the same as pressing enter and send the line.</string>
-                 </property>
-                 <property name="text">
-                  <string>Shift+enter line seperator</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_EnableSSL">
-                 <property name="toolTip">
-                  <string>Enable this to use HTTPS (SSL) when communicating with UwTerminalX server (when updating or compiling applications), otherwise uses plaintext HTTP.</string>
-                 </property>
-                 <property name="text">
-                  <string>Enable SSL</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_EnableWeeklyUpdateCheck">
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable this to check for updates to UwTerminalX and the error code file every week.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Weekly update check</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_EnableModuleFirmwareCheck">
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable this to check if the firmware version you are XCompiling for is the latest version or not (only supported with online XCompilations).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Latest firmware checking</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_EnableTerminalSizeSaving">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable this to save and restore terminal window size on opening/closing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Save terminal size</string>
-                 </property>
-                 <property name="checked">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QGridLayout" name="gridLayout_17">
-                 <property name="spacing">
-                  <number>2</number>
-                 </property>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="edit_Title">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>20</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="inputMethodHints">
-                    <set>Qt::ImhDigitsOnly</set>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="maxLength">
-                    <number>32</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_45">
-                   <property name="text">
-                    <string>Title:</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <spacer name="verticalSpacer_4">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>10</height>
+                   <width>40</width>
+                   <height>20</height>
                   </size>
                  </property>
                 </spacer>
@@ -2046,13 +1659,6 @@
              <widget class="QPushButton" name="btn_Error">
               <property name="text">
                <string>&amp;Error Code Viewer</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_ExitAutorun">
-              <property name="text">
-               <string>BL654 USB Dongle - Exit autorun</string>
               </property>
              </widget>
             </item>
@@ -3321,7 +2927,7 @@
                    <property name="text">
                     <string>When an error is encountered in an application and printed to the UART, if the error code is highlighted then you can right click and select the 'Lookup Error Code' option, which will display a description of the error code.
 
-As more error codes get added, newer releases of the error code lookup file will be made available which can be updated from within UwTerminalX using the buttons below.</string>
+As more error codes get added, newer releases of the error code lookup file will be made available which can be updated from within AuTerm using the buttons below.</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -3388,7 +2994,7 @@ As more error codes get added, newer releases of the error code lookup file will
                </size>
               </property>
               <property name="title">
-               <string>UwTerminalX</string>
+               <string>AuTerm</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_11">
                <property name="spacing">
@@ -3412,7 +3018,7 @@ As more error codes get added, newer releases of the error code lookup file will
                   <number>4</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_UwTerminalXText">
+                  <widget class="QLabel" name="label_AuTermText">
                    <property name="font">
                     <font>
                      <family>Arial</family>
@@ -3420,9 +3026,9 @@ As more error codes get added, newer releases of the error code lookup file will
                     </font>
                    </property>
                    <property name="text">
-                    <string>UwTerminalX is an open source application developed by Laird Connectivity, the source code is available for download/modification from the Github project page linked below.
+                    <string>AuTerm is an open source application developed by Laird Connectivity, the source code is available for download/modification from the Github project page linked below.
 
-You can also use the button below to check if there is a newer version of UwTerminalX available.</string>
+You can also use the button below to check if there is a newer version of AuTerm available.</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -3433,7 +3039,7 @@ You can also use the button below to check if there is a newer version of UwTerm
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="btn_UwTerminalXUpdate">
+                  <widget class="QPushButton" name="btn_AuTermUpdate">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -3450,7 +3056,7 @@ You can also use the button below to check if there is a newer version of UwTerm
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLabel" name="label_UwTerminalXUpdate">
+                  <widget class="QLabel" name="label_AuTermUpdate">
                    <property name="text">
                     <string>[Status]</string>
                    </property>
@@ -3471,302 +3077,6 @@ You can also use the button below to check if there is a newer version of UwTerm
                     </size>
                    </property>
                   </spacer>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox_4">
-              <property name="minimumSize">
-               <size>
-                <width>220</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="title">
-               <string>Applications &amp;&amp; Firmware</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_12">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="leftMargin">
-                <number>2</number>
-               </property>
-               <property name="topMargin">
-                <number>2</number>
-               </property>
-               <property name="rightMargin">
-                <number>2</number>
-               </property>
-               <property name="bottomMargin">
-                <number>2</number>
-               </property>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_13">
-                 <property name="spacing">
-                  <number>4</number>
-                 </property>
-                 <item>
-                  <widget class="QLabel" name="label_AppFirmwareText1">
-                   <property name="font">
-                    <font>
-                     <family>Arial</family>
-                     <pointsize>8</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Laird Connectivity provides sample applications for its Bluetooth modules, all of which is freely available on Github which can be opened below. Additional information can also be found on the Laird Connectivity modules website.</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="wordWrap">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_15">
-                   <property name="spacing">
-                    <number>2</number>
-                   </property>
-                   <property name="sizeConstraint">
-                    <enum>QLayout::SetDefaultConstraint</enum>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="QComboBox" name="combo_WebSelection">
-                     <item>
-                      <property name="text">
-                       <string>BL654</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>BL653</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>BL652</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>Pinnacle 100 OOB Demo</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>Bluegrass demo site</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>RM186/RM191</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>BT900</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>BL600</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>BL620</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>Wireless Modules</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>UwFlashX</string>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="btn_WebBrowse">
-                     <property name="minimumSize">
-                      <size>
-                       <width>64</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Browse</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_AppFirmwareText2">
-                   <property name="font">
-                    <font>
-                     <family>Arial</family>
-                     <pointsize>8</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>The current firmware version of Laird Connectivity modules can be retrieved below. UwFlashX is a new cross-platform firmware upgrade utility for Laird Connectivity modules, information can be found by selecting 'UwFlashX' above.</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="wordWrap">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QGroupBox" name="groupBox_7">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="title">
-                    <string>Latest Firmware</string>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_3">
-                    <property name="spacing">
-                     <number>1</number>
-                    </property>
-                    <property name="leftMargin">
-                     <number>1</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>1</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>1</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>1</number>
-                    </property>
-                    <item>
-                     <widget class="QScrollArea" name="scrollArea">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="frameShape">
-                       <enum>QFrame::NoFrame</enum>
-                      </property>
-                      <property name="frameShadow">
-                       <enum>QFrame::Raised</enum>
-                      </property>
-                      <property name="widgetResizable">
-                       <bool>true</bool>
-                      </property>
-                      <widget class="QWidget" name="scrollAreaWidgetContents">
-                       <property name="geometry">
-                        <rect>
-                         <x>0</x>
-                         <y>0</y>
-                         <width>204</width>
-                         <height>92</height>
-                        </rect>
-                       </property>
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <layout class="QVBoxLayout" name="verticalLayout_17">
-                        <property name="spacing">
-                         <number>2</number>
-                        </property>
-                        <property name="leftMargin">
-                         <number>2</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>2</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>2</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>2</number>
-                        </property>
-                        <item>
-                         <widget class="QLabel" name="label_Firmware">
-                          <property name="font">
-                           <font>
-                            <family>Arial</family>
-                           </font>
-                          </property>
-                          <property name="text">
-                           <string>Click the button below to
-check for the latest firmware</string>
-                          </property>
-                          <property name="alignment">
-                           <set>Qt::AlignCenter</set>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="btn_ModuleFirmware">
-                      <property name="text">
-                       <string>Check latest firmware</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer_3">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>5</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
-                  </widget>
                  </item>
                 </layout>
                </item>
@@ -3821,34 +3131,21 @@ check for the latest firmware</string>
             <property name="spacing">
              <number>3</number>
             </property>
-            <item row="0" column="2">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="btn_Licenses">
+              <property name="text">
+               <string>Li&amp;censes</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
              <widget class="QPushButton" name="btn_Help">
               <property name="text">
                <string>&amp;Help</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="btn_Decline">
-              <property name="text">
-               <string>&amp;Decline</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QPushButton" name="btn_Accept">
-              <property name="text">
-               <string>&amp;Accept</string>
-              </property>
-              <property name="autoDefault">
-               <bool>true</bool>
-              </property>
-              <property name="default">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4">
+            <item row="0" column="2">
              <spacer name="horizontalSpacer">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -3860,13 +3157,6 @@ check for the latest firmware</string>
                </size>
               </property>
              </spacer>
-            </item>
-            <item row="0" column="3">
-             <widget class="QPushButton" name="btn_Licenses">
-              <property name="text">
-               <string>Li&amp;censes</string>
-              </property>
-             </widget>
             </item>
            </layout>
           </item>
@@ -3893,9 +3183,7 @@ check for the latest firmware</string>
                <bool>true</bool>
               </property>
               <property name="plainText">
-               <string>This application is provided by Laird Connectivity without warranty. You are welcome to check our website for the latest version. This version is UTF-8 compliant.
-
-This message is displayed EITHER because &quot;accept&quot; is not specified in the command line OR at least one command line option has been specified with an invalid parameter.
+               <string>This application is provided without warranty. You are welcome to check our website for the latest version. This version is UTF-8 compliant.
 
 You can launch this application and bypass this window by creating a shortcut link and passing ACCEPT as a command line option. Other command line options are:-
 
@@ -3972,7 +3260,8 @@ For example: \00 can be used to represent a null character and \4C can be used t
 
 
 Copyright © Laird Connectivity 2015-2022
-For updates and source code licensed under GPLv3, check https://github.com/LairdCP/UwTerminalX or the 'Update' tab.
+Copyright © Others 2023
+For updates and source code licensed under GPLv3, check https://github.com/todo or the 'Update' tab.
 Plus and Minus images obtained from http://www.clker.com
 
 
@@ -4330,7 +3619,7 @@ You should have received a copy of the GNU General Public License along with thi
               </item>
               <item>
                <property name="text">
-                <string>UwTerminalX.ini</string>
+                <string>AuTerm.ini</string>
                </property>
               </item>
               <item>
@@ -4454,8 +3743,6 @@ You should have received a copy of the GNU General Public License along with thi
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>btn_Accept</tabstop>
-  <tabstop>btn_Decline</tabstop>
   <tabstop>btn_Help</tabstop>
   <tabstop>btn_Licenses</tabstop>
   <tabstop>text_Terms</tabstop>
@@ -4470,14 +3757,7 @@ You should have received a copy of the GNU General Public License along with thi
   <tabstop>combo_Stop</tabstop>
   <tabstop>combo_Data</tabstop>
   <tabstop>combo_Handshake</tabstop>
-  <tabstop>check_SkipDL</tabstop>
   <tabstop>check_ShowCLRF</tabstop>
-  <tabstop>check_PreXCompRun</tabstop>
-  <tabstop>radio_XCompPre</tabstop>
-  <tabstop>radio_XCompPost</tabstop>
-  <tabstop>check_PreXCompFail</tabstop>
-  <tabstop>edit_PreXCompFilename</tabstop>
-  <tabstop>btn_PreXCompSelect</tabstop>
   <tabstop>edit_LogFile</tabstop>
   <tabstop>btn_LogFileSelect</tabstop>
   <tabstop>check_LogEnable</tabstop>
@@ -4493,17 +3773,12 @@ You should have received a copy of the GNU General Public License along with thi
   <tabstop>text_TermEditData</tabstop>
   <tabstop>btn_ErrorCodeUpdate</tabstop>
   <tabstop>btn_ErrorCodeDownload</tabstop>
-  <tabstop>btn_UwTerminalXUpdate</tabstop>
+  <tabstop>btn_AuTermUpdate</tabstop>
   <tabstop>btn_GitHub</tabstop>
-  <tabstop>scrollArea</tabstop>
-  <tabstop>btn_ModuleFirmware</tabstop>
   <tabstop>combo_LogDirectory</tabstop>
   <tabstop>btn_LogRefresh</tabstop>
   <tabstop>text_LogData</tabstop>
  </tabstops>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
- </buttongroups>
 </ui>
