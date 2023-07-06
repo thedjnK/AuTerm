@@ -1,8 +1,0 @@
-As on version 1.05t the following are known issues in UwTerminalX:
-
-> Automation window flashes when always on top option is changed: This is due to having to redraw the window with the new option.
-> Automation window flashes when always on top option is selected and a file dialogue is opened or closed: This is due to having to temporally disable the window being always on top to ensure that the file dialogue is not hidden behind it, and when the option is changed the window needs to be redrawn. Disabling always on top will prevent the window from being redrawn.
-> (Linux Only) Running UwTerminalX as root without X11 authority causes endless QSystemTrayIcon no icon set loop messages: This is a caveat of using Qt. You can prevent his issue by running UwTerminalX as your normal user and granting access to the serial/USB ports using chmod as root or creating a UDEV rule.
-> (Linux Only) Enabling break with hardware flow control enabled and outgoing data waiting in buffer (red RTS) causes a lock up: This is a Linux kernel bug and has been reported, there is currently no workaround for this issue and it requires the computer to be restarted or removing the USB device and plugging it back in again.
-> (Linux Only) The default terminal font might not be a monospace font. You can change the font by right clicking and selecting font, then selecting a font such as monospace. This bug has been reported to Qt.
-> (Mac Only) Using the FTDI driver and closing the UART whilst there is still data being sent or received is likely to crash your system. This bug has been reported to FTDI but they have no current plans to fix it due to limited resources. It is advised to remove the FTDI driver and revert to the apple VCP driver which does not have this problem.
