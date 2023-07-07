@@ -1,5 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -236,6 +237,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gbaDisplayBuffer.clear();
     gbaDisplayBuffer.reserve(131072);
 
+    //Also reserve 64KB of RAM to reduce mallocs when speed testing
+    gbaSpeedReceivedData.reserve(65536);
+
     //Load settings from configuration files
     LoadSettings();
 
@@ -315,7 +319,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->text_TermEditData, SIGNAL(FileDropped(QString)), this, SLOT(DroppedFile(QString)));
 
     //Initialise popup message
-    gpmErrorForm = new PopupMessage;
+    gpmErrorForm = new PopupMessage();
 
     //Populate the list of devices
     RefreshSerialDevices();
@@ -388,11 +392,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Disable unimplemented actions
 #ifdef SKIPAUTOMATIONFORM
     //Disable automation option
-    gpMenu->actions()[11]->setEnabled(false);
+    gpMenu->actions().at(MenuActionAutomation)->setEnabled(false);
 #endif
 #ifdef SKIPSCRIPTINGFORM
     //Disable scripting option
-    gpMenu->actions()[12]->setEnabled(false);
+    gpMenu->actions().at(MenuActionScripting)->setEnabled(false);
 #endif
 
 #if defined(TARGET_OS_MAC) || (defined(SKIPUSBRECOVERY) && SKIPUSBRECOVERY == 1)
@@ -652,18 +656,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         else if (slArgs[chi].left(4).toUpper() == "PAR=")
         {
             //Set parity
-            if (slArgs[chi].right(1).toInt() >= 0 && slArgs[chi].right(1).toInt() < 3)
+            if (slArgs[chi].rightRef(1).toInt() >= 0 && slArgs[chi].rightRef(1).toInt() < 3)
             {
-                ui->combo_Parity->setCurrentIndex(slArgs[chi].right(1).toInt());
+                ui->combo_Parity->setCurrentIndex(slArgs[chi].rightRef(1).toInt());
             }
         }
         else if (slArgs[chi].left(5).toUpper() == "FLOW=")
         {
             //Set flow control
-            if (slArgs[chi].right(1).toInt() >= 0 && slArgs[chi].right(1).toInt() < 3)
+            if (slArgs[chi].rightRef(1).toInt() >= 0 && slArgs[chi].rightRef(1).toInt() < 3)
             {
                 //Valid
-                ui->combo_Handshake->setCurrentIndex(slArgs[chi].right(1).toInt());
+                ui->combo_Handshake->setCurrentIndex(slArgs[chi].rightRef(1).toInt());
             }
         }
         else if (slArgs[chi].left(7).toUpper() == "ENDCHR=")
@@ -1100,15 +1104,6 @@ MainWindow::closeEvent(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_selector_Tab_currentChanged(
-    int intIndex
-    )
-{
-}
-
-//=============================================================================
-//=============================================================================
-void
 MainWindow::on_btn_Connect_clicked(
     )
 {
@@ -1372,7 +1367,11 @@ MainWindow::SerialRead(
     )
 {
     //Update the last received field
-    ui->label_LastRx->setText(QDateTime::currentDateTime().toString("dd/MM @ hh:mm:ss"));
+    if ((gtmrPortOpened.elapsed() / 1000) > gintLastSerialTimeUpdate)
+    {
+        ui->label_LastRx->setText(QDateTime::currentDateTime().toString("dd/MM @ hh:mm:ss"));
+        gintLastSerialTimeUpdate = (gtmrPortOpened.elapsed() / 1000);
+    }
 
     //Read the data into a buffer and copy it to edit for the display data
 #if SKIPSPEEDTEST != 1
@@ -1436,46 +1435,8 @@ MainWindow::SerialRead(
         gintRXBytes = gintRXBytes + baOrigData.length();
         ui->label_TermRx->setText(QString::number(gintRXBytes));
 
-        if (gbAutoBaud == true)
-        {
-            //Append data to batch receive buffer to save memory instead of having another buffer
-            gbaBatchReceive += baOrigData;
-            if (gbaBatchReceive.indexOf("\n00\r") != -1 || (gbaBatchReceive.indexOf("\n10\t0\t") != -1 && gbaBatchReceive.indexOf("\r", gbaBatchReceive.indexOf("\n10\t0\t")) != -1))
-            {
-                //Baud rate found
-                gbAutoBaud = false;
-                gtmrBaudTimer.stop();
-                gbTermBusy = false;
-                gchTermMode = 0;
-                ui->btn_Cancel->setEnabled(false);
-
-                //Show success message to user
-                QRegularExpression reTempRE("10\t0\t([a-zA-Z0-9\\-_]{3,20})\r");
-                QRegularExpressionMatch remTempREM = reTempRE.match(gbaBatchReceive);
-                QString strMessage = tr("Successfully detected ").append((remTempREM.hasMatch() == true ? QString(remTempREM.captured(1)).append(" ") : "")).append("module on port ").append(ui->combo_COM->currentText()).append(" at baud rate ").append(ui->combo_Baud->currentText()).append(".\r\n\r\nThe port has been left open for you to communicate with the module.\r\n\r\n(Please note that it is possible to change the default module baud rate with newer firmware versions using AT+CFG 520 <baud>. Please check the smartBASIC extension manual for your module to see if this is supported and how to configure it)");
-                gpmErrorForm->show();
-                gpmErrorForm->SetMessage(&strMessage);
-
-                //Clear buffer
-                gbaBatchReceive.clear();
-            }
-        }
-
         //Send next chunk of batch data if enabled
         StreamBatchContinue(&baOrigData);
-
-#if 0
-        if (gbTermBusy == true && gchTermMode2 == 0)
-        {
-            //Currently waiting for a response
-            gstrTermBusyData = gstrTermBusyData.append(baOrigData);
-            gchTermBusyLines = gchTermBusyLines + baOrigData.count("\n");
-                        gtmrDownloadTimeoutTimer.stop();
-        else if (gbTermBusy == true && gchTermMode2 > 0 && gchTermMode2 < 20)
-        {
-            gstrTermBusyData = gstrTermBusyData.append(baOrigData);
-        }
-#endif
 #if SKIPSPEEDTEST != 1
     }
 #endif
@@ -1632,7 +1593,7 @@ MainWindow::MenuSelected(
             {
                 //Set last directory config
                 gstrLastFilename[FilenameIndexOthers] = strFilename;
-                gpTermSettings->setValue("LastOtherFileDirectory", SplitFilePath(strFilename)[0]);
+                gpTermSettings->setValue("LastOtherFileDirectory", SplitFilePath(strFilename).at(0));
 
                 //File was selected - start streaming it out
                 gpStreamFileHandle = new QFile(strFilename);
@@ -1849,7 +1810,7 @@ MainWindow::MenuSelected(
             {
                 //Set last directory config
                 gstrLastFilename[FilenameIndexOthers] = strFilename;
-                gpTermSettings->setValue("LastOtherFileDirectory", SplitFilePath(strFilename)[0]);
+                gpTermSettings->setValue("LastOtherFileDirectory", SplitFilePath(strFilename).at(0));
 
                 //File selected
                 gpStreamFileHandle = new QFile(strFilename);
@@ -2104,7 +2065,12 @@ MainWindow::KeyPressed(
         else if (gbLoopbackMode == true)
         {
             //Loopback is enabled
-            gbaDisplayBuffer.append("[Cannot send: Loopback mode is enabled.]");
+            gbaDisplayBuffer.append("[Cannot send: Loopback mode is enabled.]\n");
+
+            if (!gtmrTextUpdateTimer.isActive())
+            {
+                gtmrTextUpdateTimer.start();
+            }
         }
     }
 }
@@ -2246,7 +2212,7 @@ MainWindow::OpenDevice(
         }
 
         //Close serial port
-        while (gspSerialPort.isOpen() == true)
+        if (gspSerialPort.isOpen() == true)
         {
             gspSerialPort.clear();
             gspSerialPort.close();
@@ -2272,6 +2238,8 @@ MainWindow::OpenDevice(
         {
             gpMainLog->CloseLogFile();
         }
+
+        gtmrPortOpened.invalidate();
     }
 
     if (ui->combo_COM->currentText().length() > 0)
@@ -2427,6 +2395,9 @@ MainWindow::OpenDevice(
                 gusScriptingForm->SerialPortStatus(true);
             }
 #endif
+
+            gtmrPortOpened.start();
+            gintLastSerialTimeUpdate = 0;
         }
         else
         {
@@ -2943,14 +2914,6 @@ MainWindow::on_btn_Cancel_clicked(
             //Cancel batch streaming
             FinishBatch(true);
         }
-#if 0
-        else if (gchTermMode == MODE_CHECK_ERROR_CODE_VERSIONS || gchTermMode == MODE_CHECK_AuTerm_VERSIONS || gchTermMode == MODE_CHECK_FIRMWARE_VERSIONS || gchTermMode == MODE_CHECK_FIRMWARE_SUPPORT)
-        {
-            //Cancel network request
-            gnmrReply->abort();
-            return;
-        }
-#endif
     }
 
     //Disable button
@@ -3621,6 +3584,7 @@ void
 MainWindow::on_btn_Help_clicked(
     )
 {
+#if 0
     //Opens the help PDF file
 #ifdef __APPLE__
     if (QFile::exists(QString(gstrMacBundlePath).append("Help.pdf")))
@@ -3648,6 +3612,11 @@ MainWindow::on_btn_Help_clicked(
         }
 #endif
     }
+#endif
+
+    QString strMessage = "You are welcome to check our website for the latest version.\r\n\r\nCommand line options are:-\r\n\r\nCOM=n\r\n    Windows: COM[1..255] specifies a comport number\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\nr\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=CR, 1=LF, 2=CRLF, 3=LFCR]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \t,\r,\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form (ACCEPT must be provided before this argument)\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form (ACCEPT must be provided before this argument)\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \00 can be used to represent a null character and \4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/";
+    gpmErrorForm->SetMessage(&strMessage);
+    gpmErrorForm->show();
 }
 
 //=============================================================================
@@ -4552,8 +4521,16 @@ MainWindow::SpeedMenuSelected(
     //Speed test menu item selected
     qint8 chItem = qaAction->data().toInt();
 
-    if (gspSerialPort.isOpen() == true && gbLoopbackMode == false && gbTermBusy == false)
+    if (gspSerialPort.isOpen() == true && gbTermBusy == false)
     {
+        if (gbLoopbackMode == true)
+        {
+            QString strMessage = tr("Error: Cannot initiate speed testing as loopback mode is enabled.");
+            gpmErrorForm->show();
+            gpmErrorForm->SetMessage(&strMessage);
+            return;
+        }
+
         //Check size of string if sending data
         if (ui->combo_SpeedDataType->currentIndex() != 0 && !(ui->edit_SpeedTestData->text().length() > 3))
         {
@@ -4563,9 +4540,6 @@ MainWindow::SpeedMenuSelected(
             gpmErrorForm->SetMessage(&strMessage);
             return;
         }
-
-        //Disable loopback mode if active
-        SetLoopBackMode(false);
 
         //Enable testing
         gintSpeedTestDataBits = gspSerialPort.dataBits();
@@ -4763,6 +4737,7 @@ MainWindow::on_combo_SpeedDataType_currentIndexChanged(
     )
 {
     //Speed test type changed
+    uint8_t i = 0;
     if (ui->combo_SpeedDataType->currentIndex() == 0)
     {
         //Throughput only
@@ -4777,13 +4752,12 @@ MainWindow::on_combo_SpeedDataType_currentIndexChanged(
         ui->edit_SpeedPacketsBad->setEnabled(false);
         ui->edit_SpeedPacketsErrorRate->setEnabled(false);
 
-
         //Disable sending modes
-        gpSpeedMenu->actions()[1]->setEnabled(false);
-        gpSpeedMenu->actions()[2]->setEnabled(false);
-        gpSpeedMenu->actions()[3]->setEnabled(false);
-        gpSpeedMenu->actions()[4]->setEnabled(false);
-        gpSpeedMenu->actions()[5]->setEnabled(false);
+        while (i < gpSpeedMenu->actions().length())
+        {
+            gpSpeedMenu->actions().at(i)->setEnabled(false);
+            ++i;
+        }
     }
     else if (ui->combo_SpeedDataType->currentIndex() == 1)
     {
@@ -4800,11 +4774,11 @@ MainWindow::on_combo_SpeedDataType_currentIndexChanged(
         ui->edit_SpeedPacketsErrorRate->setEnabled(true);
 
         //Enable sending modes
-        gpSpeedMenu->actions()[1]->setEnabled(true);
-        gpSpeedMenu->actions()[2]->setEnabled(true);
-        gpSpeedMenu->actions()[3]->setEnabled(true);
-        gpSpeedMenu->actions()[4]->setEnabled(true);
-        gpSpeedMenu->actions()[5]->setEnabled(true);
+        while (i < gpSpeedMenu->actions().length())
+        {
+            gpSpeedMenu->actions().at(i)->setEnabled(true);
+            ++i;
+        }
     }
 }
 
@@ -5062,13 +5036,12 @@ MainWindow::SpeedTestReceive(
     )
 {
     //Receieved data from serial port in speed test mode
-    QByteArray baOrigData = gspSerialPort.readAll();
-
     if ((gchSpeedTestMode & SpeedModeRecv) == SpeedModeRecv)
     {
         //Check data as in receieve mode
-        gintSpeedBytesReceived += baOrigData.size();
-        gintSpeedBytesReceived10s += baOrigData.size();
+        uint64_t received_bytes = gspSerialPort.bytesAvailable();
+        gintSpeedBytesReceived += received_bytes;
+        gintSpeedBytesReceived10s += received_bytes;
 
         if (ui->check_SpeedSyncReceive->isChecked() && gbSpeedTestReceived == false)
         {
@@ -5080,7 +5053,7 @@ MainWindow::SpeedTestReceive(
         if (ui->check_SpeedShowRX->isChecked() == true)
         {
             //Append RX data to buffer
-            gbaSpeedDisplayBuffer.append(baOrigData);
+            gbaSpeedDisplayBuffer.append(gspSerialPort.peek(received_bytes));
             if (!gtmrSpeedUpdateTimer.isActive())
             {
                 gtmrSpeedUpdateTimer.start();
@@ -5090,21 +5063,103 @@ MainWindow::SpeedTestReceive(
         if (ui->combo_SpeedDataType->currentIndex() != 0)
         {
             //Test data is OK
-            gbaSpeedReceivedData.append(baOrigData);
-            while (gbaSpeedReceivedData.length() > 0)
+            uint32_t remove_size = 0;
+            gbaSpeedReceivedData.append(gspSerialPort.read(received_bytes));
+
+                while (remove_size < gbaSpeedReceivedData.length())
             {
                 //Data to check
                 int SizeToTest = gintSpeedTestMatchDataLength - gintSpeedTestReceiveIndex;
-                if (SizeToTest > gbaSpeedReceivedData.length())
+                if ((SizeToTest + remove_size) > gbaSpeedReceivedData.length())
                 {
-                    SizeToTest = gbaSpeedReceivedData.length();
+                    SizeToTest = gbaSpeedReceivedData.length() - remove_size;
                 }
 
-                if (gbaSpeedReceivedData.left(SizeToTest) == gbaSpeedMatchData.mid(gintSpeedTestReceiveIndex, SizeToTest))
+                //Optimised search check function, for testing only
+                uint32_t i = 0;
+                bool good = true;
+                pointer_buf rec_buf;
+                pointer_buf match_buf;
+                rec_buf.p8 = ((uint8_t *)gbaSpeedReceivedData.data() + remove_size);
+                match_buf.p8 = ((uint8_t *)gbaSpeedMatchData.data() + gintSpeedTestReceiveIndex);
+
+                while (i < SizeToTest)
+                {
+                    uint64_t loop_check_size = 8;
+                    switch (SizeToTest - i)
+                    {
+                    case 1:
+                        if (*rec_buf.p8 != *match_buf.p8)
+                        {
+                                good = false;
+                        }
+                        loop_check_size = 1;
+                        break;
+                    case 2:
+                        if (*rec_buf.p16 != *match_buf.p16)
+                        {
+                                good = false;
+                        }
+                        loop_check_size = 2;
+                        break;
+                    case 3:
+                        if (*rec_buf.p16 != *match_buf.p16 || *(rec_buf.p8+2) != *(match_buf.p8+2))
+                        {
+                                good = false;
+                        }
+                        loop_check_size = 3;
+                        break;
+                    case 4:
+                        if (*rec_buf.p32 != *match_buf.p32)
+                        {
+                                good = false;
+                        }
+                        loop_check_size = 4;
+                        break;
+                    case 5:
+                        if (*rec_buf.p32 != *match_buf.p32 || *(rec_buf.p8 + 4) != *(match_buf.p8 + 4))
+                        {
+                                good = false;
+                        }
+                        loop_check_size = 5;
+                        break;
+                    case 6:
+                        if (*rec_buf.p32 != *match_buf.p32 || *(rec_buf.p16 + 2) != *(match_buf.p16 + 2))
+                        {
+                                good = false;
+                        }
+                        loop_check_size = 6;
+                        break;
+                    case 7:
+                        if (*rec_buf.p32 != *match_buf.p32 || *(rec_buf.p16 + 2) != *(match_buf.p16 + 2) || *(rec_buf.p8 + 6) != *(match_buf.p8 + 6))
+                        {
+                                good = false;
+                        }
+                        loop_check_size = 7;
+                        break;
+                    default:
+                        if (*rec_buf.p64 != *match_buf.p64)
+                        {
+                                good = false;
+                        }
+                        break;
+                    }
+
+                    if (good == false)
+                    {
+                        break;
+                    }
+
+                    i += loop_check_size;
+                    rec_buf.p8 += loop_check_size;
+                    match_buf.p8 += loop_check_size;
+                }
+
+                if (good == true)
                 {
                     //Good
-                    gbaSpeedReceivedData.remove(0, SizeToTest);
-                    gintSpeedTestReceiveIndex = gintSpeedTestReceiveIndex + SizeToTest;
+                    remove_size += SizeToTest;
+                    gintSpeedTestReceiveIndex += SizeToTest;
                     if (gintSpeedTestReceiveIndex >= gintSpeedTestMatchDataLength)
                     {
                         ++gintSpeedTestStatSuccess;
@@ -5120,45 +5175,62 @@ MainWindow::SpeedTestReceive(
                     if (ui->check_SpeedShowErrors->isChecked())
                     {
                         //Show error - find mismatch position
-                        const QString strFirst(gbaSpeedMatchData);
-                        const QString strSecond(gbaSpeedReceivedData);
+                        uint16_t new_offset = (i > 5 ? i - 5 : 0);
+                        QString strFirst(gbaSpeedReceivedData.mid(remove_size + new_offset));
+                        QString strSecond(gbaSpeedMatchData.mid(gintSpeedTestReceiveIndex + new_offset));
+                        uint32_t max_size = strFirst.length() > strSecond.length() ? strSecond.length() : strFirst.length();
                         quint16 iOffset = 0;
-                        while (iOffset < SizeToTest)
+                        while (iOffset < max_size)
                         {
-                            if (strFirst.at(gintSpeedTestReceiveIndex+iOffset) != strSecond.at(iOffset))
-                            {
-                                //Found
+                                if (strFirst.at(iOffset) != strSecond.at(iOffset))
+                                {
+                                        //Found
+                                        ++iOffset;
+                                        break;
+                                }
                                 ++iOffset;
-                                break;
-                            }
-                            ++iOffset;
+                        }
+
+                        if (strFirst.length() > max_size)
+                        {
+                                strFirst.remove(max_size, strFirst.length() - max_size);
+                        }
+
+                        if (strSecond.length() > max_size)
+                        {
+                                strSecond.remove(max_size, strSecond.length() - max_size);
                         }
 
                         //Add to display
-                        gbaSpeedDisplayBuffer.append(QString("\r\nError: Data mismatch.\r\n\tExpected: ").append(gbaSpeedMatchData.mid(gintSpeedTestReceiveIndex, SizeToTest)).append("\r\n\tGot     : ").append(gbaSpeedReceivedData.left(SizeToTest)).append("\r\n\tPosition: ").append(QString("-").repeated(iOffset-1).append("^")).append("\r\n\tOccurred: ").append(ui->label_SpeedTime->text()).append(" (").append(QDateTime::currentDateTime().toLocalTime().toString()).append(")\r\n").toUtf8());
+                        gbaSpeedDisplayBuffer.append(QString("\r\nError: Data mismatch.\r\n\tExpected: ").append(strSecond).append("\r\n\tGot     : ").append(strFirst).append("\r\n\tPosition: ").append(QString("-").repeated(iOffset-1).append("^")).append("\r\n\tOccurred: ").append(ui->label_SpeedTime->text()).append(" (").append(QDateTime::currentDateTime().toLocalTime().toString()).append(")\r\n").toUtf8());
                         if (!gtmrSpeedUpdateTimer.isActive())
                         {
-                            gtmrSpeedUpdateTimer.start();
+                                gtmrSpeedUpdateTimer.start();
                         }
                     }
 
                     //Search for start character (ignoring first character)
-                    int StartChar = gbaSpeedReceivedData.indexOf(gbaSpeedMatchData.at(0), 1);
+                    int StartChar = gbaSpeedReceivedData.indexOf(gbaSpeedMatchData.at(0), remove_size + 1);
                     if (StartChar == -1)
                     {
                         //Not found, clear whole receive buffer
                         gbaSpeedReceivedData.clear();
-                        gintSpeedTestReceiveIndex = 0;
-                        gintSpeedTestReceiveIndex = gintSpeedTestReceiveIndex + SizeToTest;
                     }
                     else
                     {
                         //Found, remove until this character
                         gbaSpeedReceivedData.remove(0, StartChar);
-                        gintSpeedTestReceiveIndex = 0;
                     }
+
                     ++gintSpeedTestStatPacketsReceived;
+                    gintSpeedTestReceiveIndex = 0;
+                    remove_size = 0;
                 }
+            }
+
+            if (remove_size > 0)
+            {
+                gbaSpeedReceivedData.remove(0, remove_size);
             }
         }
     }
@@ -5175,7 +5247,7 @@ MainWindow::UpdateSpeedTestValues(
     unsigned int intHours = (lngElapsed / 3600000LL);
     unsigned char chMinutes = (lngElapsed / 60000LL) % 60;
     unsigned char chSeconds = (lngElapsed % 60000) / 1000;
-    unsigned int intMiliseconds = (lngElapsed % 600)/10;
+    unsigned int intMiliseconds = (lngElapsed % 600) / 10;
     ui->label_SpeedTime->setText(QString((intHours < 10 ? "0" : "")).append(QString::number(intHours)).append((chMinutes < 10 ? ":0" : ":")).append(QString::number(chMinutes)).append((chSeconds < 10 ? ":0" : ":")).append(QString::number(chSeconds)).append((intMiliseconds < 10 ? ".0" : ".")).append(QString::number(intMiliseconds)));
 
     if (gintSpeedBytesSent > 0)
@@ -5492,13 +5564,13 @@ MainWindow::SetLoopBackMode(
         {
             //Enabled
             gbaDisplayBuffer.append("\n[Loopback Enabled]\n");
-            gpMenu->actions()[7]->setText("Disable Loopback (Rx->Tx)");
+            gpMenu->actions().at(MenuActionLoopback)->setText("Disable Loopback (Rx->Tx)");
         }
         else
         {
             //Disabled
             gbaDisplayBuffer.append("\n[Loopback Disabled]\n");
-            gpMenu->actions()[7]->setText("Enable Loopback (Rx->Tx)");
+            gpMenu->actions().at(MenuActionLoopback)->setText("Enable Loopback (Rx->Tx)");
         }
         if (!gtmrTextUpdateTimer.isActive())
         {
@@ -5573,7 +5645,7 @@ MainWindow::ScriptingFileSelected(
     const QString *strFilepath
     )
 {
-    QString strDirectory = SplitFilePath(*strFilepath)[0];
+    QString strDirectory = SplitFilePath(*strFilepath).at(0);
     if (gpTermSettings->value("LastScriptFileDirectory").toString() != strDirectory)
     {
         //Update scripting directory

@@ -147,23 +147,23 @@ const qint8 FilenameIndexScripting              = 1;
 const qint8 FilenameIndexOthers                 = 2;
 //Constants for right click menu options
 enum menu_actions {
-MenuActionErrorHex                  = 0,
-MenuActionErrorInt,
-MenuActionLoopback,
-MenuActionStreamFile,
-MenuActionFont,
-MenuActionTextColour,
-MenuActionBackground,
-MenuActionRestoreDefaults,
-MenuActionAutomation,
-MenuActionScripting,
-MenuActionBatch,
-MenuActionClearDisplay,
-MenuActionClearRxTx,
-MenuActionCopy,
-MenuActionCopyAll,
-MenuActionPaste,
-MenuActionSelectAll
+    MenuActionErrorHex                          = 0,
+    MenuActionErrorInt,
+    MenuActionLoopback,
+    MenuActionStreamFile,
+    MenuActionFont,
+    MenuActionTextColour,
+    MenuActionBackground,
+    MenuActionRestoreDefaults,
+    MenuActionAutomation,
+    MenuActionScripting,
+    MenuActionBatch,
+    MenuActionClearDisplay,
+    MenuActionClearRxTx,
+    MenuActionCopy,
+    MenuActionCopyAll,
+    MenuActionPaste,
+    MenuActionSelectAll
 };
 //Constants for balloon (notification area) icon options
 const qint8 BalloonActionShow                   = 1;
@@ -200,6 +200,14 @@ enum class BitByteTypes
     TypeBytes,
     TypeDataBits,
     TypeAllBits
+};
+
+//Union used for checking recieved byte array contents whilst speed testing
+union pointer_buf {
+    uint8_t *p8;
+    uint16_t *p16;
+    uint32_t *p32;
+    uint64_t *p64;
 };
 
 /******************************************************************************/
@@ -285,10 +293,6 @@ public slots:
 #endif
 
 private slots:
-    void
-    on_selector_Tab_currentChanged(
-        int intIndex
-        );
     void
     on_btn_Connect_clicked(
         );
@@ -752,6 +756,8 @@ private:
     quint32 gintAutoTrimBufferDThreshold; //(Unlisted option) Number of bytes at which to trim the display buffer
     quint32 gintAutoTrimBufferDSize; //(Unlisted option) Number of bytes to trim the recieve buffer
     bool gbAppStarted; //True if application startup is complete
+    QElapsedTimer gtmrPortOpened; //Used for updating last received timestamp
+    qint64 gintLastSerialTimeUpdate; //Used for recording when next last received timestamp should appear
 
 protected:
     void dragEnterEvent(
