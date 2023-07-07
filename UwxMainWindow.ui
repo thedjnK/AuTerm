@@ -1046,6 +1046,12 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="maximumSize">
+               <size>
+                <width>250</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="title">
                <string>Port Settings</string>
               </property>
@@ -1107,16 +1113,14 @@
                      <height>16777215</height>
                     </size>
                    </property>
-                   <property name="text">
-                    <string/>
+                   <property name="mouseTracking">
+                    <bool>false</bool>
                    </property>
-                   <property name="icon">
-                    <iconset>
-                     <normalon>:/images/PlusIcon.png</normalon>
-                    </iconset>
+                   <property name="text">
+                    <string>+</string>
                    </property>
                    <property name="flat">
-                    <bool>true</bool>
+                    <bool>false</bool>
                    </property>
                   </widget>
                  </item>
@@ -1128,16 +1132,14 @@
                      <height>16777215</height>
                     </size>
                    </property>
-                   <property name="text">
-                    <string/>
+                   <property name="mouseTracking">
+                    <bool>false</bool>
                    </property>
-                   <property name="icon">
-                    <iconset>
-                     <normalon>:/images/MinusIcon.png</normalon>
-                    </iconset>
+                   <property name="text">
+                    <string>-</string>
                    </property>
                    <property name="flat">
-                    <bool>true</bool>
+                    <bool>false</bool>
                    </property>
                   </widget>
                  </item>
@@ -1162,19 +1164,6 @@
                   <widget class="QPushButton" name="btn_Refresh">
                    <property name="text">
                     <string>&amp;Refresh</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btn_DetectBaud">
-                   <property name="maximumSize">
-                    <size>
-                     <width>56</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>&amp;Auto</string>
                    </property>
                   </widget>
                  </item>
@@ -1459,6 +1448,12 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="title">
                <string/>
               </property>
@@ -1478,6 +1473,74 @@
                <property name="bottomMargin">
                 <number>2</number>
                </property>
+               <item>
+                <layout class="QGridLayout" name="gridLayout_15">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="spacing">
+                  <number>3</number>
+                 </property>
+                 <item row="1" column="1">
+                  <widget class="QLabel" name="label_24">
+                   <property name="text">
+                    <string>Busy</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <spacer name="verticalSpacer_2">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="label_19">
+                   <property name="text">
+                    <string>N/A</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLabel" name="label_23">
+                   <property name="text">
+                    <string>Clear</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" alignment="Qt::AlignRight">
+                  <widget class="QLabel" name="label_AboutI2">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0" alignment="Qt::AlignRight">
+                  <widget class="QLabel" name="label_AboutI3">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0" alignment="Qt::AlignRight">
+                  <widget class="QLabel" name="label_AboutI1">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
                <item>
                 <spacer name="horizontalSpacer_12">
                  <property name="orientation">
@@ -1616,7 +1679,7 @@
                <enum>Qt::LeftToRight</enum>
               </property>
               <property name="text">
-               <string>&amp;OK</string>
+               <string>&amp;Open</string>
               </property>
               <property name="autoDefault">
                <bool>true</bool>
@@ -1658,7 +1721,21 @@
             <item>
              <widget class="QPushButton" name="btn_Error">
               <property name="text">
-               <string>&amp;Error Code Viewer</string>
+               <string>&amp;Error Codes</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_Help">
+              <property name="text">
+               <string>&amp;Help</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_Licenses">
+              <property name="text">
+               <string>&amp;Licenses</string>
               </property>
              </widget>
             </item>
@@ -2861,507 +2938,6 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_Update">
-         <attribute name="title">
-          <string>U&amp;pdate</string>
-         </attribute>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
-            <property name="spacing">
-             <number>4</number>
-            </property>
-            <item>
-             <spacer name="horizontalSpacer_8">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox">
-              <property name="minimumSize">
-               <size>
-                <width>180</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="title">
-               <string>Error Codes</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_8">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="leftMargin">
-                <number>2</number>
-               </property>
-               <property name="topMargin">
-                <number>2</number>
-               </property>
-               <property name="rightMargin">
-                <number>2</number>
-               </property>
-               <property name="bottomMargin">
-                <number>2</number>
-               </property>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_6">
-                 <property name="spacing">
-                  <number>4</number>
-                 </property>
-                 <item>
-                  <widget class="QLabel" name="label_ErrorCodeText">
-                   <property name="font">
-                    <font>
-                     <family>Arial</family>
-                     <pointsize>8</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>When an error is encountered in an application and printed to the UART, if the error code is highlighted then you can right click and select the 'Lookup Error Code' option, which will display a description of the error code.
-
-As more error codes get added, newer releases of the error code lookup file will be made available which can be updated from within AuTerm using the buttons below.</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="wordWrap">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btn_ErrorCodeUpdate">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="text">
-                    <string>Check for Updates</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btn_ErrorCodeDownload">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="text">
-                    <string>Update error codes</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_ErrorCodeUpdate">
-                   <property name="text">
-                    <string>[Status]</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_10">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="groupBox_3">
-              <property name="minimumSize">
-               <size>
-                <width>200</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="title">
-               <string>AuTerm</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_11">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <property name="leftMargin">
-                <number>2</number>
-               </property>
-               <property name="topMargin">
-                <number>2</number>
-               </property>
-               <property name="rightMargin">
-                <number>2</number>
-               </property>
-               <property name="bottomMargin">
-                <number>2</number>
-               </property>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_9">
-                 <property name="spacing">
-                  <number>4</number>
-                 </property>
-                 <item>
-                  <widget class="QLabel" name="label_AuTermText">
-                   <property name="font">
-                    <font>
-                     <family>Arial</family>
-                     <pointsize>8</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>AuTerm is an open source application developed by Laird Connectivity, the source code is available for download/modification from the Github project page linked below.
-
-You can also use the button below to check if there is a newer version of AuTerm available.</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="wordWrap">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btn_AuTermUpdate">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="text">
-                    <string>Check for Updates</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btn_GitHub">
-                   <property name="text">
-                    <string>Visit Github Project Page</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_AuTermUpdate">
-                   <property name="text">
-                    <string>[Status]</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_11">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_9">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_About">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <attribute name="title">
-          <string>Abo&amp;ut</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <property name="leftMargin">
-           <number>3</number>
-          </property>
-          <property name="topMargin">
-           <number>3</number>
-          </property>
-          <property name="rightMargin">
-           <number>3</number>
-          </property>
-          <property name="bottomMargin">
-           <number>3</number>
-          </property>
-          <property name="spacing">
-           <number>3</number>
-          </property>
-          <item row="0" column="0">
-           <layout class="QGridLayout" name="gridLayout_2">
-            <property name="spacing">
-             <number>3</number>
-            </property>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="btn_Licenses">
-              <property name="text">
-               <string>Li&amp;censes</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QPushButton" name="btn_Help">
-              <property name="text">
-               <string>&amp;Help</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <property name="spacing">
-             <number>3</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QPlainTextEdit" name="text_Terms">
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-              <property name="plainText">
-               <string>This application is provided without warranty. You are welcome to check our website for the latest version. This version is UTF-8 compliant.
-
-You can launch this application and bypass this window by creating a shortcut link and passing ACCEPT as a command line option. Other command line options are:-
-
-ACCEPT
-    Bypass About screen on startup
-
-COM=n
-    Windows: COM[1..255] specifies a comport number
-    GNU/Linux: /dev/tty[device] specifies a TTY device
-    Mac: /dev/[device] specifies a TTY device
-
-BAUD=n
-    [1200..5000000] Could be limited to 115200 depending on PC hardware (limited to 230400 on most Macs)
-
-STOP=n
-    [1..2]
-
-DATA=n
-    [7..8]
-
-PAR=n
-    [0=None; 1=Odd; 2=Even]
-
-FLOW=n
-    [0=None; 1=Cts/Rts; 2=Xon/Xoff]
-
-ENDCHR=n
-    [line termination character :: 0=CR, 1=LF, 2=CRLF, 3=LFCR]
-
-NOCONNECT
-    Do not connect to device on startup even if ACCEPT is provided
-
-LOCALECHO=n
-    [0=Disabled; 1=Enabled]
-
-LINEMODE=n
-    [0=Disabled; 1=Enabled]
-
-LOG
-    Write screen activity to new file '&lt;appname&gt;.log' (Cannot be used with LOG+, LOG+ will take priority)
-
-LOG+
-    Append screen activity to file '&lt;appname&gt;.log' (Cannot be used with LOG, LOG+ will take priority)
-
-LOG=filename  
-    File to write the log data to this file (supply extension)
-          
-SHOWCRLF
-    When displaying a TX or RX text on screen, show \t,\r,\n as well
-
-AUTOMATION
-    Will initialise and open the automation form (ACCEPT must be provided before this argument)
-
-AUTOMATIONFILE=filename
-    Provided that the file exists, it will be loaded into the automation form.
-
-SCRIPTING
-    Will initialise and open the scripting form (ACCEPT must be provided before this argument)
-
-SCRIPTFILE=filename
-    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)
-
-SCRIPTACTION=n
-    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)
-
-TITLE=title
-    Will append to the window title (and system tray icon tooltip) the provided text
-
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-Character escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \HH whereby H represents a hex character (0-9 and A-F), additionally \r, \n and \t can be used to represent a carriage return, new line and tab character individually.
-This function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.
-For example: \00 can be used to represent a null character and \4C can be used to represent an 'L' ASCII character.
-
-
-Copyright © Laird Connectivity 2015-2022
-Copyright © Others 2023
-For updates and source code licensed under GPLv3, check https://github.com/todo or the 'Update' tab.
-Plus and Minus images obtained from http://www.clker.com
-
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <property name="spacing">
-               <number>3</number>
-              </property>
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <layout class="QGridLayout" name="gridLayout_12">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="spacing">
-                 <number>3</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_AboutI1">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLabel" name="label_24">
-                  <property name="text">
-                   <string>Busy</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_AboutI2">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLabel" name="label_19">
-                  <property name="text">
-                   <string>N/A</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLabel" name="label_23">
-                  <property name="text">
-                   <string>Clear</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="label_AboutI3">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
         <widget class="QWidget" name="tab_Logs">
          <attribute name="title">
           <string>Lo&amp;gs</string>
@@ -3743,9 +3319,6 @@ You should have received a copy of the GNU General Public License along with thi
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>btn_Help</tabstop>
-  <tabstop>btn_Licenses</tabstop>
-  <tabstop>text_Terms</tabstop>
   <tabstop>btn_Connect</tabstop>
   <tabstop>btn_Quit</tabstop>
   <tabstop>combo_PredefinedDevice</tabstop>
@@ -3771,10 +3344,6 @@ You should have received a copy of the GNU General Public License along with thi
   <tabstop>btn_TermClose</tabstop>
   <tabstop>btn_Cancel</tabstop>
   <tabstop>text_TermEditData</tabstop>
-  <tabstop>btn_ErrorCodeUpdate</tabstop>
-  <tabstop>btn_ErrorCodeDownload</tabstop>
-  <tabstop>btn_AuTermUpdate</tabstop>
-  <tabstop>btn_GitHub</tabstop>
   <tabstop>combo_LogDirectory</tabstop>
   <tabstop>btn_LogRefresh</tabstop>
   <tabstop>text_LogData</tabstop>
