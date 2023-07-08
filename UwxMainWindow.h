@@ -71,20 +71,6 @@
 #include "UwxScripting.h"
 #endif
 #include "UwxEscape.h"
-#if SKIPUSBRECOVERY != 1
-//Conditional compile for BL654 USB dongle autorun exit
-#if defined(_WIN32) && defined(_MSC_VER)
-//MSVC build on windows
-#define FTD2XX_STATIC
-#include "FTDI/ftd2xx.h"
-#elif defined(__linux__)
-//Linux
-#include <unistd.h>
-#include <libftdi1/ftdi.h>
-#include <libusb-1.0/libusb.h>
-#include <string.h>
-#endif
-#endif
 
 /******************************************************************************/
 // Defines
@@ -239,18 +225,6 @@ public slots:
     void
     DevRespTimeout(
         );
-#if defined(_WIN32) || defined(WIN32)
-    //_WIN32 isn't defined when MOC is ran but WIN32 is.
-    void
-    process_finished(
-        int intExitCode,
-        QProcess::ExitStatus esExitStatus
-        );
-    void
-    process_error(
-        QProcess::ProcessError
-        );
-#endif
     void
     SerialStatusSlot(
         );

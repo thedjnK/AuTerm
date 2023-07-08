@@ -71,20 +71,6 @@
     #endif
 #endif
 
-//Functions used for sorting local XCompiler versions
-#ifdef _WIN32
-    bool
-    CompByATI3(
-        const XCompInfoStruct &a,
-        const XCompInfoStruct &b
-        );
-    bool
-    CompByDevName(
-        const XCompDevStruct &a,
-        const XCompDevStruct &b
-        );
-#endif
-
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
