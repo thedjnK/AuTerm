@@ -99,7 +99,7 @@
 // Constants
 /******************************************************************************/
 //Constants for version and functions
-const QString UwVersion                         = "0.1"; //Version string
+const QString UwVersion                         = "0.11"; //Version string
 //Constants for timeouts and streaming
 const qint16 FileReadBlock                      = 512;     //Number of bytes to read per block when streaming files
 const qint16 StreamProgress                     = 10000;   //Number of bytes between streaming progress updates
@@ -109,8 +109,6 @@ const qint16 ModuleTimeout                      = 4000;    //Time (in ms) that a
 const QString DefaultLogFile                    = "AuTerm.log";
 const bool DefaultLogMode                       = 0;
 const bool DefaultLogEnable                     = 0;
-#if 0
-#endif
 const bool DefaultSysTrayIcon                   = 1;
 const qint16 DefaultSerialSignalCheckInterval   = 50;
 const qint16 DefaultTextUpdateInterval          = 80;
@@ -188,7 +186,7 @@ enum class BitByteTypes
     TypeAllBits
 };
 
-//Union used for checking recieved byte array contents whilst speed testing
+//Union used for checking received byte array contents whilst speed testing
 union pointer_buf {
     uint8_t *p8;
     uint16_t *p16;

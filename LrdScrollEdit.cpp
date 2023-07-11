@@ -1,5 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -25,6 +26,7 @@
 // Include Files
 /******************************************************************************/
 #include "LrdScrollEdit.h"
+#include <QRegularExpression>
 
 /******************************************************************************/
 // Local Functions or Private Members
@@ -39,13 +41,15 @@ LrdScrollEdit::LrdScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     mbLineMode = true; //Line mode is on by default
     mbSerialOpen = false; //Serial port is not open by default
     mbLocalEcho = true; //Local echo mode on by default
-    mstrDatIn = ""; //Data in is an empty string
+    mstrDatIn.clear(); //Data in is an empty string
     mstrDatOut = ""; //Data out is empty string
     mintCurPos = 0; //Current cursor position is 0
     mbContextMenuOpen = false; //Context menu not currently open
     mstrItemArray = NULL;
     nItemArraySize = 0;
     mbSliderShown = false;
+
+    mstrDatIn.reserve(32768);
 }
 
 //=============================================================================
@@ -127,9 +131,12 @@ LrdScrollEdit::eventFilter(
                 {
                     mchPosition = mchPosition-1;
                 }
+
                 mstrDatOut = mstrItemArray[mchPosition];
                 mintCurPos = mstrDatOut.length();
+
                 this->UpdateDisplay();
+
                 return true;
             }
             else if (keyEvent->key() == Qt::Key_Down && !(keyEvent->modifiers() & Qt::ShiftModifier))
@@ -139,9 +146,12 @@ LrdScrollEdit::eventFilter(
                 {
                     mchPosition = mchPosition+1;
                 }
+
                 mstrDatOut = mstrItemArray[mchPosition];
                 mintCurPos = mstrDatOut.length();
+
                 this->UpdateDisplay();
+
                 return true;
             }
             else if ((keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) && !(keyEvent->modifiers() & Qt::ControlModifier) && (!(keyEvent->modifiers() & Qt::ShiftModifier) || mbLineSeparator == false))
@@ -181,20 +191,32 @@ LrdScrollEdit::eventFilter(
                 if ((keyEvent->modifiers() & Qt::ControlModifier))
                 {
                     //Delete word
-                    quint32 intSpacePos = mintCurPos;
-                    while (intSpacePos > 0)
+                    if (mintCurPos > 0)
                     {
-                        --intSpacePos;
-                        if (mstrDatOut.at(intSpacePos) == ' ')
-                        {
-                            //Found a space
-                            break;
+                            quint32 intSpacePos = mintCurPos - 1;
+                            bool found_non_space = false;
+                            while (intSpacePos > 0)
+                            {
+                                --intSpacePos;
+                                if (mstrDatOut.at(intSpacePos) == ' ')
+                                {
+                                        //Found a space
+                                        if (found_non_space == true)
+                                        {
+                                            ++intSpacePos;
+                                                break;
+                                        }
+                                }
+                                else
+                                {
+                                        found_non_space = true;
+                                }
                         }
-                    }
 
-                    //Previous word found, remove up to the previous word
-                    mstrDatOut.remove(intSpacePos, mintCurPos-intSpacePos);
-                    mintCurPos -= mintCurPos-intSpacePos;
+                        //Previous word found, remove up to the previous word
+                        mstrDatOut.remove(intSpacePos, mintCurPos-intSpacePos);
+                        mintCurPos -= mintCurPos-intSpacePos;
+                    }
                 }
                 else if (mintCurPos > 0)
                 {
@@ -202,8 +224,10 @@ LrdScrollEdit::eventFilter(
                     mstrDatOut.remove(mintCurPos-1, 1);
                     --mintCurPos;
                 }
+
                 this->UpdateDisplay();
                 this->UpdateCursor();
+
                 return true;
             }
             else if (keyEvent->key() == Qt::Key_Left)
@@ -379,13 +403,30 @@ LrdScrollEdit::AddDatInText(
     )
 {
     //Adds data to the DatIn buffer
-    bool bIsEmpty = mstrDatIn.isEmpty();
-    mstrDatIn += QString(baDat->replace("\r\n", "\n").replace("\r", "\n"));
-    if (bIsEmpty == true && (baDat[0] == "\r" || baDat[0] == "\n"))
+    bool added = false;
+
+    if (mstrDatIn.isEmpty() == true)
     {
         //Remove first newline
-        mstrDatIn.remove(0, 1);
+        uint32_t i = 0;
+        uint32_t l = baDat->length();
+        while (i < l && (baDat->at(i) == '\r' || baDat->at(i) == '\n'))
+        {
+            ++i;
+        }
+
+        if (i > 0)
+        {
+            mstrDatIn += baDat->mid(i).replace("\r\n", "\n").replace("\r", "\n");
+            added = true;
+        }
     }
+
+    if (added == false)
+    {
+        mstrDatIn += baDat->replace("\r\n", "\n").replace("\r", "\n");
+    }
+
     this->UpdateDisplay();
 }
 
@@ -555,7 +596,34 @@ LrdScrollEdit::UpdateDisplay(
         }
 
         this->setUpdatesEnabled(false);
-        this->setPlainText(QString(mstrDatIn).append((mbLocalEcho == true && mbLineMode == true ? mstrDatOut : "")));
+        QRegularExpression reTempRE("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
+        reTempRE.setPatternOptions(QRegularExpression::MultilineOption);
+        QRegularExpressionMatch remTempREM = reTempRE.match(mstrDatIn);
+        while (remTempREM.hasMatch())
+        {
+            mstrDatIn.remove(remTempREM.capturedStart(0), remTempREM.capturedLength(0));
+            remTempREM = reTempRE.match(mstrDatIn);
+        }
+
+
+        int32_t i = mstrDatIn.length() - 1;
+        while (i >= 0)
+        {
+            char current = mstrDatIn.at(i);
+
+            if (current < 0x08 || (current >= 0x0b && current <= 0x0c) || (current >= 0x0e && current <= 0x0f))
+            {
+                mstrDatIn.replace(i, 1, QString("\\0").append(QString::number(current, 16)).toUtf8());
+            }
+            else if ((current >= 0x10 && current <= 0x1a) || (current >= 0x1c && current <= 0x1f))
+            {
+                mstrDatIn.replace(i, 1, QString("\\").append(QString::number(current, 16)).toUtf8());
+            }
+
+            --i;
+        }
+
+        this->setPlainText(QString(mstrDatIn).append(mbLocalEcho == true && mbLineMode == true ? mstrDatOut : ""));
         this->setUpdatesEnabled(true);
 
         //Update previous text size variable

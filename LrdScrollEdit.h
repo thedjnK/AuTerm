@@ -121,7 +121,7 @@ private:
     unsigned char mchPosition; //Current position
     bool mbLineMode; //True enables line mode
     bool mbSerialOpen; //True if serial port is open
-    QString mstrDatIn; //Incoming data (previous commands/received data)
+    QByteArray mstrDatIn; //Incoming data (previous commands/received data)
     QString mstrDatOut; //Outgoing data (user typed keyboard data)
     int mintCurPos; //Current text cursor position
     unsigned int mintPrevTextSize; //Holds a count of the previous text size
