@@ -2,7 +2,7 @@
 
 ## Preface
 
-Note that AuTerm is currently in the process of being forked and developed for an initial release, there is currently no code to get or application to run.
+Note that AuTerm is currently in the process of being developed for an initial release, the code is not considered stable and only pre-release test versions are available for download.
 
 Sneek preview:
 ![Sneek preview](/docs/images/peek.png?raw=true)
@@ -13,7 +13,7 @@ AuTerm is a cross-platform terminal utility, designed for communicating with emb
 
 ## Downloading
 
-Only source code is provided at present.
+Only source code is provided at present, and some pre-release test binaries.
 
 ## Setup
 
@@ -25,7 +25,7 @@ If using the SSL version of AuTerm, then the Visual Studio 2015 runtime files ar
 
 ### Mac:
 
-(**Mac OS X version 10.10 or later is required if using the pre-compiled binaries, as Secure Transport is built into OS X there is no non-SSL build available for OS X systems**): Download and open the dmg file, open it to mount it as a drive on your computer, go to the disk drive and copy the file AuTerm to folder on your computer. You can run AuTerm by double clicking the icon - if you are greeted with a warning that the executable is untrusted then you can run it by right clicking it and selecting the 'run' option. If this does not work then you may need to view the executable security settings on your mac.
+Mac versions must be built from source using Qt 5.x
 
 ### Linux (Including Raspberry Pi):
 
