@@ -257,7 +257,7 @@ UwxScripting::on_btn_Compile_clicked(
                 {
                     //Check if the time value is valid or not
                     bool bConverted = false;
-		    int intConv = tbCurrentBlock.text().rightRef(tbCurrentBlock.text().length()-1).toInt(&bConverted);
+                    int intConv = tbCurrentBlock.text().right(tbCurrentBlock.text().length()-1).toInt(&bConverted);
                     if (bConverted == false)
                     {
                         //Invalid number
@@ -596,7 +596,7 @@ UwxScripting::AdvanceLine(
                         QString strMsg = QString("Script failed (expected data not found after ").append(ui->spin_MaxRecBufSize->text()).append(" bytes (").append(QString::number(mbaRecvData.length())).append(" bytes in buffer) after ");
                         ui->edit_Script->SetExecutionLineStatus(true);
                         on_btn_Stop_clicked();
-			strMsg.append(msbStatusBar->currentMessage().rightRef(msbStatusBar->currentMessage().length()-21));
+                        strMsg.append(msbStatusBar->currentMessage().right(msbStatusBar->currentMessage().length()-21));
                         msbStatusBar->showMessage(strMsg);
                         return;
                     }
@@ -615,7 +615,7 @@ UwxScripting::AdvanceLine(
             else if (mtbExecutionBlock.text().at(0) == ScriptingWaitTime)
             {
                 //Wait for a specified period of time
-		mtmrPauseTimer.start(mtbExecutionBlock.text().rightRef(mtbExecutionBlock.text().length()-1).toUInt());
+                mtmrPauseTimer.start(mtbExecutionBlock.text().right(mtbExecutionBlock.text().length()-1).toUInt());
                 mtbExecutionBlock = mtbExecutionBlock.next();
                 ++mintCLine;
                 ucLastAct = ScriptingActionWaitTime;

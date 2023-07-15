@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>727</width>
-    <height>470</height>
+    <width>672</width>
+    <height>444</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -687,7 +687,7 @@
                  <enum>Qt::RightToLeft</enum>
                 </property>
                 <property name="text">
-                 <string>LocalEcho</string>
+                 <string>Echo</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -843,7 +843,7 @@
               </property>
               <property name="maximumSize">
                <size>
-                <width>500</width>
+                <width>250</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -870,63 +870,31 @@
                 <number>2</number>
                </property>
                <item>
-                <layout class="QFormLayout" name="formLayout">
-                 <property name="sizeConstraint">
-                  <enum>QLayout::SetDefaultConstraint</enum>
+                <widget class="QRadioButton" name="radio_LCR">
+                 <property name="text">
+                  <string>\r</string>
                  </property>
-                 <property name="fieldGrowthPolicy">
-                  <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
-                 <property name="labelAlignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="horizontalSpacing">
-                  <number>2</number>
-                 </property>
-                 <property name="verticalSpacing">
-                  <number>2</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>2</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item row="3" column="0">
-                  <widget class="QRadioButton" name="radio_LCRLF">
-                   <property name="text">
-                    <string>\r\n</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QRadioButton" name="radio_LLF">
-                   <property name="text">
-                    <string>\n</string>
-                   </property>
-                   <property name="checked">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QRadioButton" name="radio_LCR">
-                   <property name="text">
-                    <string>\r</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                </widget>
                </item>
                <item>
-                <layout class="QGridLayout" name="gridLayout_16">
-                 <property name="spacing">
-                  <number>2</number>
+                <widget class="QRadioButton" name="radio_LLF">
+                 <property name="text">
+                  <string>\n</string>
                  </property>
-                </layout>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_LCRLF">
+                 <property name="text">
+                  <string>\r\n</string>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="check_ShowCLRF">
@@ -978,11 +946,18 @@
                 </widget>
                </item>
                <item>
-                <layout class="QGridLayout" name="gridLayout_17">
+                <layout class="QHBoxLayout" name="horizontalLayout">
                  <property name="spacing">
                   <number>2</number>
                  </property>
-                 <item row="0" column="1">
+                 <item>
+                  <widget class="QLabel" name="label_45">
+                   <property name="text">
+                    <string>Title:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QLineEdit" name="edit_Title">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -1013,12 +988,18 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_45">
-                   <property name="text">
-                    <string>Title:</string>
+                 <item>
+                  <spacer name="horizontalSpacer_13">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
                    </property>
-                  </widget>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
                  </item>
                 </layout>
                </item>
@@ -1455,7 +1436,7 @@
                </size>
               </property>
               <property name="title">
-               <string/>
+               <string>Icons</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -1474,20 +1455,58 @@
                 <number>2</number>
                </property>
                <item>
-                <layout class="QGridLayout" name="gridLayout_15">
+                <layout class="QFormLayout" name="formLayout">
+                 <property name="horizontalSpacing">
+                  <number>3</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>3</number>
+                 </property>
                  <property name="leftMargin">
-                  <number>0</number>
+                  <number>3</number>
                  </property>
                  <property name="topMargin">
                   <number>0</number>
                  </property>
-                 <property name="spacing">
-                  <number>3</number>
-                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_AboutI1">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="label_19">
+                   <property name="text">
+                    <string>N/A</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_AboutI2">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="1" column="1">
                   <widget class="QLabel" name="label_24">
                    <property name="text">
                     <string>Busy</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_AboutI3">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLabel" name="label_23">
+                   <property name="text">
+                    <string>Clear</string>
                    </property>
                   </widget>
                  </item>
@@ -1503,41 +1522,6 @@
                     </size>
                    </property>
                   </spacer>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="label_19">
-                   <property name="text">
-                    <string>N/A</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QLabel" name="label_23">
-                   <property name="text">
-                    <string>Clear</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0" alignment="Qt::AlignRight">
-                  <widget class="QLabel" name="label_AboutI2">
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0" alignment="Qt::AlignRight">
-                  <widget class="QLabel" name="label_AboutI3">
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0" alignment="Qt::AlignRight">
-                  <widget class="QLabel" name="label_AboutI1">
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
                  </item>
                 </layout>
                </item>
@@ -1628,7 +1612,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Enable Logging</string>
+               <string>Logging</string>
               </property>
              </widget>
             </item>
@@ -1640,7 +1624,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Append to Log</string>
+               <string>Append</string>
               </property>
              </widget>
             </item>
@@ -1736,6 +1720,13 @@
              <widget class="QPushButton" name="btn_Licenses">
               <property name="text">
                <string>&amp;Licenses</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_Github">
+              <property name="text">
+               <string>&amp;Github</string>
               </property>
              </widget>
             </item>
@@ -1992,6 +1983,29 @@
                </spacer>
               </item>
               <item>
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>Show:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_31b_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>3</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
                <widget class="QCheckBox" name="check_SpeedShowRX">
                 <property name="enabled">
                  <bool>true</bool>
@@ -2000,7 +2014,7 @@
                  <enum>Qt::RightToLeft</enum>
                 </property>
                 <property name="text">
-                 <string>Show RX</string>
+                 <string>RX</string>
                 </property>
                 <property name="checked">
                  <bool>false</bool>
@@ -2032,7 +2046,7 @@
                  <enum>Qt::RightToLeft</enum>
                 </property>
                 <property name="text">
-                 <string>Show TX</string>
+                 <string>TX</string>
                 </property>
                 <property name="checked">
                  <bool>false</bool>
@@ -2064,7 +2078,7 @@
                  <enum>Qt::RightToLeft</enum>
                 </property>
                 <property name="text">
-                 <string>Show Errors</string>
+                 <string>Errors</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -2906,7 +2920,7 @@
                  <enum>Qt::RightToLeft</enum>
                 </property>
                 <property name="text">
-                 <string>Un-Escape String</string>
+                 <string>Un-Escape</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -3301,6 +3315,63 @@
            </layout>
           </item>
          </layout>
+        </widget>
+        <widget class="QWidget" name="tab_Plugins">
+         <attribute name="title">
+          <string>Plugins</string>
+         </attribute>
+         <widget class="QListWidget" name="list_Plugin_Plugins">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>50</y>
+            <width>201</width>
+            <height>192</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_15">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>0</y>
+            <width>691</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>AuTerm's functionality can be expanded through the use of plugins. Plugins should be placed in the same folder as the utility to be loaded.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_Plugin_Abort">
+          <property name="geometry">
+           <rect>
+            <x>250</x>
+            <y>70</y>
+            <width>80</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>About</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_Plugin_Config">
+          <property name="geometry">
+           <rect>
+            <x>250</x>
+            <y>100</y>
+            <width>80</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Config</string>
+          </property>
+         </widget>
         </widget>
        </widget>
       </item>

@@ -27,6 +27,24 @@
 /******************************************************************************/
 #include "UwxMainWindow.h"
 #include "ui_UwxMainWindow.h"
+#include "AutPlugin.h"
+#include <QDebug>
+
+
+#include <QPluginLoader>
+
+//TODO: Needs to move to struct
+QPluginLoader plugin_loader;
+
+struct plugins {
+    QString filename;
+    QString name;
+    QString version;
+    QObject *object;
+    AutPlugin *plugin;
+};
+
+QList<plugins> plugin_list;
 
 /******************************************************************************/
 // Conditional Compile Defines
@@ -78,6 +96,54 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     //Setup the GUI
     ui->setupUi(this);
+
+#if 1
+    //Find and load plugins
+    QDir app_dir(QApplication::applicationDirPath());
+    app_dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
+
+#ifdef _WIN32
+    app_dir.setNameFilters(QStringList() << "plugin_*.dll");
+#elif defined(__APPLE__)
+#error "Plugins are not supported on mac"
+#else
+    app_dir.setNameFilters(QStringList() << "plugin_*.so");
+#endif
+
+    QStringList plugin_names = app_dir.entryList();
+    int32_t i = 0;
+    struct plugins plugin;
+    while (i < plugin_names.length())
+    {
+//TODO: move plugin loader to struct
+        plugin_loader.setFileName(QString(QApplication::applicationDirPath()).append("/").append(plugin_names.at(i)));
+        plugin.object = plugin_loader.instance();
+
+        if (plugin_loader.isLoaded())
+        {
+            plugin.filename = plugin_names.at(i);
+//TODO: Add support for this
+//            plugin.name = ;
+//            plugin.version = ;
+            plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
+
+            if (plugin.plugin)
+            {
+                plugin.plugin->setup(this);
+                plugin_list.append(plugin);
+
+                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
+                connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
+            }
+            else
+            {
+                plugin_loader.unload();
+            }
+        }
+
+        ++i;
+    }
+#endif
 
 #if SKIPSPEEDTEST == 1
     //Delete speed test elements to reduce RAM usage
@@ -174,6 +240,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     //Define default variable values
     gbTermBusy = false;
+    gbPluginRunning = false;
     gbStreamingFile = false;
     gintRXBytes = 0;
     gintTXBytes = 0;
@@ -287,12 +354,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     //Enable custom context menu policy
     ui->text_TermEditData->setContextMenuPolicy(Qt::CustomContextMenu);
-
-#ifdef _WIN32
-    //Connect process termination to signal
-    connect(&gprocCompileProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(process_finished(int, QProcess::ExitStatus)));
-    connect(&gprocCompileProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(process_error(QProcess::ProcessError)));
-#endif
 
     //Connect quit signals
     connect(ui->btn_Quit, SIGNAL(clicked()), this, SLOT(close()));
@@ -477,7 +538,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     }
 
     //Add predefined devices
-    unsigned char i = 1;
+    i = 1;
     while (i < 255)
     {
         if (gpPredefinedDevice->value(QString("Port").append(QString::number(i)).append("Name")).isNull())
@@ -641,18 +702,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         else if (slArgs[chi].left(4).toUpper() == "PAR=")
         {
             //Set parity
-            if (slArgs[chi].rightRef(1).toInt() >= 0 && slArgs[chi].rightRef(1).toInt() < 3)
+            uint value = QStringView(slArgs[chi]).right(1).toUInt();
+            if (value < 3)
             {
-                ui->combo_Parity->setCurrentIndex(slArgs[chi].rightRef(1).toInt());
+                ui->combo_Parity->setCurrentIndex(value);
             }
         }
         else if (slArgs[chi].left(5).toUpper() == "FLOW=")
         {
             //Set flow control
-            if (slArgs[chi].rightRef(1).toInt() >= 0 && slArgs[chi].rightRef(1).toInt() < 3)
+            uint value = QStringView(slArgs[chi]).right(1).toUInt();
+            if (value < 3)
             {
                 //Valid
-                ui->combo_Handshake->setCurrentIndex(slArgs[chi].rightRef(1).toInt());
+                ui->combo_Handshake->setCurrentIndex(value);
             }
         }
         else if (slArgs[chi].left(7).toUpper() == "ENDCHR=")
@@ -881,10 +944,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     //Disconnect all signals
-#ifdef _WIN32
-    disconnect(this, SLOT(process_finished(int, QProcess::ExitStatus)));
-    disconnect(this, SLOT(process_error(int, QProcess::ProcessError)));
-#endif
     disconnect(this, SLOT(close()));
     disconnect(this, SLOT(EnterPressed()));
     disconnect(this, SLOT(KeyPressed(int,QChar)));
@@ -900,7 +959,7 @@ MainWindow::~MainWindow()
     disconnect(this, SLOT(UpdateReceiveText()));
     disconnect(this, SLOT(SerialPortClosing()));
     disconnect(this, SLOT(BatchTimeoutSlot()));
-    disconnect(this, SLOT(replyFinished(QNetworkReply*)));
+//    disconnect(this, SLOT(replyFinished(QNetworkReply*)));
     disconnect(this, SLOT(MessagePass(QByteArray,bool,bool)));
 #if SKIPSPEEDTEST != 1
     disconnect(this, SLOT(UpdateDisplayText()));
@@ -927,6 +986,12 @@ MainWindow::~MainWindow()
         //Close serial connection before quitting
         gspSerialPort.close();
         gpSignalTimer->stop();
+        for (int i = 0; i < plugin_list.length(); ++i)
+        {
+            plugin_list.at(i).plugin->serial_closed();
+        }
+        gbPluginHideTerminalOutput = false;
+        gbPluginRunning = false;
     }
 
     if (gbMainLogEnabled == true)
@@ -1020,8 +1085,20 @@ MainWindow::~MainWindow()
         delete gstrUpdateCheckString;
     }
 
-    //Release reserved memory by display buffer
+    //Release reserved memory buffers
     gbaDisplayBuffer.squeeze();
+    gbaSpeedReceivedData.squeeze();
+
+    //Clear up plugins
+    int32_t i = 0;
+    while (i < plugin_list.length())
+    {
+        disconnect(plugin_list.at(i).object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
+        disconnect(plugin_list.at(i).object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
+        delete plugin_list.at(i).object;
+        plugin_loader.unload();
+        ++i;
+    }
 
     //Delete variables
     delete gpMainLog;
@@ -1192,6 +1269,12 @@ MainWindow::on_btn_TermClose_clicked(
         {
             gspSerialPort.clear();
             gspSerialPort.close();
+            for (int i = 0; i < plugin_list.length(); ++i)
+            {
+                plugin_list.at(i).plugin->serial_closed();
+            }
+            gbPluginHideTerminalOutput = false;
+            gbPluginRunning = false;
         }
         gpSignalTimer->stop();
 
@@ -1351,6 +1434,7 @@ void
 MainWindow::SerialRead(
     )
 {
+//    qDebug() << "Received";
     //Update the last received field
     if ((gtmrPortOpened.elapsed() / 1000) > gintLastSerialTimeUpdate)
     {
@@ -1364,12 +1448,15 @@ MainWindow::SerialRead(
     {
         //Serial test is running, pass to speed test function
         SpeedTestReceive();
+        return;
     }
-    else
-    {
 #endif
+    QByteArray baOrigData = gspSerialPort.readAll();
+
+    if (gbPluginHideTerminalOutput == false || gbPluginRunning == false)
+    {
         //Speed test is not running
-        QByteArray baOrigData = gspSerialPort.readAll();
+//qDebug() << baOrigData;
 
 #ifndef SKIPSCRIPTINGFORM
         if (gusScriptingForm != 0 && gbScriptingRunning == true)
@@ -1422,9 +1509,17 @@ MainWindow::SerialRead(
 
         //Send next chunk of batch data if enabled
         StreamBatchContinue(&baOrigData);
-#if SKIPSPEEDTEST != 1
     }
-#endif
+
+    if (gbPluginRunning == true)
+    {
+        //A plugin is running, siphon data to it
+//TODO: limit to the running plugin only
+        for (int i = 0; i < plugin_list.length(); ++i)
+        {
+            plugin_list.at(i).plugin->serial_receive(&baOrigData);
+        }
+    }
 }
 
 //=============================================================================
@@ -2201,6 +2296,12 @@ MainWindow::OpenDevice(
         {
             gspSerialPort.clear();
             gspSerialPort.close();
+            for (int i = 0; i < plugin_list.length(); ++i)
+            {
+                plugin_list.at(i).plugin->serial_closed();
+            }
+            gbPluginHideTerminalOutput = false;
+            gbPluginRunning = false;
         }
         gpSignalTimer->stop();
 
@@ -2522,6 +2623,8 @@ MainWindow::SerialError(
     QSerialPort::SerialPortError speErrorCode
     )
 {
+    bool port_closed = false;
+
 #ifndef SKIPSCRIPTINGFORM
     if (gbScriptingRunning == true)
     {
@@ -2532,19 +2635,12 @@ MainWindow::SerialError(
     if (speErrorCode == QSerialPort::NoError)
     {
         //No error. Why this is ever emitted is a mystery to me.
+        for (int i = 0; i < plugin_list.length(); ++i)
+        {
+            plugin_list.at(i).plugin->serial_opened();
+        }
         return;
     }
-#if QT_VERSION < 0x050700
-    //As of Qt 5.7 these are now deprecated. It is being left in as a conditional compile for anyone using older versions of Qt to prevent these errors closing the serial port.
-    else if (speErrorCode == QSerialPort::ParityError)
-    {
-        //Parity error
-    }
-    else if (speErrorCode == QSerialPort::FramingError)
-    {
-        //Framing error
-    }
-#endif
     else if (speErrorCode == QSerialPort::ResourceError || speErrorCode == QSerialPort::PermissionError)
     {
         //Resource error or permission error (device unplugged?)
@@ -2557,6 +2653,7 @@ MainWindow::SerialError(
         {
             //Close active connection
             gspSerialPort.close();
+            port_closed = true;
         }
 
         if (gbStreamingFile == true)
@@ -2699,6 +2796,21 @@ MainWindow::SerialError(
         //Disallow file drops
         setAcceptDrops(false);
     }
+
+    for (int i = 0; i < plugin_list.length(); ++i)
+    {
+        plugin_list.at(i).plugin->serial_error(speErrorCode);
+    }
+
+    if (port_closed == true)
+        {
+        for (int i = 0; i < plugin_list.length(); ++i)
+        {
+            plugin_list.at(i).plugin->serial_closed();
+        }
+        gbPluginHideTerminalOutput = false;
+        gbPluginRunning = false;
+        }
 }
 
 //=============================================================================
@@ -2877,6 +2989,11 @@ MainWindow::SerialBytesWritten(
             //Batch file command
             ui->statusBar->showMessage(QString("Sending Batch line number ").append(QString::number(gintStreamBytesRead)));
         }
+    }
+
+    for (int i = 0; i < plugin_list.length(); ++i)
+    {
+        plugin_list.at(i).plugin->serial_bytes_written(intByteCount);
     }
 }
 
@@ -3114,7 +3231,7 @@ MainWindow::dropEvent(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_GitHub_clicked(
+MainWindow::on_btn_Github_clicked(
     )
 {
     //Open webpage at the AuTerm github page)
@@ -3500,6 +3617,11 @@ MainWindow::SerialPortClosing(
     if (gbSysTrayEnabled == true)
     {
         gpSysTray->setToolTip(QString("AuTerm v").append(UwVersion));
+    }
+
+    for (int i = 0; i < plugin_list.length(); ++i)
+    {
+        plugin_list.at(i).plugin->serial_about_to_close();
     }
 }
 
@@ -5747,3 +5869,59 @@ MainWindow::on_edit_Title_textEdited(
 /******************************************************************************/
 // END OF FILE
 /******************************************************************************/
+
+void MainWindow::on_btn_Plugin_Abort_clicked()
+{
+//    qDebug() << plugin_loader.isLoaded();
+//    qDebug() << button->filters();
+
+//todo: support plugin list
+    gpmErrorForm->show_message(plugin_list.at(0).plugin->plugin_about());
+//    gpmErrorForm->show();
+
+//    button->plugin_about();
+}
+
+void MainWindow::on_btn_Plugin_Config_clicked()
+{
+//todo: support plgin list
+    if (plugin_list.at(0).plugin->plugin_configuration() == false)
+    {
+        gpmErrorForm->show_message("This plugin does not have any configuration.");
+    }
+
+//    emit serial_status(true);
+}
+
+void MainWindow::plugin_set_status(bool busy, bool hide_terminal_output)
+{
+    if (busy == false)
+    {
+        gbPluginRunning = false;
+        gbPluginHideTerminalOutput = false;
+    }
+    else
+    {
+            gbPluginRunning = busy;
+    gbPluginHideTerminalOutput = hide_terminal_output;
+    }
+//    qDebug() << "Now: " << busy;
+}
+
+void MainWindow::plugin_serial_transmit(QByteArray *data)
+{
+//    qDebug() << "Transmitted";
+    if (gbPluginRunning == true)
+    {
+    gspSerialPort.write(*data);
+    gintQueuedTXBytes += data->size();
+
+           //Add to log
+    gpMainLog->WriteLogData(*data);
+
+    if (gbPluginHideTerminalOutput == false && ui->check_Echo->isChecked())
+    {
+            ui->text_TermEditData->AddDatInText(data);
+    }
+    }
+}

@@ -59,6 +59,9 @@ private slots:
     on_btn_Close_clicked(
         );
 
+public slots:
+    void show_message(QString str_message);
+
 private:
     Ui::PopupMessage *ui;
 };

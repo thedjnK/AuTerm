@@ -99,7 +99,7 @@
 // Constants
 /******************************************************************************/
 //Constants for version and functions
-const QString UwVersion                         = "0.11"; //Version string
+const QString UwVersion                         = "0.12"; //Version string
 //Constants for timeouts and streaming
 const qint16 FileReadBlock                      = 512;     //Number of bytes to read per block when streaming files
 const qint16 StreamProgress                     = 10000;   //Number of bytes between streaming progress updates
@@ -327,7 +327,7 @@ private slots:
         );
 #endif
     void
-    on_btn_GitHub_clicked(
+    on_btn_Github_clicked(
         );
     QList<QString>
     SplitFilePath(
@@ -506,6 +506,12 @@ private slots:
     on_edit_Title_textEdited(
         const QString &
         );
+    void on_btn_Plugin_Abort_clicked();
+    void on_btn_Plugin_Config_clicked();
+    void plugin_set_status(bool busy, bool hide_terminal_output);
+
+public slots:
+    void plugin_serial_transmit(QByteArray *data);
 
 private:
     Ui::MainWindow *ui;
@@ -615,9 +621,6 @@ private:
     unsigned char gchTermMode2; //Current sub-mode of download
     QString gstrTermFilename; //Holds the filename of the file to load
     QString gstrTermBusyData; //Holds the recieved data for checking
-#ifdef _WIN32
-    QProcess gprocCompileProcess; //Holds the data for the process to compile
-#endif
     QImage gimEmptyCircleImage; //Holder for empty circle image
     QImage gimRedCircleImage; //Holder for red circle image
     QImage gimGreenCircleImage; //Holder for green circle image
@@ -730,6 +733,8 @@ private:
     bool gbAppStarted; //True if application startup is complete
     QElapsedTimer gtmrPortOpened; //Used for updating last received timestamp
     qint64 gintLastSerialTimeUpdate; //Used for recording when next last received timestamp should appear
+    bool gbPluginRunning; //True if a plugin is running
+    bool gbPluginHideTerminalOutput; //True if terminal output should not be updated whilst plugin is running
 
 protected:
     void dragEnterEvent(
