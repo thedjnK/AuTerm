@@ -36,6 +36,7 @@ LrdScrollEdit::LrdScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     //Enable an event filter
     installEventFilter(this);
     installEventFilter(this->verticalScrollBar());
+    mintPrevTextSize = 0;
     mchItems = 0; //Number of items is 0
     mchPosition = 0; //Current position is 0
     mbLineMode = true; //Line mode is on by default
@@ -48,6 +49,9 @@ LrdScrollEdit::LrdScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     mstrItemArray = NULL;
     nItemArraySize = 0;
     mbSliderShown = false;
+    dat_out_updated = false;
+    dat_in_prev_check_len = 0;
+    dat_in_new_len = 0;
 
     mstrDatIn.reserve(32768);
 }
@@ -121,6 +125,7 @@ LrdScrollEdit::eventFilter(
             }
         }
 
+        dat_out_updated = true;
         if (mbLineMode == true)
         {
             //Line mode
@@ -442,7 +447,8 @@ LrdScrollEdit::AddDatOutText(
     {
         //Line mode
         mstrDatOut += strDat;
-        mintCurPos += strDat.toUtf8().length();
+        mintCurPos += strDat.length();
+        dat_out_updated = true;
         this->UpdateDisplay();
     }
     else
@@ -464,6 +470,9 @@ LrdScrollEdit::ClearDatIn(
 {
     //Clears the DatIn buffer
     mstrDatIn.clear();
+    mintPrevTextSize = 0;
+    dat_in_prev_check_len = 0;
+    dat_in_new_len = 0;
     this->moveCursor(QTextCursor::End);
     this->UpdateDisplay();
 }
@@ -477,6 +486,7 @@ LrdScrollEdit::ClearDatOut(
     //Clears the DatOut buffer
     mstrDatOut.clear();
     mintCurPos = 0;
+    dat_out_updated = true;
     this->UpdateDisplay();
 }
 
@@ -529,7 +539,9 @@ LrdScrollEdit::insertFromMimeData(
             //Line mode
             mstrDatOut.insert(mintCurPos, mdSrc->text());
             mintCurPos += mdSrc->text().length();
+            dat_out_updated = true;
             this->UpdateDisplay();
+            this->UpdateCursor();
         }
         else
         {
@@ -596,6 +608,8 @@ LrdScrollEdit::UpdateDisplay(
         }
 
         this->setUpdatesEnabled(false);
+
+//TODO: improve this
         QRegularExpression reTempRE("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
         reTempRE.setPatternOptions(QRegularExpression::MultilineOption);
         QRegularExpressionMatch remTempREM = reTempRE.match(mstrDatIn);
@@ -605,11 +619,13 @@ LrdScrollEdit::UpdateDisplay(
             remTempREM = reTempRE.match(mstrDatIn);
         }
 
+//TODO: deal with partial VT100 escape codes
 
+        //Replace unprintable characters with escape codes
         int32_t i = mstrDatIn.length() - 1;
-        while (i >= 0)
+        while (i >= dat_in_prev_check_len)
         {
-            char current = mstrDatIn.at(i);
+            uint8_t current = (uint8_t)mstrDatIn.at(i);
 
             if (current < 0x08 || (current >= 0x0b && current <= 0x0c) || (current >= 0x0e && current <= 0x0f))
             {
@@ -623,27 +639,59 @@ LrdScrollEdit::UpdateDisplay(
             --i;
         }
 
-        this->setPlainText(QString(mstrDatIn).append(mbLocalEcho == true && mbLineMode == true ? mstrDatOut : ""));
+//TODO: set this properly and define it
+        if (mintPrevTextSize < 20)
+        {
+            QString append_data = QString(mstrDatIn);
+            dat_in_new_len = append_data.length();
+            this->setPlainText(append_data.append(mbLocalEcho == true && mbLineMode == true ? mstrDatOut : ""));
+            dat_out_updated = false;
+        }
+        else
+        {
+            if (dat_in_prev_check_len != mstrDatIn.length())
+            {
+                QString append_data = mstrDatIn.mid(dat_in_prev_check_len - 1);
+                dat_in_new_len = append_data.length() + mintPrevTextSize - 1;
+
+                QTextCursor tcTmpCur = this->textCursor();
+                tcTmpCur.setPosition(mintPrevTextSize - 1);
+                tcTmpCur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
+                this->setTextCursor(tcTmpCur);
+                tcTmpCur.insertText(append_data);
+        }
+        if (mbLocalEcho == true && mbLineMode == true && dat_out_updated == 1)
+        {
+                QTextCursor tcTmpCur = this->textCursor();
+                tcTmpCur.setPosition(dat_in_new_len);
+                tcTmpCur.movePosition(QTextCursor::End, QTextCursor::KeepAnchor, 1);
+                this->setTextCursor(tcTmpCur);
+                tcTmpCur.insertText(mstrDatOut);
+                dat_out_updated = false;
+            }
+        }
         this->setUpdatesEnabled(true);
 
-        //Update previous text size variable
-        mintPrevTextSize = mstrDatIn.size();
+        //Update previous text size variables
+        mintPrevTextSize = dat_in_new_len;
+        dat_in_prev_check_len = mstrDatIn.length();
 
         //Update the cursor position
         this->UpdateCursor();
 
+//BUG: if text selected is in out buffer, this messes up selection
         if (uiAnchor != 0 || uiPosition != 0)
         {
             //Reselect previous text
             if (bShiftStart == true)
             {
                 //Adjust start position
-                uiAnchor = uiAnchor + (this->toPlainText().size() - uiCurrentSize);
+                uiAnchor = uiAnchor + (mintPrevTextSize - uiCurrentSize);
             }
             if (bShiftEnd == true)
             {
                 //Adjust end position
-                uiPosition = uiPosition + (this->toPlainText().size() - uiCurrentSize);
+                uiPosition = uiPosition + (mintPrevTextSize - uiCurrentSize);
             }
             tcTmpCur.setPosition(uiAnchor);
             tcTmpCur.setPosition(uiPosition, QTextCursor::KeepAnchor);
@@ -679,14 +727,7 @@ LrdScrollEdit::UpdateCursor(
     {
         //Local echo mode and line mode are enabled so move the cursor
         QTextCursor tcTmpCur = this->textCursor();
-        if (mstrDatIn.length() > 0)
-        {
-            tcTmpCur.setPosition(mstrDatIn.length()+mintCurPos);
-        }
-        else
-        {
-            tcTmpCur.setPosition(mintCurPos);
-        }
+        tcTmpCur.setPosition(mintPrevTextSize + mintCurPos);
         this->setTextCursor(tcTmpCur);
     }
 }

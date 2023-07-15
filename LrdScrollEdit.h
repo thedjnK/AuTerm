@@ -1,5 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -126,6 +127,9 @@ private:
     int mintCurPos; //Current text cursor position
     unsigned int mintPrevTextSize; //Holds a count of the previous text size
     bool mbSliderShown; //True if the slider moving to the bottom position upon appearing has been ran
+    bool dat_out_updated; //True if mstrDatOut has been updated and needs redrawing
+    int32_t dat_in_prev_check_len; //Holds position of mstrDatIn where hex character escaping was last performed to
+    int32_t dat_in_new_len; //Holds position of QString-version of mstrDatIn where the mstrDatIn ends
 
 public:
     bool mbLocalEcho; //True if local echo is enabled
