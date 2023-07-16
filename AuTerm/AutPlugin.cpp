@@ -27,6 +27,6 @@
 #ifdef QT_STATIC
 #ifdef STATICPLUGIN_MCUMGR
 //MCUmgr plugin
-Q_IMPORT_PLUGIN(mcumgr)
+Q_IMPORT_PLUGIN(plugin_mcumgr)
 #endif
 #endif
