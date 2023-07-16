@@ -94,11 +94,43 @@ QList<plugins> plugin_list;
 /******************************************************************************/
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    int32_t i = 0;
+
     //Setup the GUI
     ui->setupUi(this);
 
-#if 1
+#ifndef SKIPPLUGINS
     //Find and load plugins
+#ifdef QT_STATIC
+    //For static Qt builds, plugins must be compiled into the build
+    QVector<QStaticPlugin> static_plugins = QPluginLoader::staticPlugins();
+    struct plugins plugin;
+    while (i < static_plugins.length())
+    {
+        if (static_plugins.at(i).metaData().contains("IID") == true && static_plugins.at(i).metaData().value("IID").toString() == AuTermPluginInterface_iid)
+        {
+//TODO: Add support for this
+//            plugin.filename = plugin_names.at(i);
+//            plugin.name = ;
+//            plugin.version = ;
+
+            plugin.object = static_plugins.at(i).instance();
+            plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
+
+            if (plugin.plugin)
+            {
+                plugin.plugin->setup(this);
+                plugin_list.append(plugin);
+
+//                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
+                connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
+            }
+        }
+
+        ++i;
+    }
+#else
+    //For dynamic builds, external library plugins can be loaded
     QDir app_dir(QApplication::applicationDirPath());
     app_dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
 
@@ -111,7 +143,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 #endif
 
     QStringList plugin_names = app_dir.entryList();
-    int32_t i = 0;
     struct plugins plugin;
     while (i < plugin_names.length())
     {
@@ -132,7 +163,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
 
-                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
+//                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
             }
             else
@@ -143,6 +174,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
         ++i;
     }
+#endif
 #endif
 
 #if SKIPSPEEDTEST == 1
@@ -517,6 +549,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     {
         //Restore window size
         this->resize(gpTermSettings->value("WindowWidth", this->width()).toUInt(), gpTermSettings->value("WindowHeight", this->height()).toUInt());
+    }
+    else
+    {
+#ifdef _WIN32
+        this->resize(580, 210);
+#endif
     }
 
     //Check if default devices were created
