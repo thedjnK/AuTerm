@@ -3,7 +3,7 @@
 **
 ** Project: AuTerm
 **
-** Module:  AutPlugin.cpp
+** Module:  AutPlugin.h
 **
 ** Notes:
 **
@@ -30,8 +30,7 @@
 
 class AutPlugin
 {
-public:;
-    virtual ~AutPlugin() = default;
+public:
     virtual QWidget *GetWidget() = 0;
     virtual void setup(QMainWindow *main_window) = 0;
     virtual const QString plugin_about() = 0;
