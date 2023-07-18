@@ -23,10 +23,17 @@
 *******************************************************************************/
 
 /******************************************************************************/
+// Defines
+/******************************************************************************/
+//Minimum number of characters present in the buffer before text sections are
+//appended instead of replacing the whole field
+#define TERM_SIZE_MIN_APPEND_TEXT 6
+
+/******************************************************************************/
 // Include Files
 /******************************************************************************/
 #include "LrdScrollEdit.h"
-#include <QRegularExpression>
+#include "UwxEscape.h"
 
 /******************************************************************************/
 // Local Functions or Private Members
@@ -609,14 +616,9 @@ LrdScrollEdit::UpdateDisplay(
 
         this->setUpdatesEnabled(false);
 
-//TODO: improve this
-        QRegularExpression reTempRE("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
-        reTempRE.setPatternOptions(QRegularExpression::MultilineOption);
-        QRegularExpressionMatch remTempREM = reTempRE.match(mstrDatIn);
-        while (remTempREM.hasMatch())
+        if (this->strip_vt100 == true)
         {
-            mstrDatIn.remove(remTempREM.capturedStart(0), remTempREM.capturedLength(0));
-            remTempREM = reTempRE.match(mstrDatIn);
+            UwxEscape::StripVT100Formatting(&mstrDatIn);
         }
 
 //TODO: deal with partial VT100 escape codes
@@ -639,8 +641,7 @@ LrdScrollEdit::UpdateDisplay(
             --i;
         }
 
-//TODO: set this properly and define it
-        if (mintPrevTextSize < 20)
+        if (mintPrevTextSize < TERM_SIZE_MIN_APPEND_TEXT)
         {
             QString append_data = QString(mstrDatIn);
             dat_in_new_len = append_data.length();
@@ -757,6 +758,16 @@ LrdScrollEdit::TrimDatIn(
         //Threshold exceeded, trim to desired size
         mstrDatIn.remove(0, mstrDatIn.length() - intSize);
     }
+}
+
+//=============================================================================
+//=============================================================================
+void
+LrdScrollEdit::SetVT100Stripmode(
+    bool enabled
+    )
+{
+    strip_vt100 = enabled;
 }
 
 /******************************************************************************/

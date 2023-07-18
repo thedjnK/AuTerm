@@ -93,6 +93,10 @@ public:
         qint32 intThreshold,
         quint32 intSize
         );
+    void
+    SetVT100Stripmode(
+        bool enabled
+        );
 
 protected:
     bool
@@ -125,11 +129,12 @@ private:
     QByteArray mstrDatIn; //Incoming data (previous commands/received data)
     QString mstrDatOut; //Outgoing data (user typed keyboard data)
     int mintCurPos; //Current text cursor position
-    unsigned int mintPrevTextSize; //Holds a count of the previous text size
+    uint32_t mintPrevTextSize; //Holds a count of the previous text size
     bool mbSliderShown; //True if the slider moving to the bottom position upon appearing has been ran
     bool dat_out_updated; //True if mstrDatOut has been updated and needs redrawing
     int32_t dat_in_prev_check_len; //Holds position of mstrDatIn where hex character escaping was last performed to
     int32_t dat_in_new_len; //Holds position of QString-version of mstrDatIn where the mstrDatIn ends
+    bool strip_vt100; //True if VT100 format codes should be stripped
 
 public:
     bool mbLocalEcho; //True if local echo is enabled

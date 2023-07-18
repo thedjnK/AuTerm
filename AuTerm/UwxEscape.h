@@ -1,5 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2016-2017 Laird
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -38,6 +39,12 @@ public:
     void
     EscapeCharacters(
         QByteArray *baData
+        );
+
+    static
+    void
+    StripVT100Formatting(
+        QByteArray *data
         );
 };
 

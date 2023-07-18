@@ -25,6 +25,7 @@
 // Include Files
 /******************************************************************************/
 #include "UwxEscape.h"
+#include <QRegularExpression>
 
 /******************************************************************************/
 // Local Functions or Private Members
@@ -83,6 +84,25 @@ UwxEscape::EscapeCharacters(
 
         //Search for the next instance
         Next = baData->indexOf("\\", Next+1);
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void
+UwxEscape::StripVT100Formatting(
+    QByteArray *data
+    )
+{
+//TODO: improve this
+    QRegularExpression vt100_regex("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
+    vt100_regex.setPatternOptions(QRegularExpression::MultilineOption);
+    QRegularExpressionMatch regex_match = vt100_regex.match(*data);
+
+    while (regex_match.hasMatch())
+    {
+        data->remove(regex_match.capturedStart(0), regex_match.capturedLength(0));
+        regex_match = vt100_regex.match(*data);
     }
 }
 

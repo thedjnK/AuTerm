@@ -673,6 +673,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Setup the terminal scrollback buffer size
     ui->text_TermEditData->SetupScrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
 
+    //Inform terminal if VT100 formatting codes should be stripped
+    ui->text_TermEditData->SetVT100Stripmode(ui->check_StripVT100Formatting->isChecked());
+
     //Check command line
     QStringList slArgs = QCoreApplication::arguments();
     unsigned char chi = 1;
@@ -5904,10 +5907,8 @@ MainWindow::on_edit_Title_textEdited(
     }
 }
 
-/******************************************************************************/
-// END OF FILE
-/******************************************************************************/
-
+//=============================================================================
+//=============================================================================
 void MainWindow::on_btn_Plugin_Abort_clicked()
 {
 //    qDebug() << plugin_loader.isLoaded();
@@ -5920,6 +5921,8 @@ void MainWindow::on_btn_Plugin_Abort_clicked()
 //    button->plugin_about();
 }
 
+//=============================================================================
+//=============================================================================
 void MainWindow::on_btn_Plugin_Config_clicked()
 {
 //todo: support plgin list
@@ -5931,6 +5934,8 @@ void MainWindow::on_btn_Plugin_Config_clicked()
 //    emit serial_status(true);
 }
 
+//=============================================================================
+//=============================================================================
 void MainWindow::plugin_set_status(bool busy, bool hide_terminal_output)
 {
     if (busy == false)
@@ -5946,6 +5951,8 @@ void MainWindow::plugin_set_status(bool busy, bool hide_terminal_output)
 //    qDebug() << "Now: " << busy;
 }
 
+//=============================================================================
+//=============================================================================
 void MainWindow::plugin_serial_transmit(QByteArray *data)
 {
 //    qDebug() << "Transmitted";
@@ -5963,3 +5970,14 @@ void MainWindow::plugin_serial_transmit(QByteArray *data)
     }
     }
 }
+
+//=============================================================================
+//=============================================================================
+void MainWindow::on_check_StripVT100Formatting_stateChanged(int state)
+{
+    ui->text_TermEditData->SetVT100Stripmode(state != 0);
+}
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

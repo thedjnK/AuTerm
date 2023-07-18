@@ -509,6 +509,7 @@ private slots:
     void on_btn_Plugin_Abort_clicked();
     void on_btn_Plugin_Config_clicked();
     void plugin_set_status(bool busy, bool hide_terminal_output);
+    void on_check_StripVT100Formatting_stateChanged(int state);
 
 public slots:
     void plugin_serial_transmit(QByteArray *data);
