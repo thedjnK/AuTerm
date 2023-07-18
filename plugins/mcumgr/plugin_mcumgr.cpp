@@ -36,7 +36,7 @@ QStandardItemModel model_image_state;
 
 //0x08 = new version, 0x00 = old
 #define setup_smp_message(message, stream, write, group, id) \
-message.append((char)(0x00 | (write == true ? 0x02 : 0x00)));  /* Read | Write (0x00 | 0x02) */ \
+message.append((char)((check_V2_Protocol->isChecked() ? 0x08 : 0x00) | (write == true ? 0x02 : 0x00)));  /* Read | Write (0x00 | 0x02) */ \
     message.append((char)0x00);  /* Flags */ \
     message.append((char)0x00);  /* Length A */ \
     message.append((char)0x05);  /* Length B */ \
@@ -52,6 +52,26 @@ message.append((char)(0x00 | (write == true ? 0x02 : 0x00)));  /* Read | Write (
     message[3] = (uint8_t)smp_data.length(); \
     message.append(data)
 
+struct slot_state_t {
+    uint32_t slot;
+    QByteArray version;
+    QByteArray hash;
+    bool bootable;
+    bool pending;
+    bool confirmed;
+    bool active;
+    bool permanent;
+    bool splitstatus;
+    QStandardItem *item;
+};
+
+struct image_state_t {
+    uint32_t image;
+    bool image_set;
+    QList<slot_state_t> slot_list;
+    QStandardItem *item;
+};
+
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
 	uart = new smp_uart(NULL);
@@ -59,7 +79,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 	file_upload_in_progress = false;
 	file_list_in_progress = false;
 	file_upload_area = 0;
-        shell_in_progress = false;
+    shell_in_progress = false;
 
 	parent_window = main_window;
     QTabWidget *tabWidget_orig = main_window->findChild<QTabWidget *>("selector_Tab");
@@ -630,9 +650,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_9->addLayout(verticalLayout_3, 1, 2, 1, 1);
 
     tabWidget_2->addTab(tab_6, QString());
-    verticalLayoutWidget = new QWidget(tab);
+//    verticalLayoutWidget = new QWidget(tab);
+        verticalLayoutWidget = new QWidget();
     verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-    verticalLayoutWidget->setGeometry(QRect(410, 20, 229, 182));
+//    verticalLayoutWidget->setGeometry(QRect(410, 20, 229, 182));
+        verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
     verticalLayout->setObjectName("verticalLayout");
@@ -851,8 +873,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_SHELL_Clear, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Clear_clicked()));
     connect(btn_SHELL_Copy, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Copy_clicked()));
 
+connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT(on_colview_IMG_Images_updatePreviewWidget(QModelIndex)));
     colview_IMG_Images->setModel(&model_image_state);
-    colview_IMG_Images->setPreviewWidget(verticalLayoutWidget);
 
     check_IMG_Preview_Confirmed->setChecked(true);
     check_IMG_Preview_Confirmed->installEventFilter(this);
@@ -1019,21 +1041,9 @@ bool plugin_mcumgr::handleStream_upload(QCborStreamReader &reader, int32_t *new_
     return true;
 }
 
-struct blah {
-uint32_t image;
-uint32_t slot;
-QByteArray version;
-QByteArray hash;
-bool bootable;
-bool pending;
-bool confirmed;
-bool active;
-bool permanent;
-bool splitstatus;
-};
-
-QList<blah> blaharray;
-blah thisblah;
+QList<image_state_t> blaharray;
+image_state_t thisblah;
+slot_state_t thisblah2;
 
 bool plugin_mcumgr::handleStream_state(QCborStreamReader &reader, int32_t *new_rc, QString array_name)
 {
@@ -1045,15 +1055,19 @@ QString array_name_dupe = array_name;
     int64_t off = -1;
 
     thisblah.image = 0;
-    thisblah.slot = 0;
-    thisblah.version.clear();
-    thisblah.hash.clear();
-    thisblah.bootable = false;
-    thisblah.pending = false;
-    thisblah.confirmed = false;
-    thisblah.active = false;
-    thisblah.permanent = false;
-    thisblah.splitstatus = false;
+    thisblah.image_set = false;
+    thisblah.slot_list.clear();
+    thisblah.item = nullptr;
+    thisblah2.slot = 0;
+    thisblah2.version.clear();
+    thisblah2.hash.clear();
+    thisblah2.bootable = false;
+    thisblah2.pending = false;
+    thisblah2.confirmed = false;
+    thisblah2.active = false;
+    thisblah2.permanent = false;
+    thisblah2.splitstatus = false;
+    thisblah2.item = nullptr;
     uint8_t items = 0;
 
     while (!reader.lastError() && reader.hasNext())
@@ -1068,27 +1082,27 @@ QString array_name_dupe = array_name;
 		    bool *index = NULL;
 		    if (key == "bootable")
 		    {
-			    index = &thisblah.bootable;
+                index = &thisblah2.bootable;
 		    }
 		    else if (key == "pending")
 		    {
-			    index = &thisblah.pending;
+                index = &thisblah2.pending;
 		    }
 		    else if (key == "confirmed")
 		    {
-			    index = &thisblah.confirmed;
+                index = &thisblah2.confirmed;
 		    }
 		    else if (key == "active")
 		    {
-			    index = &thisblah.active;
+                index = &thisblah2.active;
 		    }
 		    else if (key == "permanent")
 		    {
-			    index = &thisblah.permanent;
+                index = &thisblah2.permanent;
 		    }
 		    else if (key == "splitStatus")
 		    {
-			    index = &thisblah.splitstatus;
+                index = &thisblah2.splitstatus;
 		    }
 
 		    if (index != NULL)
@@ -1115,10 +1129,11 @@ QString array_name_dupe = array_name;
 		    else if (key == "image")
 		    {
 			    thisblah.image = reader.toUnsignedInteger();
+                thisblah.image_set = true;
 		    }
 		    else if (key == "slot")
 		    {
-			    thisblah.slot = reader.toUnsignedInteger();
+                thisblah2.slot = reader.toUnsignedInteger();
 		    }
 
 		    reader.next();
@@ -1136,7 +1151,7 @@ QString array_name_dupe = array_name;
 
 		    if (key == "hash")
 		    {
-			    thisblah.hash = data;
+                thisblah2.hash = data;
 			    items |= 0x01;
 		    }
 	    }
@@ -1165,7 +1180,7 @@ QString array_name_dupe = array_name;
 			    }
 			    else if (key == "version")
 			    {
-				    thisblah.version = data.toUtf8();
+                    thisblah2.version = data.toUtf8();
 				    items |= 0x02;
 			    }
 		    }
@@ -1195,13 +1210,41 @@ QString array_name_dupe = array_name;
 
 			    if (array_name == "images")
 			    {
-				    blaharray.append(thisblah);
-				    QStandardItem *group = new QStandardItem(QString("Image %1").arg(thisblah.image));
-				    QStandardItem *child = new QStandardItem(QString("Slot %1").arg(thisblah.slot));
-				    group->appendRow(child);
-				    model_image_state.appendRow(group);
-				    model_image_state.setColumnCount(1);
-				    model_image_state.setRowCount(1);
+                    image_state_t *image_state_ptr = nullptr;
+
+                    if (blaharray.length() > 0)
+                    {
+                        uint8_t i = 0;
+                        while (i < blaharray.length())
+                        {
+                            if (blaharray.at(i).image_set == thisblah.image_set && (thisblah.image_set == false || blaharray.at(i).image == thisblah.image))
+                            {
+                                image_state_ptr = &blaharray[i];
+                                break;
+                            }
+
+                            ++i;
+                        }
+                    }
+
+                    if (image_state_ptr == nullptr)
+                    {
+                        if (thisblah.image_set == true)
+                        {
+                            thisblah.item = new QStandardItem(QString("Image ").append(QString::number(thisblah.image)));
+                        }
+                        else
+                        {
+                            thisblah.item = new QStandardItem("Images");
+                        }
+                        blaharray.append(thisblah);
+                        image_state_ptr = &blaharray.last();
+                        model_image_state.appendRow(thisblah.item);
+                    }
+
+                    thisblah2.item = new QStandardItem(QString("Slot ").append(QString::number(thisblah2.slot)));
+                    image_state_ptr->slot_list.append(thisblah2);
+                    image_state_ptr->item->appendRow(thisblah2.item);
 			    }
 		    }
 		    break;
@@ -1568,22 +1611,46 @@ void plugin_mcumgr::receive_waiting(QByteArray message)
 //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(upload_tmr.elapsed())).append("ms"));
 		    lbl_IMG_Status->setText("Finished.");
 
-		    uint8_t i = 0;
+#if 0
+            uint8_t i = 0;
 		    while (i < blaharray.length())
 		    {
 			    qDebug() << i;
-			    qDebug() << "\t" << blaharray[i].active;
-			    qDebug() << "\t" << blaharray[i].bootable;
-			    qDebug() << "\t" << blaharray[i].confirmed;
-			    qDebug() << "\t" << blaharray[i].hash;
-			    qDebug() << "\t" << blaharray[i].pending;
-			    qDebug() << "\t" << blaharray[i].permanent;
-			    qDebug() << "\t" << blaharray[i].image;
-			    qDebug() << "\t" << blaharray[i].slot;
-			    qDebug() << "\t" << blaharray[i].splitstatus;
-			    qDebug() << "\t" << blaharray[i].version;
+                qDebug() << "\t" << blaharray[i].image;
+                qDebug() << "\t" << blaharray[i].image_set;
+
+                edit_IMG_Log->appendPlainText(QString::number(i));
+                edit_IMG_Log->appendPlainText(QString::number(blaharray[i].image));
+                edit_IMG_Log->appendPlainText(QString::number(blaharray[i].image_set));
+                edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list.length()));
+
+                uint8_t l = 0;
+                while (l < blaharray[i].slot_list.length())
+                {
+                    qDebug() << "\t" << blaharray[i].slot_list[l].slot;
+                    qDebug() << "\t" << blaharray[i].slot_list[l].active;
+                    qDebug() << "\t" << blaharray[i].slot_list[l].bootable;
+                    qDebug() << "\t" << blaharray[i].slot_list[l].confirmed;
+                    qDebug() << "\t" << blaharray[i].slot_list[l].hash;
+                    qDebug() << "\t" << blaharray[i].slot_list[l].pending;
+                    qDebug() << "\t" << blaharray[i].slot_list[l].permanent;
+                    qDebug() << "\t" << blaharray[i].slot_list[l].splitstatus;
+                    qDebug() << "\t" << blaharray[i].slot_list[l].version;
+                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].slot));
+                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].active));
+                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].bootable));
+                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].confirmed));
+                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].pending));
+                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].permanent));
+                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].splitstatus));
+                    edit_IMG_Log->appendPlainText(QString(blaharray[i].slot_list[l].version));
+                    edit_IMG_Log->appendPlainText(QString(blaharray[i].slot_list[l].hash));
+                    ++l;
+                }
+
 			    ++i;
 		    }
+#endif
 
 		    file_list_in_progress = false;
 		    emit plugin_set_status(false, false);
@@ -1681,6 +1748,19 @@ void plugin_mcumgr::on_btn_IMG_Local_clicked()
 
 void plugin_mcumgr::on_btn_IMG_Go_clicked()
 {
+    if (model_image_state.rowCount() == 0)
+    {
+        QStandardItem *group = new QStandardItem(QString("Image %1"));
+        QStandardItem *child = new QStandardItem(QString("Slot %1"));
+        group->appendRow(child);
+        model_image_state.appendRow(group);
+    }
+    else
+    {
+        model_image_state.clear();
+        colview_IMG_Images->previewWidget()->hide();
+    }
+
     if (tabWidget_3->currentIndex() == 0)
     {
         //Upload
@@ -1750,6 +1830,9 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
     {
         //Image list
         emit plugin_set_status(true, false);
+
+        blaharray.clear();
+        model_image_state.clear();
 
         QByteArray message;
         QByteArray smp_data;
@@ -1934,4 +2017,43 @@ void plugin_mcumgr::on_btn_SHELL_Clear_clicked()
 void plugin_mcumgr::on_btn_SHELL_Copy_clicked()
 {
     QApplication::clipboard()->setText(edit_SHELL_Output->toPlainText());
+}
+
+void plugin_mcumgr::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index)
+{
+    uint8_t i = 0;
+    while (i < blaharray.length())
+    {
+        if (blaharray[i].item == model_image_state.itemFromIndex(index)->parent())
+        {
+            uint8_t l = 0;
+            while (l < blaharray[i].slot_list.length())
+            {
+                if (model_image_state.itemFromIndex(index) == blaharray[i].slot_list[l].item)
+                {
+                    edit_IMG_Preview_Hash->setText(blaharray[i].slot_list[l].hash);
+                    edit_IMG_Preview_Version->setText(blaharray[i].slot_list[l].version);
+                    check_IMG_Preview_Active->setChecked(blaharray[i].slot_list[l].active);
+                    check_IMG_Preview_Bootable->setChecked(blaharray[i].slot_list[l].bootable);
+                    check_IMG_Preview_Confirmed->setChecked(blaharray[i].slot_list[l].confirmed);
+                    check_IMG_Preview_Pending->setChecked(blaharray[i].slot_list[l].pending);
+                    check_IMG_Preview_Permanent->setChecked(blaharray[i].slot_list[l].permanent);
+
+                    i = 99;
+                    break;
+                }
+            }
+        }
+
+        ++i;
+    }
+
+    if (colview_IMG_Images->previewWidget() != verticalLayoutWidget)
+    {
+        colview_IMG_Images->setPreviewWidget(verticalLayoutWidget);
+    }
+    else
+    {
+        colview_IMG_Images->previewWidget()->show();
+    }
 }
