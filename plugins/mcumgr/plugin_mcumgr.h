@@ -40,9 +40,11 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QColumnView>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPlainTextEdit>
@@ -52,6 +54,7 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -79,14 +82,30 @@ signals:
     void plugin_set_status(bool busy, bool hide_terminal_output);
 
 private slots:
-    void on_btn_IMG_Local_clicked();
-    void on_btn_IMG_Go_clicked();
     void receive_waiting(QByteArray data);
     bool eventFilter(QObject *object, QEvent *event);
+
+    //Form slots
+    void on_btn_FS_Local_clicked();
+    void on_btn_FS_Go_clicked();
+    void on_radio_FS_Upload_clicked();
+    void on_radio_FS_Download_clicked();
+    void on_radio_FS_Size_clicked();
+    void on_radio_FS_HashChecksum_clicked();
+    void on_btn_IMG_Local_clicked();
+    void on_btn_IMG_Go_clicked();
+    void on_radio_IMG_No_Action_toggled(bool checked);
+    void on_btn_IMG_Preview_Copy_clicked();
+    void on_btn_OS_Go_clicked();
+    void on_btn_SHELL_Go_clicked();
+    void on_btn_STAT_Go_clicked();
+    void on_btn_SHELL_Clear_clicked();
+    void on_btn_SHELL_Copy_clicked();
 
 private:
     bool handleStream_upload(QCborStreamReader &reader, int32_t *new_rc, int64_t *new_off);
 	bool handleStream_state(QCborStreamReader &reader, int32_t *new_rc, QString array_name);
+    bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
     void file_upload(QByteArray *message);
     bool extract_hash(QByteArray *file_data);
 
@@ -94,7 +113,6 @@ private:
 //    QGridLayout *gridLayout;
 //    QTabWidget *tabWidget;
     QWidget *tab;
-    QLabel *label;
     QTabWidget *tabWidget_2;
     QWidget *tab_2;
     QGridLayout *gridLayout_2;
@@ -124,21 +142,23 @@ private:
     QSpacerItem *horizontalSpacer_4;
     QLabel *lbl_IMG_Status;
     QTabWidget *tabWidget_3;
-    QWidget *tab_10;
+    QWidget *tab_IMG_Upload;
     QGridLayout *gridLayout_4;
+    QProgressBar *progress_IMG_Complete;
+    QLabel *label_6;
+    QHBoxLayout *horizontalLayout_5;
+    QLineEdit *edit_IMG_Local;
+    QToolButton *btn_IMG_Local;
+    QLabel *label_4;
     QHBoxLayout *horizontalLayout_4;
     QSpinBox *edit_IMG_Image;
     QRadioButton *radio_IMG_No_Action;
     QRadioButton *radio_IMG_Test;
     QRadioButton *radio_IMG_Confirm;
-    QHBoxLayout *horizontalLayout_5;
-    QLineEdit *edit_IMG_Local;
-    QToolButton *btn_IMG_Local;
-    QLabel *label_4;
     QLabel *label_41;
-    QProgressBar *progress_IMG_Complete;
-    QLabel *label_6;
-    QWidget *tab_9;
+    QLabel *label_9;
+    QCheckBox *check_V2_Protocol_;
+    QWidget *tab_IMG_Images;
     QGridLayout *gridLayout_5;
     QColumnView *colview_IMG_Images;
     QHBoxLayout *horizontalLayout_6;
@@ -146,10 +166,70 @@ private:
     QRadioButton *radio_IMG_Get;
     QRadioButton *radio_ING_Set;
     QSpacerItem *horizontalSpacer_5;
-    QWidget *tab_4;
+    QWidget *tab_IMG_Erase;
+    QGridLayout *gridLayout_10;
+    QLabel *label_14;
+    QSpacerItem *horizontalSpacer_9;
+    QSpinBox *edit_IMG_Erase_Slot;
+    QSpacerItem *verticalSpacer_2;
+    QWidget *tab_OS;
+    QGridLayout *gridLayout_7;
+    QTabWidget *selector_OS;
+    QWidget *tab_OS_Echo;
+    QGridLayout *gridLayout_8;
+    QLabel *label_10;
+    QPlainTextEdit *edit_OS_Echo_Input;
+    QLabel *label_11;
+    QPlainTextEdit *edit_OS_Echo_Output;
+    QWidget *tab_8;
+    QWidget *tab_11;
+    QWidget *tab_OS_Reset;
+    QGridLayout *gridLayout_12;
+    QCheckBox *check_OS_Force_Reboot;
+    QSpacerItem *verticalSpacer_3;
+    QWidget *tab_OS_Info;
+    QGridLayout *gridLayout_13;
+    QLabel *label_17;
+    QLineEdit *edit_OS_UNam;
+    QHBoxLayout *horizontalLayout_10;
+    QRadioButton *radio_FS_Upload_2;
+    QRadioButton *radio_FS_Download_2;
+    QLabel *label_18;
+    QPlainTextEdit *edit_OS_Info_Output;
+    QHBoxLayout *horizontalLayout_13;
+    QSpacerItem *horizontalSpacer_17;
+    QPushButton *btn_OS_Go;
+    QSpacerItem *horizontalSpacer_18;
+    QLabel *lbl_OS_Status;
     QWidget *tab_5;
+    QGridLayout *gridLayout_11;
+    QLabel *label_15;
+    QComboBox *combo_STAT_Group;
+    QLabel *label_16;
+    QTableWidget *table_STAT_Values;
+    QHBoxLayout *horizontalLayout_9;
+    QRadioButton *radio_STAT_List;
+    QRadioButton *radio_STAT_Fetch;
+    QLabel *lbl_STAT_Status;
+    QHBoxLayout *horizontalLayout_14;
+    QSpacerItem *horizontalSpacer_19;
+    QPushButton *btn_STAT_Go;
+    QSpacerItem *horizontalSpacer_20;
     QWidget *tab_6;
-    QSpinBox *edit_MTU;
+    QGridLayout *gridLayout_9;
+    QLineEdit *edit_SHELL_Input;
+    QHBoxLayout *horizontalLayout_8;
+    QSpacerItem *horizontalSpacer_7;
+    QPushButton *btn_SHELL_Go;
+    QSpacerItem *horizontalSpacer_8;
+    QPlainTextEdit *edit_SHELL_Log;
+    QLabel *lbl_SHELL_Status;
+    QLabel *label_13;
+    QPlainTextEdit *edit_SHELL_Output;
+    QLabel *label_12;
+    QVBoxLayout *verticalLayout_3;
+    QToolButton *btn_SHELL_Clear;
+    QToolButton *btn_SHELL_Copy;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
     QFormLayout *formLayout;
@@ -165,6 +245,12 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
+    QWidget *horizontalLayoutWidget;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *label;
+    QSpinBox *edit_MTU;
+    QCheckBox *check_V2_Protocol;
+    QSpacerItem *horizontalSpacer_6;
 
     //
     QByteArray file_upload_data;
@@ -174,6 +260,7 @@ private:
     QElapsedTimer upload_tmr;
     const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
     QByteArray upload_hash;
+    bool shell_in_progress;
 };
 
 #endif // PLUGIN_MCUMGR_H
