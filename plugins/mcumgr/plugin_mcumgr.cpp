@@ -1603,7 +1603,6 @@ void plugin_mcumgr::receive_waiting(QByteArray message)
 		    //Response to set image state
 		    int32_t rc = -1;
 		    message.remove(0, 8);
-		    blaharray.clear();
 		    QCborStreamReader cbor_reader(message);
 		    bool good = handleStream_state(cbor_reader, &rc, "");
 //		    qDebug() << "Got " << good << ", " << rc;
@@ -1748,177 +1747,79 @@ void plugin_mcumgr::on_btn_IMG_Local_clicked()
 
 void plugin_mcumgr::on_btn_IMG_Go_clicked()
 {
-    if (model_image_state.rowCount() == 0)
+    if (tabWidget_3->currentIndex() == 0)
     {
-        QStandardItem *group = new QStandardItem(QString("Image %1"));
-        QStandardItem *child = new QStandardItem(QString("Slot %1"));
-        group->appendRow(child);
-        model_image_state.appendRow(group);
+        //Upload
+        emit plugin_set_status(true, false);
+
+        lbl_IMG_Status->setText("Checking...");
+
+        QFile file(edit_IMG_Local->text());
+
+        if (!file.open(QFile::ReadOnly))
+        {
+            return;
+        }
+
+        file_upload_data.clear();
+        file_upload_data.append(file.readAll());
+
+        file.close();
+
+        if (extract_hash(&file_upload_data) == false)
+        {
+            lbl_IMG_Status->setText("Hash was not found");
+            file_upload_data.clear();
+            return;
+        }
+
+           //Send start
+        file_upload_area = 0;
+
+           //Generate image data
+        QByteArray session_hash = QCryptographicHash::hash(file_upload_data, QCryptographicHash::Sha256);
+
+        upload_tmr.start();
+
+//	    qDebug() << "hash: " << session_hash.toHex();
+
+        QByteArray message;
+        QByteArray smp_data;
+        QCborStreamWriter smp_stream(&smp_data);
+
+        setup_smp_message(message, smp_stream, true, 0x01, 0x01);
+
+        smp_stream.append("image");
+        smp_stream.append(edit_IMG_Image->value());
+        smp_stream.append("len");
+        smp_stream.append(file_upload_data.length());
+        smp_stream.append("off");
+        smp_stream.append(file_upload_area);
+        smp_stream.append("sha");
+        smp_stream.append(session_hash);
+        smp_stream.append("data");
+        smp_stream.append(file_upload_data.left(edit_MTU->text().toUInt()));
+//	    qDebug() << "bytes: " << edit_MTU->text().toUInt();
+
+        finish_smp_message(message, smp_stream, smp_data);
+
+        file_upload_in_progress = true;
+
+//	    qDebug() << "len: " << message.length();
+
+        uart->send(&message);
+
+        progress_IMG_Complete->setValue(0);
+        lbl_IMG_Status->setText("Uploading...");
     }
-    else
+    else if (tabWidget_3->currentIndex() == 1)
     {
-        model_image_state.clear();
+        //Image list
+        emit plugin_set_status(true, false);
+
         colview_IMG_Images->previewWidget()->hide();
-    }
-
-    if (tabWidget_3->currentIndex() == 0)
-    {
-        //Upload
-        emit plugin_set_status(true, false);
-
-        lbl_IMG_Status->setText("Checking...");
-
-        QFile file(edit_IMG_Local->text());
-
-        if (!file.open(QFile::ReadOnly))
-        {
-            return;
-        }
-
-        file_upload_data.clear();
-        file_upload_data.append(file.readAll());
-
-        file.close();
-
-        if (extract_hash(&file_upload_data) == false)
-        {
-            lbl_IMG_Status->setText("Hash was not found");
-            file_upload_data.clear();
-            return;
-        }
-
-           //Send start
-        file_upload_area = 0;
-
-           //Generate image data
-        QByteArray session_hash = QCryptographicHash::hash(file_upload_data, QCryptographicHash::Sha256);
-
-        upload_tmr.start();
-
-//	    qDebug() << "hash: " << session_hash.toHex();
-
-        QByteArray message;
-        QByteArray smp_data;
-        QCborStreamWriter smp_stream(&smp_data);
-
-        setup_smp_message(message, smp_stream, true, 0x01, 0x01);
-
-        smp_stream.append("image");
-        smp_stream.append(edit_IMG_Image->value());
-        smp_stream.append("len");
-        smp_stream.append(file_upload_data.length());
-        smp_stream.append("off");
-        smp_stream.append(file_upload_area);
-        smp_stream.append("sha");
-        smp_stream.append(session_hash);
-        smp_stream.append("data");
-        smp_stream.append(file_upload_data.left(edit_MTU->text().toUInt()));
-//	    qDebug() << "bytes: " << edit_MTU->text().toUInt();
-
-        finish_smp_message(message, smp_stream, smp_data);
-
-        file_upload_in_progress = true;
-
-//	    qDebug() << "len: " << message.length();
-
-        uart->send(&message);
-
-        progress_IMG_Complete->setValue(0);
-        lbl_IMG_Status->setText("Uploading...");
-    }
-    else if (tabWidget_3->currentIndex() == 1)
-    {
-        //Image list
-        emit plugin_set_status(true, false);
-
-        blaharray.clear();
         model_image_state.clear();
-
-        QByteArray message;
-        QByteArray smp_data;
-        QCborStreamWriter smp_stream(&smp_data);
-
-        setup_smp_message(message, smp_stream, false, 0x01, 0x00);
-        finish_smp_message(message, smp_stream, smp_data);
-
-        file_list_in_progress = true;
-
-//	    qDebug() << "len: " << message.length();
-
-        uart->send(&message);
-
-        progress_IMG_Complete->setValue(0);
-        lbl_IMG_Status->setText("Querying...");
-    }
-    if (tabWidget_3->currentIndex() == 0)
-    {
-        //Upload
-        emit plugin_set_status(true, false);
-
-        lbl_IMG_Status->setText("Checking...");
-
-        QFile file(edit_IMG_Local->text());
-
-        if (!file.open(QFile::ReadOnly))
-        {
-            return;
-        }
-
-        file_upload_data.clear();
-        file_upload_data.append(file.readAll());
-
-        file.close();
-
-        if (extract_hash(&file_upload_data) == false)
-        {
-            lbl_IMG_Status->setText("Hash was not found");
-            file_upload_data.clear();
-            return;
-        }
-
-           //Send start
-        file_upload_area = 0;
-
-           //Generate image data
-        QByteArray session_hash = QCryptographicHash::hash(file_upload_data, QCryptographicHash::Sha256);
-
-        upload_tmr.start();
-
-//	    qDebug() << "hash: " << session_hash.toHex();
-
-        QByteArray message;
-        QByteArray smp_data;
-        QCborStreamWriter smp_stream(&smp_data);
-
-        setup_smp_message(message, smp_stream, true, 0x01, 0x01);
-
-        smp_stream.append("image");
-        smp_stream.append(edit_IMG_Image->value());
-        smp_stream.append("len");
-        smp_stream.append(file_upload_data.length());
-        smp_stream.append("off");
-        smp_stream.append(file_upload_area);
-        smp_stream.append("sha");
-        smp_stream.append(session_hash);
-        smp_stream.append("data");
-        smp_stream.append(file_upload_data.left(edit_MTU->text().toUInt()));
-//	    qDebug() << "bytes: " << edit_MTU->text().toUInt();
-
-        finish_smp_message(message, smp_stream, smp_data);
-
-        file_upload_in_progress = true;
-
-//	    qDebug() << "len: " << message.length();
-
-        uart->send(&message);
-
-        progress_IMG_Complete->setValue(0);
-        lbl_IMG_Status->setText("Uploading...");
-    }
-    else if (tabWidget_3->currentIndex() == 1)
-    {
-        //Image list
-        emit plugin_set_status(true, false);
+        blaharray.clear();
 
         QByteArray message;
         QByteArray smp_data;
