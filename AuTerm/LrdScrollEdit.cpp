@@ -34,15 +34,17 @@
 /******************************************************************************/
 #include "LrdScrollEdit.h"
 #include "UwxEscape.h"
+#include <QRegularExpression>
+#include <QDebug>
 
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
+QTextCharFormat pre;
 LrdScrollEdit::LrdScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
     //Enable an event filter
     installEventFilter(this);
-    installEventFilter(this->verticalScrollBar());
     mintPrevTextSize = 0;
     mchItems = 0; //Number of items is 0
     mchPosition = 0; //Current position is 0
@@ -61,6 +63,427 @@ LrdScrollEdit::LrdScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     dat_in_new_len = 0;
 
     mstrDatIn.reserve(32768);
+
+    pre = this->textCursor().charFormat();
+    last_format = pre;
+}
+
+//=============================================================================
+//=============================================================================
+void
+LrdScrollEdit::vt100_colour_process(
+    uint32_t code,
+    vt100_format_code *format
+    )
+{
+    const QColor *tmp_col;
+
+    if ((code >= 30 && code <= 37 || code >= 40 && code <= 47) || (code >= 90 && code <= 97 || code >= 100 && code <= 107))
+    {
+        switch (code)
+        {
+            case 30:
+            case 40:
+            {
+                tmp_col = &col_black;
+                break;
+            }
+            case 31:
+            case 41:
+            {
+                tmp_col = &col_red;
+                break;
+            }
+            case 32:
+            case 42:
+            {
+                tmp_col = &col_green;
+                break;
+            }
+            case 33:
+            case 43:
+            {
+                tmp_col = &col_yellow;
+                break;
+            }
+            case 34:
+            case 44:
+            {
+                tmp_col = &col_blue;
+                break;
+            }
+            case 35:
+            case 45:
+            {
+                tmp_col = &col_magenta;
+                break;
+            }
+            case 36:
+            case 46:
+            {
+                tmp_col = &col_cyan;
+                break;
+            }
+            case 37:
+            case 47:
+            {
+                tmp_col = &col_light_gray;
+                break;
+            }
+            case 90:
+            case 100:
+            {
+                tmp_col = &col_black;
+                break;
+            }
+            case 91:
+            case 101:
+            {
+                tmp_col = &col_red;
+                break;
+            }
+            case 92:
+            case 102:
+            {
+                tmp_col = &col_green;
+                break;
+            }
+            case 93:
+            case 103:
+            {
+                tmp_col = &col_yellow;
+                break;
+            }
+            case 94:
+            case 104:
+            {
+                tmp_col = &col_blue;
+                break;
+            }
+            case 95:
+            case 105:
+            {
+                tmp_col = &col_magenta;
+                break;
+            }
+            case 96:
+            case 106:
+            {
+                tmp_col = &col_cyan;
+                break;
+            }
+            case 97:
+            case 107:
+            default:
+            {
+                tmp_col = &col_light_gray;
+                break;
+            }
+        };
+
+        if ((code >= 30 && code <= 37) || code >= 90 && code <= 97)
+        {
+            format->foreground_color = *tmp_col;
+            format->foreground_color_set = true;
+        }
+        else
+        {
+            format->background_color = *tmp_col;
+            format->background_color_set = true;
+        }
+    }
+    else if (code == 0)
+    {
+        format->clear_formatting = true;
+    }
+}
+
+//=============================================================================
+// Searches for VT100 format codes and extracts them, removing the original
+// formatting codes and adding the formatting codes to a list. Returns true if
+// full input buffer was process, returns false if it could not be fully
+// checked due to insufficient data, in which case `checked_pos` will be
+// updated with the length of the data (after removals) that has been checked
+//=============================================================================
+bool LrdScrollEdit::vt100_process(
+    QString *buffer,
+    int32_t start,
+    QList<vt100_format_code> *formats,
+    int32_t *checked_pos
+    )
+{
+    int32_t l = buffer->length();
+    vt100_format_code tmp_format;
+    int32_t prev_pos = -1;
+
+    while (start < l)
+    {
+        if (buffer->at(start) == (QChar)0x1b)
+        {
+            int32_t pos = start + 1;
+
+            if (pos >= l)
+            {
+                //Not enough bytes to check
+                *checked_pos = start;
+                return false;
+            }
+
+            if (buffer->at(pos) == '[')
+            {
+                bool found_digit = false;
+                uint32_t format = 0;
+                ++pos;
+                memset(&tmp_format, 0, sizeof(tmp_format));
+
+                while (pos < l && (buffer->at(pos) == ';' || (buffer->at(pos) >= '0' && buffer->at(pos) <= '9')))
+                {
+                    if (buffer->at(pos) == ';')
+                    {
+                        if (found_digit == true)
+                        {
+                            vt100_colour_process(format, &tmp_format);
+                            format = 0;
+                            found_digit = false;
+                        }
+                        else
+                        {
+                            buffer->remove(start, 1);
+                            --l;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        found_digit = true;
+                        format = (format * 10) + (uint32_t)(buffer->at(pos).toLatin1() - '0');
+                    }
+
+                    ++pos;
+                }
+
+                if ((pos - start) > 10)
+                {
+                    //Too long, probably garbage
+                    buffer->remove(start, 1);
+                    --l;
+                    continue;
+                }
+                //else if (pos >= l)
+                else if (pos >= buffer->length())
+                {
+                    //Not enough bytes to check
+                    *checked_pos = start;
+                    return false;
+                }
+                else if (buffer->at(pos) == 'm')
+                {
+                    if (found_digit == false)
+                    {
+                        //assume that no data means clear formatting?
+                        format = 0;
+                    }
+
+                    if (prev_pos == start)
+                    {
+                        //Append to existing one
+                        tmp_format = formats->last();
+                        formats->pop_back();
+                    }
+                    vt100_colour_process(format, &tmp_format);
+
+                    tmp_format.start = start;
+                    formats->append(tmp_format);
+                    buffer->remove(start, (pos - start + 1));
+                    l -= (pos - start + 1);
+                    prev_pos = start;
+                    continue;
+                }
+                else if (buffer->at(pos) == 'C')
+                {
+                    //Replace with spaces
+                    if (found_digit == true)
+                    {
+                    int32_t changes = (pos - start + 1) - format;
+                    qDebug() << "replacing: " <<  buffer->mid(start, (pos - start + 1));
+                    buffer->replace(start, (pos - start + 1), QString(" ").repeated(format));
+                    l -= changes;
+                    start -= changes;
+                    qDebug() << "next char is " << buffer->at(start);
+                    continue;
+                    }
+                    else
+                    {
+                        //todo?
+                    }
+                }
+                else
+                {
+                    buffer->remove(start, 1);
+                    --l;
+                    continue;
+                }
+
+                start = pos;
+            }
+            else
+            {
+                buffer->remove(start, 1);
+                --l;
+                continue;
+            }
+        }
+
+        ++start;
+    }
+
+    return true;
+}
+
+bool LrdScrollEdit::vt100_process_no_rem(
+    QString *buffer,
+    int32_t start,
+    QList<vt100_format_code> *formats,
+    int32_t *checked_pos
+    )
+{
+    int32_t l = buffer->length();
+    vt100_format_code tmp_format;
+    int32_t prev_pos = -1;
+
+    while (start < l)
+    {
+        if (buffer->at(start) == (QChar)0x1b)
+        {
+            int32_t pos = start + 1;
+
+            if (pos >= l)
+            {
+                //Not enough bytes to check
+                *checked_pos = start;
+//                qDebug() << "Not enough";
+                return false;
+            }
+
+            if (buffer->at(pos) == '[')
+            {
+                bool found_digit = false;
+                uint32_t format = 0;
+                ++pos;
+                memset(&tmp_format, 0, sizeof(tmp_format));
+
+                while (pos < l && (buffer->at(pos) == ';' || (buffer->at(pos) >= '0' && buffer->at(pos) <= '9')))
+                {
+                    if (buffer->at(pos) == ';')
+                    {
+                        if (found_digit == true)
+                        {
+//                            qDebug() << "Got " << format;
+                            vt100_colour_process(format, &tmp_format);
+
+                            format = 0;
+                            found_digit = false;
+                        }
+                        else
+                        {
+//                            qDebug() << "Did not get any values";
+                            //buffer->remove(start, 1);
+                            //--l;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        found_digit = true;
+                        format = (format * 10) + (uint32_t)(buffer->at(pos).toLatin1() - '0');
+                    }
+
+                    ++pos;
+                }
+
+                if ((pos - start) > 10)
+                {
+                    //Too long, probably garbage
+//                    qDebug() << "garbage?";
+                    //buffer->remove(start, 1);
+                    //--l;
+//                    continue;
+                }
+                else if (pos >= l)
+                {
+                    //Not enough bytes to check
+//                    qDebug() << "Not enough2";
+                    *checked_pos = start;
+                    return false;
+                }
+                else if (buffer->at(pos) == 'm')
+                {
+                    if (found_digit == false)
+                    {
+                        //assume that no data means clear formatting?
+                        format = 0;
+                    }
+
+                    if (prev_pos == start)
+                    {
+                        //Append to existing one
+                        tmp_format = formats->last();
+                        formats->pop_back();
+                    }
+                    vt100_colour_process(format, &tmp_format);
+                    tmp_format.start = start;
+                    formats->append(tmp_format);
+
+//                    qDebug() << "Got " << format;
+//                    qDebug() << "Valid!";
+//                    buffer->remove(start, (pos - start + 1));
+//                    l -= (pos - start + 1);
+//                    prev_pos = start;
+                    //continue;
+                }
+                else if (buffer->at(pos) == 'C')
+                {
+                    //Replace with spaces
+                    if (found_digit == true)
+                    {
+                    int32_t changes = (pos - start + 1) - format;
+                    qDebug() << "replacing: " <<  buffer->mid(start, (pos - start + 1));
+                    buffer->replace(start, (pos - start + 1), QString(" ").repeated(format));
+                    l -= changes;
+                    start -= changes;
+                    qDebug() << "next char is " << buffer->at(start);
+                    continue;
+                    }
+                    else
+                    {
+                        //todo?
+                    }
+                }
+                else
+                {
+//                    qDebug() << "Invalid";
+                    //buffer->remove(start, 1);
+                    //--l;
+//                    continue;
+                }
+
+                start = pos;
+            }
+            else
+            {
+//                qDebug() << "Random";
+//                buffer->remove(start, 1);
+  //              --l;
+//                continue;
+            }
+        }
+
+        ++start;
+    }
+
+    qDebug() << "l = " << l << ", len = " << buffer->length();
+
+    return true;
 }
 
 //=============================================================================
@@ -411,7 +834,8 @@ LrdScrollEdit::SetLineMode(
 //=============================================================================
 void
 LrdScrollEdit::AddDatInText(
-    QByteArray *baDat
+    QByteArray *baDat,
+    bool apply_formatting
     )
 {
     //Adds data to the DatIn buffer
@@ -429,6 +853,10 @@ LrdScrollEdit::AddDatInText(
 
         if (i > 0)
         {
+            if (apply_formatting == false)
+            {
+                mstrDatIn += "\x1b[0m";
+            }
             mstrDatIn += baDat->mid(i).replace("\r\n", "\n").replace("\r", "\n");
             added = true;
         }
@@ -436,6 +864,10 @@ LrdScrollEdit::AddDatInText(
 
     if (added == false)
     {
+        if (apply_formatting == false)
+        {
+            mstrDatIn += "\x1b[0m";
+        }
         mstrDatIn += baDat->replace("\r\n", "\n").replace("\r", "\n");
     }
 
@@ -480,6 +912,11 @@ LrdScrollEdit::ClearDatIn(
     mintPrevTextSize = 0;
     dat_in_prev_check_len = 0;
     dat_in_new_len = 0;
+    last_format = pre;
+
+    this->clear();
+    dat_out_updated = true;
+
     this->moveCursor(QTextCursor::End);
     this->UpdateDisplay();
 }
@@ -580,6 +1017,8 @@ LrdScrollEdit::UpdateDisplay(
         bool bShiftEnd = false;
         unsigned int uiCurrentSize = 0;
 
+        int32_t cannot_parse_bytes = 0;
+
         if (this->textCursor().anchor() != this->textCursor().position())
         {
             //Text is selected
@@ -616,16 +1055,17 @@ LrdScrollEdit::UpdateDisplay(
 
         this->setUpdatesEnabled(false);
 
-        if (this->strip_vt100 == true)
-        {
-            UwxEscape::StripVT100Formatting(&mstrDatIn);
-        }
+        //if (this->strip_vt100 == true)
+        //{
+            //UwxEscape::StripVT100Formatting(&mstrDatIn);
+        //}
 
 //TODO: deal with partial VT100 escape codes
 
+#if 1
         //Replace unprintable characters with escape codes
         int32_t i = mstrDatIn.length() - 1;
-        while (i >= dat_in_prev_check_len)
+        while (i >= 0)
         {
             uint8_t current = (uint8_t)mstrDatIn.at(i);
 
@@ -633,49 +1073,149 @@ LrdScrollEdit::UpdateDisplay(
             {
                 mstrDatIn.replace(i, 1, QString("\\0").append(QString::number(current, 16)).toUtf8());
             }
-            else if ((current >= 0x10 && current <= 0x1a) || (current >= 0x1c && current <= 0x1f))
+            else if ((current >= 0x10 && current <= 0x1a) || (current >= 0x1c && current <= 0x1f && current != 0x1b))
             {
                 mstrDatIn.replace(i, 1, QString("\\").append(QString::number(current, 16)).toUtf8());
             }
 
             --i;
         }
+#endif
 
-        if (mintPrevTextSize < TERM_SIZE_MIN_APPEND_TEXT)
+        if (dat_in_prev_check_len != mstrDatIn.length())
         {
-            QString append_data = QString(mstrDatIn);
-            dat_in_new_len = append_data.length();
-            this->setPlainText(append_data.append(mbLocalEcho == true && mbLineMode == true ? mstrDatOut : ""));
-            dat_out_updated = false;
-        }
-        else
-        {
-            if (dat_in_prev_check_len != mstrDatIn.length())
+            QString append_data = mstrDatIn.mid(dat_in_prev_check_len);
+            QList<vt100_format_code> format;
+            int32_t end = 0;
+
+            if (vt100_process(&append_data, 0, &format, &end) == false)
             {
-                QString append_data = mstrDatIn.mid(dat_in_prev_check_len - 1);
-                dat_in_new_len = append_data.length() + mintPrevTextSize - 1;
+                cannot_parse_bytes = append_data.length() - end;
+                append_data.remove(end, (append_data.length() - end));
+            }
 
-                QTextCursor tcTmpCur = this->textCursor();
-                tcTmpCur.setPosition(mintPrevTextSize - 1);
-                tcTmpCur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
-                this->setTextCursor(tcTmpCur);
-                tcTmpCur.insertText(append_data);
-        }
-        if (mbLocalEcho == true && mbLineMode == true && dat_out_updated == 1)
-        {
-                QTextCursor tcTmpCur = this->textCursor();
-                tcTmpCur.setPosition(dat_in_new_len);
-                tcTmpCur.movePosition(QTextCursor::End, QTextCursor::KeepAnchor, 1);
-                this->setTextCursor(tcTmpCur);
-                tcTmpCur.insertText(mstrDatOut);
-                dat_out_updated = false;
+            if (append_data.length() > 0)
+            {
+                dat_in_new_len = append_data.length();
+                int32_t i = 0;
+
+                tcTmpCur = this->textCursor();
+                int8_t next_entry = -1;
+
+                if (format.length() > 0 && format[0].start == 0)
+                {
+                    next_entry = 0;
+                }
+
+                bool first = true;
+
+                int8_t aa = 0;
+
+                while (i < dat_in_new_len)
+                {
+                    int32_t next = dat_in_new_len;
+
+                    while (aa < format.length())
+                    {
+                        if (i < format[aa].start)
+                        {
+                            next = format[aa].start;
+                            break;
+                        }
+
+                        ++aa;
+                    }
+
+                    tcTmpCur.setPosition(mintPrevTextSize + i);
+
+                    if (first == true)
+                    {
+                        tcTmpCur.setCharFormat(last_format);
+                        first = false;
+                    }
+
+                    if (next_entry != -1 && next_entry < format.length())
+                    {
+                        if (format[next_entry].clear_formatting == true)
+                        {
+                            tcTmpCur.setCharFormat(pre);
+                        }
+                        if (format[next_entry].foreground_color_set == true)
+                        {
+                            QTextCharFormat lolz = tcTmpCur.charFormat();
+                            lolz.setForeground(QBrush(format[next_entry].foreground_color));
+                            tcTmpCur.setCharFormat(lolz);
+                        }
+                        if (format[next_entry].background_color_set == true)
+                        {
+                            QTextCharFormat lolz = tcTmpCur.charFormat();
+                            lolz.setBackground(QBrush(format[next_entry].background_color));
+                            tcTmpCur.setCharFormat(lolz);
+                        }
+                    }
+
+                    this->setTextCursor(tcTmpCur);
+                    tcTmpCur.insertText(append_data.mid(i, (next - i)));
+                    i = next;
+                    next_entry = aa;
+                }
+
+                //Reset style if final character was for style
+                if (next_entry < format.length())
+                {
+                    tcTmpCur.setPosition(format[next_entry].start);
+
+                    if (format[next_entry].clear_formatting == true)
+                    {
+                        tcTmpCur.setCharFormat(pre);
+                        last_format = pre;
+                    }
+
+                    if (format[next_entry].foreground_color_set == true)
+                    {
+                        QTextCharFormat lolz = tcTmpCur.charFormat();
+                        lolz.setForeground(QBrush(format[next_entry].foreground_color));
+                        last_format = lolz;
+                        tcTmpCur.setCharFormat(lolz);
+                    }
+
+                    if (format[next_entry].background_color_set == true)
+                    {
+                        QTextCharFormat lolz = tcTmpCur.charFormat();
+                        lolz.setBackground(QBrush(format[next_entry].background_color));
+                        last_format = lolz;
+                        tcTmpCur.setCharFormat(lolz);
+                    }
+
+                    this->setTextCursor(tcTmpCur);
+                }
+                else
+                {
+                    last_format = tcTmpCur.charFormat();
+                }
+
+                dat_in_new_len += mintPrevTextSize;
             }
         }
+
+        if (/*mbLocalEcho == true &&*/ mbLineMode == true && dat_out_updated == true)
+        {
+            /*QTextCursor*/ tcTmpCur = this->textCursor();
+            tcTmpCur.setPosition(dat_in_new_len);
+            tcTmpCur.movePosition(QTextCursor::End, QTextCursor::KeepAnchor, 1);
+
+            tcTmpCur.setCharFormat(pre);
+            this->setTextCursor(tcTmpCur);
+            tcTmpCur.insertText(mstrDatOut);
+
+            dat_out_updated = false;
+        }
+
         this->setUpdatesEnabled(true);
 
         //Update previous text size variables
         mintPrevTextSize = dat_in_new_len;
-        dat_in_prev_check_len = mstrDatIn.length();
+        dat_in_prev_check_len = mstrDatIn.length() - cannot_parse_bytes;
 
         //Update the cursor position
         this->UpdateCursor();
@@ -729,6 +1269,7 @@ LrdScrollEdit::UpdateCursor(
         //Local echo mode and line mode are enabled so move the cursor
         QTextCursor tcTmpCur = this->textCursor();
         tcTmpCur.setPosition(mintPrevTextSize + mintCurPos);
+tcTmpCur.setCharFormat(pre);
         this->setTextCursor(tcTmpCur);
     }
 }

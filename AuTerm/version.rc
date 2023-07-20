@@ -19,12 +19,12 @@
             BEGIN
                 VALUE   "CompanyName",      "thedjnK\0"
                 VALUE   "FileDescription",  "AuTerm\0"
-                VALUE   "FileVersion",      "0.11.0.0\0"
+                VALUE   "FileVersion",      "0.14.0.0\0"
                 VALUE   "InternalName",     "AuTerm\0"
                 VALUE   "LegalCopyright",   "Copyright 2023 thedjnK\0"
                 VALUE   "OriginalFilename", "AuTerm.exe\0"
                 VALUE   "ProductName",      "AuTerm\0"
-                VALUE   "ProductVersion",   "0.11.0.0\0"
+                VALUE   "ProductVersion",   "0.14.0.0\0"
             END
         END
     END

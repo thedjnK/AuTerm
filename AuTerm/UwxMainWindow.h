@@ -99,7 +99,7 @@
 // Constants
 /******************************************************************************/
 //Constants for version and functions
-const QString UwVersion                         = "0.13"; //Version string
+const QString UwVersion                         = "0.14"; //Version string
 //Constants for timeouts and streaming
 const qint16 FileReadBlock                      = 512;     //Number of bytes to read per block when streaming files
 const qint16 StreamProgress                     = 10000;   //Number of bytes between streaming progress updates
@@ -513,6 +513,7 @@ private slots:
 
 public slots:
     void plugin_serial_transmit(QByteArray *data);
+    void plugin_add_open_close_button(QPushButton *button);
 
 private:
     Ui::MainWindow *ui;
@@ -639,9 +640,6 @@ private:
     LrdLogger *gpMainLog; //Handle to the main log file (if enabled/used)
     bool gbMainLogEnabled; //True if opened successfully (and enabled)
     QMenu *gpMenu; //Main menu
-    QMenu *gpSMenu1; //Submenu 1
-    QMenu *gpSMenu2; //Submenu 2
-    QMenu *gpSMenu3; //Submenu 3
     QMenu *gpSMenu4; //Submenu 4
     QMenu *gpBalloonMenu; //Balloon menu
 #if SKIPSPEEDTEST != 1
@@ -736,6 +734,7 @@ private:
     qint64 gintLastSerialTimeUpdate; //Used for recording when next last received timestamp should appear
     bool gbPluginRunning; //True if a plugin is running
     bool gbPluginHideTerminalOutput; //True if terminal output should not be updated whilst plugin is running
+    QList<QPushButton *> list_plugin_open_close_buttons;
 
 protected:
     void dragEnterEvent(

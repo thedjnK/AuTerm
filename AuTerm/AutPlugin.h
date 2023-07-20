@@ -25,6 +25,7 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
+#include <QPushButton>
 
 #define AuTermPluginInterface_iid "org.AuTerm.PluginInterface"
 
@@ -46,6 +47,7 @@ signals:
     void show_message_box(QString str_message);
     void serial_transmit(QByteArray *data);
     void plugin_set_status(bool busy, bool hide_terminal_output);
+    void plugin_add_open_close_button(QPushButton *button);
 };
 
 Q_DECLARE_INTERFACE(AutPlugin, AuTermPluginInterface_iid)

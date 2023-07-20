@@ -119,11 +119,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
             if (plugin.plugin)
             {
-                plugin.plugin->setup(this);
-                plugin_list.append(plugin);
-
 //                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
+                connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
+
+                plugin.plugin->setup(this);
+                plugin_list.append(plugin);
             }
         }
 
@@ -160,11 +161,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
             if (plugin.plugin)
             {
-                plugin.plugin->setup(this);
-                plugin_list.append(plugin);
-
 //                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
+                connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
+
+                plugin.plugin->setup(this);
+                plugin_list.append(plugin);
             }
             else
             {
@@ -1152,9 +1154,6 @@ MainWindow::~MainWindow()
 #endif
     delete gpBalloonMenu;
     delete gpSMenu4;
-    delete gpSMenu3;
-    delete gpSMenu2;
-    delete gpSMenu1;
     delete gpMenu;
     delete gpEmptyCirclePixmap;
     delete gpRedCirclePixmap;
@@ -1220,12 +1219,12 @@ void
 MainWindow::on_btn_TermClose_clicked(
     )
 {
-    if (ui->btn_TermClose->text() == "&Open Port" || ui->btn_TermClose->text() == "Open Port")
+    if (gspSerialPort.isOpen() == false)
     {
         //Open connection
         OpenDevice();
     }
-    else if (ui->btn_TermClose->text() == "C&lose Port" || ui->btn_TermClose->text() == "Close Port")
+    else
     {
         //Close, but first clear up from download/streaming
         gbTermBusy = false;
@@ -1338,6 +1337,13 @@ MainWindow::on_btn_TermClose_clicked(
 #if SKIPSPEEDTEST != 1
         ui->btn_SpeedClose->setText("&Open Port");
 #endif
+
+        uint8_t i = 0;
+        while (i < list_plugin_open_close_buttons.length())
+        {
+            list_plugin_open_close_buttons[i]->setText("&Open Port");
+            ++i;
+        }
 
 #ifndef SKIPAUTOMATIONFORM
         //Notify automation form
@@ -2081,7 +2087,7 @@ MainWindow::EnterPressed(
                 //Local echo
                 QByteArray baTmpBA = ui->text_TermEditData->GetDatOut()->toUtf8();
                 baTmpBA.append("\n");
-                ui->text_TermEditData->AddDatInText(&baTmpBA);
+                ui->text_TermEditData->AddDatInText(&baTmpBA, false);
             }
             ui->text_TermEditData->ClearDatOut();
         }
@@ -2446,6 +2452,13 @@ MainWindow::OpenDevice(
 #if SKIPSPEEDTEST != 1
             ui->btn_SpeedClose->setText("C&lose Port");
 #endif
+
+            uint8_t i = 0;
+            while (i < list_plugin_open_close_buttons.length())
+            {
+                list_plugin_open_close_buttons[i]->setText("C&lose Port");
+                ++i;
+            }
 
             //Signal checking
             SerialStatus(1);
@@ -2897,7 +2910,7 @@ MainWindow::MessagePass(
             }
 
             //Replace unprintable characters
-            baDataString.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f");
+//            baDataString.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f");
 
             //Output to display buffer
             gbaDisplayBuffer.append(baDataString);
@@ -3146,7 +3159,7 @@ MainWindow::UpdateReceiveText(
     )
 {
     //Updates the receive text buffer
-    ui->text_TermEditData->AddDatInText(&gbaDisplayBuffer);
+    ui->text_TermEditData->AddDatInText(&gbaDisplayBuffer, true);
     gbaDisplayBuffer.clear();
 
     //(Unlisted option) Trim display buffer if required
@@ -3468,7 +3481,7 @@ MainWindow::on_check_Echo_stateChanged(
     )
 {
     //Local echo checkbox state changed
-    ui->text_TermEditData->mbLocalEcho = ui->check_Echo->isChecked();
+//    ui->text_TermEditData->mbLocalEcho = ui->check_Echo->isChecked();
 }
 
 //=============================================================================
@@ -5945,6 +5958,7 @@ void MainWindow::plugin_set_status(bool busy, bool hide_terminal_output)
     }
     else
     {
+        ui->selector_Tab->setCurrentIndex(0);
             gbPluginRunning = busy;
     gbPluginHideTerminalOutput = hide_terminal_output;
     }
@@ -5966,7 +5980,7 @@ void MainWindow::plugin_serial_transmit(QByteArray *data)
 
     if (gbPluginHideTerminalOutput == false && ui->check_Echo->isChecked())
     {
-            ui->text_TermEditData->AddDatInText(data);
+            ui->text_TermEditData->AddDatInText(data, false);
     }
     }
 }
@@ -5976,6 +5990,15 @@ void MainWindow::plugin_serial_transmit(QByteArray *data)
 void MainWindow::on_check_StripVT100Formatting_stateChanged(int state)
 {
     ui->text_TermEditData->SetVT100Stripmode(state != 0);
+}
+
+//=============================================================================
+//=============================================================================
+void MainWindow::plugin_add_open_close_button(QPushButton *button)
+{
+    list_plugin_open_close_buttons.append(button);
+    connect(button, SIGNAL(clicked(bool)), this, SLOT(on_btn_TermClose_clicked()));
+    button->setText(gspSerialPort.isOpen() == true ? "C&lose Port" : "&Open Port");
 }
 
 /******************************************************************************/
