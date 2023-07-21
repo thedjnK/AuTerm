@@ -4,7 +4,7 @@
 **
 ** Project: AuTerm
 **
-** Module: LrdScrollEdit.h
+** Module: AutScrollEdit.h
 **
 ** Notes:
 **
@@ -21,8 +21,8 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef LRDSCROLLEDIT_H
-#define LRDSCROLLEDIT_H
+#ifndef AUTSCROLLEDIT_H
+#define AUTSCROLLEDIT_H
 
 /******************************************************************************/
 // Include Files
@@ -86,22 +86,22 @@ const QColor col_white = QColor(255, 255, 255);
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class LrdScrollEdit : public QPlainTextEdit
+class AutScrollEdit : public QPlainTextEdit
 {
     Q_OBJECT
 public:
     explicit
-    LrdScrollEdit(
+    AutScrollEdit(
         QWidget *parent = 0
         );
-    ~LrdScrollEdit(
+    ~AutScrollEdit(
         );
     bool
-    SetupScrollback(
+    setup_scrollback(
         quint16 nLines
         );
     void
-    SetLineMode(
+    set_line_mode(
         bool bNewLineMode
         );
     void
@@ -109,34 +109,35 @@ public:
         const QMimeData *mdSrc
         );
     void
-    UpdateDisplay(
+    update_display(
         );
     void
-    AddDatInText(
+    add_dat_in_text(
         QByteArray *baDat,
         bool apply_formatting
         );
     void
-    AddDatOutText(
+    add_dat_out_text(
         const QString strDat
         );
     void
-    ClearDatIn(
+    clear_dat_in(
         );
     void
-    ClearDatOut(
+    clear_dat_out(
         );
     QString
-    *GetDatOut(
+    *get_dat_out(
         );
     void
-    UpdateCursor(
+    update_cursor(
         );
     void
-    SetSerialOpen(
+    set_serial_open(
         bool SerialOpen
         );
-    void TrimDatIn(
+    void
+    trim_dat_in(
         qint32 intThreshold,
         quint32 intSize
         );
@@ -173,15 +174,15 @@ protected:
 
 signals:
     void
-    EnterPressed(
+    enter_pressed(
         );
     void
-    KeyPressed(
+    key_pressed(
         int nKey,
         QChar chrKeyValue
         );
     void
-    FileDropped(
+    file_dropped(
         QString strFilename
         );
 
@@ -209,7 +210,7 @@ public:
     bool mbLineSeparator; //True if line separator is enabled
 };
 
-#endif // LRDSCROLLEDIT_H
+#endif // AUTSCROLLEDIT_H
 
 /******************************************************************************/
 // END OF FILE

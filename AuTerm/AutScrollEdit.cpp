@@ -4,7 +4,7 @@
 **
 ** Project: AuTerm
 **
-** Module: LrdEdit.cpp
+** Module: AutScrollEdit.cpp
 **
 ** Notes:
 **
@@ -32,7 +32,7 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "LrdScrollEdit.h"
+#include "AutScrollEdit.h"
 #include "UwxEscape.h"
 #include <QRegularExpression>
 #include <QDebug>
@@ -41,7 +41,7 @@
 // Local Functions or Private Members
 /******************************************************************************/
 QTextCharFormat pre;
-LrdScrollEdit::LrdScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
+AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
     //Enable an event filter
     installEventFilter(this);
@@ -71,7 +71,7 @@ LrdScrollEdit::LrdScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::vt100_colour_process(
+AutScrollEdit::vt100_colour_process(
     uint32_t code,
     vt100_format_code *format
     )
@@ -205,7 +205,7 @@ LrdScrollEdit::vt100_colour_process(
 // checked due to insufficient data, in which case `checked_pos` will be
 // updated with the length of the data (after removals) that has been checked
 //=============================================================================
-bool LrdScrollEdit::vt100_process(
+bool AutScrollEdit::vt100_process(
     QString *buffer,
     int32_t start,
     QList<vt100_format_code> *formats,
@@ -340,7 +340,7 @@ bool LrdScrollEdit::vt100_process(
     return true;
 }
 
-bool LrdScrollEdit::vt100_process_no_rem(
+bool AutScrollEdit::vt100_process_no_rem(
     QString *buffer,
     int32_t start,
     QList<vt100_format_code> *formats,
@@ -488,7 +488,7 @@ bool LrdScrollEdit::vt100_process_no_rem(
 
 //=============================================================================
 //=============================================================================
-LrdScrollEdit::~LrdScrollEdit()
+AutScrollEdit::~AutScrollEdit()
 {
     //Destructor
     delete[] mstrItemArray;
@@ -498,7 +498,7 @@ LrdScrollEdit::~LrdScrollEdit()
 //=============================================================================
 //=============================================================================
 bool
-LrdScrollEdit::SetupScrollback(
+AutScrollEdit::setup_scrollback(
     quint16 nLines
     )
 {
@@ -511,7 +511,7 @@ LrdScrollEdit::SetupScrollback(
 //=============================================================================
 //=============================================================================
 bool
-LrdScrollEdit::eventFilter(
+AutScrollEdit::eventFilter(
     QObject *target,
     QEvent *event
     )
@@ -522,7 +522,7 @@ LrdScrollEdit::eventFilter(
         if (event->type() == QEvent::MouseButtonRelease)
         {
             //Button was released, update display buffer
-            this->UpdateDisplay();
+            this->update_display();
         }
         else if (event->type() == QEvent::UpdateLater && mbSliderShown == false)
         {
@@ -570,7 +570,7 @@ LrdScrollEdit::eventFilter(
                 mstrDatOut = mstrItemArray[mchPosition];
                 mintCurPos = mstrDatOut.length();
 
-                this->UpdateDisplay();
+                this->update_display();
 
                 return true;
             }
@@ -585,7 +585,7 @@ LrdScrollEdit::eventFilter(
                 mstrDatOut = mstrItemArray[mchPosition];
                 mintCurPos = mstrDatOut.length();
 
-                this->UpdateDisplay();
+                this->update_display();
 
                 return true;
             }
@@ -615,7 +615,7 @@ LrdScrollEdit::eventFilter(
                     }
 
                     //Send message to main window
-                    emit EnterPressed();
+                    emit enter_pressed();
                 }
                 this->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
                 mintCurPos = 0;
@@ -660,8 +660,8 @@ LrdScrollEdit::eventFilter(
                     --mintCurPos;
                 }
 
-                this->UpdateDisplay();
-                this->UpdateCursor();
+                this->update_display();
+                this->update_cursor();
 
                 return true;
             }
@@ -680,13 +680,13 @@ LrdScrollEdit::eventFilter(
                             break;
                         }
                     }
-                    this->UpdateCursor();
+                    this->update_cursor();
                 }
                 else if (mintCurPos > 0)
                 {
                     //Move left
                     --mintCurPos;
-                    this->UpdateCursor();
+                    this->update_cursor();
                 }
                 return true;
             }
@@ -705,13 +705,13 @@ LrdScrollEdit::eventFilter(
                             break;
                         }
                     }
-                    this->UpdateCursor();
+                    this->update_cursor();
                 }
                 else if (mintCurPos < mstrDatOut.length())
                 {
                     //Move right
                     ++mintCurPos;
-                    this->UpdateCursor();
+                    this->update_cursor();
                 }
                 return true;
             }
@@ -722,7 +722,7 @@ LrdScrollEdit::eventFilter(
                 {
                     //Move to beginning of line
                     mintCurPos = 0;
-                    this->UpdateCursor();
+                    this->update_cursor();
                 }
                 return true;
             }
@@ -733,7 +733,7 @@ LrdScrollEdit::eventFilter(
                 {
                     //Move to end of line
                     mintCurPos = mstrDatOut.length();
-                    this->UpdateCursor();
+                    this->update_cursor();
                 }
                 return true;
             }
@@ -770,14 +770,14 @@ LrdScrollEdit::eventFilter(
                     //Delete character
                     mstrDatOut.remove(mintCurPos, 1);
                 }
-                this->UpdateDisplay();
-                this->UpdateCursor();
+                this->update_display();
+                this->update_cursor();
                 return true;
             }
             else if (keyEvent->key() != Qt::Key_Escape && keyEvent->key() != Qt::Key_Backtab && keyEvent->key() != Qt::Key_Backspace && keyEvent->key() != Qt::Key_Insert && keyEvent->key() != Qt::Key_Pause && keyEvent->key() != Qt::Key_Print && keyEvent->key() != Qt::Key_SysReq && keyEvent->key() != Qt::Key_Clear && keyEvent->key() != Qt::Key_Home && keyEvent->key() != Qt::Key_End && keyEvent->key() != Qt::Key_Shift && keyEvent->key() != Qt::Key_Control && keyEvent->key() != Qt::Key_Meta && keyEvent->key() != Qt::Key_Alt && keyEvent->key() != Qt::Key_AltGr && keyEvent->key() != Qt::Key_CapsLock && keyEvent->key() != Qt::Key_NumLock && keyEvent->key() != Qt::Key_ScrollLock && !(keyEvent->modifiers() & Qt::ControlModifier))
             {
                 //Move cursor to correct position to prevent inserting at wrong location if e.g. text is selected
-                this->UpdateCursor();
+                this->update_cursor();
 
                 //Add character
                 mstrDatOut.insert(mintCurPos, keyEvent->text());
@@ -796,8 +796,8 @@ LrdScrollEdit::eventFilter(
                     if (keyEvent->key() != Qt::Key_Escape && keyEvent->key() != Qt::Key_Tab && keyEvent->key() != Qt::Key_Backtab && /*keyEvent->key() != Qt::Key_Backspace &&*/ keyEvent->key() != Qt::Key_Insert && keyEvent->key() != Qt::Key_Delete && keyEvent->key() != Qt::Key_Pause && keyEvent->key() != Qt::Key_Print && keyEvent->key() != Qt::Key_SysReq && keyEvent->key() != Qt::Key_Clear && keyEvent->key() != Qt::Key_Home && keyEvent->key() != Qt::Key_End && keyEvent->key() != Qt::Key_Shift && keyEvent->key() != Qt::Key_Control && keyEvent->key() != Qt::Key_Meta && keyEvent->key() != Qt::Key_Alt && keyEvent->key() != Qt::Key_AltGr && keyEvent->key() != Qt::Key_CapsLock && keyEvent->key() != Qt::Key_NumLock && keyEvent->key() != Qt::Key_ScrollLock)
                     {
                         //Not a special character
-                        emit KeyPressed(keyEvent->key(), *keyEvent->text().unicode());
-                        this->UpdateDisplay();
+                        emit key_pressed(keyEvent->key(), *keyEvent->text().unicode());
+                        this->update_display();
                     }
                     return true;
                 }
@@ -821,19 +821,19 @@ LrdScrollEdit::eventFilter(
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::SetLineMode(
+AutScrollEdit::set_line_mode(
     bool bNewLineMode
     )
 {
     //Enables or disables line mode
     mbLineMode = bNewLineMode;
-    this->UpdateDisplay();
+    this->update_display();
 }
 
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::AddDatInText(
+AutScrollEdit::add_dat_in_text(
     QByteArray *baDat,
     bool apply_formatting
     )
@@ -872,13 +872,13 @@ LrdScrollEdit::AddDatInText(
         mstrDatIn += baDat->replace("\r\n", "\n").replace("\r", "\n");
     }
 
-    this->UpdateDisplay();
+    this->update_display();
 }
 
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::AddDatOutText(
+AutScrollEdit::add_dat_out_text(
     const QString strDat
     )
 {
@@ -889,7 +889,7 @@ LrdScrollEdit::AddDatOutText(
         mstrDatOut += strDat;
         mintCurPos += strDat.length();
         dat_out_updated = true;
-        this->UpdateDisplay();
+        this->update_display();
     }
     else
     {
@@ -897,7 +897,7 @@ LrdScrollEdit::AddDatOutText(
         QChar qcTmpQC;
         foreach (qcTmpQC, strDat)
         {
-            emit KeyPressed(0, qcTmpQC);
+            emit key_pressed(0, qcTmpQC);
         }
     }
 }
@@ -905,7 +905,7 @@ LrdScrollEdit::AddDatOutText(
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::ClearDatIn(
+AutScrollEdit::clear_dat_in(
     )
 {
     //Clears the DatIn buffer
@@ -919,26 +919,26 @@ LrdScrollEdit::ClearDatIn(
     dat_out_updated = true;
 
     this->moveCursor(QTextCursor::End);
-    this->UpdateDisplay();
+    this->update_display();
 }
 
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::ClearDatOut(
+AutScrollEdit::clear_dat_out(
     )
 {
     //Clears the DatOut buffer
     mstrDatOut.clear();
     mintCurPos = 0;
     dat_out_updated = true;
-    this->UpdateDisplay();
+    this->update_display();
 }
 
 //=============================================================================
 //=============================================================================
 QString *
-LrdScrollEdit::GetDatOut(
+AutScrollEdit::get_dat_out(
     )
 {
     //Returns the DatOut buffer
@@ -948,7 +948,7 @@ LrdScrollEdit::GetDatOut(
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::insertFromMimeData(
+AutScrollEdit::insertFromMimeData(
     const QMimeData *mdSrc
     )
 {
@@ -974,7 +974,7 @@ LrdScrollEdit::insertFromMimeData(
         }
 
         //Send back to main application
-        emit FileDropped(urls.first().toLocalFile());
+        emit file_dropped(urls.first().toLocalFile());
     }
     else if (mdSrc->hasText() == true)
     {
@@ -985,8 +985,8 @@ LrdScrollEdit::insertFromMimeData(
             mstrDatOut.insert(mintCurPos, mdSrc->text());
             mintCurPos += mdSrc->text().length();
             dat_out_updated = true;
-            this->UpdateDisplay();
-            this->UpdateCursor();
+            this->update_display();
+            this->update_cursor();
         }
         else
         {
@@ -995,7 +995,7 @@ LrdScrollEdit::insertFromMimeData(
             QChar qcTmpQC;
             foreach (qcTmpQC, strTmpStr)
             {
-                emit KeyPressed(0, qcTmpQC);
+                emit key_pressed(0, qcTmpQC);
             }
         }
     }
@@ -1004,7 +1004,7 @@ LrdScrollEdit::insertFromMimeData(
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::UpdateDisplay(
+AutScrollEdit::update_display(
     )
 {
     //Updates the receive text buffer, faster
@@ -1226,7 +1226,7 @@ LrdScrollEdit::UpdateDisplay(
         dat_in_prev_check_len = mstrDatIn.length() - cannot_parse_bytes;
 
         //Update the cursor position
-        this->UpdateCursor();
+        this->update_cursor();
 
 //BUG: if text selected is in out buffer, this messes up selection
         if (uiAnchor != 0 || uiPosition != 0)
@@ -1268,7 +1268,7 @@ LrdScrollEdit::UpdateDisplay(
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::UpdateCursor(
+AutScrollEdit::update_cursor(
     )
 {
     //Updates the text control's cursor position
@@ -1285,7 +1285,7 @@ tcTmpCur.setCharFormat(pre);
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::SetSerialOpen(
+AutScrollEdit::set_serial_open(
     bool SerialOpen
     )
 {
@@ -1296,7 +1296,7 @@ LrdScrollEdit::SetSerialOpen(
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::TrimDatIn(
+AutScrollEdit::trim_dat_in(
     qint32 intThreshold,
     quint32 intSize
     )
@@ -1312,7 +1312,7 @@ LrdScrollEdit::TrimDatIn(
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::set_vt100_mode(
+AutScrollEdit::set_vt100_mode(
     vt100_mode mode
     )
 {

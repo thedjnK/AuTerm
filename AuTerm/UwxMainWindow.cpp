@@ -393,11 +393,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->btn_Quit, SIGNAL(clicked()), this, SLOT(close()));
 
     //Connect key-press signals
-    connect(ui->text_TermEditData, SIGNAL(EnterPressed()), this, SLOT(EnterPressed()));
-    connect(ui->text_TermEditData, SIGNAL(KeyPressed(int,QChar)), this, SLOT(KeyPressed(int,QChar)));
+    connect(ui->text_TermEditData, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
+    connect(ui->text_TermEditData, SIGNAL(key_pressed(int,QChar)), this, SLOT(key_pressed(int,QChar)));
 
     //Connect file drag/drop signal
-    connect(ui->text_TermEditData, SIGNAL(FileDropped(QString)), this, SLOT(DroppedFile(QString)));
+    connect(ui->text_TermEditData, SIGNAL(file_dropped(QString)), this, SLOT(DroppedFile(QString)));
 
     //Initialise popup message
     gpmErrorForm = new PopupMessage();
@@ -517,7 +517,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Set update speed display timer to be single shot only and connect to slot
     gtmrSpeedUpdateTimer.setSingleShot(true);
     gtmrSpeedUpdateTimer.setInterval(gpTermSettings->value("TextUpdateInterval", DefaultTextUpdateInterval).toInt());
-    connect(&gtmrSpeedUpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateDisplayText()));
+    connect(&gtmrSpeedUpdateTimer, SIGNAL(timeout()), this, SLOT(update_displayText()));
 #endif
 
     //Setup timer for batch file timeout
@@ -673,7 +673,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 #endif
 
     //Setup the terminal scrollback buffer size
-    ui->text_TermEditData->SetupScrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
+    ui->text_TermEditData->setup_scrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
 
     //Inform terminal what to do with VT100 control codes
     if (ui->radio_vt100_ignore->isChecked() == true)
@@ -999,8 +999,8 @@ MainWindow::~MainWindow()
 {
     //Disconnect all signals
     disconnect(this, SLOT(close()));
-    disconnect(this, SLOT(EnterPressed()));
-    disconnect(this, SLOT(KeyPressed(int,QChar)));
+    disconnect(this, SLOT(enter_pressed()));
+    disconnect(this, SLOT(key_pressed(int,QChar)));
     disconnect(this, SLOT(DroppedFile(QString)));
     disconnect(this, SLOT(MenuSelected(QAction*)));
     disconnect(this, SLOT(balloontriggered(QAction*)));
@@ -1016,7 +1016,7 @@ MainWindow::~MainWindow()
 //    disconnect(this, SLOT(replyFinished(QNetworkReply*)));
     disconnect(this, SLOT(MessagePass(QByteArray,bool,bool)));
 #if SKIPSPEEDTEST != 1
-    disconnect(this, SLOT(UpdateDisplayText()));
+    disconnect(this, SLOT(update_displayText()));
     disconnect(this, SLOT(UpdateSpeedTestValues()));
     disconnect(this, SLOT(OutputSpeedTestStats()));
 
@@ -1483,7 +1483,7 @@ MainWindow::on_btn_TermClear_clicked(
     )
 {
     //Clears the screen of the terminal tab
-    ui->text_TermEditData->ClearDatIn();
+    ui->text_TermEditData->clear_dat_in();
 }
 
 //=============================================================================
@@ -1995,7 +1995,7 @@ MainWindow::MenuSelected(
     else if (intItem == MenuActionClearDisplay)
     {
         //Clear display
-        ui->text_TermEditData->ClearDatIn();
+        ui->text_TermEditData->clear_dat_in();
     }
     else if (intItem == MenuActionClearRxTx)
     {
@@ -2018,7 +2018,7 @@ MainWindow::MenuSelected(
     else if (intItem == MenuActionPaste)
     {
         //Paste data from clipboard
-        ui->text_TermEditData->AddDatOutText(QApplication::clipboard()->text());
+        ui->text_TermEditData->add_dat_out_text(QApplication::clipboard()->text());
     }
     else if (intItem == MenuActionSelectAll)
     {
@@ -2056,7 +2056,7 @@ MainWindow::balloontriggered(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::EnterPressed(
+MainWindow::enter_pressed(
     )
 {
     //Enter pressed in line mode
@@ -2066,7 +2066,7 @@ MainWindow::EnterPressed(
         {
             if (gbLoopbackMode == false)
             {
-                QByteArray baTmpBA = ui->text_TermEditData->GetDatOut()->replace("\r", "\n").replace("\n", (ui->radio_LCR->isChecked() ? "\r" : ui->radio_LLF->isChecked() ? "\n" : ui->radio_LCRLF->isChecked() ? "\r\n" : "")).toUtf8();
+                QByteArray baTmpBA = ui->text_TermEditData->get_dat_out()->replace("\r", "\n").replace("\n", (ui->radio_LCR->isChecked() ? "\r" : ui->radio_LLF->isChecked() ? "\n" : ui->radio_LCRLF->isChecked() ? "\r\n" : "")).toUtf8();
                 gspSerialPort.write(baTmpBA);
                 gintQueuedTXBytes += baTmpBA.size();
 
@@ -2096,11 +2096,11 @@ MainWindow::EnterPressed(
             if (ui->check_Echo->isChecked() == true)
             {
                 //Local echo
-                QByteArray baTmpBA = ui->text_TermEditData->GetDatOut()->toUtf8();
+                QByteArray baTmpBA = ui->text_TermEditData->get_dat_out()->toUtf8();
                 baTmpBA.append("\n");
-                ui->text_TermEditData->AddDatInText(&baTmpBA, false);
+                ui->text_TermEditData->add_dat_in_text(&baTmpBA, false);
             }
-            ui->text_TermEditData->ClearDatOut();
+            ui->text_TermEditData->clear_dat_out();
         }
     }
 }
@@ -2135,7 +2135,7 @@ MainWindow::UpdateImages(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::KeyPressed(
+MainWindow::key_pressed(
     int nKey,
     QChar chrKeyValue
     )
@@ -2486,7 +2486,7 @@ MainWindow::OpenDevice(
 #endif
 
             //Notify scroll edit
-            ui->text_TermEditData->SetSerialOpen(true);
+            ui->text_TermEditData->set_serial_open(true);
 
             //Set focus to input text edit
             ui->text_TermEditData->setFocus();
@@ -2564,7 +2564,7 @@ MainWindow::OpenDevice(
             .append(" and try again.");
             gpmErrorForm->show();
             gpmErrorForm->SetMessage(&strMessage);
-            ui->text_TermEditData->SetSerialOpen(false);
+            ui->text_TermEditData->set_serial_open(false);
         }
     }
     else
@@ -2678,7 +2678,7 @@ MainWindow::on_check_Line_stateChanged(
     )
 {
     //Line mode status changed
-    ui->text_TermEditData->SetLineMode(ui->check_Line->isChecked());
+    ui->text_TermEditData->set_line_mode(ui->check_Line->isChecked());
 }
 
 //=============================================================================
@@ -2712,7 +2712,7 @@ MainWindow::SerialError(
         QString strMessage = tr("Fatal error with serial connection.\nPlease reconnect to the device to continue.");
         gpmErrorForm->show();
         gpmErrorForm->SetMessage(&strMessage);
-        ui->text_TermEditData->SetSerialOpen(false);
+        ui->text_TermEditData->set_serial_open(false);
 
         if (gspSerialPort.isOpen() == true)
         {
@@ -3170,14 +3170,14 @@ MainWindow::UpdateReceiveText(
     )
 {
     //Updates the receive text buffer
-    ui->text_TermEditData->AddDatInText(&gbaDisplayBuffer, true);
+    ui->text_TermEditData->add_dat_in_text(&gbaDisplayBuffer, true);
     gbaDisplayBuffer.clear();
 
     //(Unlisted option) Trim display buffer if required
     if (gbAutoTrimDBuffer == true)
     {
         //Trim display buffer (this may split UTF-8 characters up)
-        ui->text_TermEditData->TrimDatIn(gintAutoTrimBufferDThreshold, gintAutoTrimBufferDSize);
+        ui->text_TermEditData->trim_dat_in(gintAutoTrimBufferDThreshold, gintAutoTrimBufferDSize);
 #pragma warning("TODO: Document trim options/add to GUI")
     }
 }
@@ -3635,7 +3635,7 @@ MainWindow::ContextMenuClosed(
 {
     //Right click context menu closed, send message to text edit object
     ui->text_TermEditData->mbContextMenuOpen = false;
-    ui->text_TermEditData->UpdateDisplay();
+    ui->text_TermEditData->update_display();
 }
 
 //=============================================================================
@@ -5608,7 +5608,7 @@ MainWindow::OutputSpeedTestAvgStats(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::UpdateDisplayText(
+MainWindow::update_displayText(
     )
 {
     //Updates the speed display with data from the buffer
@@ -6002,7 +6002,7 @@ MainWindow::plugin_serial_transmit(
 
     if (gbPluginHideTerminalOutput == false && ui->check_Echo->isChecked())
     {
-            ui->text_TermEditData->AddDatInText(data, false);
+            ui->text_TermEditData->add_dat_in_text(data, false);
     }
     }
 }

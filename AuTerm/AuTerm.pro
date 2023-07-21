@@ -21,14 +21,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     AutPlugin.cpp \
-    LrdScrollEdit.cpp \
+    AutScrollEdit.cpp \
     UwxMainWindow.cpp \
     UwxPopup.cpp \
     LrdLogger.cpp \
     UwxEscape.cpp
 
 HEADERS  += \
-    LrdScrollEdit.h \
+    AutScrollEdit.h \
     UwxMainWindow.h \
     UwxPopup.h \
     LrdLogger.h \

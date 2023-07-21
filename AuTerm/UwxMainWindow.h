@@ -58,7 +58,7 @@
 #if TARGET_OS_MAC
 #include "QStandardPaths"
 #endif
-#include "LrdScrollEdit.h"
+#include "AutScrollEdit.h"
 #include "UwxPopup.h"
 #include "LrdLogger.h"
 #if SKIPAUTOMATIONFORM != 1
@@ -231,10 +231,10 @@ public slots:
         QSerialPort::SerialPortError speErrorCode
         );
     void
-    EnterPressed(
+    enter_pressed(
         );
     void
-    KeyPressed(
+    key_pressed(
         int nKey,
         QChar chrKeyValue
         );
@@ -487,7 +487,7 @@ private slots:
         int
         );
     void
-    UpdateDisplayText(
+    update_displayText(
         );
 #endif
     void
