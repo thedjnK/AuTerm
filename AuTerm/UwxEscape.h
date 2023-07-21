@@ -44,7 +44,8 @@ public:
     static
     void
     StripVT100Formatting(
-        QByteArray *data
+        QByteArray *data,
+        int32_t offset
         );
 };
 

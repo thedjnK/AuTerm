@@ -37,6 +37,12 @@
 #include <QTextDocumentFragment>
 #include <QClipboard>
 
+enum vt100_mode {
+    VT100_MODE_IGNORE = 0,
+    VT100_MODE_STRIP,
+    VT100_MODE_DECODE,
+};
+
 enum vt100_format_type {
     FORMAT_UNSET = 0,
     FORMAT_DISABLE,
@@ -135,8 +141,8 @@ public:
         quint32 intSize
         );
     void
-    SetVT100Stripmode(
-        bool enabled
+    set_vt100_mode(
+        vt100_mode mode
         );
 
 protected:
@@ -194,8 +200,8 @@ private:
     bool dat_out_updated; //True if mstrDatOut has been updated and needs redrawing
     int32_t dat_in_prev_check_len; //Holds position of mstrDatIn where hex character escaping was last performed to
     int32_t dat_in_new_len; //Holds position of QString-version of mstrDatIn where the mstrDatIn ends
-    bool strip_vt100; //True if VT100 format codes should be stripped
     QTextCharFormat last_format; //Last format applied to dat out data
+    vt100_mode vt100_control_mode; //VT100 control code mode
 
 public:
     bool mbLocalEcho; //True if local echo is enabled

@@ -853,6 +853,7 @@ LrdScrollEdit::AddDatInText(
 
         if (i > 0)
         {
+//TODO: a better way to deal with this "hack"
             if (apply_formatting == false)
             {
                 mstrDatIn += "\x1b[0m";
@@ -1055,17 +1056,17 @@ LrdScrollEdit::UpdateDisplay(
 
         this->setUpdatesEnabled(false);
 
-        //if (this->strip_vt100 == true)
-        //{
-            //UwxEscape::StripVT100Formatting(&mstrDatIn);
-        //}
+        if (vt100_control_mode == VT100_MODE_STRIP)
+        {
+            UwxEscape::StripVT100Formatting(&mstrDatIn, dat_in_prev_check_len);
+        }
 
 //TODO: deal with partial VT100 escape codes
 
 #if 1
         //Replace unprintable characters with escape codes
         int32_t i = mstrDatIn.length() - 1;
-        while (i >= 0)
+        while (i >= dat_in_prev_check_len)
         {
             uint8_t current = (uint8_t)mstrDatIn.at(i);
 
@@ -1088,7 +1089,7 @@ LrdScrollEdit::UpdateDisplay(
             QList<vt100_format_code> format;
             int32_t end = 0;
 
-            if (vt100_process(&append_data, 0, &format, &end) == false)
+            if (vt100_control_mode == VT100_MODE_DECODE && vt100_process(&append_data, 0, &format, &end) == false)
             {
                 cannot_parse_bytes = append_data.length() - end;
                 append_data.remove(end, (append_data.length() - end));
@@ -1130,7 +1131,14 @@ LrdScrollEdit::UpdateDisplay(
 
                     if (first == true)
                     {
-                        tcTmpCur.setCharFormat(last_format);
+                        if (vt100_control_mode == VT100_MODE_DECODE)
+                        {
+                            tcTmpCur.setCharFormat(last_format);
+                        }
+                        else
+                        {
+                            tcTmpCur.setCharFormat(pre);
+                        }
                         first = false;
                     }
 
@@ -1304,11 +1312,11 @@ LrdScrollEdit::TrimDatIn(
 //=============================================================================
 //=============================================================================
 void
-LrdScrollEdit::SetVT100Stripmode(
-    bool enabled
+LrdScrollEdit::set_vt100_mode(
+    vt100_mode mode
     )
 {
-    strip_vt100 = enabled;
+    vt100_control_mode = mode;
 }
 
 /******************************************************************************/

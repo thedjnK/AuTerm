@@ -675,8 +675,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Setup the terminal scrollback buffer size
     ui->text_TermEditData->SetupScrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
 
-    //Inform terminal if VT100 formatting codes should be stripped
-    ui->text_TermEditData->SetVT100Stripmode(ui->check_StripVT100Formatting->isChecked());
+    //Inform terminal what to do with VT100 control codes
+    if (ui->radio_vt100_ignore->isChecked() == true)
+    {
+        on_radio_vt100_ignore_toggled(true);
+    }
+    else if (ui->radio_vt100_strip->isChecked() == true)
+    {
+        on_radio_vt100_strip_toggled(true);
+    }
+    else if (ui->radio_vt100_decode->isChecked() == true)
+    {
+        on_radio_vt100_decode_toggled(true);
+    }
 
     //Check command line
     QStringList slArgs = QCoreApplication::arguments();
@@ -5922,7 +5933,9 @@ MainWindow::on_edit_Title_textEdited(
 
 //=============================================================================
 //=============================================================================
-void MainWindow::on_btn_Plugin_Abort_clicked()
+void
+MainWindow::on_btn_Plugin_Abort_clicked(
+    )
 {
 //    qDebug() << plugin_loader.isLoaded();
 //    qDebug() << button->filters();
@@ -5936,7 +5949,9 @@ void MainWindow::on_btn_Plugin_Abort_clicked()
 
 //=============================================================================
 //=============================================================================
-void MainWindow::on_btn_Plugin_Config_clicked()
+void
+MainWindow::on_btn_Plugin_Config_clicked(
+    )
 {
 //todo: support plgin list
     if (plugin_list.at(0).plugin->plugin_configuration() == false)
@@ -5949,7 +5964,11 @@ void MainWindow::on_btn_Plugin_Config_clicked()
 
 //=============================================================================
 //=============================================================================
-void MainWindow::plugin_set_status(bool busy, bool hide_terminal_output)
+void
+MainWindow::plugin_set_status(
+    bool busy,
+    bool hide_terminal_output
+    )
 {
     if (busy == false)
     {
@@ -5967,7 +5986,10 @@ void MainWindow::plugin_set_status(bool busy, bool hide_terminal_output)
 
 //=============================================================================
 //=============================================================================
-void MainWindow::plugin_serial_transmit(QByteArray *data)
+void
+MainWindow::plugin_serial_transmit(
+    QByteArray *data
+    )
 {
 //    qDebug() << "Transmitted";
     if (gbPluginRunning == true)
@@ -5987,18 +6009,44 @@ void MainWindow::plugin_serial_transmit(QByteArray *data)
 
 //=============================================================================
 //=============================================================================
-void MainWindow::on_check_StripVT100Formatting_stateChanged(int state)
-{
-    ui->text_TermEditData->SetVT100Stripmode(state != 0);
-}
-
-//=============================================================================
-//=============================================================================
-void MainWindow::plugin_add_open_close_button(QPushButton *button)
+void
+MainWindow::plugin_add_open_close_button(
+    QPushButton *button
+    )
 {
     list_plugin_open_close_buttons.append(button);
     connect(button, SIGNAL(clicked(bool)), this, SLOT(on_btn_TermClose_clicked()));
     button->setText(gspSerialPort.isOpen() == true ? "C&lose Port" : "&Open Port");
+}
+
+//=============================================================================
+//=============================================================================
+void MainWindow::on_radio_vt100_ignore_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        ui->text_TermEditData->set_vt100_mode(VT100_MODE_IGNORE);
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void MainWindow::on_radio_vt100_strip_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        ui->text_TermEditData->set_vt100_mode(VT100_MODE_STRIP);
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void MainWindow::on_radio_vt100_decode_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        ui->text_TermEditData->set_vt100_mode(VT100_MODE_DECODE);
+    }
 }
 
 /******************************************************************************/

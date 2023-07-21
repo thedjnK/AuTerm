@@ -506,14 +506,39 @@ private slots:
     on_edit_Title_textEdited(
         const QString &
         );
-    void on_btn_Plugin_Abort_clicked();
-    void on_btn_Plugin_Config_clicked();
-    void plugin_set_status(bool busy, bool hide_terminal_output);
-    void on_check_StripVT100Formatting_stateChanged(int state);
+    void
+    on_btn_Plugin_Abort_clicked(
+        );
+    void
+    on_btn_Plugin_Config_clicked(
+        );
+    void
+    plugin_set_status(
+        bool busy,
+        bool hide_terminal_output
+        );
+    void
+    on_radio_vt100_ignore_toggled(
+        bool checked
+        );
+    void
+    on_radio_vt100_strip_toggled(
+        bool checked
+        );
+    void
+    on_radio_vt100_decode_toggled(
+        bool checked
+        );
 
 public slots:
-    void plugin_serial_transmit(QByteArray *data);
-    void plugin_add_open_close_button(QPushButton *button);
+    void
+    plugin_serial_transmit(
+        QByteArray *data
+        );
+    void
+    plugin_add_open_close_button(
+        QPushButton *button
+        );
 
 private:
     Ui::MainWindow *ui;

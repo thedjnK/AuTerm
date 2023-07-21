@@ -91,13 +91,14 @@ UwxEscape::EscapeCharacters(
 //=============================================================================
 void
 UwxEscape::StripVT100Formatting(
-    QByteArray *data
+    QByteArray *data,
+    int32_t offset
     )
 {
 //TODO: improve this
     QRegularExpression vt100_regex("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
     vt100_regex.setPatternOptions(QRegularExpression::MultilineOption);
-    QRegularExpressionMatch regex_match = vt100_regex.match(*data);
+    QRegularExpressionMatch regex_match = vt100_regex.match(*data, offset);
 
     while (regex_match.hasMatch())
     {
