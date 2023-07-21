@@ -125,6 +125,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
+
+                ui->list_Plugin_Plugins->addItem(QString(static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(static_plugins.at(i).metaData().value("MetaData").toObject().value("Version").toString()));
             }
         }
 
@@ -167,6 +169,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
+
+                ui->list_Plugin_Plugins->addItem(QString(static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(static_plugins.at(i).metaData().value("MetaData").toObject().value("Version").toString()));
             }
             else
             {
@@ -346,13 +350,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gimEmptyCircleImage = QImage(":/images/EmptyCircle.png");
     gimRedCircleImage = QImage(":/images/RedCircle.png");
     gimGreenCircleImage = QImage(":/images/GreenCircle.png");
-#ifdef _WIN32
-    //Load ICOs for windows
-    gimUw16Image = QImage(":/images/AuTerm16.ico");
-    gimUw32Image = QImage(":/images/AuTerm32.ico");
-#else
-    //Load PNGs for Linux/Mac
     gimUw16Image = QImage(":/images/AuTerm16.png");
+#if 0
     gimUw32Image = QImage(":/images/AuTerm32.png");
 #endif
 
@@ -368,7 +367,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gpRedCirclePixmap = new QPixmap(QPixmap::fromImage(gimRedCircleImage));
     gpGreenCirclePixmap = new QPixmap(QPixmap::fromImage(gimGreenCircleImage));
     gpUw16Pixmap = new QPixmap(QPixmap::fromImage(gimUw16Image));
+#if 0
     gpUw32Pixmap = new QPixmap(QPixmap::fromImage(gimUw32Image));
+#endif
 
     //Show images on help
     ui->label_AboutI1->setPixmap(*gpEmptyCirclePixmap);
@@ -962,6 +963,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         ++chi;
     }
 
+    //Setup UI elements
+    ui->edit_LogFile->setEnabled(ui->check_LogEnable->isChecked());
+    ui->check_LogAppend->setEnabled(ui->check_LogEnable->isChecked());
+
     if (bArgCom == true && bArgNoConnect == false)
     {
         //Enough information to connect!
@@ -1170,7 +1175,9 @@ MainWindow::~MainWindow()
     delete gpRedCirclePixmap;
     delete gpGreenCirclePixmap;
     delete gpUw16Pixmap;
+#if 0
     delete gpUw32Pixmap;
+#endif
     delete gpmErrorForm;
     delete ui;
 }
@@ -3732,11 +3739,14 @@ MainWindow::on_edit_LogFile_editingFinished(
 //=============================================================================
 void
 MainWindow::on_check_LogEnable_stateChanged(
-    int
+    int state
     )
 {
     //Logging enabled/disabled changed
     gpTermSettings->setValue("LogEnable", (ui->check_LogEnable->isChecked() == true ? 1 : 0));
+
+    ui->edit_LogFile->setEnabled(state != 0);
+    ui->check_LogAppend->setEnabled(state != 0);
 }
 
 //=============================================================================

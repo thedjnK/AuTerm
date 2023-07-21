@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>632</width>
-    <height>405</height>
+    <height>413</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -861,16 +861,16 @@
                 <number>2</number>
                </property>
                <property name="leftMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="topMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="rightMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="bottomMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <item>
                 <layout class="QGridLayout" name="gridLayout_3">
@@ -1093,16 +1093,16 @@
                 <number>2</number>
                </property>
                <property name="leftMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="topMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="rightMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="bottomMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -1495,27 +1495,27 @@
                 <number>2</number>
                </property>
                <property name="leftMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="topMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="rightMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <property name="bottomMargin">
-                <number>2</number>
+                <number>6</number>
                </property>
                <item>
                 <layout class="QFormLayout" name="formLayout">
                  <property name="horizontalSpacing">
-                  <number>2</number>
+                  <number>4</number>
                  </property>
                  <property name="verticalSpacing">
-                  <number>2</number>
+                  <number>4</number>
                  </property>
                  <property name="leftMargin">
-                  <number>3</number>
+                  <number>0</number>
                  </property>
                  <property name="topMargin">
                   <number>0</number>
@@ -3375,58 +3375,57 @@
          <attribute name="title">
           <string>Plugins</string>
          </attribute>
-         <widget class="QListWidget" name="list_Plugin_Plugins">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>50</y>
-            <width>201</width>
-            <height>192</height>
-           </rect>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="leftMargin">
+           <number>6</number>
           </property>
-         </widget>
-         <widget class="QLabel" name="label_15">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>0</y>
-            <width>691</width>
-            <height>51</height>
-           </rect>
+          <property name="topMargin">
+           <number>6</number>
           </property>
-          <property name="text">
-           <string>AuTerm's functionality can be expanded through the use of plugins. Plugins should be placed in the same folder as the utility to be loaded.</string>
+          <property name="rightMargin">
+           <number>6</number>
           </property>
-          <property name="wordWrap">
-           <bool>true</bool>
+          <property name="bottomMargin">
+           <number>6</number>
           </property>
-         </widget>
-         <widget class="QPushButton" name="btn_Plugin_Abort">
-          <property name="geometry">
-           <rect>
-            <x>250</x>
-            <y>70</y>
-            <width>80</width>
-            <height>25</height>
-           </rect>
+          <property name="spacing">
+           <number>2</number>
           </property>
-          <property name="text">
-           <string>About</string>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="btn_Plugin_Config">
-          <property name="geometry">
-           <rect>
-            <x>250</x>
-            <y>100</y>
-            <width>80</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Config</string>
-          </property>
-         </widget>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>AuTerm's functionality can be expanded through the use of plugins. Plugins should be placed in the same folder as the utility to be loaded.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QListWidget" name="list_Plugin_Plugins"/>
+          </item>
+          <item row="2" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="spacing">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="btn_Plugin_Abort">
+              <property name="text">
+               <string>About</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_Plugin_Config">
+              <property name="text">
+               <string>Config</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>

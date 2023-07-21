@@ -99,7 +99,7 @@
 // Constants
 /******************************************************************************/
 //Constants for version and functions
-const QString UwVersion                         = "0.14"; //Version string
+const QString UwVersion                         = "0.15"; //Version string
 //Constants for timeouts and streaming
 const qint16 FileReadBlock                      = 512;     //Number of bytes to read per block when streaming files
 const qint16 StreamProgress                     = 10000;   //Number of bytes between streaming progress updates
@@ -369,7 +369,7 @@ private slots:
         );
     void
     on_check_LogEnable_stateChanged(
-        int intChecked
+        int state
         );
     void
     on_check_LogAppend_stateChanged(
@@ -652,11 +652,11 @@ private:
     QImage gimRedCircleImage; //Holder for red circle image
     QImage gimGreenCircleImage; //Holder for green circle image
     QImage gimUw16Image; //Holder for UwTerminal 16x16 icon
-    QImage gimUw32Image; //Holder for UwTerminal 32x32 icon
+//    QImage gimUw32Image; //Holder for UwTerminal 32x32 icon
     QPixmap *gpEmptyCirclePixmap; //Pixmap holder for empty circle image
     QPixmap *gpRedCirclePixmap; //Pixmap holder for red circle image
     QPixmap *gpGreenCirclePixmap; //Pixmap holder for green circle image
-    QPixmap *gpUw32Pixmap; //Pixmap holder for UwTerminal 32x32 icon
+//    QPixmap *gpUw32Pixmap; //Pixmap holder for UwTerminal 32x32 icon
     QPixmap *gpUw16Pixmap; //Pixmap holder for UwTerminal 16x16 icon
     QString gstrHexData; //Holds the hex data to be sent to the device
     QString gstrDownloadFilename; //Holds the inter-function download filename
