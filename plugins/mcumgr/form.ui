@@ -36,7 +36,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>4</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -275,7 +275,7 @@
          <item row="0" column="0">
           <widget class="QTabWidget" name="tabWidget_3">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="tab_IMG_Upload">
             <attribute name="title">
@@ -834,8 +834,50 @@
          <property name="spacing">
           <number>2</number>
          </property>
+         <item row="1" column="2">
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QToolButton" name="btn_SHELL_Clear">
+             <property name="text">
+              <string>Clear</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btn_SHELL_Copy">
+             <property name="text">
+              <string>Copy</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QLabel" name="lbl_SHELL_Status">
+           <property name="text">
+            <string>[Status]</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPlainTextEdit" name="edit_SHELL_Output">
+           <property name="undoRedoEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1" colspan="2">
           <widget class="QLineEdit" name="edit_SHELL_Input"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Input:</string>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0" colspan="3">
           <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -880,64 +922,12 @@
            </item>
           </layout>
          </item>
-         <item row="4" column="0" colspan="3">
-          <widget class="QPlainTextEdit" name="edit_SHELL_Log">
-           <property name="undoRedoEnabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="QLabel" name="lbl_SHELL_Status">
-           <property name="text">
-            <string>[Status]</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_13">
            <property name="text">
             <string>Output:</string>
            </property>
           </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QPlainTextEdit" name="edit_SHELL_Output">
-           <property name="undoRedoEnabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Input:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QToolButton" name="btn_SHELL_Clear">
-             <property name="text">
-              <string>Clear</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="btn_SHELL_Copy">
-             <property name="text">
-              <string>Copy</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </item>
         </layout>
        </widget>

@@ -882,6 +882,10 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
     check_IMG_Preview_Pending->installEventFilter(this);
     check_IMG_Preview_Bootable->installEventFilter(this);
     check_IMG_Preview_Permanent->installEventFilter(this);
+
+
+    //test
+    emit plugin_add_open_close_button(btn_FS_Go);
 }
 
 bool plugin_mcumgr::eventFilter(QObject *, QEvent *event)
@@ -903,7 +907,7 @@ bool plugin_mcumgr::eventFilter(QObject *, QEvent *event)
 
 const QString plugin_mcumgr::plugin_about()
 {
-    return "AuTerminal MCUmgr plugin\r\nCopyright 2021-2023 Jamie M.\r\n\r\nCan be used to communicate with Zephyr devices with the serial MCUmgr transport enabled.\r\n\r\nUNFINISHED INITIAL TEST USE ONLY, NOT REPRESENTATIVE OF FINAL PRODUCT.\r\n\r\nBuilt using Qt " QT_VERSION_STR;
+    return "AuTerm MCUmgr plugin\r\nCopyright 2021-2023 Jamie M.\r\n\r\nCan be used to communicate with Zephyr devices with the serial MCUmgr transport enabled.\r\n\r\nUNFINISHED INITIAL TEST USE ONLY, NOT REPRESENTATIVE OF FINAL PRODUCT.\r\n\r\nBuilt using Qt " QT_VERSION_STR;
 }
 
 bool plugin_mcumgr::plugin_configuration()

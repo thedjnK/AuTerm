@@ -31,6 +31,7 @@ private slots:
     void on_btn_STAT_Go_clicked();
     void on_btn_SHELL_Clear_clicked();
     void on_btn_SHELL_Copy_clicked();
+    void on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index);
 
 private:
     Ui::Form *ui;

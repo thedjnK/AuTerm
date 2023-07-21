@@ -62,7 +62,7 @@
 class plugin_mcumgr : public QObject, AutPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID AuTermPluginInterface_iid)
+    Q_PLUGIN_METADATA(IID AuTermPluginInterface_iid FILE "plugin_mcumgr.json")
     Q_INTERFACES(AutPlugin)
 
 public:
@@ -80,6 +80,7 @@ public:
 signals:
     void show_message_box(QString str_message);
     void plugin_set_status(bool busy, bool hide_terminal_output);
+    void plugin_add_open_close_button(QPushButton *button);
 
 private slots:
     void receive_waiting(QByteArray data);
@@ -101,6 +102,7 @@ private slots:
     void on_btn_STAT_Go_clicked();
     void on_btn_SHELL_Clear_clicked();
     void on_btn_SHELL_Copy_clicked();
+    void on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index);
 
 private:
     bool handleStream_upload(QCborStreamReader &reader, int32_t *new_rc, int64_t *new_off);

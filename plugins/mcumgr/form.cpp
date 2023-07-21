@@ -87,3 +87,9 @@ void Form::on_btn_SHELL_Copy_clicked()
 {
 
 }
+
+void Form::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index)
+{
+
+}
+
