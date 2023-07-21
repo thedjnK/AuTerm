@@ -20,19 +20,19 @@ TARGET = AuTerm
 TEMPLATE = app
 
 SOURCES += main.cpp\
+    AutEscape.cpp \
     AutPlugin.cpp \
     AutScrollEdit.cpp \
     UwxMainWindow.cpp \
     UwxPopup.cpp \
-    LrdLogger.cpp \
-    UwxEscape.cpp
+    LrdLogger.cpp
 
 HEADERS  += \
+    AutEscape.h \
     AutScrollEdit.h \
     UwxMainWindow.h \
     UwxPopup.h \
     LrdLogger.h \
-    UwxEscape.h \
     AutPlugin.h
 
 FORMS    += \

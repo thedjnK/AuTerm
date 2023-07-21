@@ -33,7 +33,7 @@
 // Include Files
 /******************************************************************************/
 #include "AutScrollEdit.h"
-#include "UwxEscape.h"
+#include "AutEscape.h"
 #include <QRegularExpression>
 #include <QDebug>
 
@@ -1058,7 +1058,7 @@ AutScrollEdit::update_display(
 
         if (vt100_control_mode == VT100_MODE_STRIP)
         {
-            UwxEscape::StripVT100Formatting(&mstrDatIn, dat_in_prev_check_len);
+            AutEscape::strip_vt100_formatting(&mstrDatIn, dat_in_prev_check_len);
         }
 
 //TODO: deal with partial VT100 escape codes

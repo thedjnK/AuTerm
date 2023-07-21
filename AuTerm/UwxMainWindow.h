@@ -70,7 +70,7 @@
 #if SKIPSCRIPTINGFORM != 1
 #include "UwxScripting.h"
 #endif
-#include "UwxEscape.h"
+#include "AutEscape.h"
 
 /******************************************************************************/
 // Defines

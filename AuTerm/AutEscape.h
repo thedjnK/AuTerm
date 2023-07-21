@@ -4,7 +4,7 @@
 **
 ** Project: AuTerm
 **
-** Module: UwxEscape.h
+** Module: AutEscape.h
 **
 ** Notes:
 **
@@ -21,8 +21,8 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef UWXESCAPE_H
-#define UWXESCAPE_H
+#ifndef AUTESCAPE_H
+#define AUTESCAPE_H
 
 /******************************************************************************/
 // Include Files
@@ -32,24 +32,24 @@
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class UwxEscape
+class AutEscape
 {
 public:
     static
     void
-    EscapeCharacters(
+    escape_characters(
         QByteArray *baData
         );
 
     static
     void
-    StripVT100Formatting(
+    strip_vt100_formatting(
         QByteArray *data,
         int32_t offset
         );
 };
 
-#endif // UWXESCAPE_H
+#endif // AUTESCAPE_H
 
 /******************************************************************************/
 // END OF FILE

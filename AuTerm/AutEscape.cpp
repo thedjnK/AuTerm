@@ -1,9 +1,10 @@
 /******************************************************************************
 ** Copyright (C) 2016-2017 Laird
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: UwxEscape.h
+** Module: AutEscape.h
 **
 ** Notes:
 **
@@ -24,7 +25,7 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "UwxEscape.h"
+#include "AutEscape.h"
 #include <QRegularExpression>
 
 /******************************************************************************/
@@ -34,63 +35,73 @@
 //=============================================================================
 //=============================================================================
 void
-UwxEscape::EscapeCharacters(
-    QByteArray *baData
+AutEscape::escape_characters(
+    QByteArray *data
     )
 {
     //Escapes character sequences
-    qint32 Next = baData->indexOf("\\");
-    while (Next != -1)
+    qint32 next = data->indexOf("\\");
+    while (next != -1)
     {
-        if (baData->length() <= Next+1)
+        QChar cur_char;
+
+        if (data->length() <= next)
         {
             //No more string length, ignore
             break;
         }
-        else if (baData->at(Next+1) == '\\')
+
+        cur_char = data->at(next + 1);
+
+        if (cur_char == '\\')
         {
             //This is a \\ so remove one of the slashes and ignore the conversion
-            baData->remove(Next, 1);
+            data->remove(next, 1);
         }
-        else if (baData->at(Next+1) == 'r' || baData->at(Next+1) == 'R')
+        else if (cur_char == 'r' || cur_char == 'R')
         {
             //This is a \r or \R
-            baData->insert(Next, "\r");
-            baData->remove(Next+1, 2);
+            data->insert(next, "\r");
+            data->remove((next + 1), 2);
         }
-        else if (baData->at(Next+1) == 'n' || baData->at(Next+1) == 'N')
+        else if (cur_char == 'n' || cur_char == 'N')
         {
             //This is a \n or \N
-            baData->insert(Next, "\n");
-            baData->remove(Next+1, 2);
+            data->insert(next, "\n");
+            data->remove((next + 1), 2);
         }
-        else if (baData->at(Next+1) == 't' || baData->at(Next+1) == 'T')
+        else if (cur_char == 't' || cur_char == 'T')
         {
             //This is a \t or \T
-            baData->insert(Next, "\t");
-            baData->remove(Next+1, 2);
+            data->insert(next, "\t");
+            data->remove((next + 1), 2);
         }
-        else if (baData->length() <= Next+2)
+        else if (data->length() <= (next + 2))
         {
             //No more string length, ignore
             break;
         }
-        else if (((baData->at(Next+1) >= '0' && baData->at(Next+1) <= '9') || (baData->at(Next+1) >= 'a' && baData->at(Next+1) <= 'f') || (baData->at(Next+1) >= 'A' && baData->at(Next+1) <= 'F')) && ((baData->at(Next+2) >= '0' && baData->at(Next+2) <= '9') || (baData->at(Next+2) >= 'a' && baData->at(Next+2) <= 'f') || (baData->at(Next+2) >= 'A' && baData->at(Next+2) <= 'F')))
+        else
         {
-            //Character to escape
-            baData->insert(Next, (char)baData->mid(Next+1, 2).toInt(NULL, 16));
-            baData->remove(Next+1, 3);
+            QChar next_char = data->at(next + 2);
+
+            if (((cur_char >= '0' && cur_char <= '9') || (cur_char >= 'a' && cur_char <= 'f') || (cur_char >= 'A' && cur_char <= 'F')) && ((next_char >= '0' && next_char <= '9') || (next_char >= 'a' && next_char <= 'f') || (next_char >= 'A' && next_char <= 'F')))
+            {
+                //Character to escape
+                data->insert(next, (char)data->mid((next + 1), 2).toInt(NULL, 16));
+                data->remove((next + 1), 3);
+            }
         }
 
         //Search for the next instance
-        Next = baData->indexOf("\\", Next+1);
+        next = data->indexOf("\\", (next + 1));
     }
 }
 
 //=============================================================================
 //=============================================================================
 void
-UwxEscape::StripVT100Formatting(
+AutEscape::strip_vt100_formatting(
     QByteArray *data,
     int32_t offset
     )

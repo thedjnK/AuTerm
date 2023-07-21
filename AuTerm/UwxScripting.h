@@ -42,7 +42,7 @@
 #include <QMenu>
 #include <QKeySequence>
 #include <QShortcut>
-#include "UwxEscape.h"
+#include "AutEscape.h"
 
 /******************************************************************************/
 // Defines

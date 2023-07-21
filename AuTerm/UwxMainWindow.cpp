@@ -2904,7 +2904,7 @@ MainWindow::MessagePass(
         if (bEscapeString == true)
         {
             //Escape string sequences
-            UwxEscape::EscapeCharacters(&baDataString);
+            AutEscape::escape_characters(&baDataString);
         }
 
         //Output the data and send it to the log
@@ -4792,7 +4792,7 @@ MainWindow::SpeedMenuSelected(
             {
                 //Escape
                 gbaSpeedMatchData = ui->edit_SpeedTestData->text().toUtf8();
-                UwxEscape::EscapeCharacters(&gbaSpeedMatchData);
+                AutEscape::escape_characters(&gbaSpeedMatchData);
             }
             else
             {
@@ -5097,7 +5097,7 @@ MainWindow::on_btn_SpeedCopy_clicked(
         append("\r\n    > Rx average (All bits): ").
         append(QString::number(ui->edit_SpeedBytesRecAvg->text().toUInt()*(gintSpeedTestDataBits + gintSpeedTestStartStopParityBits)));
     }
-    UwxEscape::EscapeCharacters(&baTmpBA);
+    AutEscape::escape_characters(&baTmpBA);
     QApplication::clipboard()->setText(QString("=================================\r\n  AuTerm ").
         append(UwVersion).append(" Speed Test\r\n       ").
         append(QDate::currentDate().toString("dd/MM/yyyy")).
