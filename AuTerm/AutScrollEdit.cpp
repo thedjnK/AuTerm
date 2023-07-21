@@ -594,16 +594,16 @@ AutScrollEdit::eventFilter(
                 //Enter pressed
                 if (mbSerialOpen == true)
                 {
-                    if (mstrDatOut != mstrItemArray[mchItems])
+                    if (mchItems == 0 || mstrDatOut != mstrItemArray[(mchItems - 1)])
                     {
                         //Previous entry is not the same as this entry
-                        if (mchItems > (nItemArraySize-1))
+                        if (mchItems > (nItemArraySize - 1))
                         {
                             //Shift out last array item
                             unsigned char i = 1;
                             while (i < nItemArraySize)
                             {
-                                mstrItemArray[(i-1)] = mstrItemArray[i];
+                                mstrItemArray[(i - 1)] = mstrItemArray[i];
                                 ++i;
                             }
                             mchItems--;
@@ -656,7 +656,7 @@ AutScrollEdit::eventFilter(
                 else if (mintCurPos > 0)
                 {
                     //Delete character
-                    mstrDatOut.remove(mintCurPos-1, 1);
+                    mstrDatOut.remove((mintCurPos - 1), 1);
                     --mintCurPos;
                 }
 
