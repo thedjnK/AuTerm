@@ -126,9 +126,8 @@ const QString URLLinuxNonRootSetup = "https://github.com/LairdCP/AuTerm/wiki/Gra
     //HTTP
     const QString WebProtocol                   = "http";
 #endif
-const qint8 FilenameIndexApplication            = 0;
-const qint8 FilenameIndexScripting              = 1;
-const qint8 FilenameIndexOthers                 = 2;
+const qint8 FilenameIndexScripting              = 0;
+const qint8 FilenameIndexOthers                 = 1;
 //Constants for right click menu options
 enum menu_actions {
     MenuActionErrorHex                          = 0,
@@ -159,10 +158,10 @@ const qint8 SpeedMenuActionSendRecv             = 3;
 const qint8 SpeedMenuActionSendRecv5Delay       = 4;
 const qint8 SpeedMenuActionSendRecv10Delay      = 5;
 const qint8 SpeedMenuActionSendRecv15Delay      = 6;
-const qint8 SpeedModeInactive                   = 0b00;
-const qint8 SpeedModeRecv                       = 0b01;
-const qint8 SpeedModeSend                       = 0b10;
-const qint8 SpeedModeSendRecv                   = 0b11;
+const qint8 SpeedModeInactive                   = 0;
+const qint8 SpeedModeRecv                       = 1;
+const qint8 SpeedModeSend                       = 2;
+const qint8 SpeedModeSendRecv                   = 3;
 //Constants for speed testing
 const qint16 SpeedTestChunkSize                 = 512;  //Maximum number of bytes to send per chunk when speed testing
 const qint16 SpeedTestMinBufSize                = 128;  //Minimum buffer size when speed testing, when there are less than this number of bytes in the output buffer it will be topped up
@@ -219,9 +218,6 @@ public slots:
     void
     balloontriggered(
         QAction* qaAction
-        );
-    void
-    DevRespTimeout(
         );
     void
     SerialStatusSlot(
@@ -346,10 +342,6 @@ private slots:
         );
     void
     on_btn_PredefinedDelete_clicked(
-        );
-    void
-    DroppedFile(
-        QString strFilename
         );
     void
     on_btn_SaveDevice_clicked(
@@ -545,10 +537,6 @@ private:
     void
     RefreshSerialDevices(
         );
-    unsigned char
-    CompileApp(
-        unsigned char chMode
-        );
     void
     UpdateImages(
         );
@@ -561,13 +549,6 @@ private:
         );
     void
     OpenDevice(
-        );
-    void
-    LoadFile(
-        bool bToUWC
-        );
-    void
-    RunApplication(
         );
     void
     LookupErrorCode(
@@ -594,14 +575,6 @@ private:
         int intMinor,
         QChar qcDelta
         );
-    QString
-    CleanFilesize(
-        QString strFilename
-        );
-    QString
-    RemoveZeros(
-        QString strData
-        );
 #if SKIPSPEEDTEST != 1
     void
     SendSpeedTestData(
@@ -627,10 +600,12 @@ private:
     SetLoopBackMode(
         bool bNewMode
         );
+#if 0
     void
     AuTermUpdateCheck(
         bool bShowError
         );
+#endif
     void
     UpdateCustomisation(
         bool bDefault
@@ -643,11 +618,7 @@ private:
     OS32_64UINT gintRXBytes; //Number of RX bytes
     OS32_64UINT gintTXBytes; //Number of TX bytes
     OS32_64UINT gintQueuedTXBytes; //Number of TX bytes that have been queued in buffer (not necesserially sent)
-    unsigned char gchTermBusyLines; //Number of commands recieved (for sending applications)
     unsigned char gchTermMode; //What function is being ran when compiling
-    unsigned char gchTermMode2; //Current sub-mode of download
-    QString gstrTermFilename; //Holds the filename of the file to load
-    QString gstrTermBusyData; //Holds the recieved data for checking
     QImage gimEmptyCircleImage; //Holder for empty circle image
     QImage gimRedCircleImage; //Holder for red circle image
     QImage gimGreenCircleImage; //Holder for green circle image
@@ -658,10 +629,7 @@ private:
     QPixmap *gpGreenCirclePixmap; //Pixmap holder for green circle image
 //    QPixmap *gpUw32Pixmap; //Pixmap holder for UwTerminal 32x32 icon
     QPixmap *gpUw16Pixmap; //Pixmap holder for UwTerminal 16x16 icon
-    QString gstrHexData; //Holds the hex data to be sent to the device
-    QString gstrDownloadFilename; //Holds the inter-function download filename
     QTimer *gpSignalTimer; //Handle for a timer to update COM port signals
-    QTimer gtmrDownloadTimeoutTimer; //Timer for module timeout indication
     LrdLogger *gpMainLog; //Handle to the main log file (if enabled/used)
     bool gbMainLogEnabled; //True if opened successfully (and enabled)
     QMenu *gpMenu; //Main menu
@@ -673,7 +641,6 @@ private:
     bool gbLoopbackMode; //True if loopback mode is enabled
     bool gbSysTrayEnabled; //True if system tray is enabled
     QSystemTrayIcon *gpSysTray; //Handle for system tray object
-    bool gbIsUWCDownload; //Set to true when a UWC is being downloaded
     bool gbCTSStatus; //True when CTS is asserted
     bool gbDCDStatus; //True when DCD is asserted
     bool gbDSRStatus; //True when DSR is asserted
@@ -695,8 +662,6 @@ private:
     QNetworkAccessManager *gnmManager; //Network access manager
     QNetworkReply *gnmrReply; //Network reply
 #endif
-    QString gstrDeviceID; //What the server compiler ID is
-    bool gbFileOpened; //True when a file on the module has been opened
     QString gstrLastFilename[(FilenameIndexOthers+1)]; //Holds the filenames of the last selected files
 #ifdef RESOLVEIPSEPARATELY
     QString gstrResolvedServer; //Holds the resolved hostname of the XCompile server
@@ -704,8 +669,6 @@ private:
     bool gbEditFileModified; //True if the file in the editor pane has been modified, otherwise false
     int giEditFileType; //Type of file currently open in the editor
     bool gbErrorsLoaded; //True if error csv file has been loaded
-    QTimer gtmrBaudTimer; //Timer for automatic baud rate detection timeout
-    bool gbAutoBaud; //True if automatic baud rate detection is in progress
 #ifdef UseSSL
     QString WebProtocol; //Holds HTTP or HTTPS depending on options selected
     QSslCertificate *sslcLairdSSLNew = NULL; //Holds the (newer) Laird SSL certificate
@@ -750,7 +713,6 @@ private:
     quint32 gintDelayedSpeedTestReceive; //Stores the delay before data started being received after a speed test begins (in seconds)
     bool gbSpeedTestReceived; //Set to true when data has been received in a speed test
 #endif
-    QString *gstrUpdateCheckString; //String message for displaying weekly update message
     bool gbAutoTrimDBuffer; //(Unlisted option) Set to true to automatically trim the display buffer when it reaches a threashold
     quint32 gintAutoTrimBufferDThreshold; //(Unlisted option) Number of bytes at which to trim the display buffer
     quint32 gintAutoTrimBufferDSize; //(Unlisted option) Number of bytes to trim the recieve buffer

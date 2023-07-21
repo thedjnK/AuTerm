@@ -170,12 +170,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
 
-                ui->list_Plugin_Plugins->addItem(QString(static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(static_plugins.at(i).metaData().value("MetaData").toObject().value("Version").toString()));
+                ui->list_Plugin_Plugins->addItem(QString(plugin_loader.metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(plugin_loader.metaData().value("MetaData").toObject().value("Version").toString()));
             }
             else
             {
                 plugin_loader.unload();
             }
+        }
+        else
+        {
+            qDebug() << plugin_loader.errorString();
         }
 
         ++i;
@@ -283,24 +287,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gintRXBytes = 0;
     gintTXBytes = 0;
     gintQueuedTXBytes = 0;
-    gchTermBusyLines = 0;
     gchTermMode = 0;
-    gchTermMode2 = 0;
     gbMainLogEnabled = false;
     gbLoopbackMode = false;
     gbSysTrayEnabled = false;
-    gbIsUWCDownload = false;
     gbCTSStatus = 0;
     gbDCDStatus = 0;
     gbDSRStatus = 0;
     gbRIStatus = 0;
     gbStreamingBatch = false;
     gbaBatchReceive.clear();
-    gbFileOpened = false;
     gbEditFileModified = false;
     giEditFileType = -1;
     gbErrorsLoaded = false;
-    gbAutoBaud = false;
 #if 0
     gnmManager = 0;
 #endif
@@ -308,7 +307,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gtmrSpeedTestDelayTimer = 0;
     gbSpeedTestRunning = false;
 #endif
-    gstrUpdateCheckString = 0;
 
 #ifndef SKIPAUTOMATIONFORM
     guaAutomationForm = 0;
@@ -398,7 +396,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->text_TermEditData, SIGNAL(key_pressed(int,QChar)), this, SLOT(key_pressed(int,QChar)));
 
     //Connect file drag/drop signal
-    connect(ui->text_TermEditData, SIGNAL(file_dropped(QString)), this, SLOT(DroppedFile(QString)));
 
     //Initialise popup message
     gpmErrorForm = new PopupMessage();
@@ -493,11 +490,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 #if SKIPSPEEDTEST != 1
     connect(gpSpeedMenu, SIGNAL(triggered(QAction*)), this, SLOT(SpeedMenuSelected(QAction*)), Qt::AutoConnection);
 #endif
-
-    //Configure the module timeout timer
-    gtmrDownloadTimeoutTimer.setSingleShot(true);
-    gtmrDownloadTimeoutTimer.setInterval(ModuleTimeout);
-    connect(&gtmrDownloadTimeoutTimer, SIGNAL(timeout()), this, SLOT(DevRespTimeout()));
 
     //Configure the signal timer
     gpSignalTimer = new QTimer(this);
@@ -615,7 +607,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->text_TermEditData->mbLineSeparator = ui->check_LineSeparator->isChecked();
 
     //Load last directory path
-    gstrLastFilename[FilenameIndexApplication] = gpTermSettings->value("LastFileDirectory", "").toString();
     gstrLastFilename[FilenameIndexScripting] = gpTermSettings->value("LastScriptFileDirectory", "").toString();
     gstrLastFilename[FilenameIndexOthers] = gpTermSettings->value("LastOtherFileDirectory", "").toString();
 
@@ -1006,11 +997,9 @@ MainWindow::~MainWindow()
     disconnect(this, SLOT(close()));
     disconnect(this, SLOT(enter_pressed()));
     disconnect(this, SLOT(key_pressed(int,QChar)));
-    disconnect(this, SLOT(DroppedFile(QString)));
     disconnect(this, SLOT(MenuSelected(QAction*)));
     disconnect(this, SLOT(balloontriggered(QAction*)));
     disconnect(this, SLOT(ContextMenuClosed()));
-    disconnect(this, SLOT(DevRespTimeout()));
     disconnect(this, SLOT(SerialStatusSlot()));
     disconnect(this, SLOT(SerialRead()));
     disconnect(this, SLOT(SerialError(QSerialPort::SerialPortError)));
@@ -1138,12 +1127,6 @@ MainWindow::~MainWindow()
     }
 #endif
 
-    if (gstrUpdateCheckString != NULL)
-    {
-        //Clear up update checking string
-        delete gstrUpdateCheckString;
-    }
-
     //Release reserved memory buffers
     gbaDisplayBuffer.squeeze();
     gbaSpeedReceivedData.squeeze();
@@ -1247,7 +1230,6 @@ MainWindow::on_btn_TermClose_clicked(
         //Close, but first clear up from download/streaming
         gbTermBusy = false;
         gchTermMode = 0;
-        gchTermMode2 = 0;
         ui->btn_Cancel->setEnabled(false);
         if (gbStreamingFile == true)
         {
@@ -2251,30 +2233,6 @@ MainWindow::DoLineEnd(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::DevRespTimeout(
-    )
-{
-    //Runs to indiciate a device timeout when waiting to compile an application
-    if (gbTermBusy == true)
-    {
-        //Update buffer
-        gbaDisplayBuffer.append("\nTimeout occured whilst attempting to XCompile application or download to module.\n");
-        if (!gtmrTextUpdateTimer.isActive())
-        {
-            gtmrTextUpdateTimer.start();
-        }
-
-        //Reset variables
-        gbTermBusy = false;
-        gchTermBusyLines = 0;
-        gstrTermBusyData = tr("");
-        ui->btn_Cancel->setEnabled(false);
-    }
-}
-
-//=============================================================================
-//=============================================================================
-void
 MainWindow::SerialStatus(
     bool bType
     )
@@ -2350,7 +2308,7 @@ MainWindow::OpenDevice(
     if (gspSerialPort.isOpen() == true)
     {
         //Serial port is already open - cancel any pending operations
-        if (gbTermBusy == true && gbFileOpened == true)
+        if (gbTermBusy == true)
         {
             //Run cancel operation
             on_btn_Cancel_clicked();
@@ -2586,57 +2544,6 @@ MainWindow::OpenDevice(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::LoadFile(
-    bool bToUWC
-    )
-{
-    //Load
-    QList<QString> lstFI = SplitFilePath(gstrTermFilename);
-    QFile fileFileName((bToUWC == true ? QString(lstFI[0]).append(lstFI[1]).append(".uwc") : gstrTermFilename));
-    if (!fileFileName.open(QIODevice::ReadOnly))
-    {
-        //Unable to open file
-        QString strMessage = tr("Error during XCompile: Access to selected file is denied: ").append((bToUWC ? QString(lstFI[0]).append(lstFI[1]).append(".uwc") : gstrTermFilename));
-        gpmErrorForm->show();
-        gpmErrorForm->SetMessage(&strMessage);
-        gbTermBusy = false;
-        ui->btn_Cancel->setEnabled(false);
-        return;
-    }
-
-    //Is this a UWC download?
-    gbIsUWCDownload = bToUWC;
-
-    //Create a data stream and hex string holder
-    QDataStream in(&fileFileName);
-    gstrHexData = "";
-    while (!in.atEnd())
-    {
-        //One byte at a time, convert the data to hex
-        quint8 ThisByte;
-        in >> ThisByte;
-        QString strThisHex;
-        strThisHex.setNum(ThisByte, 16);
-        if (strThisHex.length() == 1)
-        {
-            //Expand to 2 characters
-            gstrHexData.append("0");
-        }
-
-        //Add the hex character to the string
-        gstrHexData.append(strThisHex.toUpper());
-    }
-
-    //Close the file handle
-    fileFileName.close();
-
-    //Download filename is filename without a file extension
-    gstrDownloadFilename = (lstFI[1].indexOf(".") == -1 ? lstFI[1] : lstFI[1].left(lstFI[1].indexOf(".")));
-}
-
-//=============================================================================
-//=============================================================================
-void
 MainWindow::on_check_Break_stateChanged(
     )
 {
@@ -2804,7 +2711,6 @@ MainWindow::SerialError(
         //No longer busy
         gbTermBusy = false;
         gchTermMode = 0;
-        gchTermMode2 = 0;
 
         //Disable cancel button
         ui->btn_Cancel->setEnabled(false);
@@ -3295,9 +3201,6 @@ MainWindow::dropEvent(
         //Invalid filename
         return;
     }
-
-    //Pass to other function call
-    DroppedFile(strFileName);
 }
 
 //=============================================================================
@@ -3608,19 +3511,6 @@ MainWindow::on_btn_PredefinedDelete_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::DroppedFile(
-    QString strFilename
-    )
-{
-    //File dragged for download
-    if (gbTermBusy == false)
-    {
-    }
-}
-
-//=============================================================================
-//=============================================================================
-void
 MainWindow::on_btn_SaveDevice_clicked(
     )
 {
@@ -3766,37 +3656,7 @@ void
 MainWindow::on_btn_Help_clicked(
     )
 {
-#if 0
-    //Opens the help PDF file
-#ifdef __APPLE__
-    if (QFile::exists(QString(gstrMacBundlePath).append("Help.pdf")))
-#else
-    if (QFile::exists("Help.pdf"))
-#endif
-    {
-        //File present - open
-#ifdef __APPLE__
-        QDesktopServices::openUrl(QUrl::fromLocalFile(QString(gstrMacBundlePath).append("Help.pdf")));
-#else
-        QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("Help.pdf").absoluteFilePath()));
-#endif
-    }
-    else
-    {
-        //File not present, open on website instead
-#if 0
-        if (QDesktopServices::openUrl(QUrl(QString("http://").append(ServerHost).append("/AuTerm_help.pdf"))) == false)
-        {
-            //Failed to open
-            QString strMessage = tr("Help file (Help.pdf) was not found and an error occured whilst attempting to open the online version.");
-            gpmErrorForm->show();
-            gpmErrorForm->SetMessage(&strMessage);
-        }
-#endif
-    }
-#endif
-
-    QString strMessage = "You are welcome to check our website for the latest version.\r\n\r\nCommand line options are:-\r\n\r\nCOM=n\r\n    Windows: COM[1..255] specifies a comport number\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\nr\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=\\r, 1=\\n, 2=\\r\\n]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \\t,\\r,\\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \00 can be used to represent a null character and \4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/";
+    QString strMessage = "Command line options are:-\r\n\r\nCOM=n\r\n    Windows: COM[1..255] specifies a comport number\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\nr\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=\\r, 1=\\n, 2=\\r\\n]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \\t,\\r,\\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \00 can be used to represent a null character and \4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/";
     gpmErrorForm->SetMessage(&strMessage);
     gpmErrorForm->show();
 }
@@ -4409,76 +4269,6 @@ MainWindow::on_check_EnableSSL_stateChanged(
     }
 }
 #endif
-
-//=============================================================================
-//=============================================================================
-QString
-MainWindow::CleanFilesize(
-    QString strFilename
-    )
-{
-    //Cleanly calculates the filesize of an application rounding up
-    QFile fileFileName(strFilename);
-    if (!fileFileName.exists())
-    {
-        //File does not exist
-        return "Size not known";
-    }
-    else
-    {
-        //File exists
-        float intSize = fileFileName.size();
-        if (intSize > 1073741824)
-        {
-            //GB (If this occurs then something went very, very wrong)
-            intSize = std::ceil(intSize/10737418.24)/100;
-            return RemoveZeros(QString::number(intSize, 'f', 2)).append("GB");
-        }
-        else if (intSize > 1048576)
-        {
-            //MB (This should never occur)
-            intSize = std::ceil(intSize/10485.76)/100;
-            return RemoveZeros(QString::number(intSize, 'f', 2)).append("MB");
-        }
-        else if (intSize > 1024)
-        {
-            //KB
-            intSize = std::ceil(intSize/10.24)/100;
-            return RemoveZeros(QString::number(intSize, 'f', 2)).append("KB");
-        }
-        else
-        {
-            //Bytes
-            intSize = std::ceil(intSize*100)/100;
-            return RemoveZeros(QString::number(intSize, 'f', 2)).append("B");
-        }
-    }
-}
-
-//=============================================================================
-//=============================================================================
-QString
-MainWindow::RemoveZeros(
-    QString strData
-    )
-{
-    //Removes trailing zeros and decimal point
-    if (strData.right(2) == "00")
-    {
-        //Remove trailing zeros and decimal point
-        return strData.left(strData.size()-3);
-    }
-    else if (strData.right(1) == "0")
-    {
-        //Remove trailing zero
-        return strData.left(strData.size()-1);
-    }
-    else
-    {
-        //Nothing to remove
-        return strData;
-    }
-}
 
 //=============================================================================
 //=============================================================================
@@ -5773,6 +5563,7 @@ MainWindow::SetLoopBackMode(
     }
 }
 
+#if 0
 //=============================================================================
 //=============================================================================
 void
@@ -5781,7 +5572,6 @@ MainWindow::AuTermUpdateCheck(
     )
 {
     //Send request to check for AuTerm updates
-#if 0
     if (LookupDNSName(bShowError) == true)
     {
         gbTermBusy = true;
@@ -5829,8 +5619,8 @@ MainWindow::AuTermUpdateCheck(
         ))));
         ui->statusBar->showMessage("Checking for AuTerm updates...");
     }
-#endif
 }
+#endif
 
 //=============================================================================
 //=============================================================================
