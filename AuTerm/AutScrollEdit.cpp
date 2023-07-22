@@ -23,19 +23,17 @@
 *******************************************************************************/
 
 /******************************************************************************/
-// Defines
-/******************************************************************************/
-//Minimum number of characters present in the buffer before text sections are
-//appended instead of replacing the whole field
-#define TERM_SIZE_MIN_APPEND_TEXT 6
-
-/******************************************************************************/
 // Include Files
 /******************************************************************************/
 #include "AutScrollEdit.h"
 #include "AutEscape.h"
 #include <QRegularExpression>
 #include <QDebug>
+
+/******************************************************************************/
+// Constants
+/******************************************************************************/
+const QChar unicode_replacement_char = QChar(0xfffd);
 
 /******************************************************************************/
 // Local Functions or Private Members
@@ -59,7 +57,6 @@ AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     nItemArraySize = 0;
     mbSliderShown = false;
     dat_out_updated = false;
-    dat_in_prev_check_len = 0;
     dat_in_new_len = 0;
 
     mstrDatIn.reserve(32768);
@@ -883,7 +880,6 @@ void AutScrollEdit::clear_dat_in()
     //Clears the DatIn buffer
     mstrDatIn.clear();
     mintPrevTextSize = 0;
-    dat_in_prev_check_len = 0;
     dat_in_new_len = 0;
     last_format = pre;
 
@@ -1021,15 +1017,14 @@ void AutScrollEdit::update_display()
 
         if (vt100_control_mode == VT100_MODE_STRIP)
         {
-            AutEscape::strip_vt100_formatting(&mstrDatIn, dat_in_prev_check_len);
+            AutEscape::strip_vt100_formatting(&mstrDatIn, 0);
         }
 
 //TODO: deal with partial VT100 escape codes
 
-#if 1
         //Replace unprintable characters with escape codes
         int32_t i = mstrDatIn.length() - 1;
-        while (i >= dat_in_prev_check_len)
+        while (i >= 0)
         {
             uint8_t current = (uint8_t)mstrDatIn.at(i);
 
@@ -1044,17 +1039,30 @@ void AutScrollEdit::update_display()
 
             --i;
         }
-#endif
 
-        if (dat_in_prev_check_len != mstrDatIn.length())
+        if (mstrDatIn.length() > 0)
         {
-            QString append_data = mstrDatIn.mid(dat_in_prev_check_len);
+            QString append_data = mstrDatIn;
             QList<vt100_format_code> format;
             int32_t end = 0;
 
+            //Check if we have unicode replacement characters, if so, wait for next chunk
+            i = append_data.length() - 1;
+            while (i >= 0 && append_data[i] == unicode_replacement_char && end < 3)
+            {
+                ++end;
+                --i;
+            }
+
+            if (end > 0)
+            {
+                cannot_parse_bytes += end;
+                append_data.remove((append_data.length() - end), end);
+            }
+
             if (vt100_control_mode == VT100_MODE_DECODE && vt100_process(&append_data, 0, &format, &end) == false)
             {
-                cannot_parse_bytes = append_data.length() - end;
+                cannot_parse_bytes += append_data.length() - end;
                 append_data.remove(end, (append_data.length() - end));
             }
 
@@ -1186,7 +1194,7 @@ void AutScrollEdit::update_display()
 
         //Update previous text size variables
         mintPrevTextSize = dat_in_new_len;
-        dat_in_prev_check_len = mstrDatIn.length() - cannot_parse_bytes;
+        mstrDatIn.remove(0, (mstrDatIn.length() - cannot_parse_bytes));
 
         //Update the cursor position
         this->update_cursor();

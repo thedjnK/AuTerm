@@ -50,7 +50,7 @@ enum vt100_format_type {
 };
 
 struct vt100_format_code {
-    uint32_t start;
+    int32_t start;
     QColor background_color;
     bool background_color_set;
     QColor foreground_color;
@@ -130,7 +130,6 @@ private:
     uint32_t mintPrevTextSize; //Holds a count of the previous text size
     bool mbSliderShown; //True if the slider moving to the bottom position upon appearing has been ran
     bool dat_out_updated; //True if mstrDatOut has been updated and needs redrawing
-    int32_t dat_in_prev_check_len; //Holds position of mstrDatIn where hex character escaping was last performed to
     int32_t dat_in_new_len; //Holds position of QString-version of mstrDatIn where the mstrDatIn ends
     QTextCharFormat last_format; //Last format applied to dat out data
     vt100_mode vt100_control_mode; //VT100 control code mode

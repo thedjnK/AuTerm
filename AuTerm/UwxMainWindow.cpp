@@ -4980,24 +4980,30 @@ MainWindow::SendSpeedTestData(
     int intMaxLength
     )
 {
-    //Send string out. It's OK to send less than the maximum length but not more
-    int intSendTimes = (intMaxLength / gintSpeedTestMatchDataLength);
+    //Send string out. It's OK to send less than the maximum length but not more, unless none fit
+    int intSendTimes = 1;
+
+    if (intMaxLength > gintSpeedTestMatchDataLength)
+    {
+        intSendTimes = (intMaxLength / gintSpeedTestMatchDataLength);
+    }
+
     if (ui->check_SpeedShowTX->isChecked())
     {
         //Show TX data in terminal
-        while (intSendTimes > 0)
+        int print_times = intSendTimes;
+
+        while (print_times > 0)
         {
             //Append to buffer
             gbaSpeedDisplayBuffer.append(gbaSpeedMatchData);
-            --intSendTimes;
+            --print_times;
         }
+
         if (!gtmrSpeedUpdateTimer.isActive())
         {
             gtmrSpeedUpdateTimer.start();
         }
-
-        //Reset variable for actual sending
-        intSendTimes = (intMaxLength / gintSpeedTestMatchDataLength);
     }
 
     while (intSendTimes > 0)
@@ -5068,7 +5074,7 @@ MainWindow::SpeedTestReceive(
         if (ui->combo_SpeedDataType->currentIndex() != 0)
         {
             //Test data is OK
-            uint32_t remove_size = 0;
+            int32_t remove_size = 0;
             gbaSpeedReceivedData.append(gspSerialPort.read(received_bytes));
             while (remove_size < gbaSpeedReceivedData.length())
             {
@@ -5080,7 +5086,7 @@ MainWindow::SpeedTestReceive(
                 }
 
                 //Optimised search check function. for testing only
-                uint32_t i = 0;
+                int32_t i = 0;
                 bool good = true;
                 pointer_buf rec_buf;
                 pointer_buf match_buf;
@@ -5182,7 +5188,7 @@ MainWindow::SpeedTestReceive(
                         uint16_t new_offset = (i > 5 ? i - 5 : 0);
                         QString strFirst(gbaSpeedReceivedData.mid(remove_size + new_offset));
                         QString strSecond(gbaSpeedMatchData.mid(gintSpeedTestReceiveIndex + new_offset));
-                        uint32_t max_size = strFirst.length() > strSecond.length() ? strSecond.length() : strFirst.length();
+                        int32_t max_size = strFirst.length() > strSecond.length() ? strSecond.length() : strFirst.length();
                         quint16 iOffset = 0;
                         while (iOffset < max_size)
                         {
