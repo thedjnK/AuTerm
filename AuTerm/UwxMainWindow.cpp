@@ -27,24 +27,7 @@
 /******************************************************************************/
 #include "UwxMainWindow.h"
 #include "ui_UwxMainWindow.h"
-#include "AutPlugin.h"
 #include <QDebug>
-
-
-#include <QPluginLoader>
-
-//TODO: Needs to move to struct
-QPluginLoader plugin_loader;
-
-struct plugins {
-    QString filename;
-    QString name;
-    QString version;
-    QObject *object;
-    AutPlugin *plugin;
-};
-
-QList<plugins> plugin_list;
 
 /******************************************************************************/
 // Conditional Compile Defines
@@ -109,11 +92,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     {
         if (static_plugins.at(i).metaData().contains("IID") == true && static_plugins.at(i).metaData().value("IID").toString() == AuTermPluginInterface_iid)
         {
-//TODO: Add support for this
-//            plugin.filename = plugin_names.at(i);
-//            plugin.name = ;
-//            plugin.version = ;
-
             plugin.object = static_plugins.at(i).instance();
             plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
 
@@ -149,16 +127,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     struct plugins plugin;
     while (i < plugin_names.length())
     {
-//TODO: move plugin loader to struct
-        plugin_loader.setFileName(QString(QApplication::applicationDirPath()).append("/").append(plugin_names.at(i)));
-        plugin.object = plugin_loader.instance();
+        plugin.plugin_loader = new QPluginLoader(QString(QApplication::applicationDirPath()).append("/").append(plugin_names.at(i)));
+        plugin.object = plugin.plugin_loader->instance();
 
-        if (plugin_loader.isLoaded())
+        if (plugin.plugin_loader->isLoaded())
         {
             plugin.filename = plugin_names.at(i);
-//TODO: Add support for this
-//            plugin.name = ;
-//            plugin.version = ;
             plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
 
             if (plugin.plugin)
@@ -170,16 +144,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
 
-                ui->list_Plugin_Plugins->addItem(QString(plugin_loader.metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(plugin_loader.metaData().value("MetaData").toObject().value("Version").toString()));
+                ui->list_Plugin_Plugins->addItem(QString(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Version").toString()));
             }
             else
             {
-                plugin_loader.unload();
+                plugin.plugin_loader->unload();
+                delete plugin.plugin_loader;
             }
         }
         else
         {
-            qDebug() << plugin_loader.errorString();
+            qDebug() << plugin.plugin_loader->errorString();
+            delete plugin.plugin_loader;
         }
 
         ++i;
@@ -187,7 +163,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 #endif
 #endif
 
-#if SKIPSPEEDTEST == 1
+#ifdef SKIPSPEEDTEST
     //Delete speed test elements to reduce RAM usage
     ui->tab_SpeedTest->setEnabled(false);
     ui->edit_SpeedBytesRec->deleteLater();
@@ -218,21 +194,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->tab_SpeedTest->deleteLater();
 #endif
 
-    //Output build information
-#if SKIPAUTOMATIONFORM == 1 || SKIPERRORCODEFORM == 1 || SKIPSCRIPTINGFORM == 1 || SKIPSPEEDTEST == 1
-    ui->text_Terms->appendPlainText("");
-#endif
-#if SKIPAUTOMATIONFORM == 1
-    ui->text_Terms->appendPlainText("[Built without Automation support]");
-#endif
-#if SKIPERRORCODEFORM == 1
-    ui->text_Terms->appendPlainText("[Built without Error code form]");
-#endif
-#if SKIPSCRIPTINGFORM == 1
-    ui->text_Terms->appendPlainText("[Built without Scripting support]");
-#endif
-#if SKIPSPEEDTEST == 1
-    ui->text_Terms->appendPlainText("[Built without Speed test support]");
+#ifdef SKIPPLUGINS
+    ui->list_Plugin_Plugins->deleteLater();
+    ui->btn_Plugin_Config->deleteLater();
+    ui->btn_Plugin_Abort->deleteLater();
+    ui->tab_Plugins->deleteLater();
 #endif
 
 #ifdef TARGET_OS_MAC
@@ -282,7 +248,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     //Define default variable values
     gbTermBusy = false;
-    gbPluginRunning = false;
     gbStreamingFile = false;
     gintRXBytes = 0;
     gintTXBytes = 0;
@@ -303,7 +268,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 #if 0
     gnmManager = 0;
 #endif
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     gtmrSpeedTestDelayTimer = 0;
     gbSpeedTestRunning = false;
 #endif
@@ -320,14 +285,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gbScriptingRunning = false;
     gusScriptingForm = 0;
 #endif
+#ifndef SKIPPLUGINS
+    gbPluginRunning = false;
+#endif
     gbAppStarted = false;
 
     //Clear display buffer byte array and reserve 128KB of RAM to reduce mallocs (should allow faster speed testing at 1M baud)
     gbaDisplayBuffer.clear();
     gbaDisplayBuffer.reserve(131072);
 
+#ifndef SKIPSPEEDTEST
     //Also reserve 64KB of RAM to reduce mallocs when speed testing
     gbaSpeedReceivedData.reserve(65536);
+#endif
 
     //Load settings from configuration files
     LoadSettings();
@@ -403,7 +373,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Populate the list of devices
     RefreshSerialDevices();
 
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     //Setup speed test mode timers
     gtmrSpeedTestStats.setInterval(SpeedTestStatUpdateTime);
     gtmrSpeedTestStats.setSingleShot(false);
@@ -436,13 +406,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gpMenu->addAction("Lookup Selected Error-Code (Hex)")->setData(MenuActionErrorHex);
     gpMenu->addAction("Lookup Selected Error-Code (Int)")->setData(MenuActionErrorInt);
     gpMenu->addAction("Enable Loopback (Rx->Tx)")->setData(MenuActionLoopback);
+    gpMenu->addAction("Stream File Out")->setData(MenuActionStreamFile);
     gpSMenu4 = gpMenu->addMenu("Customisation");
     gpSMenu4->addAction("Font")->setData(MenuActionFont);
     gpSMenu4->addAction("Text Colour")->setData(MenuActionTextColour);
     gpSMenu4->addAction("Background Colour")->setData(MenuActionBackground);
     gpSMenu4->addAction("Restore Defaults")->setData(MenuActionRestoreDefaults);
     gpMenu->addAction("Automation")->setData(MenuActionAutomation);
+#ifdef SKIPAUTOMATIONFORM
+    //Disable unimplemented automation option
+    gpMenu->actions().last()->setEnabled(false);
+#endif
     gpMenu->addAction("Scripting")->setData(MenuActionScripting);
+#ifdef SKIPSCRIPTINGFORM
+    //Disable unimplemented scripting option
+    gpMenu->actions().last()->setEnabled(false);
+#endif
     gpMenu->addAction("Batch")->setData(MenuActionBatch);
     gpMenu->addAction("Clear Display")->setData(MenuActionClearDisplay);
     gpMenu->addAction("Clear RX/TX count")->setData(MenuActionClearRxTx);
@@ -457,7 +436,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gpBalloonMenu->addAction("Show AuTerm")->setData(BalloonActionShow);
     gpBalloonMenu->addAction("Exit")->setData(BalloonActionExit);
 
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     //Create speed test button items
     gpSpeedMenu = new QMenu(this);
     gpSpeedMenu->addAction("Receive-only test")->setData(SpeedMenuActionRecv);
@@ -466,16 +445,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gpSpeedMenu->addAction("Send && receive test (delay 5 seconds)")->setData(SpeedMenuActionSendRecv5Delay);
     gpSpeedMenu->addAction("Send && receive test (delay 10 seconds)")->setData(SpeedMenuActionSendRecv10Delay);
     gpSpeedMenu->addAction("Send && receive test (delay 15 seconds)")->setData(SpeedMenuActionSendRecv15Delay);
-#endif
-
-    //Disable unimplemented actions
-#ifdef SKIPAUTOMATIONFORM
-    //Disable automation option
-    gpMenu->actions().at(MenuActionAutomation)->setEnabled(false);
-#endif
-#ifdef SKIPSCRIPTINGFORM
-    //Disable scripting option
-    gpMenu->actions().at(MenuActionScripting)->setEnabled(false);
 #endif
 
 #if defined(TARGET_OS_MAC) || (defined(SKIPUSBRECOVERY) && SKIPUSBRECOVERY == 1)
@@ -487,7 +456,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(gpMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuSelected(QAction*)), Qt::AutoConnection);
     connect(gpMenu, SIGNAL(aboutToHide()), this, SLOT(ContextMenuClosed()), Qt::AutoConnection);
     connect(gpBalloonMenu, SIGNAL(triggered(QAction*)), this, SLOT(balloontriggered(QAction*)), Qt::AutoConnection);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     connect(gpSpeedMenu, SIGNAL(triggered(QAction*)), this, SLOT(SpeedMenuSelected(QAction*)), Qt::AutoConnection);
 #endif
 
@@ -506,7 +475,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gtmrTextUpdateTimer.setInterval(gpTermSettings->value("TextUpdateInterval", DefaultTextUpdateInterval).toInt());
     connect(&gtmrTextUpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateReceiveText()));
 
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     //Set update speed display timer to be single shot only and connect to slot
     gtmrSpeedUpdateTimer.setSingleShot(true);
     gtmrSpeedUpdateTimer.setInterval(gpTermSettings->value("TextUpdateInterval", DefaultTextUpdateInterval).toInt());
@@ -548,7 +517,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     else
     {
 #ifdef _WIN32
-        this->resize(580, 210);
+        this->resize(600, 300);
 #endif
     }
 
@@ -623,7 +592,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
         ui->text_TermEditData->setPalette(palTmp);
         ui->text_LogData->setPalette(palTmp);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         ui->text_SpeedEditData->setPalette(palTmp);
 #endif
     }
@@ -636,7 +605,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Setup font
     ui->text_TermEditData->setFont(fntTmpFnt2);
     ui->text_LogData->setFont(fntTmpFnt2);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     ui->text_SpeedEditData->setFont(fntTmpFnt2);
 #endif
 
@@ -686,7 +655,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     unsigned char chi = 1;
     bool bArgCom = false;
     bool bArgNoConnect = false;
+#ifndef SKIPSCRIPTINGFORM
     bool bStartScript = false;
+#endif
     while (chi < slArgs.length())
     {
         if (slArgs[chi].toUpper() == "DUPLICATE")
@@ -962,11 +933,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     {
         //Enough information to connect!
         OpenDevice();
+#ifndef SKIPSCRIPTINGFORM
         if (bStartScript == true)
         {
             //Start script execution request
             ScriptStartRequest();
         }
+#endif
     }
 
     //(Unlisted option) Setup display buffer automatic trimming
@@ -981,8 +954,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         //FTDI driver detected and warning has not been shown, show warning
         gpTermSettings->setValue("MacFTDIDriverWarningShown", 1);
         QString strMessage = tr("Warning: The Mac FTDI VCP driver has been detected on your system. There is a known issue with this driver that can cause your system to crash if the serial port is closed and the buffer is not empty.\r\n\r\nIf you experience this issue, it is recommended that you remove the FTDI driver and use the apple VCP driver instead. Instructions to do this are available from the FTDI website (follow the uninstall section): http://www.ftdichip.com/Support/Documents/AppNotes/AN_134_FTDI_Drivers_Installation_Guide_for_MAC_OSX.pdf\r\n\r\nThis message will not be shown again.");
-        gpmErrorForm->show();
         gpmErrorForm->SetMessage(&strMessage);
+        gpmErrorForm->show();
     }
 #endif
 
@@ -1009,7 +982,7 @@ MainWindow::~MainWindow()
     disconnect(this, SLOT(BatchTimeoutSlot()));
 //    disconnect(this, SLOT(replyFinished(QNetworkReply*)));
     disconnect(this, SLOT(MessagePass(QByteArray,bool,bool)));
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     disconnect(this, SLOT(update_displayText()));
     disconnect(this, SLOT(UpdateSpeedTestValues()));
     disconnect(this, SLOT(OutputSpeedTestStats()));
@@ -1034,12 +1007,14 @@ MainWindow::~MainWindow()
         //Close serial connection before quitting
         gspSerialPort.close();
         gpSignalTimer->stop();
+#ifndef SKIPPLUGINS
         for (int i = 0; i < plugin_list.length(); ++i)
         {
             plugin_list.at(i).plugin->serial_closed();
         }
         gbPluginHideTerminalOutput = false;
         gbPluginRunning = false;
+#endif
     }
 
     if (gbMainLogEnabled == true)
@@ -1129,8 +1104,12 @@ MainWindow::~MainWindow()
 
     //Release reserved memory buffers
     gbaDisplayBuffer.squeeze();
-    gbaSpeedReceivedData.squeeze();
 
+#ifndef SKIPSPEEDTEST
+    gbaSpeedReceivedData.squeeze();
+#endif
+
+#ifndef SKIPPLUGINS
     //Clear up plugins
     int32_t i = 0;
     while (i < plugin_list.length())
@@ -1138,9 +1117,11 @@ MainWindow::~MainWindow()
         disconnect(plugin_list.at(i).object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
         disconnect(plugin_list.at(i).object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
         delete plugin_list.at(i).object;
-        plugin_loader.unload();
+        plugin_list.at(i).plugin_loader->unload();
+        delete plugin_list.at(i).plugin_loader;
         ++i;
     }
+#endif
 
     //Delete variables
     delete gpMainLog;
@@ -1148,7 +1129,7 @@ MainWindow::~MainWindow()
     delete gpTermSettings;
     delete gpErrorMessages;
     delete gpSignalTimer;
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     delete gpSpeedMenu;
 #endif
     delete gpBalloonMenu;
@@ -1249,7 +1230,7 @@ MainWindow::on_btn_TermClose_clicked(
             delete gpStreamFileHandle;
             gbaBatchReceive.clear();
         }
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         else if (gbSpeedTestRunning == true)
         {
             //Clear up speed testing
@@ -1309,12 +1290,15 @@ MainWindow::on_btn_TermClose_clicked(
         {
             gspSerialPort.clear();
             gspSerialPort.close();
+
+#ifndef SKIPPLUGINS
             for (int i = 0; i < plugin_list.length(); ++i)
             {
                 plugin_list.at(i).plugin->serial_closed();
             }
             gbPluginHideTerminalOutput = false;
             gbPluginRunning = false;
+#endif
         }
         gpSignalTimer->stop();
 
@@ -1324,7 +1308,7 @@ MainWindow::on_btn_TermClose_clicked(
         ui->check_Echo->setEnabled(false);
         ui->check_Line->setEnabled(false);
         ui->check_RTS->setEnabled(false);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         ui->check_SpeedDTR->setEnabled(false);
         ui->check_SpeedRTS->setEnabled(false);
 #endif
@@ -1334,16 +1318,18 @@ MainWindow::on_btn_TermClose_clicked(
 
         //Change button text
         ui->btn_TermClose->setText("&Open Port");
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         ui->btn_SpeedClose->setText("&Open Port");
 #endif
 
+#ifndef SKIPPLUGINS
         uint8_t i = 0;
         while (i < list_plugin_open_close_buttons.length())
         {
             list_plugin_open_close_buttons[i]->setText("&Open Port");
             ++i;
         }
+#endif
 
 #ifndef SKIPAUTOMATIONFORM
         //Notify automation form
@@ -1368,7 +1354,7 @@ MainWindow::on_btn_TermClose_clicked(
         ui->check_LogAppend->setEnabled(true);
         ui->btn_LogFileSelect->setEnabled(true);
 
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         //Disable speed testing
         ui->btn_SpeedStartStop->setEnabled(false);
 #endif
@@ -1490,7 +1476,7 @@ MainWindow::SerialRead(
     }
 
     //Read the data into a buffer and copy it to edit for the display data
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     if (gbSpeedTestRunning == true)
     {
         //Serial test is running, pass to speed test function
@@ -1500,7 +1486,9 @@ MainWindow::SerialRead(
 #endif
     QByteArray baOrigData = gspSerialPort.readAll();
 
+#ifndef SKIPPLUGINS
     if (gbPluginHideTerminalOutput == false || gbPluginRunning == false)
+#endif
     {
         //Speed test is not running
 //qDebug() << baOrigData;
@@ -1558,6 +1546,7 @@ MainWindow::SerialRead(
         StreamBatchContinue(&baOrigData);
     }
 
+#ifndef SKIPPLUGINS
     if (gbPluginRunning == true)
     {
         //A plugin is running, siphon data to it
@@ -1567,6 +1556,7 @@ MainWindow::SerialRead(
             plugin_list.at(i).plugin->serial_receive(&baOrigData);
         }
     }
+#endif
 }
 
 //=============================================================================
@@ -1729,8 +1719,8 @@ MainWindow::MenuSelected(
                 {
                     //Unable to open file
                     QString strMessage = tr("Error during file streaming: Access to selected file is denied: ").append(strFilename);
-                    gpmErrorForm->show();
                     gpmErrorForm->SetMessage(&strMessage);
+                    gpmErrorForm->show();
                     return;
                 }
 
@@ -1775,7 +1765,7 @@ MainWindow::MenuSelected(
             ui->text_TermEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
             ui->text_LogData->setFont(fntTmpFnt);
             ui->text_LogData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
             ui->text_SpeedEditData->setFont(fntTmpFnt);
             ui->text_SpeedEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
 #endif
@@ -1795,7 +1785,7 @@ MainWindow::MenuSelected(
             palTmp.setColor(QPalette::Inactive, QPalette::Text, palTmp.color(QPalette::Active, QPalette::Text));
             ui->text_TermEditData->setPalette(palTmp);
             ui->text_LogData->setPalette(palTmp);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
             ui->text_SpeedEditData->setPalette(palTmp);
 #endif
 
@@ -1814,7 +1804,7 @@ MainWindow::MenuSelected(
             palTmp.setColor(QPalette::Inactive, QPalette::Base, palTmp.color(QPalette::Active, QPalette::Base));
             ui->text_TermEditData->setPalette(palTmp);
             ui->text_LogData->setPalette(palTmp);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
             ui->text_SpeedEditData->setPalette(palTmp);
 #endif
 
@@ -1846,7 +1836,7 @@ MainWindow::MenuSelected(
         ui->text_TermEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
         ui->text_LogData->setFont(fntTmpFnt);
         ui->text_LogData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         ui->text_SpeedEditData->setFont(fntTmpFnt);
         ui->text_SpeedEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
         ui->text_SpeedEditData->setPalette(palTmp);
@@ -1946,8 +1936,8 @@ MainWindow::MenuSelected(
                 {
                     //Unable to open file
                     QString strMessage = tr("Error during batch streaming: Access to selected file is denied: ").append(strFilename);
-                    gpmErrorForm->show();
                     gpmErrorForm->SetMessage(&strMessage);
+                    gpmErrorForm->show();
                     return;
                 }
 
@@ -2319,12 +2309,15 @@ MainWindow::OpenDevice(
         {
             gspSerialPort.clear();
             gspSerialPort.close();
+
+#ifndef SKIPPLUGINS
             for (int i = 0; i < plugin_list.length(); ++i)
             {
                 plugin_list.at(i).plugin->serial_closed();
             }
             gbPluginHideTerminalOutput = false;
             gbPluginRunning = false;
+#endif
         }
         gpSignalTimer->stop();
 
@@ -2370,7 +2363,7 @@ MainWindow::OpenDevice(
             //Successful
             ui->statusBar->showMessage(QString("[").append(ui->combo_COM->currentText()).append(":").append(ui->combo_Baud->currentText()).append(",").append((ui->combo_Parity->currentIndex() == 0 ? "N" : ui->combo_Parity->currentIndex() == 1 ? "O" : ui->combo_Parity->currentIndex() == 2 ? "E" : "")).append(",").append(ui->combo_Data->currentText()).append(",").append(ui->combo_Stop->currentText()).append(",").append((ui->combo_Handshake->currentIndex() == 0 ? "N" : ui->combo_Handshake->currentIndex() == 1 ? "H" : ui->combo_Handshake->currentIndex() == 2 ? "S" : "")).append("]{").append((ui->radio_LCR->isChecked() ? "\\r" : (ui->radio_LLF->isChecked() ? "\\n" : (ui->radio_LCRLF->isChecked() ? "\\r\\n" : "")))).append("}"));
             ui->label_TermConn->setText(ui->statusBar->currentMessage());
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
             ui->label_SpeedConn->setText(ui->statusBar->currentMessage());
 #endif
 
@@ -2397,7 +2390,7 @@ MainWindow::OpenDevice(
             {
                 //Hardware handshaking
                 ui->check_RTS->setEnabled(false);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
                 ui->check_SpeedRTS->setEnabled(false);
 #endif
             }
@@ -2405,7 +2398,7 @@ MainWindow::OpenDevice(
             {
                 //Not hardware handshaking - RTS
                 ui->check_RTS->setEnabled(true);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
                 ui->check_SpeedRTS->setEnabled(true);
 #endif
                 gspSerialPort.setRequestToSend(ui->check_RTS->isChecked());
@@ -2417,7 +2410,7 @@ MainWindow::OpenDevice(
             //Enable checkboxes
             ui->check_Break->setEnabled(true);
             ui->check_DTR->setEnabled(true);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
             ui->check_SpeedDTR->setEnabled(true);
 #endif
             ui->check_Echo->setEnabled(true);
@@ -2425,16 +2418,18 @@ MainWindow::OpenDevice(
 
             //Update button text
             ui->btn_TermClose->setText("C&lose Port");
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
             ui->btn_SpeedClose->setText("C&lose Port");
 #endif
 
+#ifndef SKIPPLUGINS
             uint8_t i = 0;
             while (i < list_plugin_open_close_buttons.length())
             {
                 list_plugin_open_close_buttons[i]->setText("C&lose Port");
                 ++i;
             }
+#endif
 
             //Signal checking
             SerialStatus(1);
@@ -2462,7 +2457,7 @@ MainWindow::OpenDevice(
             ui->check_LogAppend->setEnabled(false);
             ui->btn_LogFileSelect->setEnabled(false);
 
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
             //Enable speed testing
             ui->btn_SpeedStartStop->setEnabled(true);
 #endif
@@ -2497,8 +2492,8 @@ MainWindow::OpenDevice(
                 {
                     //Log not writeable
                     QString strMessage = tr("Error whilst opening log.\nPlease ensure you have access to the log file ").append(ui->edit_LogFile->text()).append(" and have enough free space on your hard drive.");
-                    gpmErrorForm->show();
                     gpmErrorForm->SetMessage(&strMessage);
+                    gpmErrorForm->show();
                 }
             }
 
@@ -2527,8 +2522,8 @@ MainWindow::OpenDevice(
 #endif
             .append((ui->combo_Baud->currentText().toULong() > 115200 ? ", please also ensure that your serial device supports baud rates greater than 115200 (normal COM ports do not have support for these baud rates)" : ""))
             .append(" and try again.");
-            gpmErrorForm->show();
             gpmErrorForm->SetMessage(&strMessage);
+            gpmErrorForm->show();
             ui->text_TermEditData->set_serial_open(false);
         }
     }
@@ -2536,8 +2531,8 @@ MainWindow::OpenDevice(
     {
         //No serial port selected
         QString strMessage = tr("No serial port was selected, please select a serial port and try again.\r\nIf you see no serial ports listed, ensure your device is connected to your computer and you have the appropriate drivers installed.");
-        gpmErrorForm->show();
         gpmErrorForm->SetMessage(&strMessage);
+        gpmErrorForm->show();
     }
 }
 
@@ -2559,7 +2554,7 @@ MainWindow::on_check_RTS_stateChanged(
 {
     //RTS status changed
     gspSerialPort.setRequestToSend(ui->check_RTS->isChecked());
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     if (ui->check_SpeedRTS->isChecked() != ui->check_RTS->isChecked())
     {
         //Update speed form checkbox
@@ -2576,7 +2571,7 @@ MainWindow::on_check_DTR_stateChanged(
 {
     //DTR status changed
     gspSerialPort.setDataTerminalReady(ui->check_DTR->isChecked());
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     if (ui->check_SpeedDTR->isChecked() != ui->check_DTR->isChecked())
     {
         //Update speed form checkbox
@@ -2614,18 +2609,20 @@ MainWindow::SerialError(
     if (speErrorCode == QSerialPort::NoError)
     {
         //No error. Why this is ever emitted is a mystery to me.
+#ifndef SKIPPLUGINS
         for (int i = 0; i < plugin_list.length(); ++i)
         {
             plugin_list.at(i).plugin->serial_opened();
         }
+#endif
         return;
     }
     else if (speErrorCode == QSerialPort::ResourceError || speErrorCode == QSerialPort::PermissionError)
     {
         //Resource error or permission error (device unplugged?)
         QString strMessage = tr("Fatal error with serial connection.\nPlease reconnect to the device to continue.");
-        gpmErrorForm->show();
         gpmErrorForm->SetMessage(&strMessage);
+        gpmErrorForm->show();
         ui->text_TermEditData->set_serial_open(false);
 
         if (gspSerialPort.isOpen() == true)
@@ -2653,7 +2650,7 @@ MainWindow::SerialError(
             delete gpStreamFileHandle;
             gbaBatchReceive.clear();
         }
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         else if (gbSpeedTestRunning == true)
         {
             //Clear up speed testing
@@ -2721,7 +2718,7 @@ MainWindow::SerialError(
         ui->check_Echo->setEnabled(false);
         ui->check_Line->setEnabled(false);
         ui->check_RTS->setEnabled(false);
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         ui->check_SpeedDTR->setEnabled(false);
         ui->check_SpeedRTS->setEnabled(false);
 #endif
@@ -2734,7 +2731,7 @@ MainWindow::SerialError(
 
         //Change button text
         ui->btn_TermClose->setText("&Open Port");
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
         ui->btn_SpeedClose->setText("&Open Port");
 #endif
 
@@ -2775,20 +2772,23 @@ MainWindow::SerialError(
         setAcceptDrops(false);
     }
 
+#ifndef SKIPPLUGINS
     for (int i = 0; i < plugin_list.length(); ++i)
     {
         plugin_list.at(i).plugin->serial_error(speErrorCode);
     }
 
     if (port_closed == true)
-        {
+    {
         for (int i = 0; i < plugin_list.length(); ++i)
         {
             plugin_list.at(i).plugin->serial_closed();
         }
+
         gbPluginHideTerminalOutput = false;
         gbPluginRunning = false;
-        }
+    }
+#endif
 }
 
 //=============================================================================
@@ -2907,7 +2907,7 @@ MainWindow::SerialBytesWritten(
     )
 {
     //Updates the display with the number of bytes written
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     if (gbSpeedTestRunning == true)
     {
         //Speed test is running, pass to speed test function
@@ -2969,10 +2969,12 @@ MainWindow::SerialBytesWritten(
         }
     }
 
+#ifndef SKIPPLUGINS
     for (int i = 0; i < plugin_list.length(); ++i)
     {
         plugin_list.at(i).plugin->serial_bytes_written(intByteCount);
     }
+#endif
 }
 
 //=============================================================================
@@ -3214,8 +3216,8 @@ MainWindow::on_btn_Github_clicked(
     {
         //Failed to open URL
         QString strMessage = tr("An error occured whilst attempting to open a web browser, please ensure you have a web browser installed and configured. URL: https://github.com/thedjnK/AuTerm");
-        gpmErrorForm->show();
         gpmErrorForm->SetMessage(&strMessage);
+        gpmErrorForm->show();
     }
 }
 
@@ -3252,8 +3254,8 @@ MainWindow::replyFinished(
         {
             //Output error message
             QString strMessage = QString("An error occured during an online request related to XCompilation or updates: ").append(nrReply->errorString());
-            gpmErrorForm->show();
             gpmErrorForm->SetMessage(&strMessage);
+            gpmErrorForm->show();
         }
     }
     else
@@ -3285,8 +3287,8 @@ MainWindow::replyFinished(
                 {
                     //Server error
                     QString strMessage = QString("A server error was encountered whilst checking for an updated AuTerm version.");
-                    gpmErrorForm->show();
                     gpmErrorForm->SetMessage(&strMessage);
+                    gpmErrorForm->show();
                 }
                 else if (joJsonObject["Result"].toString() == "1")
                 {
@@ -3299,8 +3301,8 @@ MainWindow::replyFinished(
                 {
                     //Server responded with error
                     QString strMessage = QString("Server responded with error code ").append(joJsonObject["Result"].toString()).append("; ").append(joJsonObject["Error"].toString());
-                    gpmErrorForm->show();
                     gpmErrorForm->SetMessage(&strMessage);
+                    gpmErrorForm->show();
                 }
 
                 if (gupdUpdateCheck == UpdateCheckTypes::TypeWekely)
@@ -3323,8 +3325,8 @@ MainWindow::replyFinished(
             {
                 //Error whilst decoding JSON
                 QString strMessage = QString("Unable to decode JSON data from server, debug data: ").append(jdJsonData.toJson());
-                gpmErrorForm->show();
                 gpmErrorForm->SetMessage(&strMessage);
+                gpmErrorForm->show();
             }
 
             //Back to non-busy mode
@@ -3581,10 +3583,12 @@ MainWindow::SerialPortClosing(
         gpSysTray->setToolTip(QString("AuTerm v").append(UwVersion));
     }
 
+#ifndef SKIPPLUGINS
     for (int i = 0; i < plugin_list.length(); ++i)
     {
         plugin_list.at(i).plugin->serial_about_to_close();
     }
+#endif
 }
 
 //=============================================================================
@@ -3656,7 +3660,21 @@ void
 MainWindow::on_btn_Help_clicked(
     )
 {
-    QString strMessage = "Command line options are:-\r\n\r\nCOM=n\r\n    Windows: COM[1..255] specifies a comport number\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\nr\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=\\r, 1=\\n, 2=\\r\\n]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \\t,\\r,\\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \00 can be used to represent a null character and \4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/";
+    QString strMessage = "Command line options are:-\r\n\r\nCOM=n\r\n    Windows: COM[1..255] specifies a comport number\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\nr\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=\\r, 1=\\n, 2=\\r\\n]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \\t,\\r,\\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \\00 can be used to represent a null character and \\4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/"
+#ifdef SKIPAUTOMATIONFORM
+    "\r\n[Built without Automation support]"
+#endif
+#ifdef SKIPERRORCODEFORM
+    "\r\n[Built without Error code form]"
+#endif
+#ifdef SKIPSCRIPTINGFORM
+    "\r\n[Built without Scripting support]"
+#endif
+#ifdef SKIPSPEEDTEST
+    "\r\n[Built without Speed test support]"
+#endif
+    ;
+
     gpmErrorForm->SetMessage(&strMessage);
     gpmErrorForm->show();
 }
@@ -3739,9 +3757,9 @@ MainWindow::on_btn_Licenses_clicked(
 "dbus:\n\nD-Bus is licensed to you under your choice of the Academic Free\nLicense version 2.1, or the GNU General Public License version 2\n(or, at your option any later version).\n\n\n"
 "icu:\n\nICU License - ICU 1.8.1 and later\nCOPYRIGHT AND PERMISSION NOTICE\nCopyright (c) 1995-2015 International Business Machines Corporation and others\nAll rights reserved.\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, provided that the above copyright notice(s) and this permission notice appear in all copies of the Software and that both the above copyright notice(s) and this permission notice appear in supporting documentation.\nTHE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.\nExcept as contained in this notice, the name of a copyright holder shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Software without prior written authorization of the copyright holder.\n\n\n"
 "Unicode:\n\nCOPYRIGHT AND PERMISSION NOTICE\n\nCopyright © 1991-2015 Unicode, Inc. All rights reserved.\nDistributed under the Terms of Use in\nhttp://www.unicode.org/copyright.html.\n\nPermission is hereby granted, free of charge, to any person obtaining\na copy of the Unicode data files and any associated documentation\n(the 'Data Files') or Unicode software and any associated documentation\n(the 'Software') to deal in the Data Files or Software\nwithout restriction, including without limitation the rights to use,\ncopy, modify, merge, publish, distribute, and/or sell copies of\nthe Data Files or Software, and to permit persons to whom the Data Files\nor Software are furnished to do so, provided that\n(a) this copyright and permission notice appear with all copies\nof the Data Files or Software,\n(b) this copyright and permission notice appear in associated\ndocumentation, and\n(c) there is clear notice in each modified Data File or in the Software\nas well as in the documentation associated with the Data File(s) or\nSoftware that the data or software has been modified.\n\nTHE DATA FILES AND SOFTWARE ARE PROVIDED 'AS IS', WITHOUT WARRANTY OF\nANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE\nWARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND\nNONINFRINGEMENT OF THIRD PARTY RIGHTS.\nIN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS\nNOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL\nDAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,\nDATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER\nTORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR\nPERFORMANCE OF THE DATA FILES OR SOFTWARE.\n\nExcept as contained in this notice, the name of a copyright holder\nshall not be used in advertising or otherwise to promote the sale,\nuse or other dealings in these Data Files or Software without prior\nwritten authorization of the copyright holder.\n\n\n"
-"OpenSSL:\r\n\r\nCopyright (c) 1998-2016 The OpenSSL Project.  All rights reserved.\r\n\r\nRedistribution and use in source and binary forms, with or without\r\nmodification, are permitted provided that the following conditions\r\nare met:\r\n\r\n1. Redistributions of source code must retain the above copyright\r\n   notice, this list of conditions and the following disclaimer. \r\n\r\n2. Redistributions in binary form must reproduce the above copyright\r\n   notice, this list of conditions and the following disclaimer in\r\n   the documentation and/or other materials provided with the\r\n   distribution.\r\n\r\n3. All advertising materials mentioning features or use of this\r\n   software must display the following acknowledgment:\r\n   'This product includes software developed by the OpenSSL Project\r\n   for use in the OpenSSL Toolkit. (http://www.openssl.org/)'\r\n\r\n4. The names 'OpenSSL Toolkit' and 'OpenSSL Project' must not be used to\r\n   endorse or promote products derived from this software without\r\n   prior written permission. For written permission, please contact\r\n   openssl-core@openssl.org.\r\n\r\n5. Products derived from this software may not be called 'OpenSSL'\r\n   nor may 'OpenSSL' appear in their names without prior written\r\n   permission of the OpenSSL Project.\r\n\r\n6. Redistributions of any form whatsoever must retain the following\r\n   acknowledgment:\r\n   'This product includes software developed by the OpenSSL Project\r\n   for use in the OpenSSL Toolkit (http://www.openssl.org/)'\r\n\r\nTHIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY\r\nEXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\r\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\r\nPURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR\r\nITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\r\nSPECIAL, EXEMPLARY, OR").append(" CONSEQUENTIAL DAMAGES (INCLUDING, BUT\r\nNOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\r\nLOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\r\nHOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,\r\nSTRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\r\nARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED\r\nOF THE POSSIBILITY OF SUCH DAMAGE.\r\n====================================================================\r\n\r\nThis product includes cryptographic software written by Eric Young\r\n(eay@cryptsoft.com).  This product includes software written by Tim\r\nHudson (tjh@cryptsoft.com).\r\n\r\n\r\n Original SSLeay License\r\n -----------------------\r\n\r\nCopyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)\r\nAll rights reserved.\r\n\r\nThis package is an SSL implementation written\r\nby Eric Young (eay@cryptsoft.com).\r\nThe implementation was written so as to conform with Netscapes SSL.\r\n\r\nThis library is free for commercial and non-commercial use as long as\r\nthe following conditions are aheared to.  The following conditions\r\napply to all code found in this distribution, be it the RC4, RSA,\r\nlhash, DES, etc., code; not just the SSL code.  The SSL documentation\r\nincluded with this distribution is covered by the same copyright terms\r\nexcept that the holder is Tim Hudson (tjh@cryptsoft.com).\r\n\r\nCopyright remains Eric Young's, and as such any Copyright notices in\r\nthe code are not to be removed.\r\nIf this package is used in a product, Eric Young should be given attribution\r\nas the author of the parts of the library used.\r\nThis can be in the form of a textual message at program startup or\r\nin documentation (online or textual) provided with the package.\r\n\r\nRedistribution and use in source and binary forms, with or without\r\nmodification, are permitted provided that the following conditions\r\nare met:\r\n1. Redistributions of source code must retain the copyright\r\n   notice, this list of conditions and the following disclaimer.\r\n2. Redistributions in binary form must reproduce the above copyright\r\n   notice, this list of conditions and the following disclaimer in the\r\n   documentation and/or other materials provided with the distribution.\r\n3. All advertising materials mentioning features or use of this software\r\n   must display the following acknowledgement:\r\n   'This product includes cryptographic software written by\r\n    Eric Young (eay@cryptsoft.com)'\r\n   The word 'cryptographic' can be left out if the rouines from the library\r\n   being used are not cryptographic related :-).\r\n4. If you include any Windows specific code (or a derivative thereof) from \r\n   the apps directory (application code) you must include an acknowledgement:\r\n   'This product includes software written by Tim Hudson (tjh@cryptsoft.com)'\r\n\r\nTHIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND\r\nANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\r\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\r\nARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE\r\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\r\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS\r\nOR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\r\nHOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\r\nLIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY\r\nOUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF\r\nSUCH DAMAGE.\r\n\r\nThe licence and distribution terms for any publically available version or\r\nderivative of this code cannot be changed.  i.e. this code cannot simply be\r\ncopied and put under another distribution licence\r\n[including the GNU Public Licence.]\r\n");
-    gpmErrorForm->show();
+"OpenSSL:\r\n\r\nCopyright (c) 1998-2016 The OpenSSL Project.  All rights reserved.\r\n\r\nRedistribution and use in source and binary forms, with or without\r\nmodification, are permitted provided that the following conditions\r\nare met:\r\n\r\n1. Redistributions of source code must retain the above copyright\r\n   notice, this list of conditions and the following disclaimer. \r\n\r\n2. Redistributions in binary form must reproduce the above copyright\r\n   notice, this list of conditions and the following disclaimer in\r\n   the documentation and/or other materials provided with the\r\n   distribution.\r\n\r\n3. All advertising materials mentioning features or use of this\r\n   software must display the following acknowledgment:\r\n   'This product includes software developed by the OpenSSL Project\r\n   for use in the OpenSSL Toolkit. (http://www.openssl.org/)'\r\n\r\n4. The names 'OpenSSL Toolkit' and 'OpenSSL Project' must not be used to\r\n   endorse or promote products derived from this software without\r\n   prior written permission. For written permission, please contact\r\n   openssl-core@openssl.org.\r\n\r\n5. Products derived from this software may not be called 'OpenSSL'\r\n   nor may 'OpenSSL' appear in their names without prior written\r\n   permission of the OpenSSL Project.\r\n\r\n6. Redistributions of any form whatsoever must retain the following\r\n   acknowledgment:\r\n   'This product includes software developed by the OpenSSL Project\r\n   for use in the OpenSSL Toolkit (http://www.openssl.org/)'\r\n\r\nTHIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY\r\nEXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\r\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\r\nPURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR\r\nITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\r\nSPECIAL, EXEMPLARY, OR").append(" CONSEQUENTIAL DAMAGES (INCLUDING, BUT\r\nNOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\r\nLOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\r\nHOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,\r\nSTRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\r\nARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED\r\nOF THE POSSIBILITY OF SUCH DAMAGE.\r\n====================================================================\r\n\r\nThis product includes cryptographic software written by Eric Young\r\n(eay@cryptsoft.com).  This product includes software written by Tim\r\nHudson (tjh@cryptsoft.com).\r\n\r\n\r\n Original SSLeay License\r\n -----------------------\r\n\r\nCopyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)\r\nAll rights reserved.\r\n\r\nThis package is an SSL implementation written\r\nby Eric Young (eay@cryptsoft.com).\r\nThe implementation was written so as to conform with Netscapes SSL.\r\n\r\nThis library is free for commercial and non-commercial use as long as\r\nthe following conditions are aheared to.  The following conditions\r\napply to all code found in this distribution, be it the RC4, RSA,\r\nlhash, DES, etc., code; not just the SSL code.  The SSL documentation\r\nincluded with this distribution is covered by the same copyright terms\r\nexcept that the holder is Tim Hudson (tjh@cryptsoft.com).\r\n\r\nCopyright remains Eric Young's, and as such any Copyright notices in\r\nthe code are not to be removed.\r\nIf this package is used in a product, Eric Young should be given attribution\r\nas the author of the parts of the library used.\r\nThis can be in the form of a textual message at program startup or\r\nin documentation (online or textual) provided with the package.\r\n\r\nRedistribution and use in source and binary forms, with or without\r\nmodification, are permitted provided that the following conditions\r\nare met:\r\n1. Redistributions of source code must retain the copyright\r\n   notice, this list of conditions and the following disclaimer.\r\n2. Redistributions in binary form must reproduce the above copyright\r\n   notice, this list of conditions and the following disclaimer in the\r\n   documentation and/or other materials provided with the distribution.\r\n3. All advertising materials mentioning features or use of this software\r\n   must display the following acknowledgement:\r\n   'This product includes cryptographic software written by\r\n    Eric Young (eay@cryptsoft.com)'\r\n   The word 'cryptographic' can be left out if the rouines from the library\r\n   being used are not cryptographic related :-).\r\n4. If you include any Windows specific code (or a derivative thereof) from \r\n   the apps directory (application code) you must include an acknowledgement:\r\n   'This product includes software written by Tim Hudson (tjh@cryptsoft.com)'\r\n\r\nTHIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND\r\nANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\r\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\r\nARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE\r\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\r\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS\r\nOR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\r\nHOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\r\nLIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY\r\nOUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF\r\nSUCH DAMAGE.\r\n\r\nThe licence and distribution terms for any publically available version or\r\nderivative of this code cannot be changed.  i.e. this code cannot simply be\r\ncopied and put under another distribution licence\r\n[including the GNU Public Licence.]");
     gpmErrorForm->SetMessage(&strMessage);
+    gpmErrorForm->show();
 }
 
 //=============================================================================
@@ -4350,7 +4368,7 @@ MainWindow::ScriptFinished(
 }
 #endif
 
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
 //=============================================================================
 //=============================================================================
 void
@@ -4511,8 +4529,8 @@ MainWindow::SpeedMenuSelected(
         if (gbLoopbackMode == true)
         {
             QString strMessage = tr("Error: Cannot initiate speed testing as loopback mode is enabled.");
-            gpmErrorForm->show();
             gpmErrorForm->SetMessage(&strMessage);
+            gpmErrorForm->show();
             return;
         }
 
@@ -4521,8 +4539,8 @@ MainWindow::SpeedMenuSelected(
         {
             //Invalid string size
             QString strMessage = tr("Error: Test data string must be a minimum of 4 bytes for speed testing.");
-            gpmErrorForm->show();
             gpmErrorForm->SetMessage(&strMessage);
+            gpmErrorForm->show();
             return;
         }
 
@@ -5556,6 +5574,7 @@ MainWindow::SetLoopBackMode(
             gbaDisplayBuffer.append("\n[Loopback Disabled]\n");
             gpMenu->actions().at(MenuActionLoopback)->setText("Enable Loopback (Rx->Tx)");
         }
+
         if (!gtmrTextUpdateTimer.isActive())
         {
             gtmrTextUpdateTimer.start();
@@ -5731,20 +5750,17 @@ MainWindow::on_edit_Title_textEdited(
     }
 }
 
+#ifndef SKIPPLUGINS
 //=============================================================================
 //=============================================================================
 void
 MainWindow::on_btn_Plugin_Abort_clicked(
     )
 {
-//    qDebug() << plugin_loader.isLoaded();
-//    qDebug() << button->filters();
-
-//todo: support plugin list
-    gpmErrorForm->show_message(plugin_list.at(0).plugin->plugin_about());
-//    gpmErrorForm->show();
-
-//    button->plugin_about();
+    if (ui->list_Plugin_Plugins->currentRow() >= 0)
+    {
+        gpmErrorForm->show_message(plugin_list.at(ui->list_Plugin_Plugins->currentRow()).plugin->plugin_about());
+    }
 }
 
 //=============================================================================
@@ -5753,13 +5769,10 @@ void
 MainWindow::on_btn_Plugin_Config_clicked(
     )
 {
-//todo: support plgin list
-    if (plugin_list.at(0).plugin->plugin_configuration() == false)
+    if (ui->list_Plugin_Plugins->currentRow() >= 0 && plugin_list.at(ui->list_Plugin_Plugins->currentRow()).plugin->plugin_configuration() == false)
     {
         gpmErrorForm->show_message("This plugin does not have any configuration.");
     }
-
-//    emit serial_status(true);
 }
 
 //=============================================================================
@@ -5778,10 +5791,9 @@ MainWindow::plugin_set_status(
     else
     {
         ui->selector_Tab->setCurrentIndex(0);
-            gbPluginRunning = busy;
-    gbPluginHideTerminalOutput = hide_terminal_output;
+        gbPluginRunning = busy;
+        gbPluginHideTerminalOutput = hide_terminal_output;
     }
-//    qDebug() << "Now: " << busy;
 }
 
 //=============================================================================
@@ -5794,16 +5806,16 @@ MainWindow::plugin_serial_transmit(
 //    qDebug() << "Transmitted";
     if (gbPluginRunning == true)
     {
-    gspSerialPort.write(*data);
-    gintQueuedTXBytes += data->size();
+        gspSerialPort.write(*data);
+        gintQueuedTXBytes += data->size();
 
-           //Add to log
-    gpMainLog->WriteLogData(*data);
+//TODO: Add to log
+        gpMainLog->WriteLogData(*data);
 
-    if (gbPluginHideTerminalOutput == false && ui->check_Echo->isChecked())
-    {
+        if (gbPluginHideTerminalOutput == false && ui->check_Echo->isChecked())
+        {
             ui->text_TermEditData->add_dat_in_text(data, false);
-    }
+        }
     }
 }
 
@@ -5818,6 +5830,7 @@ MainWindow::plugin_add_open_close_button(
     connect(button, SIGNAL(clicked(bool)), this, SLOT(on_btn_TermClose_clicked()));
     button->setText(gspSerialPort.isOpen() == true ? "C&lose Port" : "&Open Port");
 }
+#endif
 
 //=============================================================================
 //=============================================================================

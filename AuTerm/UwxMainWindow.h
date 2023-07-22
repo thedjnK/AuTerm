@@ -61,16 +61,20 @@
 #include "AutScrollEdit.h"
 #include "UwxPopup.h"
 #include "LrdLogger.h"
-#if SKIPAUTOMATIONFORM != 1
+#ifndef SKIPAUTOMATIONFORM
 #include "UwxAutomation.h"
 #endif
-#if SKIPERRORCODEFORM != 1
+#ifndef SKIPERRORCODEFORM
 #include "UwxErrorCode.h"
 #endif
-#if SKIPSCRIPTINGFORM != 1
+#ifndef SKIPSCRIPTINGFORM
 #include "UwxScripting.h"
 #endif
 #include "AutEscape.h"
+#ifndef SKIPPLUGINS
+#include <QPluginLoader>
+#include "AutPlugin.h"
+#endif
 
 /******************************************************************************/
 // Defines
@@ -193,6 +197,18 @@ union pointer_buf {
     uint64_t *p64;
 };
 
+#ifndef SKIPPLUGINS
+//Struct used for holding plugin objects
+struct plugins {
+    QPluginLoader *plugin_loader;
+    QObject *object;
+    AutPlugin *plugin;
+#ifndef QT_STATIC
+    QString filename;
+#endif
+};
+#endif
+
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
@@ -208,279 +224,97 @@ public:
         );
 
 public slots:
-    void
-    SerialRead(
-        );
-    void
-    MenuSelected(
-        QAction* qaAction
-        );
-    void
-    balloontriggered(
-        QAction* qaAction
-        );
-    void
-    SerialStatusSlot(
-        );
-    void
-    SerialError(
-        QSerialPort::SerialPortError speErrorCode
-        );
-    void
-    enter_pressed(
-        );
-    void
-    key_pressed(
-        int nKey,
-        QChar chrKeyValue
-        );
-    void
-    SerialBytesWritten(
-        qint64 intByteCount
-        );
-    void
-    SerialPortClosing(
-        );
-    void
-    MessagePass(
-        QByteArray baDataString,
-        bool bEscapeString,
-        bool bFromScripting
-        );
-#if SKIPSPEEDTEST != 1
-    void
-    SpeedMenuSelected(
-        QAction* qaAction
-        );
-    quint64
-    BitsBytesConvert(
-        quint64 iCount,
-        BitByteTypes bbtFrom,
-        BitByteTypes bbtTo
-        );
+    void SerialRead();
+    void MenuSelected(QAction* qaAction);
+    void balloontriggered(QAction* qaAction);
+    void SerialStatusSlot();
+    void SerialError(QSerialPort::SerialPortError speErrorCode);
+    void enter_pressed();
+    void key_pressed(int nKey, QChar chrKeyValue);
+    void SerialBytesWritten(qint64 intByteCount);
+    void SerialPortClosing();
+    void MessagePass(QByteArray baDataString, bool bEscapeString, bool bFromScripting);
+#ifndef SKIPSPEEDTEST
+    void SpeedMenuSelected(QAction* qaAction);
+    quint64 BitsBytesConvert(quint64 iCount, BitByteTypes bbtFrom, BitByteTypes bbtTo);
 #endif
 
 private slots:
-    void
-    on_btn_Connect_clicked(
-        );
-    void
-    on_btn_TermClose_clicked(
-        );
-    void
-    on_btn_Refresh_clicked(
-        );
-    void
-    on_btn_TermClear_clicked(
-        );
-    void
-    on_btn_Duplicate_clicked(
-        );
-    void
-    on_text_TermEditData_customContextMenuRequested(
-        const QPoint &pos
-        );
-    void
-    on_check_Break_stateChanged(
-        );
-    void
-    on_check_RTS_stateChanged(
-        );
-    void
-    on_check_DTR_stateChanged(
-        );
-    void
-    on_check_Line_stateChanged(
-        );
-    void
-    closeEvent(
-        QCloseEvent *closeEvent
-        );
-    void
-    on_btn_Cancel_clicked(
-        );
-    void
-    UpdateReceiveText(
-        );
-    void
-    BatchTimeoutSlot(
-        );
-    void
-    on_combo_COM_currentIndexChanged(
-        int intIndex
-        );
+    void on_btn_Connect_clicked();
+    void on_btn_TermClose_clicked();
+    void on_btn_Refresh_clicked();
+    void on_btn_TermClear_clicked();
+    void on_btn_Duplicate_clicked();
+    void on_text_TermEditData_customContextMenuRequested(const QPoint &pos);
+    void on_check_Break_stateChanged();
+    void on_check_RTS_stateChanged();
+    void on_check_DTR_stateChanged();
+    void on_check_Line_stateChanged();
+    void closeEvent(QCloseEvent *closeEvent);
+    void on_btn_Cancel_clicked();
+    void UpdateReceiveText();
+    void BatchTimeoutSlot();
+    void on_combo_COM_currentIndexChanged(int intIndex);
 #if 0
-    void
-    replyFinished(
-        QNetworkReply* nrReply
-        );
+    void replyFinished(QNetworkReply* nrReply);
 #endif
 #ifdef UseSSL
-    void
-    sslErrors(
-        QNetworkReply*,
-        QList<QSslError>
-        );
+    void sslErrors(QNetworkReply*, QList<QSslError>);
 #endif
-    void
-    on_btn_Github_clicked(
-        );
-    QList<QString>
-    SplitFilePath(
-        QString strFilename
-        );
-    void
-    on_check_Echo_stateChanged(
-        int bChecked
-        );
-    void
-    on_combo_PredefinedDevice_currentIndexChanged(
-        int intIndex
-        );
-    void
-    on_btn_PredefinedAdd_clicked(
-        );
-    void
-    on_btn_PredefinedDelete_clicked(
-        );
-    void
-    on_btn_SaveDevice_clicked(
-        );
-    void
-    ContextMenuClosed(
-        );
-    bool
-    event(
-        QEvent *evtEvent
-        );
-    void
-    on_btn_LogFileSelect_clicked(
-        );
-    void
-    on_edit_LogFile_editingFinished(
-        );
-    void
-    on_check_LogEnable_stateChanged(
-        int state
-        );
-    void
-    on_check_LogAppend_stateChanged(
-        int intChecked
-        );
-    void
-    on_btn_Help_clicked(
-        );
-    void
-    on_combo_LogDirectory_currentIndexChanged(
-        int
-        );
-    void
-    on_btn_LogRefresh_clicked(
-        );
-    void
-    on_btn_Licenses_clicked(
-        );
-    void
-    on_btn_EditViewFolder_clicked(
-        );
-    void
-    on_combo_EditFile_currentIndexChanged(
-        int
-        );
-    void
-    on_btn_EditSave_clicked(
-        );
-    void
-    on_btn_EditLoad_clicked(
-        );
+    void on_btn_Github_clicked();
+    QList<QString> SplitFilePath(QString strFilename);
+    void on_check_Echo_stateChanged(int bChecked);
+    void on_combo_PredefinedDevice_currentIndexChanged(int intIndex);
+    void on_btn_PredefinedAdd_clicked();
+    void on_btn_PredefinedDelete_clicked();
+    void on_btn_SaveDevice_clicked();
+    void ContextMenuClosed();
+    bool event(QEvent *evtEvent);
+    void on_btn_LogFileSelect_clicked();
+    void on_edit_LogFile_editingFinished();
+    void on_check_LogEnable_stateChanged(int state);
+    void on_check_LogAppend_stateChanged(int intChecked);
+    void on_btn_Help_clicked();
+    void on_combo_LogDirectory_currentIndexChanged(int);
+    void on_btn_LogRefresh_clicked();
+    void on_btn_Licenses_clicked();
+    void on_btn_EditViewFolder_clicked();
+    void on_combo_EditFile_currentIndexChanged(int);
+    void on_btn_EditSave_clicked();
+    void on_btn_EditLoad_clicked();
 #ifndef __APPLE__
-    void
-    on_btn_EditExternal_clicked(
-        );
+    void on_btn_EditExternal_clicked();
 #endif
-    void
-    on_btn_LogViewExternal_clicked(
-        );
-    void
-    on_btn_LogViewFolder_clicked(
-        );
-    void
-    on_text_EditData_textChanged(
-        );
-    void
-    on_combo_LogFile_currentIndexChanged(
-        int
-        );
-    void
-    on_btn_ReloadLog_clicked(
-        );
+    void on_btn_LogViewExternal_clicked();
+    void on_btn_LogViewFolder_clicked();
+    void on_text_EditData_textChanged();
+    void on_combo_LogFile_currentIndexChanged(int);
+    void on_btn_ReloadLog_clicked();
 #ifdef UseSSL
-    void
-    on_check_EnableSSL_stateChanged(
-        int
-        );
+    void on_check_EnableSSL_stateChanged(int);
 #endif
-    void
-    on_check_LineSeparator_stateChanged(
-        int
-        );
-#if SKIPERRORCODEFORM != 1
-    void
-    on_btn_Error_clicked(
-        );
+    void on_check_LineSeparator_stateChanged(int);
+#ifndef SKIPERRORCODEFORM
+    void on_btn_Error_clicked();
 #endif
-#if SKIPSCRIPTINGFORM != 1
-    void
-    ScriptStartRequest(
-        );
-    void
-    ScriptFinished(
-        );
+#ifndef SKIPSCRIPTINGFORM
+    void ScriptStartRequest();
+    void ScriptFinished();
 #endif
-#if SKIPSPEEDTEST != 1
-    void
-    on_check_SpeedRTS_stateChanged(
-        int
-        );
-    void
-    on_check_SpeedDTR_stateChanged(
-        int
-        );
-    void
-    on_btn_SpeedClear_clicked(
-        );
-    void
-    on_btn_SpeedClose_clicked(
-        );
-    void
-    on_btn_SpeedStartStop_clicked(
-        );
-    void
-    OutputSpeedTestStats(
-        );
-    void
-    on_combo_SpeedDataType_currentIndexChanged(
-        int
-        );
-    void
-    on_btn_SpeedCopy_clicked(
-        );
-    void
-    UpdateSpeedTestValues(
-        );
-    void
-    SpeedTestStartTimer(
-        );
-    void
-    SpeedTestStopTimer(
-        );
-    void
-    on_combo_SpeedDataDisplay_currentIndexChanged(
-        int
-        );
-    void
-    update_displayText(
-        );
+#ifndef SKIPSPEEDTEST
+    void on_check_SpeedRTS_stateChanged(int);
+    void on_check_SpeedDTR_stateChanged(int);
+    void on_btn_SpeedClear_clicked();
+    void on_btn_SpeedClose_clicked();
+    void on_btn_SpeedStartStop_clicked();
+    void OutputSpeedTestStats();
+    void on_combo_SpeedDataType_currentIndexChanged(int);
+    void on_btn_SpeedCopy_clicked();
+    void UpdateSpeedTestValues();
+    void SpeedTestStartTimer();
+    void SpeedTestStopTimer();
+    void on_combo_SpeedDataDisplay_currentIndexChanged(int);
+    void update_displayText();
 #endif
     void
     ScriptingFileSelected(
@@ -498,6 +332,7 @@ private slots:
     on_edit_Title_textEdited(
         const QString &
         );
+#ifndef SKIPPLUGINS
     void
     on_btn_Plugin_Abort_clicked(
         );
@@ -509,6 +344,7 @@ private slots:
         bool busy,
         bool hide_terminal_output
         );
+#endif
     void
     on_radio_vt100_ignore_toggled(
         bool checked
@@ -522,6 +358,7 @@ private slots:
         bool checked
         );
 
+#ifndef SKIPPLUGINS
 public slots:
     void
     plugin_serial_transmit(
@@ -531,6 +368,7 @@ public slots:
     plugin_add_open_close_button(
         QPushButton *button
         );
+#endif
 
 private:
     Ui::MainWindow *ui;
@@ -575,7 +413,7 @@ private:
         int intMinor,
         QChar qcDelta
         );
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     void
     SendSpeedTestData(
         int intMaxLength
@@ -635,7 +473,7 @@ private:
     QMenu *gpMenu; //Main menu
     QMenu *gpSMenu4; //Submenu 4
     QMenu *gpBalloonMenu; //Balloon menu
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     QMenu *gpSpeedMenu; //Speed testing menu
 #endif
     bool gbLoopbackMode; //True if loopback mode is enabled
@@ -674,18 +512,18 @@ private:
     QSslCertificate *sslcLairdSSLNew = NULL; //Holds the (newer) Laird SSL certificate
 #endif
     PopupMessage *gpmErrorForm; //Error message form
-#if SKIPAUTOMATIONFORM != 1
+#ifndef SKIPAUTOMATIONFORM
     UwxAutomation *guaAutomationForm; //Automation form
 #endif
-#if SKIPERRORCODEFORM != 1
+#ifndef SKIPERRORCODEFORM
     UwxErrorCode *gecErrorCodeForm; //Error code lookup form
 #endif
-#if SKIPSCRIPTINGFORM != 1
+#ifndef SKIPSCRIPTINGFORM
     UwxScripting *gusScriptingForm; //Scripting form
     bool gbScriptingRunning; //True if a script is running
 #endif
     bool gbSpeedTestRunning; //True if speed test is running
-#if SKIPSPEEDTEST != 1
+#ifndef SKIPSPEEDTEST
     unsigned char gchSpeedTestMode; //What mode the speed test is (inactive, receive, send or send & receive)
     QElapsedTimer gtmrSpeedTimer; //Used for timing how long a speed test has been running
     QByteArray gbaSpeedDisplayBuffer; //Buffer of data to display for speed test mode
@@ -719,17 +557,16 @@ private:
     bool gbAppStarted; //True if application startup is complete
     QElapsedTimer gtmrPortOpened; //Used for updating last received timestamp
     qint64 gintLastSerialTimeUpdate; //Used for recording when next last received timestamp should appear
+#ifndef SKIPPLUGINS
     bool gbPluginRunning; //True if a plugin is running
     bool gbPluginHideTerminalOutput; //True if terminal output should not be updated whilst plugin is running
     QList<QPushButton *> list_plugin_open_close_buttons;
+    QList<plugins> plugin_list;
+#endif
 
 protected:
-    void dragEnterEvent(
-        QDragEnterEvent *dragEvent
-        );
-    void dropEvent(
-        QDropEvent *dropEvent
-        );
+    void dragEnterEvent(QDragEnterEvent *dragEvent);
+    void dropEvent(QDropEvent *dropEvent);
 };
 
 #endif // UWXMAINWINDOW_H

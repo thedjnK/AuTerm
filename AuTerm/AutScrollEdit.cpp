@@ -70,11 +70,7 @@ AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::vt100_colour_process(
-    uint32_t code,
-    vt100_format_code *format
-    )
+void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *format)
 {
     const QColor *tmp_col;
 
@@ -205,12 +201,7 @@ AutScrollEdit::vt100_colour_process(
 // checked due to insufficient data, in which case `checked_pos` will be
 // updated with the length of the data (after removals) that has been checked
 //=============================================================================
-bool AutScrollEdit::vt100_process(
-    QString *buffer,
-    int32_t start,
-    QList<vt100_format_code> *formats,
-    int32_t *checked_pos
-    )
+bool AutScrollEdit::vt100_process(QString *buffer, int32_t start, QList<vt100_format_code> *formats, int32_t *checked_pos)
 {
     int32_t l = buffer->length();
     vt100_format_code tmp_format;
@@ -497,10 +488,7 @@ AutScrollEdit::~AutScrollEdit()
 
 //=============================================================================
 //=============================================================================
-bool
-AutScrollEdit::setup_scrollback(
-    quint16 nLines
-    )
+bool AutScrollEdit::setup_scrollback(quint16 nLines)
 {
     //Sets up the scrollback array
     mstrItemArray = new QString[nLines+1];
@@ -510,11 +498,7 @@ AutScrollEdit::setup_scrollback(
 
 //=============================================================================
 //=============================================================================
-bool
-AutScrollEdit::eventFilter(
-    QObject *target,
-    QEvent *event
-    )
+bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
 {
     if (target == this->verticalScrollBar())
     {
@@ -820,10 +804,7 @@ AutScrollEdit::eventFilter(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::set_line_mode(
-    bool bNewLineMode
-    )
+void AutScrollEdit::set_line_mode(bool bNewLineMode)
 {
     //Enables or disables line mode
     mbLineMode = bNewLineMode;
@@ -832,11 +813,7 @@ AutScrollEdit::set_line_mode(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::add_dat_in_text(
-    QByteArray *baDat,
-    bool apply_formatting
-    )
+void AutScrollEdit::add_dat_in_text(QByteArray *baDat, bool apply_formatting)
 {
     //Adds data to the DatIn buffer
     bool added = false;
@@ -877,10 +854,7 @@ AutScrollEdit::add_dat_in_text(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::add_dat_out_text(
-    const QString strDat
-    )
+void AutScrollEdit::add_dat_out_text(const QString strDat)
 {
     //Adds data to the DatOut buffer
     if (mbLineMode == true)
@@ -904,9 +878,7 @@ AutScrollEdit::add_dat_out_text(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::clear_dat_in(
-    )
+void AutScrollEdit::clear_dat_in()
 {
     //Clears the DatIn buffer
     mstrDatIn.clear();
@@ -924,9 +896,7 @@ AutScrollEdit::clear_dat_in(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::clear_dat_out(
-    )
+void AutScrollEdit::clear_dat_out()
 {
     //Clears the DatOut buffer
     mstrDatOut.clear();
@@ -937,9 +907,7 @@ AutScrollEdit::clear_dat_out(
 
 //=============================================================================
 //=============================================================================
-QString *
-AutScrollEdit::get_dat_out(
-    )
+QString *AutScrollEdit::get_dat_out()
 {
     //Returns the DatOut buffer
     return &mstrDatOut;
@@ -947,10 +915,7 @@ AutScrollEdit::get_dat_out(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::insertFromMimeData(
-    const QMimeData *mdSrc
-    )
+void AutScrollEdit::insertFromMimeData(const QMimeData *mdSrc)
 {
     if (mdSrc->hasUrls() == true)
     {
@@ -1003,9 +968,7 @@ AutScrollEdit::insertFromMimeData(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::update_display(
-    )
+void AutScrollEdit::update_display()
 {
     //Updates the receive text buffer, faster
     if (this->verticalScrollBar()->isSliderDown() != true && mbContextMenuOpen == false)
@@ -1267,9 +1230,7 @@ AutScrollEdit::update_display(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::update_cursor(
-    )
+void AutScrollEdit::update_cursor()
 {
     //Updates the text control's cursor position
     if (mbLocalEcho == true && mbLineMode == true)
@@ -1284,10 +1245,7 @@ tcTmpCur.setCharFormat(pre);
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::set_serial_open(
-    bool SerialOpen
-    )
+void AutScrollEdit::set_serial_open(bool SerialOpen)
 {
     //Updates the serial open variable
     mbSerialOpen = SerialOpen;
@@ -1295,11 +1253,7 @@ AutScrollEdit::set_serial_open(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::trim_dat_in(
-    qint32 intThreshold,
-    quint32 intSize
-    )
+void AutScrollEdit::trim_dat_in(qint32 intThreshold, quint32 intSize)
 {
     //Trim the display buffer
     if (mstrDatIn.length() > intThreshold)
@@ -1311,10 +1265,7 @@ AutScrollEdit::trim_dat_in(
 
 //=============================================================================
 //=============================================================================
-void
-AutScrollEdit::set_vt100_mode(
-    vt100_mode mode
-    )
+void AutScrollEdit::set_vt100_mode(vt100_mode mode)
 {
     vt100_control_mode = mode;
 }

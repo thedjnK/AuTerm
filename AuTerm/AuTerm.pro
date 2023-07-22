@@ -1,16 +1,4 @@
 # AuTerm Qt project qmake file
-# By default all components are built for Github AuTerm releases
-
-# Uncomment to exclude building automation form
-#DEFINES += "SKIPAUTOMATIONFORM"
-# Uncomment to exclude building error code lookup form
-#DEFINES += "SKIPERRORCODEFORM"
-# Uncomment to exclude building scripting form
-#DEFINES += "SKIPSCRIPTINGFORM"
-# Uncomment to exclude building speed test functionality
-#DEFINES += "SKIPSPEEDTEST"
-# Uncomment to resolve IP address from hostname prior to making web request
-#DEFINES += "RESOLVEIPSEPARATELY"
 
 include(../AuTerm-includes.pri)
 
@@ -33,7 +21,6 @@ HEADERS  += \
     UwxMainWindow.h \
     UwxPopup.h \
     LrdLogger.h \
-    AutPlugin.h
 
 FORMS    += \
     UwxPopup.ui \
@@ -78,7 +65,10 @@ win32:RC_ICONS = images/AuTerm32.ico
 # Mac application icon
 ICON = MacAuTermIcon.icns
 
+# Plugins
 !contains(DEFINES, SKIPPLUGINS) {
+    HEADERS += AutPlugin.h
+
     contains(CONFIG, static) {
         !contains(DEFINES, SKIPPLUGIN_MCUMGR) {
             exists(../plugins/mcumgr) {

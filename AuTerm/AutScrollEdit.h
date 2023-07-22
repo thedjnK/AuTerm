@@ -90,101 +90,32 @@ class AutScrollEdit : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    explicit
-    AutScrollEdit(
-        QWidget *parent = 0
-        );
-    ~AutScrollEdit(
-        );
-    bool
-    setup_scrollback(
-        quint16 nLines
-        );
-    void
-    set_line_mode(
-        bool bNewLineMode
-        );
-    void
-    insertFromMimeData(
-        const QMimeData *mdSrc
-        );
-    void
-    update_display(
-        );
-    void
-    add_dat_in_text(
-        QByteArray *baDat,
-        bool apply_formatting
-        );
-    void
-    add_dat_out_text(
-        const QString strDat
-        );
-    void
-    clear_dat_in(
-        );
-    void
-    clear_dat_out(
-        );
-    QString
-    *get_dat_out(
-        );
-    void
-    update_cursor(
-        );
-    void
-    set_serial_open(
-        bool SerialOpen
-        );
-    void
-    trim_dat_in(
-        qint32 intThreshold,
-        quint32 intSize
-        );
-    void
-    set_vt100_mode(
-        vt100_mode mode
-        );
+    explicit AutScrollEdit(QWidget *parent = 0);
+    ~AutScrollEdit();
+    bool setup_scrollback(quint16 nLines);
+    void set_line_mode(bool bNewLineMode);
+    void insertFromMimeData(const QMimeData *mdSrc);
+    void update_display();
+    void add_dat_in_text(QByteArray *baDat, bool apply_formatting);
+    void add_dat_out_text(const QString strDat);
+    void clear_dat_in();
+    void clear_dat_out();
+    QString *get_dat_out();
+    void update_cursor();
+    void set_serial_open(bool SerialOpen);
+    void trim_dat_in(qint32 intThreshold, quint32 intSize);
+    void set_vt100_mode(vt100_mode mode);
 
 protected:
-    bool
-    eventFilter(
-        QObject *target,
-        QEvent *event
-        );
-    bool
-    vt100_process(
-        QString *buffer,
-        int32_t start,
-        QList<vt100_format_code> *format,
-        int32_t *checked_pos
-        );
-    bool
-    vt100_process_no_rem(
-        QString *buffer,
-        int32_t start,
-        QList<vt100_format_code> *format,
-        int32_t *checked_pos
-        );
-    void
-    vt100_colour_process(
-        uint32_t code,
-        vt100_format_code *format
-        );
+    bool eventFilter(QObject *target, QEvent *event);
+    bool vt100_process(QString *buffer, int32_t start, QList<vt100_format_code> *format, int32_t *checked_pos);
+    bool vt100_process_no_rem(QString *buffer, int32_t start, QList<vt100_format_code> *format, int32_t *checked_pos);
+    void vt100_colour_process(uint32_t code, vt100_format_code *format);
 
 signals:
-    void
-    enter_pressed(
-        );
-    void
-    key_pressed(
-        int nKey,
-        QChar chrKeyValue
-        );
-    void
-    file_dropped(
-        QString strFilename
-        );
+    void enter_pressed();
+    void key_pressed(int nKey, QChar chrKeyValue);
+    void file_dropped(QString strFilename);
 
 private:
     QString *mstrItemArray; //Item text
