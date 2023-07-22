@@ -200,10 +200,10 @@ union pointer_buf {
 #ifndef SKIPPLUGINS
 //Struct used for holding plugin objects
 struct plugins {
-    QPluginLoader *plugin_loader;
     QObject *object;
     AutPlugin *plugin;
 #ifndef QT_STATIC
+    QPluginLoader *plugin_loader;
     QString filename;
 #endif
 };

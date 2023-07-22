@@ -1117,8 +1117,10 @@ MainWindow::~MainWindow()
         disconnect(plugin_list.at(i).object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
         disconnect(plugin_list.at(i).object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
         delete plugin_list.at(i).object;
+#ifndef QT_STATIC
         plugin_list.at(i).plugin_loader->unload();
         delete plugin_list.at(i).plugin_loader;
+#endif
         ++i;
     }
 #endif
