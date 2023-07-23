@@ -133,6 +133,7 @@ private:
     int32_t dat_in_new_len; //Holds position of QString-version of mstrDatIn where the mstrDatIn ends
     QTextCharFormat last_format; //Last format applied to dat out data
     vt100_mode vt100_control_mode; //VT100 control code mode
+    bool had_dat_in_data; //True if there is current data displayed from the dat in buffer
 
 public:
     bool mbLocalEcho; //True if local echo is enabled

@@ -41,40 +41,38 @@ AutEscape::escape_characters(
 {
     //Escapes character sequences
     qint32 next = data->indexOf("\\");
+
     while (next != -1)
     {
         QChar cur_char;
 
-        if (data->length() <= next)
+        if (data->length() <= (next + 1))
         {
             //No more string length, ignore
             break;
         }
 
-        cur_char = data->at(next + 1);
+        cur_char = QChar(data->at(next + 1)).toLower();
 
         if (cur_char == '\\')
         {
             //This is a \\ so remove one of the slashes and ignore the conversion
             data->remove(next, 1);
         }
-        else if (cur_char == 'r' || cur_char == 'R')
+        else if (cur_char == 'r')
         {
             //This is a \r or \R
-            data->insert(next, "\r");
-            data->remove((next + 1), 2);
+            data->replace(next, 2, "\r");
         }
-        else if (cur_char == 'n' || cur_char == 'N')
+        else if (cur_char == 'n')
         {
             //This is a \n or \N
-            data->insert(next, "\n");
-            data->remove((next + 1), 2);
+            data->replace(next, 2, "\n");
         }
-        else if (cur_char == 't' || cur_char == 'T')
+        else if (cur_char == 't')
         {
             //This is a \t or \T
-            data->insert(next, "\t");
-            data->remove((next + 1), 2);
+            data->replace(next, 2, "\t");
         }
         else if (data->length() <= (next + 2))
         {
@@ -83,13 +81,13 @@ AutEscape::escape_characters(
         }
         else
         {
-            QChar next_char = data->at(next + 2);
+            QChar next_char = QChar(data->at(next + 2)).toLower();
 
-            if (((cur_char >= '0' && cur_char <= '9') || (cur_char >= 'a' && cur_char <= 'f') || (cur_char >= 'A' && cur_char <= 'F')) && ((next_char >= '0' && next_char <= '9') || (next_char >= 'a' && next_char <= 'f') || (next_char >= 'A' && next_char <= 'F')))
+            if (((cur_char >= '0' && cur_char <= '9') || (cur_char >= 'a' && cur_char <= 'f')) && ((next_char >= '0' && next_char <= '9') || (next_char >= 'a' && next_char <= 'f')))
             {
                 //Character to escape
-                data->insert(next, (char)data->mid((next + 1), 2).toInt(NULL, 16));
-                data->remove((next + 1), 3);
+                char replacement = (char)data->mid((next + 1), 2).toInt(NULL, 16);
+                data->replace(next, 3, &replacement, sizeof(char));
             }
         }
 

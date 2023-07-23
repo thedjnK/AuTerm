@@ -58,6 +58,7 @@ AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     mbSliderShown = false;
     dat_out_updated = false;
     dat_in_new_len = 0;
+    had_dat_in_data = false;
 
     mstrDatIn.reserve(32768);
 
@@ -815,7 +816,7 @@ void AutScrollEdit::add_dat_in_text(QByteArray *baDat, bool apply_formatting)
     //Adds data to the DatIn buffer
     bool added = false;
 
-    if (mstrDatIn.isEmpty() == true)
+    if (had_dat_in_data == false)
     {
         //Remove first newline
         uint32_t i = 0;
@@ -828,7 +829,7 @@ void AutScrollEdit::add_dat_in_text(QByteArray *baDat, bool apply_formatting)
         if (i > 0)
         {
 //TODO: a better way to deal with this "hack"
-            if (apply_formatting == false)
+            if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
             {
                 mstrDatIn += "\x1b[0m";
             }
@@ -839,13 +840,14 @@ void AutScrollEdit::add_dat_in_text(QByteArray *baDat, bool apply_formatting)
 
     if (added == false)
     {
-        if (apply_formatting == false)
+        if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
         {
             mstrDatIn += "\x1b[0m";
         }
         mstrDatIn += baDat->replace("\r\n", "\n").replace("\r", "\n");
     }
 
+    had_dat_in_data = true;
     this->update_display();
 }
 
@@ -885,6 +887,7 @@ void AutScrollEdit::clear_dat_in()
 
     this->clear();
     dat_out_updated = true;
+    had_dat_in_data = false;
 
     this->moveCursor(QTextCursor::End);
     this->update_display();
