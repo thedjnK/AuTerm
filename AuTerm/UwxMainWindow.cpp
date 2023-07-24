@@ -1504,7 +1504,7 @@ MainWindow::SerialRead(
         }
 #endif
 
-        if (gbTermBusy == false)
+//        if (gbTermBusy == false)
         {
             //Update the display with the data
             QByteArray baDispData = baOrigData;

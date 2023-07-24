@@ -1035,7 +1035,7 @@ void AutScrollEdit::update_display()
             {
                 mstrDatIn.replace(i, 1, QString("\\0").append(QString::number(current, 16)).toUtf8());
             }
-            else if ((current >= 0x10 && current <= 0x1a) || (current >= 0x1c && current <= 0x1f && current != 0x1b))
+            else if ((current >= 0x10 && current <= 0x1a) || (current >= 0x1c && current <= 0x1f) || (current == 0x1b && vt100_control_mode != VT100_MODE_DECODE))
             {
                 mstrDatIn.replace(i, 1, QString("\\").append(QString::number(current, 16)).toUtf8());
             }

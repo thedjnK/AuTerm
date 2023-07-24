@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>632</width>
-    <height>413</height>
+    <width>648</width>
+    <height>448</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -443,6 +443,9 @@
                 </property>
                 <property name="sizeAdjustPolicy">
                  <enum>QAbstractScrollArea::AdjustToContents</enum>
+                </property>
+                <property name="undoRedoEnabled">
+                 <bool>false</bool>
                 </property>
                 <property name="readOnly">
                  <bool>false</bool>
@@ -3476,7 +3479,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
