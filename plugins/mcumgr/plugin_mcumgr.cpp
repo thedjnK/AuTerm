@@ -81,8 +81,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 	file_upload_area = 0;
     shell_in_progress = false;
 
-	parent_window = main_window;
-    QTabWidget *tabWidget_orig = main_window->findChild<QTabWidget *>("selector_Tab");
+    parent_window = main_window;
+    QTabWidget *tabWidget_orig = parent_window->findChild<QTabWidget *>("selector_Tab");
 //    QPushButton *other = main_window->findChild<QPushButton *>("btn_TermClose");
 
 //    gridLayout = new QGridLayout();
@@ -851,7 +851,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     //QMetaObject::connectSlotsByName(Form);
 
 //Signals
-    connect(uart, SIGNAL(serial_write(QByteArray*)), main_window, SLOT(plugin_serial_transmit(QByteArray*)));
+    connect(uart, SIGNAL(serial_write(QByteArray*)), parent_window, SLOT(plugin_serial_transmit(QByteArray*)));
     connect(uart, SIGNAL(receive_waiting(QByteArray)), this, SLOT(receive_waiting(QByteArray)));
     //connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     //connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
@@ -1153,12 +1153,13 @@ QString array_name_dupe = array_name;
 			    r = reader.readByteArray();
 		    }
 
-		    if (key == "hash")
-		    {
+            if (key == "hash")
+            {
                 thisblah2.hash = data;
-			    items |= 0x01;
-		    }
-	    }
+                emit plugin_to_hex(&thisblah2.hash);
+                items |= 0x01;
+            }
+        }
 	    break;
 	    case QCborStreamReader::String:
 	    {
@@ -1947,6 +1948,8 @@ void plugin_mcumgr::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex 
                     i = 99;
                     break;
                 }
+
+                ++l;
             }
         }
 

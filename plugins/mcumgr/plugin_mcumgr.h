@@ -81,6 +81,7 @@ signals:
     void show_message_box(QString str_message);
     void plugin_set_status(bool busy, bool hide_terminal_output);
     void plugin_add_open_close_button(QPushButton *button);
+    void plugin_to_hex(QByteArray *data);
 
 private slots:
     void receive_waiting(QByteArray data);
