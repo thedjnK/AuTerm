@@ -100,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 //                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
                 connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
+                connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
 
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
@@ -140,6 +141,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 //                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
                 connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
+                connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
 
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
@@ -5837,6 +5839,16 @@ MainWindow::plugin_add_open_close_button(
     list_plugin_open_close_buttons.append(button);
     connect(button, SIGNAL(clicked(bool)), this, SLOT(on_btn_TermClose_clicked()));
     button->setText(gspSerialPort.isOpen() == true ? "C&lose Port" : "&Open Port");
+}
+
+//=============================================================================
+//=============================================================================
+void
+MainWindow::plugin_to_hex(
+    QByteArray *data
+    )
+{
+    AutEscape::to_hex(data);
 }
 #endif
 

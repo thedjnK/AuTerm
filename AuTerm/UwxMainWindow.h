@@ -368,6 +368,10 @@ public slots:
     plugin_add_open_close_button(
         QPushButton *button
         );
+    void
+    plugin_to_hex(
+        QByteArray *data
+        );
 #endif
 
 private:

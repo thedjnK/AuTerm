@@ -34,10 +34,7 @@
 
 //=============================================================================
 //=============================================================================
-void
-AutEscape::escape_characters(
-    QByteArray *data
-    )
+void AutEscape::escape_characters(QByteArray *data)
 {
     //Escapes character sequences
     qint32 next = data->indexOf("\\");
@@ -98,11 +95,7 @@ AutEscape::escape_characters(
 
 //=============================================================================
 //=============================================================================
-void
-AutEscape::strip_vt100_formatting(
-    QByteArray *data,
-    int32_t offset
-    )
+void AutEscape::strip_vt100_formatting(QByteArray *data, int32_t offset)
 {
 //TODO: improve this
     QRegularExpression vt100_regex("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
@@ -113,6 +106,52 @@ AutEscape::strip_vt100_formatting(
     {
         data->remove(regex_match.capturedStart(0), regex_match.capturedLength(0));
         regex_match = vt100_regex.match(*data);
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void AutEscape::replace_unprintable(QByteArray *data, bool include_1b)
+{
+    int32_t i = data->length() - 1;
+
+    while (i >= 0)
+    {
+        uint8_t current = (uint8_t)data->at(i);
+
+        if (current < 0x08 || (current >= 0x0b && current <= 0x0c) || (current >= 0x0e && current <= 0x0f))
+        {
+            data->replace(i, 1, QString("\\0").append(QString::number(current, 16)).toUtf8());
+        }
+        else if ((current >= 0x10 && current <= 0x1a) || (current >= 0x1c && current <= 0x1f && (include_1b == true || current != 0x1b)))
+        {
+            data->replace(i, 1, QString("\\").append(QString::number(current, 16)).toUtf8());
+        }
+
+        --i;
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void AutEscape::to_hex(QByteArray *data)
+{
+    int32_t i = data->length() - 1;
+
+    while (i >= 0)
+    {
+        uint8_t current = (uint8_t)data->at(i);
+
+        if (current <= 0x0f)
+        {
+            data->replace(i, 1, QString("0").append(QString::number(current, 16)).toUtf8());
+        }
+        else
+        {
+            data->replace(i, 1, QString::number(current, 16).toUtf8());
+        }
+
+        --i;
     }
 }
 

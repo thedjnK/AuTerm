@@ -48,6 +48,7 @@ signals:
     void serial_transmit(QByteArray *data);
     void plugin_set_status(bool busy, bool hide_terminal_output);
     void plugin_add_open_close_button(QPushButton *button);
+    void plugin_to_hex(QByteArray *data);
 };
 
 Q_DECLARE_INTERFACE(AutPlugin, AuTermPluginInterface_iid)
