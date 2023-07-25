@@ -93,8 +93,7 @@ UwxScripting::UwxScripting(QWidget *parent) : QDialog(parent), ui(new Ui::UwxScr
     //Create option menu items
     gpOptionsMenu = new QMenu(this);
     gpOptionsMenu->addAction("Change Font")->setData(MenuActionChangeFont);
-    gpSOptionsMenu1 = gpOptionsMenu->addMenu("Export to");
-    gpSOptionsMenu1->addAction("String Player")->setData(MenuActionExportStringPlayer);
+    //gpSOptionsMenu1 = gpOptionsMenu->addMenu("Export to");
 
     //Connect signals
     connect(gpOptionsMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuSelected(QAction*)));
@@ -136,7 +135,7 @@ UwxScripting::~UwxScripting(
     delete qaKeyShortcuts[0];
     delete mhlHighlighter;
     delete msbStatusBar;
-    delete gpSOptionsMenu1;
+//    delete gpSOptionsMenu1;
     delete gpOptionsMenu;
     delete ui;
 }
@@ -446,84 +445,6 @@ UwxScripting::on_btn_Stop_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxScripting::ExportToStringPlayer(
-    )
-{
-    //Export to stringplayer
-    if (on_btn_Compile_clicked() == false)
-    {
-        //Compile successful
-        QString strSaveFile = QFileDialog::getSaveFileName(this, tr("Save File"), "", "StringPlayer Files (*.sub)");
-
-        if (strSaveFile.length() > 1)
-        {
-            //File was selected
-            QFile fileExport(strSaveFile);
-            if (fileExport.open(QFile::WriteOnly | QFile::Text))
-            {
-                //File opened for writing. Output the data to the file
-                QTextStream tsDataStream(&fileExport);
-
-                //Output header
-                tsDataStream << "//Exported from AuTerm v" << mstrAuTermVersion << " Scripting on " << QDate::currentDate().toString("dd/MM/yyyy") << " @ " << QTime::currentTime().toString("hh:mm") << "\r\n\r\nSET vPort \"0\" //Change to the port number to send/receive data on\r\nDECLARE vWaitTime\r\nSET vWaitTime \"5000\" //Change to the desired maximum wait time for each receive event in ms\r\n\r\n";
-
-                //Go through each block in the editor
-                QTextBlock tbCurrentBlock = ui->edit_Script->document()->firstBlock();
-                while (tbCurrentBlock.isValid())
-                {
-                    if (tbCurrentBlock.text().left(2) == ScriptingComment)
-                    {
-                        //Comment
-                        tsDataStream << tbCurrentBlock.text() << "\r\n";
-                    }
-                    else if (tbCurrentBlock.text().at(0) == ScriptingDataOut)
-                    {
-                        //Send out
-                        tsDataStream << "SENDCMD [vPort] \"" << tbCurrentBlock.text().right(tbCurrentBlock.text().length()-1) << "\"\r\n";
-                    }
-                    else if (tbCurrentBlock.text().at(0) == ScriptingDataIn)
-                    {
-                        //Receive
-                        tsDataStream << "WAITRESPEX [vWaitTime] [vPort] \"" << tbCurrentBlock.text().right(tbCurrentBlock.text().length()-1) << "\"\r\n";
-                    }
-                    else if (tbCurrentBlock.text().at(0) == ScriptingWaitTime)
-                    {
-                        //Wait for
-                        tsDataStream << "DELAY \"" << tbCurrentBlock.text().right(tbCurrentBlock.text().length()-1) << "\"\r\n";
-                    }
-                    else if (tbCurrentBlock.text().length() == 0)
-                    {
-                        //Newline
-                        tsDataStream << "\r\n";
-                    }
-                    else if (QString(tbCurrentBlock.text()).replace("\t", "").replace(" ", "").length() > 0)
-                    {
-                        //Text present that isn't space/tab, just assume a newline
-                        tsDataStream << "\r\n";
-                    }
-
-                    //Progress to next block
-                    tbCurrentBlock = tbCurrentBlock.next();
-                }
-                fileExport.close();
-
-                //Show message
-                msbStatusBar->showMessage("StringPlayer export successful!");
-            }
-            else
-            {
-                //Failed to open file
-                QString strMessage = tr("Error during Scripting StringPlayer file export: Access to selected file is denied: ").append(strSaveFile);
-                mFormAuto->SetMessage(&strMessage);
-                mFormAuto->show();
-            }
-        }
-    }
-}
-
-//=============================================================================
-//=============================================================================
-void
 UwxScripting::AdvanceLine(
     )
 {
@@ -581,12 +502,14 @@ UwxScripting::AdvanceLine(
                 mbaMatchData = mtbExecutionBlock.text().right(mtbExecutionBlock.text().length()-1).toUtf8();
                 AutEscape::escape_characters(&mbaMatchData);
                 ucLastAct = ScriptingActionDataIn;
+
                 if (!gtmrRecTimer.isValid())
                 {
                     //Start timer
                     gtmrRecTimer.start();
                     mtmrUpdateTimer.start(500);
                 }
+
                 if (CheckRecvMatchBuffers() == false)
                 {
                     //Waiting on a match
@@ -603,13 +526,6 @@ UwxScripting::AdvanceLine(
                     mbWaitingForReceive = true;
                     UpdateStatusBar();
                     return;
-                }
-
-                if (gtmrRecTimer.isValid())
-                {
-                    //Stop timer and invalidate it
-                    gtmrRecTimer.invalidate();
-                    mtmrUpdateTimer.stop();
                 }
             }
             else if (mtbExecutionBlock.text().at(0) == ScriptingWaitTime)
@@ -637,6 +553,13 @@ UwxScripting::AdvanceLine(
         UpdateStatusBar();
         mtbExecutionBlock = mtbExecutionBlock.next();
         ++mintCLine;
+
+        if (gtmrRecTimer.isValid())
+        {
+            //Stop timer and invalidate it
+            gtmrRecTimer.invalidate();
+            mtmrUpdateTimer.stop();
+        }
     }
 
     //Means execution has finished
@@ -726,21 +649,13 @@ UwxScripting::CheckRecvMatchBuffers(
     {
         //Length of receive buffer is greater than or equal to the match string, perform search
         int intPos = mbaRecvData.indexOf(mbaMatchData);
-        if (intPos != -1)
+
+        if (intPos != -1 && intPos < ui->spin_MaxRecBufSize->value())
         {
-            //Data found
-            if (intPos < ui->spin_MaxRecBufSize->value())
-            {
-                //Position OK: shift array and progress to next line
-                mbaRecvData = mbaRecvData.right(mbaRecvData.length() - intPos - mbaMatchData.length());
-                mbWaitingForReceive = false;
-                return true;
-            }
-            else
-            {
-                //Text found but after buffer size limit, return failure
-                return false;
-            }
+            //Position OK: shift array and progress to next line
+            mbaRecvData = mbaRecvData.right(mbaRecvData.length() - intPos - mbaMatchData.length());
+            mbWaitingForReceive = false;
+            return true;
         }
     }
 
@@ -922,11 +837,6 @@ UwxScripting::MenuSelected(
     {
         //Change font
         ChangeFont();
-    }
-    else if (intItem == MenuActionExportStringPlayer)
-    {
-        //Export to string player
-        ExportToStringPlayer();
     }
 }
 

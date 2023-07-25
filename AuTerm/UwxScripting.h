@@ -1,5 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2016-2018 Laird
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -166,9 +167,6 @@ private slots:
     on_btn_Stop_clicked(
         );
     void
-    ExportToStringPlayer(
-        );
-    void
     AdvanceLine(
         );
     void
@@ -215,7 +213,7 @@ private:
     QElapsedTimer gtmrScriptTimer; //Times how long the script took to execute
     QElapsedTimer gtmrRecTimer; //Times how long a receive took
     QMenu *gpOptionsMenu; //Options menu
-    QMenu *gpSOptionsMenu1; //Options export sub-menu
+    //QMenu *gpSOptionsMenu1; //Options export sub-menu
     QShortcut *qaKeyShortcuts[5]; //Shortcut object handles for various keyboard shortcuts
     OS32_64INT mnRepeats; //Number of script repeats completed (when specific mode is enabled)
     uint32_t mnScriptLines; //Number of lines in the script
