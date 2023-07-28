@@ -17,12 +17,14 @@ TARGET          = $$qtLibraryTarget(libmcumgr)
 SOURCES += \
     plugin_mcumgr.cpp \
     smp_message.cpp \
+    smp_processor.cpp \
     smp_uart.cpp
 
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
     plugin_mcumgr.h \
     smp_message.h \
+    smp_processor.h \
     smp_uart.h
 
 DISTFILES += plugin_mcumgr.json

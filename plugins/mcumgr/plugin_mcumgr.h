@@ -34,6 +34,7 @@
 #include <QCborMap>
 #include <QCborValue>
 #include "AutPlugin.h"
+#include "smp_processor.h"
 
 //Form includes
 #include <QtCore/QVariant>
@@ -66,6 +67,7 @@ class plugin_mcumgr : public QObject, AutPlugin
     Q_INTERFACES(AutPlugin)
 
 public:
+    ~plugin_mcumgr();
     QWidget *GetWidget();
     void setup(QMainWindow *main_window);
     const QString plugin_about();
@@ -86,6 +88,8 @@ signals:
 private slots:
     void receive_waiting(QByteArray data);
     bool eventFilter(QObject *object, QEvent *event);
+    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray *data);
+    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
 
     //Form slots
     void on_btn_FS_Local_clicked();

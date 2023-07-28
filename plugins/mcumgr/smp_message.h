@@ -71,7 +71,6 @@ public:
     QByteArray *data(void);
     QByteArray contents(void);
     static smp_op_t response_op(smp_op_t op);
-    void flip_endian();
 
 private:
     QByteArray buffer;

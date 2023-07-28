@@ -24,35 +24,39 @@
 #define smp_uart_H
 
 #include <QObject>
+#include "smp_message.h"
 
 class smp_uart : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
-	    public:
-		     smp_uart(QObject *parent);
-	~smp_uart();
-	void send(QByteArray *data);
-	int get_mtu();
+public:
+    smp_uart(QObject *parent);
+    ~smp_uart();
+    void send(smp_message *message);
+    int get_mtu();
 
 private:
-	void data_received(QByteArray message);
+    void data_received(QByteArray *message);
 
 signals:
-	void serial_write(QByteArray *data);
-	void receive_waiting(QByteArray data);
+    void serial_write(QByteArray *data);
+    void receive_waiting(smp_message *message);
 
 public slots:
-	void serial_read(QByteArray *rec_data);
+    void serial_read(QByteArray *rec_data);
 
 private:
-	QByteArray SerialData;
-	QByteArray SMPBuffer;
-	QByteArray SMPBufferActualData;
-	bool SMPWaitingForContinuation = false;
-	const QByteArray smp_first_header = QByteArrayLiteral("\x06\x09");
-	const QByteArray smp_continuation_header = QByteArrayLiteral("\x04\x14");
-	uint16_t waiting_packet_length = 0;
+    static uint16_t crc16(const QByteArray *src, size_t i, size_t len, uint16_t polynomial,
+                          uint16_t initial_value, bool pad);
+
+    QByteArray SerialData;
+    QByteArray SMPBuffer;
+    QByteArray SMPBufferActualData;
+    bool SMPWaitingForContinuation = false;
+    const QByteArray smp_first_header = QByteArrayLiteral("\x06\x09");
+    const QByteArray smp_continuation_header = QByteArrayLiteral("\x04\x14");
+    uint16_t waiting_packet_length = 0;
 };
 
 #endif // smp_uart_H
