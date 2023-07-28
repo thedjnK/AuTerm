@@ -25,50 +25,57 @@
 
 #include <QByteArray>
 
-enum smp_op_t {
-	SMP_OP_READ = 0,
-	SMP_OP_WRITE,
-	SMP_OP_READ_RESPONSE,
-	SMP_OP_WRITE_RESPONSE,
+enum smp_op_t : uint8_t {
+    SMP_OP_READ = 0,
+    SMP_OP_READ_RESPONSE,
+    SMP_OP_WRITE,
+    SMP_OP_WRITE_RESPONSE,
 };
 
 struct smp_hdr {
-#ifdef LITTLE_ENDIAN
-	smp_op_t nh_op:3;               /* MGMT_OP_[...] */
-	uint8_t  nh_version:2;
-	uint8_t  _res1:3;
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+    smp_op_t nh_op:3;               /* MGMT_OP_[...] */
+    uint8_t  nh_version:2;
+    uint8_t  _res1:3;
 #else
-	uint8_t  _res1:3;
-	uint8_t  nh_version:2;
-	smp_op_t nh_op:3;               /* MGMT_OP_[...] */
+    uint8_t  _res1:3;
+    uint8_t  nh_version:2;
+    smp_op_t nh_op:3;               /* MGMT_OP_[...] */
 #endif
-	uint8_t  nh_flags;              /* Reserved for future flags */
-	uint16_t nh_len;                /* Length of the payload */
-	uint16_t nh_group;              /* MGMT_GROUP_ID_[...] */
-	uint8_t  nh_seq;                /* Sequence number */
-	uint8_t  nh_id;                 /* Message ID within group */
+    uint8_t  nh_flags;              /* Reserved for future flags */
+    uint16_t nh_len;                /* Length of the payload */
+    uint16_t nh_group;              /* MGMT_GROUP_ID_[...] */
+    uint8_t  nh_seq;                /* Sequence number */
+    uint8_t  nh_id;                 /* Message ID within group */
 };
+
+//Ensure header size is correct
+static_assert(sizeof(smp_hdr) == 8);
 
 class smp_message
 {
 public:
-	smp_message();
-	//~smp_mesage();
+    smp_message();
+    //~smp_mesage();
 
-	void append(const QByteArray data);
-	const struct smp_hdr *get_header(void);
-	int size(void);
-	int data_size(void);
-	bool valid(void);
-	void set_header(const struct smp_hdr *data);
-	void set_header(const QByteArray data);
-	void set_header(const smp_op_t operation, const uint8_t version, const uint8_t flags, const uint16_t length, const uint16_t group, const uint8_t sequence, const uint8_t command);
-	const QByteArray *data(void);
-	QByteArray contents(void);
+    void append(const QByteArray data);
+    void append(const QByteArray *data);
+    void clear();
+    const smp_hdr *get_header(void);
+    int size(void);
+    int data_size(void);
+    bool is_valid(void);
+    void set_header(const smp_hdr *data);
+    void set_header(const QByteArray data);
+    void set_header(const smp_op_t operation, const uint8_t version, const uint8_t flags, const uint16_t length, const uint16_t group, const uint8_t sequence, const uint8_t command);
+    QByteArray *data(void);
+    QByteArray contents(void);
+    static smp_op_t response_op(smp_op_t op);
+    void flip_endian();
 
 private:
-	QByteArray buffer;
-	bool header_added;
+    QByteArray buffer;
+    bool header_added;
 };
 
 #endif // SMP_MESSAGE_H
