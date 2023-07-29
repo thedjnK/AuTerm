@@ -31,6 +31,9 @@
 #include <QElapsedTimer>
 #include <QCborStreamReader>
 
+//Forward declaration due to reverse dependency
+class smp_group;
+
 enum smp_error_type {
     SMP_ERROR_NONE,
     SMP_ERROR_RC,
@@ -40,7 +43,12 @@ enum smp_error_type {
 struct smp_error_t {
     smp_error_type type;
     int32_t rc;
-    int16_t group;
+    uint16_t group;
+};
+
+struct smp_group_match_t {
+    uint16_t group;
+    smp_group *handler;
 };
 
 class smp_processor : public QObject
@@ -50,16 +58,14 @@ class smp_processor : public QObject
 public:
     smp_processor(QObject *parent, smp_uart *uart_driver);
     ~smp_processor();
-    bool send(smp_message *message, uint32_t timeout_ms);
+    bool send(smp_message *message, uint32_t timeout_ms, uint8_t repeats);
     bool is_busy();
+    void register_handler(uint16_t group, smp_group *handler);
+    void unregister_handler(uint16_t group);
 
 private:
     void cleanup();
     bool decode_message(QCborStreamReader &reader, uint8_t version, uint16_t level, QString *parent, smp_error_t *error);
-
-signals:
-    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray *data);
-    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
 
 public slots:
     void message_timeout();
@@ -70,8 +76,9 @@ private:
     smp_message *last_message;
     const smp_hdr *last_message_header;
     QTimer repeat_timer;
-    uint8_t repeats;
+    uint8_t repeat_times;
     bool busy;
+    QList<smp_group_match_t> group_handlers;
 };
 
 #endif // smp_processor_H

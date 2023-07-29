@@ -22,13 +22,14 @@
 *******************************************************************************/
 
 #include "smp_processor.h"
+#include "smp_group.h"
 
 smp_processor::smp_processor(QObject *parent, smp_uart *uart_driver)
 {
     uart = uart_driver;
     last_message = nullptr;
     last_message_header = nullptr;
-    repeats = 0;
+    repeat_times = 0;
     busy = false;
 
     connect(&repeat_timer, SIGNAL(timeout()), this, SLOT(message_timeout()));
@@ -38,9 +39,10 @@ smp_processor::smp_processor(QObject *parent, smp_uart *uart_driver)
 smp_processor::~smp_processor()
 {
     cleanup();
+    group_handlers.clear();
 }
 
-bool smp_processor::send(smp_message *message, uint32_t timeout_ms)
+bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repeats)
 {
     if (busy)
     {
@@ -50,7 +52,7 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms)
     last_message = message;
     last_message_header = message->get_header();
     repeat_timer.setInterval(timeout_ms);
-    repeats = 0;
+    repeat_times = repeats;
     busy = true;
 
     uart->send(last_message);
@@ -62,6 +64,26 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms)
 bool smp_processor::is_busy()
 {
     return busy;
+}
+
+void smp_processor::register_handler(uint16_t group, smp_group *handler)
+{
+    group_handlers.append(smp_group_match_t{group, handler});
+}
+
+void smp_processor::unregister_handler(uint16_t group)
+{
+    uint8_t i = 0;
+    while (i < group_handlers.length())
+    {
+        if (group_handlers[i].group == group)
+        {
+            group_handlers.removeAt(i);
+            break;
+        }
+
+        ++i;
+    }
 }
 
 void smp_processor::cleanup()
@@ -80,7 +102,7 @@ void smp_processor::cleanup()
         last_message_header = nullptr;
     }
 
-    repeats = 0;
+    repeat_times = 0;
     busy = false;
 }
 
@@ -92,15 +114,43 @@ void smp_processor::message_timeout()
         return;
     }
 
-    if (repeats > 2)
+    if (repeat_times == 0)
     {
         //Too many repeats
+        uint16_t group = last_message_header->nh_group;
+        uint8_t i = 0;
+
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+        group = ((group & 0xff) << 8) | ((group & 0xff00) >> 8);
+#endif
+
+        //Search for the handler for this group
+        while (i < group_handlers.length())
+        {
+            if (group_handlers[i].group == group)
+            {
+                break;
+            }
+
+            ++i;
+        }
+
+        if (i == group_handlers.length())
+        {
+            //There is no registered handler for this group
+            qDebug() << "No registered handler for group " << group << ", cannot send timeout message.";
+        }
+        else
+        {
+            group_handlers[i].handler->timeout(last_message);
+        }
+
         cleanup();
         return;
     }
 
     //Resend message
-    ++repeats;
+    --repeat_times;
     repeat_timer.start();
     uart->send(last_message);
 }
@@ -146,10 +196,30 @@ void smp_processor::message_received(smp_message *response)
         uint8_t op = response_header->nh_op;
         uint16_t group = response_header->nh_group;
         uint8_t command = response_header->nh_id;
+        uint8_t i = 0;
 
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
         group = ((group & 0xff) << 8) | ((group & 0xff00) >> 8);
 #endif
+
+        //Search for the handler for this group
+        while (i < group_handlers.length())
+        {
+            if (group_handlers[i].group == group)
+            {
+                break;
+            }
+
+            ++i;
+        }
+
+        if (i == group_handlers.length())
+        {
+            //There is no registered handler for this group, clean up
+            qDebug() << "No registered handler for group " << group << ", dropping response.";
+            this->cleanup();
+            return;
+        }
 
         QCborStreamReader cbor_reader(response->contents());
         smp_error_t error;
@@ -167,12 +237,12 @@ void smp_processor::message_received(smp_message *response)
         if (error.type != SMP_ERROR_NONE)
         {
             //Received either "rc" (legacy) error or "ret" error
-            emit receive_error(version, op, group, command, error);
+            group_handlers[i].handler->receive_error(version, op, group, command, error);
         }
         else
         {
             //No error, good response
-            emit receive_ok(version, op, group, command, &response->contents());
+            group_handlers[i].handler->receive_ok(version, op, group, command, &response->contents());
         }
     }
 }

@@ -1539,7 +1539,7 @@ void plugin_mcumgr::file_upload(QByteArray *message)
 
                 smp_message *tmp_message = new smp_message();
                 tmp_message->append(message);
-                processor->send(tmp_message, 4000);
+                processor->send(tmp_message, 4000, 3);
 
                 //uart->send(&message);
 			    lbl_IMG_Status->setText(QString("Marking image ").append(radio_IMG_Test->isChecked() ? "for test." : "as confirmed."));
@@ -1576,7 +1576,7 @@ void plugin_mcumgr::file_upload(QByteArray *message)
 
         smp_message *tmp_message = new smp_message();
         tmp_message->append(message);
-        processor->send(tmp_message, 4000);
+        processor->send(tmp_message, 4000, 3);
         //uart->send(&message);
     }
     else
@@ -1836,7 +1836,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
 //	    qDebug() << "len: " << message.length();
 
 //        uart->send(&message);
-        processor->send(tmp_message, 4000);
+        processor->send(tmp_message, 4000, 3);
 
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Uploading...");
@@ -1863,7 +1863,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
 
         smp_message *tmp_message = new smp_message();
         tmp_message->append(message);
-        processor->send(tmp_message, 4000);
+        processor->send(tmp_message, 4000, 3);
 //        uart->send(&message);
 
         progress_IMG_Complete->setValue(0);
@@ -1931,7 +1931,7 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
 //	    qDebug() << "len: " << message.length();
 
 //        uart->send(&message);
-        processor->send(tmp_message, 4000);
+        processor->send(tmp_message, 4000, 3);
 
         lbl_SHELL_Status->setText("Executing...");
 }
