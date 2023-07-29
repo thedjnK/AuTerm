@@ -34,18 +34,6 @@
 //Forward declaration due to reverse dependency
 class smp_group;
 
-enum smp_error_type {
-    SMP_ERROR_NONE,
-    SMP_ERROR_RC,
-    SMP_ERROR_RET,
-};
-
-struct smp_error_t {
-    smp_error_type type;
-    int32_t rc;
-    uint16_t group;
-};
-
 struct smp_group_match_t {
     uint16_t group;
     smp_group *handler;
