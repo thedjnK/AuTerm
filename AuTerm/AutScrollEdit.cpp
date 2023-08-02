@@ -576,7 +576,7 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
                 //Enter pressed
                 if (mbSerialOpen == true)
                 {
-                    if (mchItems == 0 || mstrDatOut != mstrItemArray[(mchItems - 1)])
+                    if (mstrDatOut != "" && (mchItems == 0 || mstrDatOut != mstrItemArray[(mchItems - 1)]))
                     {
                         //Previous entry is not the same as this entry
                         if (mchItems > (nItemArraySize - 1))
@@ -588,13 +588,15 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
                                 mstrItemArray[(i - 1)] = mstrItemArray[i];
                                 ++i;
                             }
+
                             mchItems--;
                         }
-                        //mstrItemArray[mchItems] = this->toPlainText();
+
                         mstrItemArray[mchItems] = mstrDatOut;
                         mchItems++;
-                        mchPosition = mchItems;
                     }
+
+                    mchPosition = mchItems;
 
                     //Send message to main window
                     emit enter_pressed();
