@@ -34,7 +34,7 @@ public:
         processor = parent;
         processor->register_handler(group_id, this);
     }
-    virtual void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray *data) = 0;
+    virtual void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) = 0;
     virtual void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) = 0;
     virtual void timeout(smp_message *message) = 0;
 

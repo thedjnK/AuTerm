@@ -139,13 +139,22 @@ void smp_processor::message_timeout()
         {
             //There is no registered handler for this group
             qDebug() << "No registered handler for group " << group << ", cannot send timeout message.";
+            cleanup();
         }
         else
         {
-            group_handlers[i].handler->timeout(last_message);
+            //Keep message pointer valid but cleanup so callback can send a message
+            smp_message *backup_message = last_message;
+            last_message = nullptr;
+            last_message_header = nullptr;
+
+            cleanup();
+            group_handlers[i].handler->timeout(backup_message);
+
+            //Delete backup pointer
+            delete backup_message;
         }
 
-        cleanup();
         return;
     }
 
@@ -242,7 +251,7 @@ void smp_processor::message_received(smp_message *response)
         else
         {
             //No error, good response
-            group_handlers[i].handler->receive_ok(version, op, group, command, &response->contents());
+            group_handlers[i].handler->receive_ok(version, op, group, command, response->contents());
         }
     }
 }
