@@ -65,6 +65,13 @@ win32:RC_ICONS = images/AuTerm32.ico
 # Mac application icon
 ICON = MacAuTermIcon.icns
 
+# Common build location
+CONFIG(release, debug|release) {
+    DESTDIR = ../release
+} else {
+    DESTDIR = ../debug
+}
+
 # Plugins
 !contains(DEFINES, SKIPPLUGINS) {
     HEADERS += AutPlugin.h
@@ -74,18 +81,15 @@ ICON = MacAuTermIcon.icns
             exists(../plugins/mcumgr) {
                 DEFINES += "STATICPLUGIN_MCUMGR"
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../plugins/release/ -llibmcumgr
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../plugins/debug/ -llibmcumgr
-else:unix: LIBS += -L$$OUT_PWD/../plugins/ -llibmcumgr
+		win32: LIBS += -L$$DESTDIR -lplugin_mcumgr
+		else:unix: LIBS += -L$$DESTDIR -lplugin_mcumgr
 
-INCLUDEPATH += $$PWD/../plugins
-DEPENDPATH += $$PWD/../plugins
+#INCLUDEPATH += $$PWD/../plugins
+#DEPENDPATH += $$PWD/../plugins
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../plugins/release/libmcumgr.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../plugins/debug/libmcumgr.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../plugins/release/libmcumgr.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../plugins/debug/libmcumgr.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../plugins/libmcumgr.a
+		win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
+		else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_mcumgr.lib
+		else:unix: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
             }
         }
     }

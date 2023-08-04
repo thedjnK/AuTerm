@@ -8,7 +8,7 @@ CONFIG += plugin
 CONFIG += c++17
 
 INCLUDEPATH    += ../../AuTerm
-TARGET          = $$qtLibraryTarget(libmcumgr)
+TARGET          = $$qtLibraryTarget(plugin_mcumgr)
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -38,10 +38,11 @@ unix {
 
 CONFIG += install_ok  # Do not cargo-cult this!
 
+# Common build location
 CONFIG(release, debug|release) {
-    DESTDIR = ../release
+    DESTDIR = ../../release
 } else {
-    DESTDIR = ../debug
+    DESTDIR = ../../debug
 
     # The following form is only used for creating the GUI in Qt Creator, it is
     # not used by any part of the code in a normal build, therefore only build
