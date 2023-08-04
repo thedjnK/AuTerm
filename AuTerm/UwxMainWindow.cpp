@@ -1471,7 +1471,6 @@ void
 MainWindow::SerialRead(
     )
 {
-//    qDebug() << "Received";
     //Update the last received field
     if ((gtmrPortOpened.elapsed() / 1000) > gintLastSerialTimeUpdate)
     {
@@ -1489,6 +1488,8 @@ MainWindow::SerialRead(
     }
 #endif
     QByteArray baOrigData = gspSerialPort.readAll();
+//    qDebug() << "Received: " << baOrigData;
+
 
 #ifndef SKIPPLUGINS
     if (gbPluginHideTerminalOutput == false || gbPluginRunning == false)
@@ -5881,6 +5882,15 @@ void MainWindow::on_radio_vt100_decode_toggled(bool checked)
         ui->text_TermEditData->set_vt100_mode(VT100_MODE_DECODE);
     }
 }
+
+#ifndef SKIPPLUGINS
+//=============================================================================
+//=============================================================================
+void MainWindow::on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *)
+{
+    on_btn_Plugin_Config_clicked();
+}
+#endif
 
 /******************************************************************************/
 // END OF FILE

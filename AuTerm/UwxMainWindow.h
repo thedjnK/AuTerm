@@ -103,7 +103,7 @@
 // Constants
 /******************************************************************************/
 //Constants for version and functions
-const QString UwVersion                         = "0.16a"; //Version string
+const QString UwVersion                         = "0.16b"; //Version string
 //Constants for timeouts and streaming
 const qint16 FileReadBlock                      = 512;     //Number of bytes to read per block when streaming files
 const qint16 StreamProgress                     = 10000;   //Number of bytes between streaming progress updates
@@ -359,6 +359,8 @@ private slots:
         );
 
 #ifndef SKIPPLUGINS
+    void on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *);
+
 public slots:
     void
     plugin_serial_transmit(
