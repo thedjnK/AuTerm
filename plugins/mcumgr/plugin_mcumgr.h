@@ -35,6 +35,7 @@
 #include <QCborValue>
 #include "AutPlugin.h"
 #include "smp_processor.h"
+#include "smp_group.h"
 
 //Form includes
 #include <QtCore/QVariant>
@@ -59,6 +60,14 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+
+enum mcumgr_action_t {
+    ACTION_IMG_UPLOAD,
+    ACTION_IMG_UPLOAD_SET,
+    ACTION_IMG_IMAGE_LIST,
+    ACTION_IMG_IMAGE_SET,
+    ACTION_IMG_IMAGE_ERASE,
+};
 
 class plugin_mcumgr : public QObject, AutPlugin
 {
@@ -90,6 +99,10 @@ private slots:
     bool eventFilter(QObject *object, QEvent *event);
     void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray *data);
     void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
+    void group_to_hex(QByteArray *data);
+
+    void status(uint8_t user_data, group_status status, QString error_string);
+    void progress(uint8_t user_data, uint8_t percent);
 
     //Form slots
     void on_btn_FS_Local_clicked();
@@ -164,7 +177,7 @@ private:
     QRadioButton *radio_IMG_Confirm;
     QLabel *label_41;
     QLabel *label_9;
-    QCheckBox *check_V2_Protocol_;
+    QCheckBox *check_IMG_Reset;
     QWidget *tab_IMG_Images;
     QGridLayout *gridLayout_5;
     QColumnView *colview_IMG_Images;

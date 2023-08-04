@@ -26,6 +26,7 @@
 #include <QFileDialog>
 #include "smp_uart.h"
 #include "smp_processor.h"
+#include "smp_group_img_mgmt.h"
 
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -35,6 +36,7 @@ QMainWindow *parent_window;
 smp_uart *uart;
 smp_processor *processor;
 QStandardItemModel model_image_state;
+smp_group_img_mgmt *my_img;
 
 //0x08 = new version, 0x00 = old
 #define setup_smp_message(message, stream, write, group, id) \
@@ -54,6 +56,7 @@ message.append((char)((check_V2_Protocol->isChecked() ? 0x08 : 0x00) | (write ==
     message[3] = (uint8_t)smp_data.length(); \
     message.append(data)
 
+#if 0
 struct slot_state_t {
     uint32_t slot;
     QByteArray version;
@@ -73,6 +76,7 @@ struct image_state_t {
     QList<slot_state_t> slot_list;
     QStandardItem *item;
 };
+#endif
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
@@ -311,10 +315,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_4->addWidget(label_9, 2, 0, 1, 1);
 
-    check_V2_Protocol_ = new QCheckBox(tab_IMG_Upload);
-    check_V2_Protocol_->setObjectName("check_V2_Protocol_");
+    check_IMG_Reset = new QCheckBox(tab_IMG_Upload);
+    check_IMG_Reset->setObjectName("check_IMG_Reset");
 
-    gridLayout_4->addWidget(check_V2_Protocol_, 2, 1, 1, 1);
+    gridLayout_4->addWidget(check_IMG_Reset, 2, 1, 1, 1);
 
     tabWidget_3->addTab(tab_IMG_Upload, QString());
     tab_IMG_Images = new QWidget();
@@ -798,7 +802,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
     label_41->setText(QCoreApplication::translate("Form", "Image:", nullptr));
     label_9->setText(QCoreApplication::translate("Form", "Reset:", nullptr));
-    check_V2_Protocol_->setText(QCoreApplication::translate("Form", "After upload", nullptr));
+    check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Upload), QCoreApplication::translate("Form", "Upload", nullptr));
     label_5->setText(QCoreApplication::translate("Form", "State:", nullptr));
     radio_IMG_Get->setText(QCoreApplication::translate("Form", "Get", nullptr));
@@ -859,8 +863,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(uart, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
     //connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     //connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
-    connect(processor, SIGNAL(receive_error(uint8_t,uint8_t,uint16_t,uint8_t,smp_error_t)), this, SLOT(receive_error(uint8_t,uint8_t,uint16_t,uint8_t,smp_error_t)));
-    connect(processor, SIGNAL(receive_ok(uint8_t,uint8_t,uint16_t,uint8_t,QByteArray*)), this, SLOT(receive_ok(uint8_t,uint8_t,uint16_t,uint8_t,QByteArray*)));
+//    connect(processor, SIGNAL(receive_error(uint8_t,uint8_t,uint16_t,uint8_t,smp_error_t)), this, SLOT(receive_error(uint8_t,uint8_t,uint16_t,uint8_t,smp_error_t)));
+//    connect(processor, SIGNAL(receive_ok(uint8_t,uint8_t,uint16_t,uint8_t,QByteArray*)), this, SLOT(receive_ok(uint8_t,uint8_t,uint16_t,uint8_t,QByteArray*)));
 
 //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
@@ -892,10 +896,16 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
 
     //test
     emit plugin_add_open_close_button(btn_FS_Go);
+    my_img = new smp_group_img_mgmt(processor);
+
+    connect(my_img, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(my_img, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(my_img, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 }
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+    delete my_img;
     delete processor;
     delete uart;
 }
@@ -1775,7 +1785,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
     {
         //Upload
         emit plugin_set_status(true, false);
-
+#if 0
         lbl_IMG_Status->setText("Checking...");
 
         QFile file(edit_IMG_Local->text());
@@ -1837,6 +1847,10 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
 
 //        uart->send(&message);
         processor->send(tmp_message, 4000, 3);
+#endif
+
+        my_img->set_parameters(0, edit_MTU->value(), 0, 0, ACTION_IMG_UPLOAD);
+        my_img->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
 
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Uploading...");
@@ -1846,6 +1860,12 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         //Image list
         emit plugin_set_status(true, false);
 
+        blaharray.clear();
+        model_image_state.clear();
+        my_img->set_parameters(0, edit_MTU->value(), 0, 0, ACTION_IMG_IMAGE_LIST);
+        my_img->start_image_get(&blaharray);
+
+#if 0
         colview_IMG_Images->previewWidget()->hide();
         model_image_state.clear();
         blaharray.clear();
@@ -1865,6 +1885,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         tmp_message->append(message);
         processor->send(tmp_message, 4000, 3);
 //        uart->send(&message);
+#endif
 
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Querying...");
@@ -2084,4 +2105,77 @@ void plugin_mcumgr::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint
 void plugin_mcumgr::receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error)
 {
     qDebug() << "Got error: " << version << ", " << op << ", " << group << ", "  << command << ", " << error.type << ", " << error.rc << ", " << error.group;
+}
+
+void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error_string)
+{
+    /*
+     *     STATUS_COMPLETE = 0,
+    STATUS_ERROR,
+    STATUS_TIMEOUT,
+    STATUS_CANCELLED
+*/
+
+    bool finished = true;
+
+    qDebug() << "Status: " << status << "Sender: " << sender() << ", my_img: " << my_img;
+    if (sender() == my_img)
+    {
+        qDebug() << "img sender";
+        if (status == STATUS_COMPLETE)
+        {
+            qDebug() << "complete";
+            //Advance to next stage of image upload
+            if (user_data == ACTION_IMG_UPLOAD)
+            {
+                qDebug() << "is upload";
+                if (radio_IMG_Test->isChecked() || radio_IMG_Confirm->isChecked())
+                {
+                    //Mark image for test or confirmation
+                    finished = false;
+
+                    my_img->set_parameters(0, edit_MTU->value(), 0, 0, ACTION_IMG_UPLOAD_SET);
+                    my_img->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false));
+                    qDebug() << "do upload of " << upload_hash;
+                }
+            }
+            else if (user_data == ACTION_IMG_UPLOAD_SET)
+            {
+/*                if (check_IMG_Reset->isChecked())
+                {
+                    //Reboot device
+                    finished = false;
+                }*/
+            }
+            else if (user_data == ACTION_IMG_IMAGE_LIST)
+            {
+                uint8_t i = 0;
+                while (i < blaharray.length())
+                {
+                    model_image_state.appendRow(blaharray[i].item);
+                    ++i;
+                }
+            }
+        }
+    }
+
+    if (finished == true)
+    {
+        emit plugin_set_status(false, false);
+    }
+
+    if (error_string != nullptr)
+    {
+        qDebug() << "Status message: " << error_string;
+    }
+}
+
+void plugin_mcumgr::progress(uint8_t user_data, uint8_t percent)
+{
+    progress_IMG_Complete->setValue(percent);
+}
+
+void plugin_mcumgr::group_to_hex(QByteArray *data)
+{
+    emit plugin_to_hex(data);
 }

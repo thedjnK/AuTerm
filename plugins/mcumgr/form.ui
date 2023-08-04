@@ -275,7 +275,7 @@
          <item row="0" column="0">
           <widget class="QTabWidget" name="tabWidget_3">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="tab_IMG_Upload">
             <attribute name="title">
@@ -391,7 +391,7 @@
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QCheckBox" name="check_V2_Protocol_">
+              <widget class="QCheckBox" name="check_IMG_Reset">
                <property name="text">
                 <string>After upload</string>
                </property>
