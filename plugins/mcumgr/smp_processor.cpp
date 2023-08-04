@@ -328,6 +328,7 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
             }
             default:
             {
+                reader.next();
                 break;
             }
 

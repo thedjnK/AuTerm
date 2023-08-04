@@ -27,6 +27,8 @@
 #include "smp_message.h"
 #include "smp_processor.h"
 
+#include <QDebug>
+
 enum group_status {
     STATUS_COMPLETE = 0,
     STATUS_ERROR,
@@ -34,7 +36,7 @@ enum group_status {
     STATUS_CANCELLED
 };
 
-class smp_group: public QObject
+class smp_group : public QObject
 {
     Q_OBJECT
 
@@ -45,12 +47,13 @@ public:
         processor->register_handler(group_id, this);
     }
 
-    void set_parameters(uint8_t version, uint16_t mtu, uint8_t retries, uint16_t timeout)
+    void set_parameters(uint8_t version, uint16_t mtu, uint8_t retries, uint16_t timeout, uint8_t user_data)
     {
         smp_version = version;
         smp_mtu = mtu;
         smp_retries = retries;
         smp_timeout = timeout;
+        smp_user_data = user_data;
     }
 
     virtual void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) = 0;
@@ -59,8 +62,9 @@ public:
     virtual void cancel() = 0;
 
 signals:
-    void status(group_status status, QString error_string);
-    void progress(uint8_t percent);
+    void status(uint8_t user_data, group_status status, QString error_string);
+    void progress(uint8_t user_data, uint8_t percent);
+
 
 protected:
     smp_processor *processor;
@@ -68,6 +72,7 @@ protected:
     uint16_t smp_mtu;
     uint8_t smp_retries;
     uint16_t smp_timeout;
+    uint8_t smp_user_data;
 };
 
 #endif // SMP_GROUP_H

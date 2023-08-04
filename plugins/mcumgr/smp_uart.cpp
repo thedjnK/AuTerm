@@ -108,14 +108,14 @@ void smp_uart::serial_read(QByteArray *rec_data)
                     SMPWaitingForContinuation = true;
                     SMPBufferActualData = SMPBuffer;
                 }
-
-                SerialData.remove(pos, (posA - pos + 1));
-
-                pos = SerialData.indexOf(smp_first_header);
-                posA = SerialData.indexOf(0x0a, pos + 2);
-                pos_other = SerialData.indexOf(smp_continuation_header);
-                posA_other = SerialData.indexOf(0x0a, pos_other + 2);
             }
+
+            SerialData.remove(pos, (posA - pos + 1));
+
+            pos = SerialData.indexOf(smp_first_header);
+            posA = SerialData.indexOf(0x0a, pos + 2);
+            pos_other = SerialData.indexOf(smp_continuation_header);
+            posA_other = SerialData.indexOf(0x0a, pos_other + 2);
         }
         else if (SMPWaitingForContinuation == true)
         {
@@ -164,27 +164,27 @@ void smp_uart::serial_read(QByteArray *rec_data)
                     //More data expected in another packet
                     SMPWaitingForContinuation = true;
                 }
+            }
 
-                SerialData.remove(pos_other, (posA_other - pos_other + 1));
+            SerialData.remove(pos_other, (posA_other - pos_other + 1));
 
-                pos = SerialData.indexOf(smp_first_header);
-                if (pos == -1)
-                {
-                    posA = -1;
-                }
-                else
-                {
-                    posA = SerialData.indexOf(0x0a, pos + 2);
-                }
-                pos_other = SerialData.indexOf(smp_continuation_header);
-                if (pos_other == -1)
-                {
-                    posA_other = -1;
-                }
-                else
-                {
-                    posA_other = SerialData.indexOf(0x0a, pos_other + 2);
-                }
+            pos = SerialData.indexOf(smp_first_header);
+            if (pos == -1)
+            {
+                posA = -1;
+            }
+            else
+            {
+                posA = SerialData.indexOf(0x0a, pos + 2);
+            }
+            pos_other = SerialData.indexOf(smp_continuation_header);
+            if (pos_other == -1)
+            {
+                posA_other = -1;
+            }
+            else
+            {
+                posA_other = SerialData.indexOf(0x0a, pos_other + 2);
             }
         }
     }
