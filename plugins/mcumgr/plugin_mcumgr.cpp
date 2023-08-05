@@ -60,28 +60,6 @@ message.append((char)((check_V2_Protocol->isChecked() ? 0x08 : 0x00) | (write ==
     message[3] = (uint8_t)smp_data.length(); \
     message.append(data)
 
-#if 0
-struct slot_state_t {
-    uint32_t slot;
-    QByteArray version;
-    QByteArray hash;
-    bool bootable;
-    bool pending;
-    bool confirmed;
-    bool active;
-    bool permanent;
-    bool splitstatus;
-    QStandardItem *item;
-};
-
-struct image_state_t {
-    uint32_t image;
-    bool image_set;
-    QList<slot_state_t> slot_list;
-    QStandardItem *item;
-};
-#endif
-
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
     uart = new smp_uart(this);
@@ -867,8 +845,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(uart, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
     //connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     //connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
-//    connect(processor, SIGNAL(receive_error(uint8_t,uint8_t,uint16_t,uint8_t,smp_error_t)), this, SLOT(receive_error(uint8_t,uint8_t,uint16_t,uint8_t,smp_error_t)));
-//    connect(processor, SIGNAL(receive_ok(uint8_t,uint8_t,uint16_t,uint8_t,QByteArray*)), this, SLOT(receive_ok(uint8_t,uint8_t,uint16_t,uint8_t,QByteArray*)));
 
 //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
@@ -1232,254 +1208,9 @@ bool plugin_mcumgr::extract_hash(QByteArray *file_data)
     return false;
 }
 
-void plugin_mcumgr::file_upload(QByteArray *message)
-{
-#if 0
-//    message->remove(0, 8);
-    QCborStreamReader cbor_reader(*message);
-    int32_t rc = -1;
-    int64_t off = -1;
-    bool good = handleStream_upload(cbor_reader, &rc, &off);
-
-//    qDebug() << "rc = " << rc << ", off = " << off;
-
-    if (off != -1 && rc != 9)
-    {
-	    file_upload_area = off;
-    }
-//    qDebug() << "good is " << good;
-
-    if (file_upload_area != 0)
-    {
-	    progress_IMG_Complete->setValue(file_upload_area * 100 / file_upload_data.length());
-    }
-
-    if (good == true)
-    {
-	    //Upload next chunk
-	    if (file_upload_area >= file_upload_data.length())
-	    {
-		    float blah = file_upload_data.length();
-		    uint8_t prefix = 0;
-		    while (blah >= 1024)
-		    {
-			    blah /= 1024;
-			    ++prefix;
-		    }
-		    QString bob;
-		    if (prefix == 0)
-		    {
-			    bob = "B";
-		    }
-		    else if (prefix == 1)
-		    {
-			    bob = "KiB";
-		    }
-		    else if (prefix == 2)
-		    {
-			    bob = "MiB";
-		    }
-		    else if (prefix == 3)
-		    {
-			    bob = "GiB";
-		    }
-
-		    blah = file_upload_data.length() / (float)(upload_tmr.elapsed() / 1000);
-		    prefix = 0;
-		    while (blah >= 1024)
-		    {
-			    blah /= 1024;
-			    ++prefix;
-		    }
-
-		    if (prefix == 0)
-		    {
-			    bob = "B";
-		    }
-		    else if (prefix == 1)
-		    {
-			    bob = "KiB";
-		    }
-		    else if (prefix == 2)
-		    {
-			    bob = "MiB";
-		    }
-		    else if (prefix == 3)
-		    {
-			    bob = "GiB";
-		    }
-		    edit_IMG_Log->appendPlainText(QString("~").append(QString::number(blah)).append(bob).append("ps throughput"));
-
-		    file_upload_data.clear();
-
-		    if (radio_IMG_Test->isChecked() || radio_IMG_Confirm->isChecked())
-		    {
-			    QByteArray message;
-			    QByteArray smp_data;
-			    QCborStreamWriter smp_stream(&smp_data);
-
-			    setup_smp_message(message, smp_stream, true, 0x01, 0x00);
-
-			    smp_stream.append("hash");
-			    smp_stream.append(upload_hash);
-			    if (radio_IMG_Confirm->isChecked())
-			    {
-				smp_stream.append("confirm");
-				smp_stream.append(false);
-			    }
-
-			    finish_smp_message(message, smp_stream, smp_data);
-//			    qDebug() << message;
-//			    qDebug() << "hash is " << upload_hash;
-
-                smp_message *tmp_message = new smp_message();
-                tmp_message->append(message);
-                processor->send(tmp_message, 4000, 3);
-
-                //uart->send(&message);
-			    lbl_IMG_Status->setText(QString("Marking image ").append(radio_IMG_Test->isChecked() ? "for test." : "as confirmed."));
-		    }
-		    else
-		    {
-			    file_upload_in_progress = false;
-			    upload_tmr.invalidate();
-			    upload_hash.clear();
-			    file_upload_area = 0;
-			    emit plugin_set_status(false, false);
-			    lbl_IMG_Status->setText("Finished.");
-		    }
-
-		    return;
-	    }
-
-	    QByteArray message;
-	    QByteArray smp_data;
-	    QCborStreamWriter smp_stream(&smp_data);
-
-	    setup_smp_message(message, smp_stream, true, 0x01, 0x01);
-
-	    smp_stream.append("off");
-	    smp_stream.append(file_upload_area);
-	    smp_stream.append("data");
-	    smp_stream.append(file_upload_data.mid(file_upload_area, edit_MTU->text().toUInt()));
-
-//	    qDebug() << "off: " << file_upload_area << ", left: " << file_upload_data.length();
-
-	    finish_smp_message(message, smp_stream, smp_data);
-
-//	    qDebug() << "len: " << smp_data.length();
-
-        smp_message *tmp_message = new smp_message();
-        tmp_message->append(message);
-        processor->send(tmp_message, 4000, 3);
-        //uart->send(&message);
-    }
-    else
-    {
-	    file_upload_in_progress = false;
-    }
-#endif
-}
-
 void plugin_mcumgr::receive_waiting(QByteArray message)
 {
 #if 0
-	uint16_t group = message.at(4);
-    group <<= 8;
-    group |= message.at(5);
-    uint8_t command = (uint8_t)message.at(7);
-    if (file_upload_in_progress == true && group == 1)
-    {
-	    if (command == 0x00)
-	    {
-		    //Response to set image state
-		    int32_t rc = -1;
-		    message.remove(0, 8);
-		    QCborStreamReader cbor_reader(message);
-		    bool good = handleStream_state(cbor_reader, &rc, "");
-//		    qDebug() << "Got " << good << ", " << rc;
-
-//		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(upload_tmr.elapsed())).append("ms"));
-		    lbl_IMG_Status->setText(QString("Finished #2 in ").append(QString::number(upload_tmr.elapsed())).append("ms"));
-
-		    file_upload_in_progress = false;
-		    upload_tmr.invalidate();
-		    upload_hash.clear();
-		    file_upload_area = 0;
-		    emit plugin_set_status(false, false);
-	    }
-	    else if (command == 0x01)
-	    {
-		    file_upload(&message);
-	    }
-	    else
-	    {
-		    qDebug() << "Unexpected command ID: " << command;
-	    }
-    }
-    else if (file_list_in_progress == true && group == 1)
-    {
-	    if (command == 0x00)
-	    {
-		    //Response to set image state
-		    int32_t rc = -1;
-		    message.remove(0, 8);
-		    QCborStreamReader cbor_reader(message);
-		    bool good = handleStream_state(cbor_reader, &rc, "");
-//		    qDebug() << "Got " << good << ", " << rc;
-
-//		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(upload_tmr.elapsed())).append("ms"));
-		    lbl_IMG_Status->setText("Finished.");
-
-#if 0
-            uint8_t i = 0;
-		    while (i < blaharray.length())
-		    {
-			    qDebug() << i;
-                qDebug() << "\t" << blaharray[i].image;
-                qDebug() << "\t" << blaharray[i].image_set;
-
-                edit_IMG_Log->appendPlainText(QString::number(i));
-                edit_IMG_Log->appendPlainText(QString::number(blaharray[i].image));
-                edit_IMG_Log->appendPlainText(QString::number(blaharray[i].image_set));
-                edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list.length()));
-
-                uint8_t l = 0;
-                while (l < blaharray[i].slot_list.length())
-                {
-                    qDebug() << "\t" << blaharray[i].slot_list[l].slot;
-                    qDebug() << "\t" << blaharray[i].slot_list[l].active;
-                    qDebug() << "\t" << blaharray[i].slot_list[l].bootable;
-                    qDebug() << "\t" << blaharray[i].slot_list[l].confirmed;
-                    qDebug() << "\t" << blaharray[i].slot_list[l].hash;
-                    qDebug() << "\t" << blaharray[i].slot_list[l].pending;
-                    qDebug() << "\t" << blaharray[i].slot_list[l].permanent;
-                    qDebug() << "\t" << blaharray[i].slot_list[l].splitstatus;
-                    qDebug() << "\t" << blaharray[i].slot_list[l].version;
-                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].slot));
-                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].active));
-                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].bootable));
-                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].confirmed));
-                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].pending));
-                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].permanent));
-                    edit_IMG_Log->appendPlainText(QString::number(blaharray[i].slot_list[l].splitstatus));
-                    edit_IMG_Log->appendPlainText(QString(blaharray[i].slot_list[l].version));
-                    edit_IMG_Log->appendPlainText(QString(blaharray[i].slot_list[l].hash));
-                    ++l;
-                }
-
-			    ++i;
-		    }
-#endif
-
-		    file_list_in_progress = false;
-		    emit plugin_set_status(false, false);
-	    }
-	    else
-	    {
-		    qDebug() << "Unexpected command ID: " << command;
-	    }
-    }
     else if (shell_in_progress == true && group == 9 && command == 0)
     {
         int32_t rc = -1;
@@ -1573,69 +1304,6 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
     {
         //Upload
         emit plugin_set_status(true, false);
-#if 0
-        lbl_IMG_Status->setText("Checking...");
-
-        QFile file(edit_IMG_Local->text());
-
-        if (!file.open(QFile::ReadOnly))
-        {
-            return;
-        }
-
-        file_upload_data.clear();
-        file_upload_data.append(file.readAll());
-
-        file.close();
-
-        if (extract_hash(&file_upload_data) == false)
-        {
-            lbl_IMG_Status->setText("Hash was not found");
-            file_upload_data.clear();
-            return;
-        }
-
-           //Send start
-        file_upload_area = 0;
-
-           //Generate image data
-        QByteArray session_hash = QCryptographicHash::hash(file_upload_data, QCryptographicHash::Sha256);
-
-        upload_tmr.start();
-
-//	    qDebug() << "hash: " << session_hash.toHex();
-
-        QByteArray message;
-        QByteArray smp_data;
-        QCborStreamWriter smp_stream(&smp_data);
-
-        setup_smp_message(message, smp_stream, true, 0x01, 0x01);
-
-        smp_stream.append("image");
-        smp_stream.append(edit_IMG_Image->value());
-        smp_stream.append("len");
-        smp_stream.append(file_upload_data.length());
-        smp_stream.append("off");
-        smp_stream.append(file_upload_area);
-        smp_stream.append("sha");
-        smp_stream.append(session_hash);
-        smp_stream.append("data");
-        smp_stream.append(file_upload_data.left(edit_MTU->text().toUInt()));
-//	    qDebug() << "bytes: " << edit_MTU->text().toUInt();
-
-        finish_smp_message(message, smp_stream, smp_data);
-
-        file_upload_in_progress = true;
-
-
-        smp_message *tmp_message = new smp_message();
-        tmp_message->append(message);
-
-//	    qDebug() << "len: " << message.length();
-
-//        uart->send(&message);
-        processor->send(tmp_message, 4000, 3);
-#endif
 
         my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_UPLOAD);
         my_img->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
@@ -1648,32 +1316,11 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         //Image list
         emit plugin_set_status(true, false);
 
-        blaharray.clear();
-        model_image_state.clear();
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_IMAGE_LIST);
-        my_img->start_image_get(&blaharray);
-
-#if 0
         colview_IMG_Images->previewWidget()->hide();
         model_image_state.clear();
         blaharray.clear();
-
-        QByteArray message;
-        QByteArray smp_data;
-        QCborStreamWriter smp_stream(&smp_data);
-
-        setup_smp_message(message, smp_stream, false, 0x01, 0x00);
-        finish_smp_message(message, smp_stream, smp_data);
-
-        file_list_in_progress = true;
-
-//	    qDebug() << "len: " << message.length();
-
-        smp_message *tmp_message = new smp_message();
-        tmp_message->append(message);
-        processor->send(tmp_message, 4000, 3);
-//        uart->send(&message);
-#endif
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_IMAGE_LIST);
+        my_img->start_image_get(&blaharray);
 
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Querying...");
@@ -1813,96 +1460,6 @@ void plugin_mcumgr::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex 
     {
         colview_IMG_Images->previewWidget()->show();
     }
-}
-
-void plugin_mcumgr::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray *data)
-{
-    qDebug() << "Got ok: " << version << ", " << op << ", " << group << ", "  << command << ", " << data;
-
-#if 0
-    if (file_upload_in_progress == true && group == 1)
-    {
-        if (command == 0x00)
-        {
-            //Response to set image state
-            int32_t rc = -1;
-//            message.remove(0, 8);
-            QCborStreamReader cbor_reader(*data);
-            bool good = handleStream_state(cbor_reader, &rc, "");
-            //		    qDebug() << "Got " << good << ", " << rc;
-
-            //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(upload_tmr.elapsed())).append("ms"));
-            lbl_IMG_Status->setText(QString("Finished #2 in ").append(QString::number(upload_tmr.elapsed())).append("ms"));
-
-            file_upload_in_progress = false;
-            upload_tmr.invalidate();
-            upload_hash.clear();
-            file_upload_area = 0;
-            emit plugin_set_status(false, false);
-        }
-        else if (command == 0x01)
-        {
-            file_upload(data);
-        }
-        else
-        {
-            qDebug() << "Unexpected command ID: " << command;
-        }
-    }
-    else if (file_list_in_progress == true && group == 1)
-    {
-        if (command == 0x00)
-        {
-            //Response to set image state
-            int32_t rc = -1;
-//            message.remove(0, 8);
-            QCborStreamReader cbor_reader(*data);
-            bool good = handleStream_state(cbor_reader, &rc, "");
-            //		    qDebug() << "Got " << good << ", " << rc;
-
-            //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(upload_tmr.elapsed())).append("ms"));
-            lbl_IMG_Status->setText("Finished.");
-
-            file_list_in_progress = false;
-            emit plugin_set_status(false, false);
-        }
-        else
-        {
-            qDebug() << "Unexpected command ID: " << command;
-        }
-    }
-    else if (shell_in_progress == true && group == 9 && command == 0)
-    {
-        int32_t rc = -1;
-        int32_t ret = -1;
-        QString response;
-        QCborStreamReader cbor_reader(*data);
-        bool good = handleStream_shell(cbor_reader, &rc, &ret, &response);
-
-        shell_in_progress = false;
-        emit plugin_set_status(false, false);
-
-        if (rc != -1)
-        {
-            lbl_SHELL_Status->setText(QString("Finished, error (rc): ").append(QString::number(rc)));
-        }
-        else if (ret != -1)
-        {
-            lbl_SHELL_Status->setText(QString("Finished, error (ret): ").append(QString::number(ret)));
-        }
-        else
-        {
-            lbl_SHELL_Status->setText("Finished");
-        }
-
-        edit_SHELL_Output->appendPlainText(response);
-    }
-#endif
-}
-
-void plugin_mcumgr::receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error)
-{
-    qDebug() << "Got error: " << version << ", " << op << ", " << group << ", "  << command << ", " << error.type << ", " << error.rc << ", " << error.group;
 }
 
 void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error_string)

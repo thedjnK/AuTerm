@@ -97,8 +97,6 @@ signals:
 private slots:
     void receive_waiting(QByteArray data);
     bool eventFilter(QObject *object, QEvent *event);
-    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray *data);
-    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
     void group_to_hex(QByteArray *data);
 
     void status(uint8_t user_data, group_status status, QString error_string);
@@ -125,7 +123,6 @@ private slots:
 private:
     bool handleStream_upload(QCborStreamReader &reader, int32_t *new_rc, int64_t *new_off);
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
-    void file_upload(QByteArray *message);
     bool extract_hash(QByteArray *file_data);
 
     //Form items
