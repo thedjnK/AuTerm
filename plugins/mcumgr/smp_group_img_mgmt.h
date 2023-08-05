@@ -70,10 +70,12 @@ signals:
     void plugin_to_hex(QByteArray *data);
 
 private:
-    bool extract_hash(QByteArray *file_data);
+    bool extract_hash(QByteArray *file_data, QByteArray *hash);
     bool handleStream_upload(QCborStreamReader &reader, int32_t *new_rc, int64_t *new_off);
-    bool handleStream_state(QCborStreamReader &reader, int32_t *new_rc, QString array_name);
+    bool handleStream_state(QCborStreamReader &reader, QString array_name);
     void file_upload(QByteArray *message);
+    QString mode_to_string(uint8_t mode);
+    QString op_to_string(uint8_t op);
 
     bool busy;
     uint8_t mode;
@@ -85,8 +87,8 @@ private:
     //bool file_list_in_progress;
     uint32_t file_upload_area;
     QElapsedTimer upload_tmr;
-    const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
     QByteArray upload_hash;
+    bool upgrade_only;
 
     QList<image_state_t> *host_images;
 };

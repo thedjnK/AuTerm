@@ -24,6 +24,7 @@
 #define SMP_MESSAGE_H
 
 #include <QByteArray>
+#include <QCborStreamWriter>
 
 enum smp_error_type {
     SMP_ERROR_NONE,
@@ -68,12 +69,12 @@ class smp_message
 {
 public:
     smp_message();
+    void start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t sequence, uint8_t id);
     //~smp_mesage();
-
     void append(const QByteArray data);
     void append(const QByteArray *data);
     void clear();
-    const smp_hdr *get_header(void);
+    smp_hdr *get_header(void);
     int size(void);
     int data_size(void);
     bool is_valid(void);
@@ -83,10 +84,13 @@ public:
     QByteArray *data(void);
     QByteArray contents(void);
     static smp_op_t response_op(smp_op_t op);
+    void end_message();
+    QCborStreamWriter *writer();
 
 private:
     QByteArray buffer;
     bool header_added;
+    QCborStreamWriter cbor_writer = QCborStreamWriter(&buffer);
 };
 
 #endif // SMP_MESSAGE_H

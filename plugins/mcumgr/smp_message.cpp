@@ -22,9 +22,34 @@
 *******************************************************************************/
 #include "smp_message.h"
 
+const uint8_t SMP_VERSION_1_HEADER = 0x00;
+const uint8_t SMP_VERSION_2_HEADER = 0x08;
+
 smp_message::smp_message()
 {
     this->header_added = false;
+}
+
+void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t sequence, uint8_t id)
+{
+    this->buffer.append((char)((version == 1 ? SMP_VERSION_2_HEADER : SMP_VERSION_1_HEADER) | op));  /* Read | Write (0x00 | 0x02) */
+    this->buffer.append((char)0x00);  /* Flags */
+    this->buffer.append((char)0x00);  /* Length A */
+    this->buffer.append((char)0x00);  /* Length B */
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+    this->buffer.append((char)(group >> 8));  /* Group A */
+    this->buffer.append((char)group);  /* Group B */
+#else
+    this->buffer.append((char)group);  /* Group A */
+    this->buffer.append((char)(group >> 8));  /* Group B */
+#endif
+    this->buffer.append((char)sequence);  /* Sequence */
+    this->buffer.append((char)id);   /* Message ID */
+
+    cbor_writer.device()->seek(this->buffer.length());
+    cbor_writer.startMap();
+
+    this->header_added = true;
 }
 
 /*smp_message::~smp_message()
@@ -48,14 +73,14 @@ void smp_message::clear()
     this->header_added = false;
 }
 
-const smp_hdr *smp_message::get_header(void)
+smp_hdr *smp_message::get_header(void)
 {
     if (this->buffer.size() < (int)sizeof(struct smp_hdr))
     {
         return NULL;
     }
 
-    return (const smp_hdr *)this->buffer.data();
+    return (smp_hdr *)this->buffer.data();
 }
 
 int smp_message::size(void)
@@ -137,4 +162,26 @@ QByteArray smp_message::contents(void)
 smp_op_t smp_message::response_op(smp_op_t op)
 {
     return op == SMP_OP_READ ? SMP_OP_READ_RESPONSE : SMP_OP_WRITE_RESPONSE;
+}
+
+void smp_message::end_message()
+{
+    if (this->header_added == true)
+    {
+        cbor_writer.endMap();
+
+        uint16_t data_size = this->buffer.length() - sizeof(sizeof(smp_hdr));
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+        this->buffer[2] = (uint8_t)(data_size >> 8);
+        this->buffer[3] = (uint8_t)data_size;
+#else
+        this->buffer[2] = (uint8_t)data_size;
+        this->buffer[3] = (uint8_t)(data_size >> 8);
+#endif
+    }
+}
+
+QCborStreamWriter *smp_message::writer()
+{
+    return &cbor_writer;
 }

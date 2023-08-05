@@ -53,6 +53,7 @@
 #include <QUrl>
 #include <QFileInfo>
 #include <QStringView>
+#include <QListWidgetItem>
 //Need cmath for std::ceil function
 #include <cmath>
 #if TARGET_OS_MAC

@@ -51,6 +51,7 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repe
 
     last_message = message;
     last_message_header = message->get_header();
+    last_message_version = last_message_header->nh_version;
     repeat_timer.setInterval(timeout_ms);
     repeat_times = repeats;
     busy = true;
@@ -116,7 +117,6 @@ void smp_processor::message_timeout()
 
     if (repeat_times == 0)
     {
-        //Too many repeats
         uint16_t group = last_message_header->nh_group;
         uint8_t i = 0;
 
@@ -156,6 +156,19 @@ void smp_processor::message_timeout()
         }
 
         return;
+    }
+
+    //If this is a version 2 message, try sending a version 1 packet to see if version 2 is unsupported by the server
+    if (last_message_version == 1)
+    {
+        if (last_message_header->nh_version == last_message_version)
+        {
+            last_message_header->nh_version = 0;
+        }
+        else
+        {
+            last_message_header->nh_version = 1;
+        }
     }
 
     //Resend message

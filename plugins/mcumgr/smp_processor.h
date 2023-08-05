@@ -62,7 +62,8 @@ public slots:
 private:
     smp_uart *uart;
     smp_message *last_message;
-    const smp_hdr *last_message_header;
+    smp_hdr *last_message_header;
+    uint8_t last_message_version;
     QTimer repeat_timer;
     uint8_t repeat_times;
     bool busy;

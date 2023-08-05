@@ -1071,226 +1071,6 @@ QList<image_state_t> blaharray;
 image_state_t thisblah;
 slot_state_t thisblah2;
 
-bool plugin_mcumgr::handleStream_state(QCborStreamReader &reader, int32_t *new_rc, QString array_name)
-{
-QString array_name_dupe = array_name;
-    qDebug() << reader.lastError() << reader.hasNext();
-
-    QString key = "";
-    int32_t rc = -1;
-    int64_t off = -1;
-
-    thisblah.image = 0;
-    thisblah.image_set = false;
-    thisblah.slot_list.clear();
-    thisblah.item = nullptr;
-    thisblah2.slot = 0;
-    thisblah2.version.clear();
-    thisblah2.hash.clear();
-    thisblah2.bootable = false;
-    thisblah2.pending = false;
-    thisblah2.confirmed = false;
-    thisblah2.active = false;
-    thisblah2.permanent = false;
-    thisblah2.splitstatus = false;
-    thisblah2.item = nullptr;
-    uint8_t items = 0;
-
-    while (!reader.lastError() && reader.hasNext())
-    {
-	    bool keyset = false;
-//	    qDebug() << "Key: " << key;
-//	    qDebug() << "Type: " << reader.type();
-	    switch (reader.type())
-	    {
-	    case QCborStreamReader::SimpleType:
-	    {
-		    bool *index = NULL;
-		    if (key == "bootable")
-		    {
-                index = &thisblah2.bootable;
-		    }
-		    else if (key == "pending")
-		    {
-                index = &thisblah2.pending;
-		    }
-		    else if (key == "confirmed")
-		    {
-                index = &thisblah2.confirmed;
-		    }
-		    else if (key == "active")
-		    {
-                index = &thisblah2.active;
-		    }
-		    else if (key == "permanent")
-		    {
-                index = &thisblah2.permanent;
-		    }
-		    else if (key == "splitStatus")
-		    {
-                index = &thisblah2.splitstatus;
-		    }
-
-		    if (index != NULL)
-		    {
-			    *index = reader.toBool();
-		    }
-
-		    reader.next();
-		    break;
-	    }
-
-	    case QCborStreamReader::UnsignedInteger:
-	    case QCborStreamReader::NegativeInteger:
-	    case QCborStreamReader::Float16:
-	    case QCborStreamReader::Float:
-	    case QCborStreamReader::Double:
-	    {
-		    //	handleFixedWidth(reader);
-		    if (key == "rc")
-		    {
-//			    qDebug() << "found rc";
-			    rc = reader.toInteger();
-		    }
-		    else if (key == "image")
-		    {
-			    thisblah.image = reader.toUnsignedInteger();
-                thisblah.image_set = true;
-		    }
-		    else if (key == "slot")
-		    {
-                thisblah2.slot = reader.toUnsignedInteger();
-		    }
-
-		    reader.next();
-		    break;
-	    }
-	    case QCborStreamReader::ByteArray:
-	    {
-		    QByteArray data;
-		    auto r = reader.readByteArray();
-		    while (r.status == QCborStreamReader::Ok)
-		    {
-			    data.append(r.data);
-			    r = reader.readByteArray();
-		    }
-
-            if (key == "hash")
-            {
-                thisblah2.hash = data;
-                emit plugin_to_hex(&thisblah2.hash);
-                items |= 0x01;
-            }
-        }
-	    break;
-	    case QCborStreamReader::String:
-	    {
-		    QString data;
-		    auto r = reader.readString();
-		    while (r.status == QCborStreamReader::Ok)
-		    {
-			    data.append(r.data);
-			    r = reader.readString();
-		    }
-
-		    if (r.status == QCborStreamReader::Error)
-		    {
-			    data.clear();
-			    qDebug("Error decoding string");
-		    }
-		    else
-		    {
-			    if (key.isEmpty())
-			    {
-				    key = data;
-				    keyset = true;
-			    }
-			    else if (key == "version")
-			    {
-                    thisblah2.version = data.toUtf8();
-				    items |= 0x02;
-			    }
-		    }
-		    break;
-	    }
-	    case QCborStreamReader::Array:
-	    case QCborStreamReader::Map:
-
-		    if (reader.type() == QCborStreamReader::Array)
-		    {
-			    array_name_dupe = key;
-		    }
-		    reader.enterContainer();
-		    while (reader.lastError() == QCborError::NoError && reader.hasNext())
-		    {
-			    qDebug() << "container/map";
-			    handleStream_state(reader, new_rc, array_name_dupe);
-//			    if (key == "images")
-//			    {
-//				    blaharray.append(thisblah);
-//			    }
-		    }
-		    if (reader.lastError() == QCborError::NoError)
-		    {
-			    qDebug() << "leave";
-			    reader.leaveContainer();
-
-			    if (array_name == "images")
-			    {
-                    image_state_t *image_state_ptr = nullptr;
-
-                    if (blaharray.length() > 0)
-                    {
-                        uint8_t i = 0;
-                        while (i < blaharray.length())
-                        {
-                            if (blaharray.at(i).image_set == thisblah.image_set && (thisblah.image_set == false || blaharray.at(i).image == thisblah.image))
-                            {
-                                image_state_ptr = &blaharray[i];
-                                break;
-                            }
-
-                            ++i;
-                        }
-                    }
-
-                    if (image_state_ptr == nullptr)
-                    {
-                        if (thisblah.image_set == true)
-                        {
-                            thisblah.item = new QStandardItem(QString("Image ").append(QString::number(thisblah.image)));
-                        }
-                        else
-                        {
-                            thisblah.item = new QStandardItem("Images");
-                        }
-                        blaharray.append(thisblah);
-                        image_state_ptr = &blaharray.last();
-                        model_image_state.appendRow(thisblah.item);
-                    }
-
-                    thisblah2.item = new QStandardItem(QString("Slot ").append(QString::number(thisblah2.slot)));
-                    image_state_ptr->slot_list.append(thisblah2);
-                    image_state_ptr->item->appendRow(thisblah2.item);
-			    }
-		    }
-		    break;
-	    }
-
-	    if (keyset == false && !key.isEmpty())
-	    {
-		    key = "";
-	    }
-    }
-
-    if (new_rc != NULL && rc != -1)
-    {
-	    *new_rc = rc;
-    }
-
-    return true;
-}
-
 bool plugin_mcumgr::handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data)
 {
 //    qDebug() << reader.lastError() << reader.hasNext();
@@ -1597,6 +1377,7 @@ void plugin_mcumgr::file_upload(QByteArray *message)
 
 void plugin_mcumgr::receive_waiting(QByteArray message)
 {
+#if 0
 	uint16_t group = message.at(4);
     group <<= 8;
     group |= message.at(5);
@@ -1720,6 +1501,7 @@ void plugin_mcumgr::receive_waiting(QByteArray message)
 
         edit_SHELL_Output->appendPlainText(data);
     }
+#endif
 }
 
 void plugin_mcumgr::serial_opened()
@@ -1849,7 +1631,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         processor->send(tmp_message, 4000, 3);
 #endif
 
-        my_img->set_parameters(0, edit_MTU->value(), 0, 0, ACTION_IMG_UPLOAD);
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), 0, 0, ACTION_IMG_UPLOAD);
         my_img->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
 
         progress_IMG_Complete->setValue(0);
@@ -1862,7 +1644,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
 
         blaharray.clear();
         model_image_state.clear();
-        my_img->set_parameters(0, edit_MTU->value(), 0, 0, ACTION_IMG_IMAGE_LIST);
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), 0, 0, ACTION_IMG_IMAGE_LIST);
         my_img->start_image_get(&blaharray);
 
 #if 0
@@ -2022,7 +1804,7 @@ void plugin_mcumgr::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint
 {
     qDebug() << "Got ok: " << version << ", " << op << ", " << group << ", "  << command << ", " << data;
 
-
+#if 0
     if (file_upload_in_progress == true && group == 1)
     {
         if (command == 0x00)
@@ -2100,6 +1882,7 @@ void plugin_mcumgr::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint
 
         edit_SHELL_Output->appendPlainText(response);
     }
+#endif
 }
 
 void plugin_mcumgr::receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error)
@@ -2118,7 +1901,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
     bool finished = true;
 
-    qDebug() << "Status: " << status << "Sender: " << sender() << ", my_img: " << my_img;
+    qDebug() << "Status: " << status << "Sender: " << sender();
     if (sender() == my_img)
     {
         qDebug() << "img sender";
@@ -2134,7 +1917,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     //Mark image for test or confirmation
                     finished = false;
 
-                    my_img->set_parameters(0, edit_MTU->value(), 0, 0, ACTION_IMG_UPLOAD_SET);
+                    my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), 0, 0, ACTION_IMG_UPLOAD_SET);
                     my_img->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false));
                     qDebug() << "do upload of " << upload_hash;
                 }
