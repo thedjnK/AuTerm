@@ -51,6 +51,12 @@ struct image_state_t {
     QStandardItem *item;
 };
 
+enum img_mgmt_upload_match : uint8_t {
+    MATCH_NOT_PRESENT = 0,
+    MATCH_FAILED,
+    MATCH_PASSED
+};
+
 class smp_group_img_mgmt : public smp_group
 {
     Q_OBJECT
@@ -71,13 +77,12 @@ signals:
 
 private:
     bool extract_hash(QByteArray *file_data, QByteArray *hash);
-    bool handleStream_upload(QCborStreamReader &reader, int32_t *new_rc, int64_t *new_off);
-    bool handleStream_state(QCborStreamReader &reader, QString array_name);
+    bool parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match);
+    bool parse_state_response(QCborStreamReader &reader, QString array_name);
     void file_upload(QByteArray *message);
     QString mode_to_string(uint8_t mode);
     QString op_to_string(uint8_t op);
 
-    bool busy;
     uint8_t mode;
 
     //
@@ -89,6 +94,7 @@ private:
     QElapsedTimer upload_tmr;
     QByteArray upload_hash;
     bool upgrade_only;
+    uint8_t upload_repeated_parts;
 
     QList<image_state_t> *host_images;
 };

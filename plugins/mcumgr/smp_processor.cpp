@@ -42,7 +42,7 @@ smp_processor::~smp_processor()
     group_handlers.clear();
 }
 
-bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repeats)
+bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check)
 {
     if (busy)
     {
@@ -51,6 +51,7 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repe
 
     last_message = message;
     last_message_header = message->get_header();
+    last_message_version_check = allow_version_check;
     last_message_version = last_message_header->nh_version;
     repeat_timer.setInterval(timeout_ms);
     repeat_times = repeats;
@@ -159,7 +160,7 @@ void smp_processor::message_timeout()
     }
 
     //If this is a version 2 message, try sending a version 1 packet to see if version 2 is unsupported by the server
-    if (last_message_version == 1)
+    if (last_message_version_check == true && last_message_version == 1)
     {
         if (last_message_header->nh_version == last_message_version)
         {
@@ -281,17 +282,17 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
             case QCborStreamReader::UnsignedInteger:
             case QCborStreamReader::NegativeInteger:
             {
-                if (key == "rc" && version == 0 && level == 0)
+                if (key == "rc" && version == 0 && level == 1)
                 {
                     error->rc = reader.toInteger();
                     error->type = SMP_ERROR_RC;
                 }
-                else if (key == "rc" && version == 1 && level == 1 && parent != nullptr && *parent == "ret")
+                else if (key == "rc" && version == 1 && level == 2 && parent != nullptr && *parent == "ret")
                 {
                     error->rc = reader.toUnsignedInteger();
                     error->type = SMP_ERROR_RET;
                 }
-                else if (key == "group" && version == 1 && level == 1 && parent != nullptr && *parent == "ret")
+                else if (key == "group" && version == 1 && level == 2 && parent != nullptr && *parent == "ret")
                 {
                     error->group = reader.toUnsignedInteger();
                     error->type = SMP_ERROR_RET;

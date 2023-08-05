@@ -24,7 +24,7 @@
 #include <QFile>
 #include <QCryptographicHash>
 
-enum modes {
+enum modes : uint8_t {
     MODE_IDLE = 0,
     MODE_UPLOAD_FIRMWARE,
     MODE_LIST_IMAGES,
@@ -32,7 +32,7 @@ enum modes {
     MODE_ERASE_IMAGE
 };
 
-enum img_mgmt_commands {
+enum img_mgmt_commands : uint8_t {
     COMMAND_STATE = 0,
     COMMAND_UPLOAD,
     COMMAND_ERASE = 5
@@ -48,7 +48,7 @@ slot_state_t slot_state_buffer;
 
 smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent, group_id)
 {
-    mode = 0;
+    mode = MODE_IDLE;
 }
 
 bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
@@ -116,13 +116,9 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
     return hash_found;
 }
 
-bool smp_group_img_mgmt::handleStream_upload(QCborStreamReader &reader, int32_t *new_rc, int64_t *new_off)
+bool smp_group_img_mgmt::parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match)
 {
-    //    qDebug() << reader.lastError() << reader.hasNext();
-
     QString key = "";
-    int32_t rc = -1;
-    int64_t off = -1;
 
     while (!reader.lastError() && reader.hasNext())
     {
@@ -131,74 +127,97 @@ bool smp_group_img_mgmt::handleStream_upload(QCborStreamReader &reader, int32_t 
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
         {
-        case QCborStreamReader::UnsignedInteger:
-        case QCborStreamReader::NegativeInteger:
-        case QCborStreamReader::SimpleType:
-        case QCborStreamReader::Float16:
-        case QCborStreamReader::Float:
-        case QCborStreamReader::Double:
-        {
-            //	handleFixedWidth(reader);
-            if (key == "rc")
+            case QCborStreamReader::SimpleType:
             {
-                //			    qDebug() << "found rc";
-                rc = reader.toInteger();
-            }
-            else if (key == "off")
-            {
-                //			    qDebug() << "found off";
-                off = reader.toInteger();
-            }
-
-            reader.next();
-            break;
-        }
-        case QCborStreamReader::ByteArray:
-        {
-            auto r = reader.readByteArray();
-            while (r.status == QCborStreamReader::Ok)
-            {
-                r = reader.readByteArray();
-            }
-        }
-        break;
-        case QCborStreamReader::String:
-        {
-            QString data;
-            auto r = reader.readString();
-            while (r.status == QCborStreamReader::Ok)
-            {
-                data.append(r.data);
-                r = reader.readString();
-            }
-
-            if (r.status == QCborStreamReader::Error)
-            {
-                data.clear();
-                qDebug("Error decoding string");
-            }
-            else
-            {
-                if (key.isEmpty())
+                if (key == "match")
                 {
-                    key = data;
-                    keyset = true;
+                    bool match_value = reader.toBool();
+
+                    if (match_value == true)
+                    {
+                        *match = MATCH_FAILED;
+                    }
+                    else
+                    {
+                        *match = MATCH_PASSED;
+                    }
                 }
+
+                reader.next();
+                break;
             }
-            break;
-        }
-        case QCborStreamReader::Array:
-        case QCborStreamReader::Map:
-            reader.enterContainer();
-            while (reader.lastError() == QCborError::NoError && reader.hasNext())
+
+            case QCborStreamReader::UnsignedInteger:
+            case QCborStreamReader::NegativeInteger:
             {
-                handleStream_upload(reader, new_rc, new_off);
+                if (key == "off")
+                {
+                    //			    qDebug() << "found off";
+                    *new_off = reader.toInteger();
+                }
+
+                reader.next();
+                break;
             }
-            if (reader.lastError() == QCborError::NoError)
+
+            case QCborStreamReader::ByteArray:
             {
-                reader.leaveContainer();
+                auto r = reader.readByteArray();
+
+                while (r.status == QCborStreamReader::Ok)
+                {
+                    r = reader.readByteArray();
+                }
+
+                break;
             }
-            break;
+
+            case QCborStreamReader::String:
+            {
+                QString data;
+                auto r = reader.readString();
+                while (r.status == QCborStreamReader::Ok)
+                {
+                    data.append(r.data);
+                    r = reader.readString();
+                }
+
+                if (r.status == QCborStreamReader::Error)
+                {
+                    data.clear();
+                    qDebug("Error decoding string");
+                }
+                else
+                {
+                    if (key.isEmpty())
+                    {
+                        key = data;
+                        keyset = true;
+                    }
+                }
+
+                break;
+            }
+
+            case QCborStreamReader::Array:
+            case QCborStreamReader::Map:
+            {
+                reader.enterContainer();
+                while (reader.lastError() == QCborError::NoError && reader.hasNext())
+                {
+                    parse_upload_response(reader, new_off, match);
+                }
+                if (reader.lastError() == QCborError::NoError)
+                {
+                    reader.leaveContainer();
+                }
+                break;
+            }
+
+            default:
+            {
+                reader.next();
+            }
         }
 
         if (keyset == false && !key.isEmpty())
@@ -207,20 +226,10 @@ bool smp_group_img_mgmt::handleStream_upload(QCborStreamReader &reader, int32_t 
         }
     }
 
-    if (new_rc != NULL && rc != -1)
-    {
-        *new_rc = rc;
-    }
-
-    if (new_off != NULL && off != -1)
-    {
-        *new_off = off;
-    }
-
     return true;
 }
 
-bool smp_group_img_mgmt::handleStream_state(QCborStreamReader &reader, QString array_name)
+bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString array_name)
 {
     QString array_name_dupe = array_name;
     QString key = "";
@@ -365,7 +374,7 @@ bool smp_group_img_mgmt::handleStream_state(QCborStreamReader &reader, QString a
                 while (reader.lastError() == QCborError::NoError && reader.hasNext())
                 {
                     qDebug() << "container/map";
-                    handleStream_state(reader, array_name_dupe);
+                    parse_state_response(reader, array_name_dupe);
                 }
 
                 if (reader.lastError() == QCborError::NoError)
@@ -432,20 +441,40 @@ bool smp_group_img_mgmt::handleStream_state(QCborStreamReader &reader, QString a
 
 void smp_group_img_mgmt::file_upload(QByteArray *message)
 {
-    int32_t rc = -1;
     int64_t off = -1;
     bool good = true;
 
     if (message != nullptr)
     {
+        img_mgmt_upload_match match = MATCH_NOT_PRESENT;
         QCborStreamReader cbor_reader(*message);
-        good = handleStream_upload(cbor_reader, &rc, &off);
+        good = parse_upload_response(cbor_reader, &off, &match);
 
     //    qDebug() << "rc = " << rc << ", off = " << off;
 
-        if (off != -1 && rc != 9)
+        if (off != -1 /*&& rc != 9*/)
         {
+            if (off < this->file_upload_area)
+            {
+                ++upload_repeated_parts;
+
+                if (upload_repeated_parts > 3)
+                {
+                    //Repeated lower offset 3 times, going in loop uploading the same thing over and over
+//TODO:
+qDebug() << "Going in circles...";
+                }
+            }
+            else
+            {
+                upload_repeated_parts = 0;
+            }
+
             this->file_upload_area = off;
+        }
+        else
+        {
+            upload_repeated_parts = 0;
         }
         //    qDebug() << "good is " << good;
 
@@ -560,7 +589,7 @@ void smp_group_img_mgmt::file_upload(QByteArray *message)
 
         //	    qDebug() << "len: " << smp_data.length();
 
-        processor->send(tmp_message, 4000, 3);
+        processor->send(tmp_message, smp_timeout, smp_retries, (this->file_upload_area == 0 ? true : false));
     }
     else
     {
@@ -575,10 +604,12 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
     if (mode == MODE_IDLE)
     {
         qDebug() << "Unexpected response, not busy";
+        emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
     else if (group != 1)
     {
         qDebug() << "Unexpected group, not 1";
+        emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
     else if (mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
     {
@@ -594,7 +625,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             //Response to set image state
             int32_t rc = -1;
             QCborStreamReader cbor_reader(*data);
-            bool good = handleStream_state(cbor_reader, &rc, "");
+            bool good = parse_state_response(cbor_reader, &rc, "");
             //		    qDebug() << "Got " << good << ", " << rc;
 
             //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
@@ -615,7 +646,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             //Response to set image state
             //            message.remove(0, 8);
             QCborStreamReader cbor_reader(data);
-            bool good = handleStream_state(cbor_reader, "");
+            bool good = parse_state_response(cbor_reader, "");
             //		    qDebug() << "Got " << good << ", " << rc;
 
             //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
@@ -632,7 +663,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             //Response to set image state
             //            message.remove(0, 8);
             QCborStreamReader cbor_reader(data);
-            bool good = handleStream_state(cbor_reader, "");
+            bool good = parse_state_response(cbor_reader, "");
             //		    qDebug() << "Got " << good << ", " << rc;
 
             //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
@@ -653,22 +684,22 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
     bool cleanup = true;
     qDebug() << "error :(";
 
-    if (op == COMMAND_STATE && mode == MODE_LIST_IMAGES)
+    if (command == COMMAND_STATE && mode == MODE_LIST_IMAGES)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (op == COMMAND_STATE && mode == MODE_SET_IMAGE)
+    else if (command == COMMAND_STATE && mode == MODE_SET_IMAGE)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (op == COMMAND_UPLOAD && mode == MODE_UPLOAD_FIRMWARE)
+    else if (command == COMMAND_UPLOAD && mode == MODE_UPLOAD_FIRMWARE)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (op == COMMAND_ERASE && mode == MODE_ERASE_IMAGE)
+    else if (command == COMMAND_ERASE && mode == MODE_ERASE_IMAGE)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
@@ -681,6 +712,16 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
 
     if (cleanup == true)
     {
+        if (mode == MODE_UPLOAD_FIRMWARE)
+        {
+            upload_image = 0;
+            file_upload_data.clear();
+            file_upload_area = 0;
+            upload_tmr.invalidate();
+            upload_hash.clear();
+            upgrade_only = false;
+        }
+
         mode = MODE_IDLE;
     }
 }
@@ -688,6 +729,16 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
 void smp_group_img_mgmt::timeout(smp_message *message)
 {
     qDebug() << "timeout :(";
+
+    if (mode == MODE_UPLOAD_FIRMWARE)
+    {
+        upload_image = 0;
+        file_upload_data.clear();
+        file_upload_area = 0;
+        upload_tmr.invalidate();
+        upload_hash.clear();
+        upgrade_only = false;
+    }
 
     //TODO:
     emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));
@@ -699,7 +750,18 @@ void smp_group_img_mgmt::cancel()
 {
     if (mode != MODE_IDLE)
     {
-        //TODO
+        if (mode == MODE_UPLOAD_FIRMWARE)
+        {
+            upload_image = 0;
+            file_upload_data.clear();
+            file_upload_area = 0;
+            upload_tmr.invalidate();
+            upload_hash.clear();
+            upgrade_only = false;
+        }
+
+        mode = MODE_IDLE;
+
         emit status(smp_user_data, STATUS_CANCELLED, nullptr);
     }
 }
@@ -719,7 +781,7 @@ bool smp_group_img_mgmt::start_image_get(QList<image_state_t> *images)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, 4000, 3);
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -731,6 +793,7 @@ bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm)
 
     tmp_message->writer()->append("hash");
     tmp_message->writer()->append(*hash);
+
     if (confirm == true)
     {
         tmp_message->writer()->append("confirm");
@@ -742,7 +805,7 @@ bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm)
     tmp_message->end_message();
 
     mode = MODE_SET_IMAGE;
-    processor->send(tmp_message, 4000, 3);
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
 
 //    lbl_IMG_Status->setText(QString("Marking image ").append(radio_IMG_Test->isChecked() ? "for test." : "as confirmed."));
 
@@ -791,7 +854,20 @@ bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, 
 
 bool smp_group_img_mgmt::start_image_erase(uint8_t slot)
 {
-    return false;
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, 0x01, 0x01, 0x05);
+
+    tmp_message->writer()->append("slot");
+    tmp_message->writer()->append(slot);
+
+    //			    qDebug() << message;
+    //			    qDebug() << "hash is " << this->upload_hash;
+    tmp_message->end_message();
+
+    mode = MODE_ERASE_IMAGE;
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
 }
 
 QString smp_group_img_mgmt::mode_to_string(uint8_t mode)

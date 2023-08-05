@@ -46,7 +46,7 @@ class smp_processor : public QObject
 public:
     smp_processor(QObject *parent, smp_uart *uart_driver);
     ~smp_processor();
-    bool send(smp_message *message, uint32_t timeout_ms, uint8_t repeats);
+    bool send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check);
     bool is_busy();
     void register_handler(uint16_t group, smp_group *handler);
     void unregister_handler(uint16_t group);
@@ -63,6 +63,7 @@ private:
     smp_uart *uart;
     smp_message *last_message;
     smp_hdr *last_message_header;
+    bool last_message_version_check;
     uint8_t last_message_version;
     QTimer repeat_timer;
     uint8_t repeat_times;

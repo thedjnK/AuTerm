@@ -32,6 +32,10 @@
 #include <QRegularExpression>
 #include <QClipboard>
 
+const uint8_t retries = 3;
+const uint16_t timeout_ms = 3000;
+const uint16_t timeout_erase_ms = 14000;
+
 QMainWindow *parent_window;
 smp_uart *uart;
 smp_processor *processor;
@@ -1230,6 +1234,7 @@ bool plugin_mcumgr::extract_hash(QByteArray *file_data)
 
 void plugin_mcumgr::file_upload(QByteArray *message)
 {
+#if 0
 //    message->remove(0, 8);
     QCborStreamReader cbor_reader(*message);
     int32_t rc = -1;
@@ -1373,6 +1378,7 @@ void plugin_mcumgr::file_upload(QByteArray *message)
     {
 	    file_upload_in_progress = false;
     }
+#endif
 }
 
 void plugin_mcumgr::receive_waiting(QByteArray message)
@@ -1631,7 +1637,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         processor->send(tmp_message, 4000, 3);
 #endif
 
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), 0, 0, ACTION_IMG_UPLOAD);
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_UPLOAD);
         my_img->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
 
         progress_IMG_Complete->setValue(0);
@@ -1644,7 +1650,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
 
         blaharray.clear();
         model_image_state.clear();
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), 0, 0, ACTION_IMG_IMAGE_LIST);
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_IMAGE_LIST);
         my_img->start_image_get(&blaharray);
 
 #if 0
@@ -1671,6 +1677,15 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
 
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Querying...");
+    }
+    else if (tabWidget_3->currentIndex() == 2)
+    {
+        //Erase
+        emit plugin_set_status(true, false);
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, ACTION_IMG_IMAGE_ERASE);
+        my_img->start_image_erase(edit_IMG_Erase_Slot->value());
+        progress_IMG_Complete->setValue(0);
+        lbl_IMG_Status->setText("Erasing...");
     }
 }
 
@@ -1734,7 +1749,7 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
 //	    qDebug() << "len: " << message.length();
 
 //        uart->send(&message);
-        processor->send(tmp_message, 4000, 3);
+        processor->send(tmp_message, timeout_ms, 3, true);
 
         lbl_SHELL_Status->setText("Executing...");
 }
@@ -1917,7 +1932,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     //Mark image for test or confirmation
                     finished = false;
 
-                    my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), 0, 0, ACTION_IMG_UPLOAD_SET);
+                    my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_UPLOAD_SET);
                     my_img->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false));
                     qDebug() << "do upload of " << upload_hash;
                 }
