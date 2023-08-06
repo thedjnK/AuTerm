@@ -67,6 +67,8 @@ enum mcumgr_action_t {
     ACTION_IMG_IMAGE_LIST,
     ACTION_IMG_IMAGE_SET,
     ACTION_IMG_IMAGE_ERASE,
+
+    ACTION_OS_ECHO,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin

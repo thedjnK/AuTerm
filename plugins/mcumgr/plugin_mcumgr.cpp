@@ -27,6 +27,7 @@
 #include "smp_uart.h"
 #include "smp_processor.h"
 #include "smp_group_img_mgmt.h"
+#include "smp_group_os_mgmt.h"
 
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -41,6 +42,7 @@ smp_uart *uart;
 smp_processor *processor;
 QStandardItemModel model_image_state;
 smp_group_img_mgmt *my_img;
+smp_group_os_mgmt *my_os;
 
 //0x08 = new version, 0x00 = old
 #define setup_smp_message(message, stream, write, group, id) \
@@ -877,14 +879,20 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
     //test
     emit plugin_add_open_close_button(btn_FS_Go);
     my_img = new smp_group_img_mgmt(processor);
+    my_os = new smp_group_os_mgmt(processor);
 
     connect(my_img, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(my_img, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
     connect(my_img, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+
+    connect(my_os, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(my_os, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(my_os, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 }
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+    delete my_os;
     delete my_img;
     delete processor;
     delete uart;
@@ -1348,7 +1356,13 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 {
     if (selector_OS->currentWidget() == tab_OS_Echo)
     {
-        edit_OS_Echo_Output->appendPlainText("Echo");
+        emit plugin_set_status(true, false);
+
+        edit_OS_Echo_Output->clear();
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_ECHO);
+        my_os->start_echo(edit_OS_Echo_Input->toPlainText());
+
+        lbl_OS_Status->setText("Echoing...");
     }
     else if (selector_OS->currentWidget() == tab_OS_Reset)
     {
@@ -1510,6 +1524,18 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     model_image_state.appendRow(blaharray[i].item);
                     ++i;
                 }
+            }
+        }
+    }
+    else if (sender() == my_os)
+    {
+        qDebug() << "os sender";
+        if (status == STATUS_COMPLETE)
+        {
+            qDebug() << "complete";
+            if (user_data == ACTION_OS_ECHO)
+            {
+                edit_OS_Echo_Output->appendPlainText(error_string);
             }
         }
     }

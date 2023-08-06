@@ -83,19 +83,15 @@ private:
     QString mode_to_string(uint8_t mode);
     QString op_to_string(uint8_t op);
 
-    uint8_t mode;
-
     //
+    uint8_t mode;
     uint8_t upload_image;
     QByteArray file_upload_data;
-    //bool file_upload_in_progress;
-    //bool file_list_in_progress;
     uint32_t file_upload_area;
     QElapsedTimer upload_tmr;
     QByteArray upload_hash;
     bool upgrade_only;
     uint8_t upload_repeated_parts;
-
     QList<image_state_t> *host_images;
 };
 

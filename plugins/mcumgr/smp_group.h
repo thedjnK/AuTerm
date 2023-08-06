@@ -29,11 +29,22 @@
 
 #include <QDebug>
 
-enum group_status {
+enum group_status : uint8_t {
     STATUS_COMPLETE = 0,
     STATUS_ERROR,
     STATUS_TIMEOUT,
     STATUS_CANCELLED
+};
+
+enum smp_group_ids : uint16_t {
+    SMP_GROUP_ID_OS = 0,
+    SMP_GROUP_ID_IMG,
+    SMP_GROUP_ID_STATS,
+    SMP_GROUP_ID_CONFIG,
+    SMP_GROUP_ID_FS = 8,
+    SMP_GROUP_ID_SHELL,
+    SMP_GROUP_ID_ZBASIC = 63,
+    SMP_GROUP_ID_USER_DEFINED,
 };
 
 class smp_group : public QObject
