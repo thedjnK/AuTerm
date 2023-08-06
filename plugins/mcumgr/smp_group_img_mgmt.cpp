@@ -41,12 +41,11 @@ enum img_mgmt_commands : uint8_t {
 const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
 const uint16_t image_tlv_tag_sha256 = 0x10;
 const uint8_t sha256_size = 32;
-const uint16_t group_id = 1;
 
 image_state_t image_state_buffer;
 slot_state_t slot_state_buffer;
 
-smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent, group_id)
+smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_IMG)
 {
     mode = MODE_IDLE;
 }
