@@ -30,6 +30,13 @@
 #include <QCborMap>
 #include <QCborValue>
 
+struct task_list_t {
+    QString name;
+    uint32_t priority;
+    uint32_t id;
+    uint32_t state;
+};
+
 class smp_group_os_mgmt : public smp_group
 {
     Q_OBJECT
@@ -41,20 +48,20 @@ public:
     void timeout(smp_message *message);
     void cancel();
     bool start_echo(QString data);
-    static bool error_lookup(int32_t rc, QString *error);
-    /*
     bool start_task_stats();
+    /*
     bool start_memory_pool();
     bool start_date_time_get();
     bool start_date_time_set();
     bool start_mcumgr_parameters();
     bool start_os_application_info();
     */
+    static bool error_lookup(int32_t rc, QString *error);
 
 private:
     bool parse_echo_response(QCborStreamReader &reader, QString *response);
+    bool parse_task_stats_response(QCborStreamReader &reader, bool *in_tasks, task_list_t *current_task, QList<task_list_t> *task_array);
     /*
-    bool parse_task_stats_response(QCborStreamReader &reader, );
     bool parse_memory_pool_response(QCborStreamReader &reader, );
     bool parse_date_time_response(QCborStreamReader &reader, );
     bool parse_mcumgr_parameters_response(QCborStreamReader &reader, );
@@ -62,7 +69,7 @@ private:
     */
 
     QString mode_to_string(uint8_t mode);
-    QString op_to_string(uint8_t op);
+    QString command_to_string(uint8_t command);
 
     //
     uint8_t mode;
