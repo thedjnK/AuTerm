@@ -192,7 +192,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_3">
+       <widget class="QWidget" name="tab_IMG_Images_2">
         <attribute name="title">
          <string>Img</string>
         </attribute>
@@ -536,7 +536,7 @@
          <item row="0" column="0">
           <widget class="QTabWidget" name="selector_OS">
            <property name="currentIndex">
-            <number>4</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="tab_OS_Echo">
             <attribute name="title">
@@ -572,12 +572,12 @@
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="tab_8">
+           <widget class="QWidget" name="tab_OS_Tasks">
             <attribute name="title">
              <string>Stats</string>
             </attribute>
            </widget>
-           <widget class="QWidget" name="tab_11">
+           <widget class="QWidget" name="tab_OS_Memory">
             <attribute name="title">
              <string>Memory</string>
             </attribute>

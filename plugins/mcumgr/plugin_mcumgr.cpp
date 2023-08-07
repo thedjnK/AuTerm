@@ -28,6 +28,7 @@
 #include "smp_processor.h"
 #include "smp_group_img_mgmt.h"
 #include "smp_group_os_mgmt.h"
+#include "smp_error.h"
 
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -50,9 +51,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     uart = new smp_uart(this);
     processor = new smp_processor(this, uart);
 
-	file_upload_in_progress = false;
-	file_list_in_progress = false;
-	file_upload_area = 0;
+    file_upload_in_progress = false;
+    file_list_in_progress = false;
+    file_upload_area = 0;
     shell_in_progress = false;
 
     parent_window = main_window;
@@ -64,81 +65,81 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    tabWidget = new QTabWidget(tabWidget_orig);
 //    tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
     tab = new QWidget(tabWidget_orig);
-    tab->setObjectName("tab");
+    tab->setObjectName(QString::fromUtf8("tab"));
     tabWidget_2 = new QTabWidget(tab);
-    tabWidget_2->setObjectName("tabWidget_2");
+    tabWidget_2->setObjectName(QString::fromUtf8("tabWidget_2"));
     tabWidget_2->setGeometry(QRect(10, 40, 380, 281));
     tabWidget_2->setTabPosition(QTabWidget::West);
     tab_2 = new QWidget();
-    tab_2->setObjectName("tab_2");
+    tab_2->setObjectName(QString::fromUtf8("tab_2"));
     gridLayout_2 = new QGridLayout(tab_2);
     gridLayout_2->setSpacing(2);
-    gridLayout_2->setObjectName("gridLayout_2");
+    gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
     gridLayout_2->setContentsMargins(6, 6, 6, 6);
     lbl_FS_Status = new QLabel(tab_2);
-    lbl_FS_Status->setObjectName("lbl_FS_Status");
+    lbl_FS_Status->setObjectName(QString::fromUtf8("lbl_FS_Status"));
 
     gridLayout_2->addWidget(lbl_FS_Status, 4, 0, 1, 2);
 
     label_2 = new QLabel(tab_2);
-    label_2->setObjectName("label_2");
+    label_2->setObjectName(QString::fromUtf8("label_2"));
 
     gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
 
     progress_FS_Complete = new QProgressBar(tab_2);
-    progress_FS_Complete->setObjectName("progress_FS_Complete");
+    progress_FS_Complete->setObjectName(QString::fromUtf8("progress_FS_Complete"));
     progress_FS_Complete->setValue(0);
 
     gridLayout_2->addWidget(progress_FS_Complete, 3, 0, 1, 3);
 
     edit_FS_Log = new QPlainTextEdit(tab_2);
-    edit_FS_Log->setObjectName("edit_FS_Log");
+    edit_FS_Log->setObjectName(QString::fromUtf8("edit_FS_Log"));
     edit_FS_Log->setUndoRedoEnabled(false);
     edit_FS_Log->setReadOnly(true);
 
     gridLayout_2->addWidget(edit_FS_Log, 7, 0, 1, 3);
 
     edit_FS_Remote = new QLineEdit(tab_2);
-    edit_FS_Remote->setObjectName("edit_FS_Remote");
+    edit_FS_Remote->setObjectName(QString::fromUtf8("edit_FS_Remote"));
 
     gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
 
     btn_FS_Local = new QToolButton(tab_2);
-    btn_FS_Local->setObjectName("btn_FS_Local");
+    btn_FS_Local->setObjectName(QString::fromUtf8("btn_FS_Local"));
 
     gridLayout_2->addWidget(btn_FS_Local, 0, 2, 1, 1);
 
     edit_FS_Local = new QLineEdit(tab_2);
-    edit_FS_Local->setObjectName("edit_FS_Local");
+    edit_FS_Local->setObjectName(QString::fromUtf8("edit_FS_Local"));
 
     gridLayout_2->addWidget(edit_FS_Local, 0, 1, 1, 1);
 
     label_3 = new QLabel(tab_2);
-    label_3->setObjectName("label_3");
+    label_3->setObjectName(QString::fromUtf8("label_3"));
 
     gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setSpacing(2);
-    horizontalLayout->setObjectName("horizontalLayout");
+    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
     radio_FS_Upload = new QRadioButton(tab_2);
-    radio_FS_Upload->setObjectName("radio_FS_Upload");
+    radio_FS_Upload->setObjectName(QString::fromUtf8("radio_FS_Upload"));
     radio_FS_Upload->setChecked(true);
 
     horizontalLayout->addWidget(radio_FS_Upload);
 
     radio_FS_Download = new QRadioButton(tab_2);
-    radio_FS_Download->setObjectName("radio_FS_Download");
+    radio_FS_Download->setObjectName(QString::fromUtf8("radio_FS_Download"));
 
     horizontalLayout->addWidget(radio_FS_Download);
 
     radio_FS_Size = new QRadioButton(tab_2);
-    radio_FS_Size->setObjectName("radio_FS_Size");
+    radio_FS_Size->setObjectName(QString::fromUtf8("radio_FS_Size"));
 
     horizontalLayout->addWidget(radio_FS_Size);
 
     radio_FS_HashChecksum = new QRadioButton(tab_2);
-    radio_FS_HashChecksum->setObjectName("radio_FS_HashChecksum");
+    radio_FS_HashChecksum->setObjectName(QString::fromUtf8("radio_FS_HashChecksum"));
 
     horizontalLayout->addWidget(radio_FS_HashChecksum);
 
@@ -147,14 +148,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_2 = new QHBoxLayout();
     horizontalLayout_2->setSpacing(2);
-    horizontalLayout_2->setObjectName("horizontalLayout_2");
+    horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
     horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_2->addItem(horizontalSpacer);
 
     btn_FS_Go = new QPushButton(tab_2);
-    btn_FS_Go->setObjectName("btn_FS_Go");
+    btn_FS_Go->setObjectName(QString::fromUtf8("btn_FS_Go"));
 
     horizontalLayout_2->addWidget(btn_FS_Go);
 
@@ -166,14 +167,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_2->addLayout(horizontalLayout_2, 5, 0, 1, 3);
 
     tabWidget_2->addTab(tab_2, QString());
-    tab_3 = new QWidget();
-    tab_3->setObjectName("tab_3");
-    gridLayout_3 = new QGridLayout(tab_3);
+    tab_IMG_Images_2 = new QWidget();
+    tab_IMG_Images_2->setObjectName(QString::fromUtf8("tab_IMG_Images_2"));
+    gridLayout_3 = new QGridLayout(tab_IMG_Images_2);
     gridLayout_3->setSpacing(2);
-    gridLayout_3->setObjectName("gridLayout_3");
+    gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
     gridLayout_3->setContentsMargins(6, 6, 6, 6);
-    edit_IMG_Log = new QPlainTextEdit(tab_3);
-    edit_IMG_Log->setObjectName("edit_IMG_Log");
+    edit_IMG_Log = new QPlainTextEdit(tab_IMG_Images_2);
+    edit_IMG_Log->setObjectName(QString::fromUtf8("edit_IMG_Log"));
     edit_IMG_Log->setUndoRedoEnabled(false);
     edit_IMG_Log->setReadOnly(true);
 
@@ -181,14 +182,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_3 = new QHBoxLayout();
     horizontalLayout_3->setSpacing(2);
-    horizontalLayout_3->setObjectName("horizontalLayout_3");
+    horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
     horizontalLayout_3->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_3->addItem(horizontalSpacer_3);
 
-    btn_IMG_Go = new QPushButton(tab_3);
-    btn_IMG_Go->setObjectName("btn_IMG_Go");
+    btn_IMG_Go = new QPushButton(tab_IMG_Images_2);
+    btn_IMG_Go->setObjectName(QString::fromUtf8("btn_IMG_Go"));
 
     horizontalLayout_3->addWidget(btn_IMG_Go);
 
@@ -199,40 +200,40 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_3->addLayout(horizontalLayout_3, 5, 0, 1, 3);
 
-    lbl_IMG_Status = new QLabel(tab_3);
-    lbl_IMG_Status->setObjectName("lbl_IMG_Status");
+    lbl_IMG_Status = new QLabel(tab_IMG_Images_2);
+    lbl_IMG_Status->setObjectName(QString::fromUtf8("lbl_IMG_Status"));
 
     gridLayout_3->addWidget(lbl_IMG_Status, 3, 0, 1, 2);
 
-    tabWidget_3 = new QTabWidget(tab_3);
-    tabWidget_3->setObjectName("tabWidget_3");
+    tabWidget_3 = new QTabWidget(tab_IMG_Images_2);
+    tabWidget_3->setObjectName(QString::fromUtf8("tabWidget_3"));
     tab_IMG_Upload = new QWidget();
-    tab_IMG_Upload->setObjectName("tab_IMG_Upload");
+    tab_IMG_Upload->setObjectName(QString::fromUtf8("tab_IMG_Upload"));
     gridLayout_4 = new QGridLayout(tab_IMG_Upload);
     gridLayout_4->setSpacing(2);
-    gridLayout_4->setObjectName("gridLayout_4");
+    gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
     gridLayout_4->setContentsMargins(6, 6, 6, 6);
     progress_IMG_Complete = new QProgressBar(tab_IMG_Upload);
-    progress_IMG_Complete->setObjectName("progress_IMG_Complete");
+    progress_IMG_Complete->setObjectName(QString::fromUtf8("progress_IMG_Complete"));
     progress_IMG_Complete->setValue(0);
 
     gridLayout_4->addWidget(progress_IMG_Complete, 3, 1, 1, 1);
 
     label_6 = new QLabel(tab_IMG_Upload);
-    label_6->setObjectName("label_6");
+    label_6->setObjectName(QString::fromUtf8("label_6"));
 
     gridLayout_4->addWidget(label_6, 3, 0, 1, 1);
 
     horizontalLayout_5 = new QHBoxLayout();
     horizontalLayout_5->setSpacing(2);
-    horizontalLayout_5->setObjectName("horizontalLayout_5");
+    horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
     edit_IMG_Local = new QLineEdit(tab_IMG_Upload);
-    edit_IMG_Local->setObjectName("edit_IMG_Local");
+    edit_IMG_Local->setObjectName(QString::fromUtf8("edit_IMG_Local"));
 
     horizontalLayout_5->addWidget(edit_IMG_Local);
 
     btn_IMG_Local = new QToolButton(tab_IMG_Upload);
-    btn_IMG_Local->setObjectName("btn_IMG_Local");
+    btn_IMG_Local->setObjectName(QString::fromUtf8("btn_IMG_Local"));
 
     horizontalLayout_5->addWidget(btn_IMG_Local);
 
@@ -240,32 +241,32 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_4->addLayout(horizontalLayout_5, 0, 1, 1, 1);
 
     label_4 = new QLabel(tab_IMG_Upload);
-    label_4->setObjectName("label_4");
+    label_4->setObjectName(QString::fromUtf8("label_4"));
 
     gridLayout_4->addWidget(label_4, 0, 0, 1, 1);
 
     horizontalLayout_4 = new QHBoxLayout();
     horizontalLayout_4->setSpacing(2);
-    horizontalLayout_4->setObjectName("horizontalLayout_4");
+    horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
     edit_IMG_Image = new QSpinBox(tab_IMG_Upload);
-    edit_IMG_Image->setObjectName("edit_IMG_Image");
+    edit_IMG_Image->setObjectName(QString::fromUtf8("edit_IMG_Image"));
     edit_IMG_Image->setMaximumSize(QSize(60, 16777215));
 
     horizontalLayout_4->addWidget(edit_IMG_Image);
 
     radio_IMG_No_Action = new QRadioButton(tab_IMG_Upload);
-    radio_IMG_No_Action->setObjectName("radio_IMG_No_Action");
+    radio_IMG_No_Action->setObjectName(QString::fromUtf8("radio_IMG_No_Action"));
 
     horizontalLayout_4->addWidget(radio_IMG_No_Action);
 
     radio_IMG_Test = new QRadioButton(tab_IMG_Upload);
-    radio_IMG_Test->setObjectName("radio_IMG_Test");
+    radio_IMG_Test->setObjectName(QString::fromUtf8("radio_IMG_Test"));
     radio_IMG_Test->setChecked(true);
 
     horizontalLayout_4->addWidget(radio_IMG_Test);
 
     radio_IMG_Confirm = new QRadioButton(tab_IMG_Upload);
-    radio_IMG_Confirm->setObjectName("radio_IMG_Confirm");
+    radio_IMG_Confirm->setObjectName(QString::fromUtf8("radio_IMG_Confirm"));
 
     horizontalLayout_4->addWidget(radio_IMG_Confirm);
 
@@ -273,47 +274,47 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_4->addLayout(horizontalLayout_4, 1, 1, 1, 1);
 
     label_41 = new QLabel(tab_IMG_Upload);
-    label_41->setObjectName("label_41");
+    label_41->setObjectName(QString::fromUtf8("label_41"));
 
     gridLayout_4->addWidget(label_41, 1, 0, 1, 1);
 
     label_9 = new QLabel(tab_IMG_Upload);
-    label_9->setObjectName("label_9");
+    label_9->setObjectName(QString::fromUtf8("label_9"));
 
     gridLayout_4->addWidget(label_9, 2, 0, 1, 1);
 
     check_IMG_Reset = new QCheckBox(tab_IMG_Upload);
-    check_IMG_Reset->setObjectName("check_IMG_Reset");
+    check_IMG_Reset->setObjectName(QString::fromUtf8("check_IMG_Reset"));
 
     gridLayout_4->addWidget(check_IMG_Reset, 2, 1, 1, 1);
 
     tabWidget_3->addTab(tab_IMG_Upload, QString());
     tab_IMG_Images = new QWidget();
-    tab_IMG_Images->setObjectName("tab_IMG_Images");
+    tab_IMG_Images->setObjectName(QString::fromUtf8("tab_IMG_Images"));
     gridLayout_5 = new QGridLayout(tab_IMG_Images);
     gridLayout_5->setSpacing(2);
-    gridLayout_5->setObjectName("gridLayout_5");
+    gridLayout_5->setObjectName(QString::fromUtf8("gridLayout_5"));
     gridLayout_5->setContentsMargins(6, 6, 6, 6);
     colview_IMG_Images = new QColumnView(tab_IMG_Images);
-    colview_IMG_Images->setObjectName("colview_IMG_Images");
+    colview_IMG_Images->setObjectName(QString::fromUtf8("colview_IMG_Images"));
 
     gridLayout_5->addWidget(colview_IMG_Images, 0, 0, 1, 1);
 
     horizontalLayout_6 = new QHBoxLayout();
-    horizontalLayout_6->setObjectName("horizontalLayout_6");
+    horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
     label_5 = new QLabel(tab_IMG_Images);
-    label_5->setObjectName("label_5");
+    label_5->setObjectName(QString::fromUtf8("label_5"));
 
     horizontalLayout_6->addWidget(label_5);
 
     radio_IMG_Get = new QRadioButton(tab_IMG_Images);
-    radio_IMG_Get->setObjectName("radio_IMG_Get");
+    radio_IMG_Get->setObjectName(QString::fromUtf8("radio_IMG_Get"));
     radio_IMG_Get->setChecked(true);
 
     horizontalLayout_6->addWidget(radio_IMG_Get);
 
     radio_ING_Set = new QRadioButton(tab_IMG_Images);
-    radio_ING_Set->setObjectName("radio_ING_Set");
+    radio_ING_Set->setObjectName(QString::fromUtf8("radio_ING_Set"));
 
     horizontalLayout_6->addWidget(radio_ING_Set);
 
@@ -326,11 +327,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_3->addTab(tab_IMG_Images, QString());
     tab_IMG_Erase = new QWidget();
-    tab_IMG_Erase->setObjectName("tab_IMG_Erase");
+    tab_IMG_Erase->setObjectName(QString::fromUtf8("tab_IMG_Erase"));
     gridLayout_10 = new QGridLayout(tab_IMG_Erase);
-    gridLayout_10->setObjectName("gridLayout_10");
+    gridLayout_10->setObjectName(QString::fromUtf8("gridLayout_10"));
     label_14 = new QLabel(tab_IMG_Erase);
-    label_14->setObjectName("label_14");
+    label_14->setObjectName(QString::fromUtf8("label_14"));
 
     gridLayout_10->addWidget(label_14, 0, 0, 1, 1);
 
@@ -339,7 +340,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_10->addItem(horizontalSpacer_9, 0, 2, 1, 1);
 
     edit_IMG_Erase_Slot = new QSpinBox(tab_IMG_Erase);
-    edit_IMG_Erase_Slot->setObjectName("edit_IMG_Erase_Slot");
+    edit_IMG_Erase_Slot->setObjectName(QString::fromUtf8("edit_IMG_Erase_Slot"));
     edit_IMG_Erase_Slot->setMinimumSize(QSize(40, 0));
     edit_IMG_Erase_Slot->setMaximumSize(QSize(16777215, 16777215));
 
@@ -353,53 +354,53 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_3->addWidget(tabWidget_3, 0, 0, 1, 1);
 
-    tabWidget_2->addTab(tab_3, QString());
+    tabWidget_2->addTab(tab_IMG_Images_2, QString());
     tab_OS = new QWidget();
-    tab_OS->setObjectName("tab_OS");
+    tab_OS->setObjectName(QString::fromUtf8("tab_OS"));
     gridLayout_7 = new QGridLayout(tab_OS);
     gridLayout_7->setSpacing(2);
-    gridLayout_7->setObjectName("gridLayout_7");
+    gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
     selector_OS = new QTabWidget(tab_OS);
-    selector_OS->setObjectName("selector_OS");
+    selector_OS->setObjectName(QString::fromUtf8("selector_OS"));
     tab_OS_Echo = new QWidget();
-    tab_OS_Echo->setObjectName("tab_OS_Echo");
+    tab_OS_Echo->setObjectName(QString::fromUtf8("tab_OS_Echo"));
     gridLayout_8 = new QGridLayout(tab_OS_Echo);
-    gridLayout_8->setObjectName("gridLayout_8");
+    gridLayout_8->setObjectName(QString::fromUtf8("gridLayout_8"));
     label_10 = new QLabel(tab_OS_Echo);
-    label_10->setObjectName("label_10");
+    label_10->setObjectName(QString::fromUtf8("label_10"));
 
     gridLayout_8->addWidget(label_10, 0, 0, 1, 1);
 
     edit_OS_Echo_Input = new QPlainTextEdit(tab_OS_Echo);
-    edit_OS_Echo_Input->setObjectName("edit_OS_Echo_Input");
+    edit_OS_Echo_Input->setObjectName(QString::fromUtf8("edit_OS_Echo_Input"));
 
     gridLayout_8->addWidget(edit_OS_Echo_Input, 0, 1, 1, 1);
 
     label_11 = new QLabel(tab_OS_Echo);
-    label_11->setObjectName("label_11");
+    label_11->setObjectName(QString::fromUtf8("label_11"));
 
     gridLayout_8->addWidget(label_11, 1, 0, 1, 1);
 
     edit_OS_Echo_Output = new QPlainTextEdit(tab_OS_Echo);
-    edit_OS_Echo_Output->setObjectName("edit_OS_Echo_Output");
+    edit_OS_Echo_Output->setObjectName(QString::fromUtf8("edit_OS_Echo_Output"));
     edit_OS_Echo_Output->setUndoRedoEnabled(false);
     edit_OS_Echo_Output->setReadOnly(true);
 
     gridLayout_8->addWidget(edit_OS_Echo_Output, 1, 1, 1, 1);
 
     selector_OS->addTab(tab_OS_Echo, QString());
-    tab_8 = new QWidget();
-    tab_8->setObjectName("tab_8");
-    selector_OS->addTab(tab_8, QString());
-    tab_11 = new QWidget();
-    tab_11->setObjectName("tab_11");
-    selector_OS->addTab(tab_11, QString());
+    tab_OS_Tasks = new QWidget();
+    tab_OS_Tasks->setObjectName(QString::fromUtf8("tab_OS_Tasks"));
+    selector_OS->addTab(tab_OS_Tasks, QString());
+    tab_OS_Memory = new QWidget();
+    tab_OS_Memory->setObjectName(QString::fromUtf8("tab_OS_Memory"));
+    selector_OS->addTab(tab_OS_Memory, QString());
     tab_OS_Reset = new QWidget();
-    tab_OS_Reset->setObjectName("tab_OS_Reset");
+    tab_OS_Reset->setObjectName(QString::fromUtf8("tab_OS_Reset"));
     gridLayout_12 = new QGridLayout(tab_OS_Reset);
-    gridLayout_12->setObjectName("gridLayout_12");
+    gridLayout_12->setObjectName(QString::fromUtf8("gridLayout_12"));
     check_OS_Force_Reboot = new QCheckBox(tab_OS_Reset);
-    check_OS_Force_Reboot->setObjectName("check_OS_Force_Reboot");
+    check_OS_Force_Reboot->setObjectName(QString::fromUtf8("check_OS_Force_Reboot"));
 
     gridLayout_12->addWidget(check_OS_Force_Reboot, 0, 0, 1, 1);
 
@@ -409,32 +410,32 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     selector_OS->addTab(tab_OS_Reset, QString());
     tab_OS_Info = new QWidget();
-    tab_OS_Info->setObjectName("tab_OS_Info");
+    tab_OS_Info->setObjectName(QString::fromUtf8("tab_OS_Info"));
     gridLayout_13 = new QGridLayout(tab_OS_Info);
     gridLayout_13->setSpacing(2);
-    gridLayout_13->setObjectName("gridLayout_13");
+    gridLayout_13->setObjectName(QString::fromUtf8("gridLayout_13"));
     label_17 = new QLabel(tab_OS_Info);
-    label_17->setObjectName("label_17");
+    label_17->setObjectName(QString::fromUtf8("label_17"));
 
     gridLayout_13->addWidget(label_17, 0, 0, 1, 1);
 
     edit_OS_UNam = new QLineEdit(tab_OS_Info);
-    edit_OS_UNam->setObjectName("edit_OS_UNam");
+    edit_OS_UNam->setObjectName(QString::fromUtf8("edit_OS_UNam"));
     edit_OS_UNam->setReadOnly(true);
 
     gridLayout_13->addWidget(edit_OS_UNam, 0, 1, 1, 1);
 
     horizontalLayout_10 = new QHBoxLayout();
     horizontalLayout_10->setSpacing(2);
-    horizontalLayout_10->setObjectName("horizontalLayout_10");
+    horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
     radio_FS_Upload_2 = new QRadioButton(tab_OS_Info);
-    radio_FS_Upload_2->setObjectName("radio_FS_Upload_2");
+    radio_FS_Upload_2->setObjectName(QString::fromUtf8("radio_FS_Upload_2"));
     radio_FS_Upload_2->setChecked(true);
 
     horizontalLayout_10->addWidget(radio_FS_Upload_2);
 
     radio_FS_Download_2 = new QRadioButton(tab_OS_Info);
-    radio_FS_Download_2->setObjectName("radio_FS_Download_2");
+    radio_FS_Download_2->setObjectName(QString::fromUtf8("radio_FS_Download_2"));
 
     horizontalLayout_10->addWidget(radio_FS_Download_2);
 
@@ -442,12 +443,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_13->addLayout(horizontalLayout_10, 1, 0, 1, 2);
 
     label_18 = new QLabel(tab_OS_Info);
-    label_18->setObjectName("label_18");
+    label_18->setObjectName(QString::fromUtf8("label_18"));
 
     gridLayout_13->addWidget(label_18, 2, 0, 1, 1);
 
     edit_OS_Info_Output = new QPlainTextEdit(tab_OS_Info);
-    edit_OS_Info_Output->setObjectName("edit_OS_Info_Output");
+    edit_OS_Info_Output->setObjectName(QString::fromUtf8("edit_OS_Info_Output"));
 
     gridLayout_13->addWidget(edit_OS_Info_Output, 2, 1, 1, 1);
 
@@ -457,14 +458,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_13 = new QHBoxLayout();
     horizontalLayout_13->setSpacing(2);
-    horizontalLayout_13->setObjectName("horizontalLayout_13");
+    horizontalLayout_13->setObjectName(QString::fromUtf8("horizontalLayout_13"));
     horizontalLayout_13->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer_17 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_13->addItem(horizontalSpacer_17);
 
     btn_OS_Go = new QPushButton(tab_OS);
-    btn_OS_Go->setObjectName("btn_OS_Go");
+    btn_OS_Go->setObjectName(QString::fromUtf8("btn_OS_Go"));
 
     horizontalLayout_13->addWidget(btn_OS_Go);
 
@@ -476,47 +477,47 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_7->addLayout(horizontalLayout_13, 2, 0, 1, 1);
 
     lbl_OS_Status = new QLabel(tab_OS);
-    lbl_OS_Status->setObjectName("lbl_OS_Status");
+    lbl_OS_Status->setObjectName(QString::fromUtf8("lbl_OS_Status"));
 
     gridLayout_7->addWidget(lbl_OS_Status, 1, 0, 1, 1);
 
     tabWidget_2->addTab(tab_OS, QString());
     tab_5 = new QWidget();
-    tab_5->setObjectName("tab_5");
+    tab_5->setObjectName(QString::fromUtf8("tab_5"));
     gridLayout_11 = new QGridLayout(tab_5);
-    gridLayout_11->setObjectName("gridLayout_11");
+    gridLayout_11->setObjectName(QString::fromUtf8("gridLayout_11"));
     label_15 = new QLabel(tab_5);
-    label_15->setObjectName("label_15");
+    label_15->setObjectName(QString::fromUtf8("label_15"));
 
     gridLayout_11->addWidget(label_15, 0, 0, 1, 1);
 
     combo_STAT_Group = new QComboBox(tab_5);
-    combo_STAT_Group->setObjectName("combo_STAT_Group");
+    combo_STAT_Group->setObjectName(QString::fromUtf8("combo_STAT_Group"));
     combo_STAT_Group->setEditable(true);
 
     gridLayout_11->addWidget(combo_STAT_Group, 0, 1, 1, 1);
 
     label_16 = new QLabel(tab_5);
-    label_16->setObjectName("label_16");
+    label_16->setObjectName(QString::fromUtf8("label_16"));
 
     gridLayout_11->addWidget(label_16, 1, 0, 1, 1);
 
     table_STAT_Values = new QTableWidget(tab_5);
-    table_STAT_Values->setObjectName("table_STAT_Values");
+    table_STAT_Values->setObjectName(QString::fromUtf8("table_STAT_Values"));
 
     gridLayout_11->addWidget(table_STAT_Values, 1, 1, 1, 1);
 
     horizontalLayout_9 = new QHBoxLayout();
     horizontalLayout_9->setSpacing(2);
-    horizontalLayout_9->setObjectName("horizontalLayout_9");
+    horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
     radio_STAT_List = new QRadioButton(tab_5);
-    radio_STAT_List->setObjectName("radio_STAT_List");
+    radio_STAT_List->setObjectName(QString::fromUtf8("radio_STAT_List"));
     radio_STAT_List->setChecked(true);
 
     horizontalLayout_9->addWidget(radio_STAT_List);
 
     radio_STAT_Fetch = new QRadioButton(tab_5);
-    radio_STAT_Fetch->setObjectName("radio_STAT_Fetch");
+    radio_STAT_Fetch->setObjectName(QString::fromUtf8("radio_STAT_Fetch"));
 
     horizontalLayout_9->addWidget(radio_STAT_Fetch);
 
@@ -524,20 +525,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_11->addLayout(horizontalLayout_9, 2, 0, 1, 2);
 
     lbl_STAT_Status = new QLabel(tab_5);
-    lbl_STAT_Status->setObjectName("lbl_STAT_Status");
+    lbl_STAT_Status->setObjectName(QString::fromUtf8("lbl_STAT_Status"));
 
     gridLayout_11->addWidget(lbl_STAT_Status, 3, 0, 1, 2);
 
     horizontalLayout_14 = new QHBoxLayout();
     horizontalLayout_14->setSpacing(2);
-    horizontalLayout_14->setObjectName("horizontalLayout_14");
+    horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
     horizontalLayout_14->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer_19 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_14->addItem(horizontalSpacer_19);
 
     btn_STAT_Go = new QPushButton(tab_5);
-    btn_STAT_Go->setObjectName("btn_STAT_Go");
+    btn_STAT_Go->setObjectName(QString::fromUtf8("btn_STAT_Go"));
 
     horizontalLayout_14->addWidget(btn_STAT_Go);
 
@@ -550,25 +551,57 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_2->addTab(tab_5, QString());
     tab_6 = new QWidget();
-    tab_6->setObjectName("tab_6");
+    tab_6->setObjectName(QString::fromUtf8("tab_6"));
     gridLayout_9 = new QGridLayout(tab_6);
     gridLayout_9->setSpacing(2);
-    gridLayout_9->setObjectName("gridLayout_9");
+    gridLayout_9->setObjectName(QString::fromUtf8("gridLayout_9"));
+    verticalLayout_3 = new QVBoxLayout();
+    verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+    btn_SHELL_Clear = new QToolButton(tab_6);
+    btn_SHELL_Clear->setObjectName(QString::fromUtf8("btn_SHELL_Clear"));
+
+    verticalLayout_3->addWidget(btn_SHELL_Clear);
+
+    btn_SHELL_Copy = new QToolButton(tab_6);
+    btn_SHELL_Copy->setObjectName(QString::fromUtf8("btn_SHELL_Copy"));
+
+    verticalLayout_3->addWidget(btn_SHELL_Copy);
+
+
+    gridLayout_9->addLayout(verticalLayout_3, 1, 2, 1, 1);
+
+    lbl_SHELL_Status = new QLabel(tab_6);
+    lbl_SHELL_Status->setObjectName(QString::fromUtf8("lbl_SHELL_Status"));
+
+    gridLayout_9->addWidget(lbl_SHELL_Status, 2, 0, 1, 3);
+
+    edit_SHELL_Output = new QPlainTextEdit(tab_6);
+    edit_SHELL_Output->setObjectName(QString::fromUtf8("edit_SHELL_Output"));
+    edit_SHELL_Output->setUndoRedoEnabled(false);
+    edit_SHELL_Output->setReadOnly(true);
+
+    gridLayout_9->addWidget(edit_SHELL_Output, 1, 1, 1, 1);
+
     edit_SHELL_Input = new QLineEdit(tab_6);
-    edit_SHELL_Input->setObjectName("edit_SHELL_Input");
+    edit_SHELL_Input->setObjectName(QString::fromUtf8("edit_SHELL_Input"));
 
     gridLayout_9->addWidget(edit_SHELL_Input, 0, 1, 1, 2);
 
+    label_12 = new QLabel(tab_6);
+    label_12->setObjectName(QString::fromUtf8("label_12"));
+
+    gridLayout_9->addWidget(label_12, 0, 0, 1, 1);
+
     horizontalLayout_8 = new QHBoxLayout();
     horizontalLayout_8->setSpacing(2);
-    horizontalLayout_8->setObjectName("horizontalLayout_8");
+    horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
     horizontalLayout_8->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_8->addItem(horizontalSpacer_7);
 
     btn_SHELL_Go = new QPushButton(tab_6);
-    btn_SHELL_Go->setObjectName("btn_SHELL_Go");
+    btn_SHELL_Go->setObjectName(QString::fromUtf8("btn_SHELL_Go"));
 
     horizontalLayout_8->addWidget(btn_SHELL_Go);
 
@@ -579,83 +612,44 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_9->addLayout(horizontalLayout_8, 3, 0, 1, 3);
 
-    edit_SHELL_Log = new QPlainTextEdit(tab_6);
-    edit_SHELL_Log->setObjectName("edit_SHELL_Log");
-    edit_SHELL_Log->setUndoRedoEnabled(false);
-    edit_SHELL_Log->setReadOnly(true);
-
-    gridLayout_9->addWidget(edit_SHELL_Log, 4, 0, 1, 3);
-
-    lbl_SHELL_Status = new QLabel(tab_6);
-    lbl_SHELL_Status->setObjectName("lbl_SHELL_Status");
-
-    gridLayout_9->addWidget(lbl_SHELL_Status, 2, 0, 1, 3);
-
     label_13 = new QLabel(tab_6);
-    label_13->setObjectName("label_13");
+    label_13->setObjectName(QString::fromUtf8("label_13"));
 
     gridLayout_9->addWidget(label_13, 1, 0, 1, 1);
 
-    edit_SHELL_Output = new QPlainTextEdit(tab_6);
-    edit_SHELL_Output->setObjectName("edit_SHELL_Output");
-    edit_SHELL_Output->setUndoRedoEnabled(false);
-    edit_SHELL_Output->setReadOnly(true);
-
-    gridLayout_9->addWidget(edit_SHELL_Output, 1, 1, 1, 1);
-
-    label_12 = new QLabel(tab_6);
-    label_12->setObjectName("label_12");
-
-    gridLayout_9->addWidget(label_12, 0, 0, 1, 1);
-
-    verticalLayout_3 = new QVBoxLayout();
-    verticalLayout_3->setObjectName("verticalLayout_3");
-    btn_SHELL_Clear = new QToolButton(tab_6);
-    btn_SHELL_Clear->setObjectName("btn_SHELL_Clear");
-
-    verticalLayout_3->addWidget(btn_SHELL_Clear);
-
-    btn_SHELL_Copy = new QToolButton(tab_6);
-    btn_SHELL_Copy->setObjectName("btn_SHELL_Copy");
-
-    verticalLayout_3->addWidget(btn_SHELL_Copy);
-
-
-    gridLayout_9->addLayout(verticalLayout_3, 1, 2, 1, 1);
-
     tabWidget_2->addTab(tab_6, QString());
 //    verticalLayoutWidget = new QWidget(tab);
-        verticalLayoutWidget = new QWidget();
-    verticalLayoutWidget->setObjectName("verticalLayoutWidget");
+    verticalLayoutWidget = new QWidget();
+    verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
 //    verticalLayoutWidget->setGeometry(QRect(410, 20, 229, 182));
-        verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
+    verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
-    verticalLayout->setObjectName("verticalLayout");
+    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
     verticalLayout->setContentsMargins(0, 0, 0, 0);
     formLayout = new QFormLayout();
-    formLayout->setObjectName("formLayout");
+    formLayout->setObjectName(QString::fromUtf8("formLayout"));
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     formLayout->setHorizontalSpacing(2);
     formLayout->setVerticalSpacing(2);
     label_7 = new QLabel(verticalLayoutWidget);
-    label_7->setObjectName("label_7");
+    label_7->setObjectName(QString::fromUtf8("label_7"));
 
     formLayout->setWidget(0, QFormLayout::LabelRole, label_7);
 
     edit_IMG_Preview_Hash = new QLineEdit(verticalLayoutWidget);
-    edit_IMG_Preview_Hash->setObjectName("edit_IMG_Preview_Hash");
+    edit_IMG_Preview_Hash->setObjectName(QString::fromUtf8("edit_IMG_Preview_Hash"));
     edit_IMG_Preview_Hash->setReadOnly(true);
 
     formLayout->setWidget(0, QFormLayout::FieldRole, edit_IMG_Preview_Hash);
 
     label_8 = new QLabel(verticalLayoutWidget);
-    label_8->setObjectName("label_8");
+    label_8->setObjectName(QString::fromUtf8("label_8"));
 
     formLayout->setWidget(1, QFormLayout::LabelRole, label_8);
 
     edit_IMG_Preview_Version = new QLineEdit(verticalLayoutWidget);
-    edit_IMG_Preview_Version->setObjectName("edit_IMG_Preview_Version");
+    edit_IMG_Preview_Version->setObjectName(QString::fromUtf8("edit_IMG_Preview_Version"));
     edit_IMG_Preview_Version->setReadOnly(true);
 
     formLayout->setWidget(1, QFormLayout::FieldRole, edit_IMG_Preview_Version);
@@ -665,31 +659,31 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_6 = new QGridLayout();
     gridLayout_6->setSpacing(2);
-    gridLayout_6->setObjectName("gridLayout_6");
+    gridLayout_6->setObjectName(QString::fromUtf8("gridLayout_6"));
     check_IMG_Preview_Confirmed = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Confirmed->setObjectName("check_IMG_Preview_Confirmed");
+    check_IMG_Preview_Confirmed->setObjectName(QString::fromUtf8("check_IMG_Preview_Confirmed"));
 
     gridLayout_6->addWidget(check_IMG_Preview_Confirmed, 1, 0, 1, 1);
 
     check_IMG_Preview_Active = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Active->setObjectName("check_IMG_Preview_Active");
+    check_IMG_Preview_Active->setObjectName(QString::fromUtf8("check_IMG_Preview_Active"));
     check_IMG_Preview_Active->setEnabled(true);
     check_IMG_Preview_Active->setCheckable(true);
 
     gridLayout_6->addWidget(check_IMG_Preview_Active, 0, 0, 1, 1);
 
     check_IMG_Preview_Pending = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Pending->setObjectName("check_IMG_Preview_Pending");
+    check_IMG_Preview_Pending->setObjectName(QString::fromUtf8("check_IMG_Preview_Pending"));
 
     gridLayout_6->addWidget(check_IMG_Preview_Pending, 1, 1, 1, 1);
 
     check_IMG_Preview_Bootable = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Bootable->setObjectName("check_IMG_Preview_Bootable");
+    check_IMG_Preview_Bootable->setObjectName(QString::fromUtf8("check_IMG_Preview_Bootable"));
 
     gridLayout_6->addWidget(check_IMG_Preview_Bootable, 0, 1, 1, 1);
 
     check_IMG_Preview_Permanent = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Permanent->setObjectName("check_IMG_Preview_Permanent");
+    check_IMG_Preview_Permanent->setObjectName(QString::fromUtf8("check_IMG_Preview_Permanent"));
 
     gridLayout_6->addWidget(check_IMG_Preview_Permanent, 2, 0, 1, 1);
 
@@ -697,7 +691,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout->addLayout(gridLayout_6);
 
     btn_IMG_Preview_Copy = new QPushButton(verticalLayoutWidget);
-    btn_IMG_Preview_Copy->setObjectName("btn_IMG_Preview_Copy");
+    btn_IMG_Preview_Copy->setObjectName(QString::fromUtf8("btn_IMG_Preview_Copy"));
 
     verticalLayout->addWidget(btn_IMG_Preview_Copy);
 
@@ -706,18 +700,18 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout->addItem(verticalSpacer);
 
     horizontalLayoutWidget = new QWidget(tab);
-    horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
+    horizontalLayoutWidget->setObjectName(QString::fromUtf8("horizontalLayoutWidget"));
     horizontalLayoutWidget->setGeometry(QRect(10, 10, 341, 31));
     horizontalLayout_7 = new QHBoxLayout(horizontalLayoutWidget);
-    horizontalLayout_7->setObjectName("horizontalLayout_7");
+    horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
     horizontalLayout_7->setContentsMargins(0, 0, 0, 0);
     label = new QLabel(horizontalLayoutWidget);
-    label->setObjectName("label");
+    label->setObjectName(QString::fromUtf8("label"));
 
     horizontalLayout_7->addWidget(label);
 
     edit_MTU = new QSpinBox(horizontalLayoutWidget);
-    edit_MTU->setObjectName("edit_MTU");
+    edit_MTU->setObjectName(QString::fromUtf8("edit_MTU"));
     edit_MTU->setMinimum(32);
     edit_MTU->setMaximum(2048);
     edit_MTU->setValue(128);
@@ -725,7 +719,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_7->addWidget(edit_MTU);
 
     check_V2_Protocol = new QCheckBox(horizontalLayoutWidget);
-    check_V2_Protocol->setObjectName("check_V2_Protocol");
+    check_V2_Protocol->setObjectName(QString::fromUtf8("check_V2_Protocol"));
 
     horizontalLayout_7->addWidget(check_V2_Protocol);
 
@@ -741,9 +735,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(2);
+    tabWidget_2->setCurrentIndex(1);
     tabWidget_3->setCurrentIndex(0);
-    selector_OS->setCurrentIndex(4);
+    selector_OS->setCurrentIndex(2);
 
 //    QMetaObject::connectSlotsByName(Form);
 
@@ -777,12 +771,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_3), QCoreApplication::translate("Form", "Img", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_IMG_Images_2), QCoreApplication::translate("Form", "Img", nullptr));
     label_10->setText(QCoreApplication::translate("Form", "Input:", nullptr));
     label_11->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Echo), QCoreApplication::translate("Form", "Echo", nullptr));
-    selector_OS->setTabText(selector_OS->indexOf(tab_8), QCoreApplication::translate("Form", "Stats", nullptr));
-    selector_OS->setTabText(selector_OS->indexOf(tab_11), QCoreApplication::translate("Form", "Memory", nullptr));
+    selector_OS->setTabText(selector_OS->indexOf(tab_OS_Tasks), QCoreApplication::translate("Form", "Stats", nullptr));
+    selector_OS->setTabText(selector_OS->indexOf(tab_OS_Memory), QCoreApplication::translate("Form", "Memory", nullptr));
     check_OS_Force_Reboot->setText(QCoreApplication::translate("Form", "Force reboot", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Reset), QCoreApplication::translate("Form", "Reset", nullptr));
     label_17->setText(QCoreApplication::translate("Form", "uname:", nullptr));
@@ -800,12 +794,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     lbl_STAT_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_STAT_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_5), QCoreApplication::translate("Form", "Stats", nullptr));
-    btn_SHELL_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    lbl_SHELL_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
-    label_12->setText(QCoreApplication::translate("Form", "Input:", nullptr));
     btn_SHELL_Clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
     btn_SHELL_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
+    lbl_SHELL_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    label_12->setText(QCoreApplication::translate("Form", "Input:", nullptr));
+    btn_SHELL_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_6), QCoreApplication::translate("Form", "Shell", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
@@ -884,15 +878,15 @@ plugin_mcumgr::~plugin_mcumgr()
 bool plugin_mcumgr::eventFilter(QObject *, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress ||
-	event->type() == QEvent::MouseButtonRelease ||
-	event->type() == QEvent::MouseButtonDblClick ||
-	event->type() == QEvent::KeyPress ||
-	event->type() == QEvent::KeyRelease ||
-	event->type() == QEvent::InputMethod ||
-	event->type() == QEvent::ActivationChange ||
-	event->type() == QEvent::ModifiedChange)
+    event->type() == QEvent::MouseButtonRelease ||
+    event->type() == QEvent::MouseButtonDblClick ||
+    event->type() == QEvent::KeyPress ||
+    event->type() == QEvent::KeyRelease ||
+    event->type() == QEvent::InputMethod ||
+    event->type() == QEvent::ActivationChange ||
+    event->type() == QEvent::ModifiedChange)
     {
-	    return true;
+        return true;
     }
 
     return false;
@@ -1084,16 +1078,16 @@ void plugin_mcumgr::serial_closed()
 {
     if (file_upload_in_progress == true)
     {
-	    file_upload_data.clear();
-	    file_upload_in_progress = false;
-	    file_upload_area = 0;
-	    upload_tmr.invalidate();
-	    upload_hash.clear();
+        file_upload_data.clear();
+        file_upload_in_progress = false;
+        file_upload_area = 0;
+        upload_tmr.invalidate();
+        upload_hash.clear();
     }
 
     if (file_list_in_progress == true)
     {
-	    file_list_in_progress = false;
+        file_list_in_progress = false;
     }
 }
 
@@ -1134,7 +1128,7 @@ void plugin_mcumgr::on_btn_IMG_Local_clicked()
 
 void plugin_mcumgr::on_btn_IMG_Go_clicked()
 {
-    if (tabWidget_3->currentIndex() == 0)
+    if (tabWidget_3->currentWidget() == tab_IMG_Upload)
     {
         //Upload
         emit plugin_set_status(true, false);
@@ -1145,7 +1139,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Uploading...");
     }
-    else if (tabWidget_3->currentIndex() == 1)
+    else if (tabWidget_3->currentWidget() == tab_IMG_Images)
     {
         //Image list
         emit plugin_set_status(true, false);
@@ -1159,7 +1153,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Querying...");
     }
-    else if (tabWidget_3->currentIndex() == 2)
+    else if (tabWidget_3->currentWidget() == tab_IMG_Erase)
     {
         //Erase
         emit plugin_set_status(true, false);
@@ -1190,13 +1184,29 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 
         lbl_OS_Status->setText("Echoing...");
     }
+    else if (selector_OS->currentWidget() == tab_OS_Tasks)
+    {
+        emit plugin_set_status(true, false);
+
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_ECHO);
+        my_os->start_task_stats();
+
+        edit_OS_Echo_Output->appendPlainText("Infoing...");
+    }
+    else if (selector_OS->currentWidget() == tab_OS_Memory)
+    {
+        emit plugin_set_status(true, false);
+
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_ECHO);
+        my_os->start_memory_pool();
+
+        edit_OS_Echo_Output->appendPlainText("Reset");
+    }
     else if (selector_OS->currentWidget() == tab_OS_Reset)
     {
-        edit_OS_Echo_Output->appendPlainText("Reset");
     }
     else if (selector_OS->currentWidget() == tab_OS_Info)
     {
-        edit_OS_Echo_Output->appendPlainText("Info");
     }
 }
 
