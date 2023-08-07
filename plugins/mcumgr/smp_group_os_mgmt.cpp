@@ -343,7 +343,7 @@ void smp_group_os_mgmt::cancel()
 bool smp_group_os_mgmt::start_echo(QString data)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, 0x01, COMMAND_ECHO);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_ECHO);
     tmp_message->writer()->append("d");
     tmp_message->writer()->append(data);
     tmp_message->end_message();
@@ -360,7 +360,7 @@ bool smp_group_os_mgmt::start_echo(QString data)
 bool smp_group_os_mgmt::start_task_stats()
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, 0x01, COMMAND_TASK_STATS);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_TASK_STATS);
     tmp_message->end_message();
 
     mode = MODE_TASK_STATS;
@@ -376,26 +376,26 @@ QString smp_group_os_mgmt::mode_to_string(uint8_t mode)
 {
     switch (mode)
     {
-    case MODE_IDLE:
-        return "Idle";
-    case MODE_ECHO:
-        return "Echo";
-    case MODE_TASK_STATS:
-        return "Task Statistics";
-    case MODE_MEMORY_POOL:
-        return "Memory pool";
-    case MODE_DATE_TIME_GET:
-        return "Date/time get";
-    case MODE_DATE_TIME_SET:
-        return "Date/time set";
-    case MODE_RESET:
-        return "Reset";
-    case MODE_MCUMGR_PARAMETERS:
-        return "MCUmgr parameters";
-    case MODE_OS_APPLICATION_INFO:
-        return "OS/Application info";
-    default:
-        return "Invalid";
+        case MODE_IDLE:
+            return "Idle";
+        case MODE_ECHO:
+            return "Echo";
+        case MODE_TASK_STATS:
+            return "Task Statistics";
+        case MODE_MEMORY_POOL:
+            return "Memory pool";
+        case MODE_DATE_TIME_GET:
+            return "Date/time get";
+        case MODE_DATE_TIME_SET:
+            return "Date/time set";
+        case MODE_RESET:
+            return "Reset";
+        case MODE_MCUMGR_PARAMETERS:
+            return "MCUmgr parameters";
+        case MODE_OS_APPLICATION_INFO:
+            return "OS/Application info";
+        default:
+            return "Invalid";
     }
 }
 
@@ -403,22 +403,22 @@ QString smp_group_os_mgmt::command_to_string(uint8_t command)
 {
     switch (command)
     {
-    case COMMAND_ECHO:
-        return "Echo";
-    case COMMAND_TASK_STATS:
-        return "Task Statistics";
-    case COMMAND_MEMORY_POOL:
-        return "Memory pool";
-    case COMMAND_DATE_TIME:
-        return "Date/time";
-    case COMMAND_RESET:
-        return "Reset";
-    case COMMAND_MCUMGR_PARAMETERS:
-        return "MCUmgr parameters";
-    case COMMAND_OS_APPLICATION_INFO:
-        return "OS/Application info";
-    default:
-        return "Invalid";
+        case COMMAND_ECHO:
+            return "Echo";
+        case COMMAND_TASK_STATS:
+            return "Task Statistics";
+        case COMMAND_MEMORY_POOL:
+            return "Memory pool";
+        case COMMAND_DATE_TIME:
+            return "Date/time";
+        case COMMAND_RESET:
+            return "Reset";
+        case COMMAND_MCUMGR_PARAMETERS:
+            return "MCUmgr parameters";
+        case COMMAND_OS_APPLICATION_INFO:
+            return "OS/Application info";
+        default:
+            return "Invalid";
     }
 }
 

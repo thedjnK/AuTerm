@@ -30,7 +30,7 @@ smp_message::smp_message()
     this->header_added = false;
 }
 
-void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t sequence, uint8_t id)
+void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id)
 {
     this->buffer.append((char)((version == 1 ? SMP_VERSION_2_HEADER : SMP_VERSION_1_HEADER) | op));  /* Read | Write (0x00 | 0x02) */
     this->buffer.append((char)0x00);  /* Flags */
@@ -43,7 +43,7 @@ void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, ui
     this->buffer.append((char)group);  /* Group A */
     this->buffer.append((char)(group >> 8));  /* Group B */
 #endif
-    this->buffer.append((char)sequence);  /* Sequence */
+    this->buffer.append((char)0x00);  /* Sequence */
     this->buffer.append((char)id);   /* Message ID */
 
     cbor_writer.device()->seek(this->buffer.length());
