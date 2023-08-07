@@ -25,7 +25,7 @@
 enum modes : uint8_t {
     MODE_IDLE = 0,
     MODE_ECHO,
-    MODE_STATS,
+    MODE_TASK_STATS,
     MODE_MEMORY_POOL,
     MODE_DATE_TIME,
     MODE_RESET,
@@ -35,7 +35,7 @@ enum modes : uint8_t {
 
 enum os_mgmt_commands : uint8_t {
     COMMAND_ECHO = 0,
-    COMMAND_STATS = 2,
+    COMMAND_TASK_STATS = 2,
     COMMAND_MEMORY_POOL,
     COMMAND_DATE_TIME,
     COMMAND_RESET,
@@ -222,8 +222,8 @@ QString smp_group_os_mgmt::mode_to_string(uint8_t mode)
         return "Idle";
     case MODE_ECHO:
         return "Echo";
-    case MODE_STATS:
-        return "Statistics";
+    case MODE_TASK_STATS:
+        return "Task Statistics";
     case MODE_MEMORY_POOL:
         return "Memory pool";
     case MODE_DATE_TIME:
@@ -245,8 +245,8 @@ QString smp_group_os_mgmt::op_to_string(uint8_t op)
     {
     case COMMAND_ECHO:
         return "Echo";
-    case COMMAND_STATS:
-        return "Statistics";
+    case COMMAND_TASK_STATS:
+        return "Task Statistics";
     case COMMAND_MEMORY_POOL:
         return "Memory pool";
     case COMMAND_DATE_TIME:

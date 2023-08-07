@@ -43,24 +43,7 @@ smp_processor *processor;
 QStandardItemModel model_image_state;
 smp_group_img_mgmt *my_img;
 smp_group_os_mgmt *my_os;
-
-//0x08 = new version, 0x00 = old
-#define setup_smp_message(message, stream, write, group, id) \
-message.append((char)((check_V2_Protocol->isChecked() ? 0x08 : 0x00) | (write == true ? 0x02 : 0x00)));  /* Read | Write (0x00 | 0x02) */ \
-    message.append((char)0x00);  /* Flags */ \
-    message.append((char)0x00);  /* Length A */ \
-    message.append((char)0x05);  /* Length B */ \
-    message.append((char)(group >> 8));  /* Group A */ \
-    message.append((char)group);  /* Group B */ \
-    message.append((char)0x01);  /* Sequence */ \
-    message.append((char)id);   /* Message ID */ \
-    stream.startMap()
-
-#define finish_smp_message(message, stream, data) \
-    stream.endMap(); \
-    message[2] = (uint8_t)(smp_data.length() >> 8); \
-    message[3] = (uint8_t)smp_data.length(); \
-    message.append(data)
+QList<image_state_t> blaharray;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
@@ -951,114 +934,6 @@ void plugin_mcumgr::serial_about_to_close()
     qDebug() << "about to close";
 }
 
-bool plugin_mcumgr::handleStream_upload(QCborStreamReader &reader, int32_t *new_rc, int64_t *new_off)
-{
-//    qDebug() << reader.lastError() << reader.hasNext();
-
-    QString key = "";
-    int32_t rc = -1;
-    int64_t off = -1;
-
-    while (!reader.lastError() && reader.hasNext())
-    {
-	    bool keyset = false;
-//	    qDebug() << "Key: " << key;
-//	    qDebug() << "Type: " << reader.type();
-	    switch (reader.type())
-	    {
-	    case QCborStreamReader::UnsignedInteger:
-	    case QCborStreamReader::NegativeInteger:
-	    case QCborStreamReader::SimpleType:
-	    case QCborStreamReader::Float16:
-	    case QCborStreamReader::Float:
-	    case QCborStreamReader::Double:
-	    {
-		    //	handleFixedWidth(reader);
-		    if (key == "rc")
-		    {
-//			    qDebug() << "found rc";
-			    rc = reader.toInteger();
-		    }
-		    else if (key == "off")
-		    {
-//			    qDebug() << "found off";
-			    off = reader.toInteger();
-		    }
-
-		    reader.next();
-		    break;
-	    }
-	    case QCborStreamReader::ByteArray:
-	    {
-		    auto r = reader.readByteArray();
-		    while (r.status == QCborStreamReader::Ok)
-		    {
-			    r = reader.readByteArray();
-		    }
-	    }
-	    break;
-	    case QCborStreamReader::String:
-	    {
-		    QString data;
-		    auto r = reader.readString();
-		    while (r.status == QCborStreamReader::Ok)
-		    {
-			    data.append(r.data);
-			    r = reader.readString();
-		    }
-
-		    if (r.status == QCborStreamReader::Error)
-		    {
-			    data.clear();
-			    qDebug("Error decoding string");
-		    }
-		    else
-		    {
-			    if (key.isEmpty())
-			    {
-				    key = data;
-				    keyset = true;
-			    }
-		    }
-		    break;
-	    }
-	    case QCborStreamReader::Array:
-	    case QCborStreamReader::Map:
-		    reader.enterContainer();
-		    while (reader.lastError() == QCborError::NoError && reader.hasNext())
-		    {
-			    handleStream_upload(reader, new_rc, new_off);
-		    }
-		    if (reader.lastError() == QCborError::NoError)
-		    {
-			    reader.leaveContainer();
-		    }
-		    break;
-	    }
-
-	    if (keyset == false && !key.isEmpty())
-	    {
-		    key = "";
-	    }
-    }
-
-    if (new_rc != NULL && rc != -1)
-    {
-	    *new_rc = rc;
-    }
-
-    if (new_off != NULL && off != -1)
-    {
-	    *new_off = off;
-    }
-
-    return true;
-}
-
-QList<image_state_t> blaharray;
-image_state_t thisblah;
-slot_state_t thisblah2;
-
 bool plugin_mcumgr::handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data)
 {
 //    qDebug() << reader.lastError() << reader.hasNext();
@@ -1165,55 +1040,6 @@ bool plugin_mcumgr::handleStream_shell(QCborStreamReader &reader, int32_t *new_r
     }
 
     return true;
-}
-
-bool plugin_mcumgr::extract_hash(QByteArray *file_data)
-{
-    bool found = false;
-
-    int32_t pos = file_data->length() - 4;
-    int16_t length;
-    while (pos >= 0)
-    {
-	    if (file_data->mid(pos, 2) == image_tlv_magic)
-	    {
-		    length = file_data->at(pos + 2);
-		    length |= ((uint16_t)file_data->at(pos + 3)) << 8;
-
-		    if ((pos + length) == file_data->length())
-		    {
-			    found = true;
-			    break;
-		    }
-	    }
-
-	    --pos;
-    }
-
-    if (found == true)
-    {
-	    int32_t new_pos = pos + 4;
-	    while (new_pos < file_data->length())
-	    {
-		    uint8_t type = file_data->at(new_pos);
-		    int16_t local_length = file_data->at(new_pos + 2);
-		    local_length |= ((uint16_t)file_data->at(new_pos + 3)) << 8;
-
-//		    qDebug() << "Type " << type << ", length " << local_length;
-
-		    if (type == 0x10 && local_length == 32)
-		    {
-			    //We have the hash we wanted
-			    upload_hash = file_data->mid((new_pos + 4), local_length);
-			    //todo: check if another hash is present?
-			    return true;
-		    }
-
-		    new_pos += local_length + 4;
-	    }
-    }
-
-    return false;
 }
 
 void plugin_mcumgr::receive_waiting(QByteArray message)
@@ -1376,6 +1202,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 
 void plugin_mcumgr::on_btn_SHELL_Go_clicked()
 {
+#if 0
         //Execute shell command
         emit plugin_set_status(true, false);
 
@@ -1413,6 +1240,7 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
         processor->send(tmp_message, timeout_ms, 3, true);
 
         lbl_SHELL_Status->setText("Executing...");
+#endif
 }
 
 void plugin_mcumgr::on_btn_STAT_Go_clicked()

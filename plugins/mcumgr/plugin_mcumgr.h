@@ -123,9 +123,7 @@ private slots:
     void on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index);
 
 private:
-    bool handleStream_upload(QCborStreamReader &reader, int32_t *new_rc, int64_t *new_off);
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
-    bool extract_hash(QByteArray *file_data);
 
     //Form items
 //    QGridLayout *gridLayout;
