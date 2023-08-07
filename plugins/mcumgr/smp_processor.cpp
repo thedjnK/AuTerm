@@ -26,6 +26,7 @@
 
 smp_processor::smp_processor(QObject *parent, smp_uart *uart_driver)
 {
+    sequence = 0;
     uart = uart_driver;
     last_message = nullptr;
     last_message_header = nullptr;
@@ -51,6 +52,8 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repe
 
     last_message = message;
     last_message_header = message->get_header();
+    //Set message sequence
+    last_message_header->nh_seq = sequence;
     last_message_version_check = allow_version_check;
     last_message_version = last_message_header->nh_version;
     repeat_timer.setInterval(timeout_ms);
@@ -59,6 +62,7 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repe
 
     uart->send(last_message);
     repeat_timer.start();
+    ++sequence;
 
     return true;
 }

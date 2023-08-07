@@ -60,6 +60,7 @@ public slots:
     void message_received(smp_message *message);
 
 private:
+    uint8_t sequence;
     smp_uart *uart;
     smp_message *last_message;
     smp_hdr *last_message_header;
