@@ -1578,6 +1578,31 @@
                    </property>
                   </spacer>
                  </item>
+                 <item row="4" column="1">
+                  <widget class="QLabel" name="label_logo">
+                   <property name="minimumSize">
+                    <size>
+                     <width>64</width>
+                     <height>64</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>64</width>
+                     <height>64</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="pixmap">
+                    <pixmap resource="AuTermImages.qrc">:/images/AuTerm32.png</pixmap>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </item>
                <item>
@@ -3476,7 +3501,9 @@
   <tabstop>btn_LogRefresh</tabstop>
   <tabstop>text_LogData</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="AuTermImages.qrc"/>
+ </resources>
  <connections/>
  <buttongroups>
   <buttongroup name="buttonGroup_2"/>
