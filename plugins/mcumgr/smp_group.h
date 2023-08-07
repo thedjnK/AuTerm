@@ -58,7 +58,6 @@ public:
         processor = parent;
         processor->register_handler(group_id, this);
         smp_error::register_error_lookup_function(group_id, this);
-
         error_lookup = error_lookup_function;
     }
 

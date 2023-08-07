@@ -82,7 +82,7 @@ private:
     bool parse_state_response(QCborStreamReader &reader, QString array_name);
     void file_upload(QByteArray *message);
     QString mode_to_string(uint8_t mode);
-    QString op_to_string(uint8_t op);
+    QString command_to_string(uint8_t command);
 
     //
     uint8_t mode;

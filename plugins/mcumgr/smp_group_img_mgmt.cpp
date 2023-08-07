@@ -739,7 +739,7 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
     else
     {
         //Unexpected response operation for mode
-        emit status(smp_user_data, STATUS_ERROR, QString("Unexpected error (Mode: %1, op: %2)").arg(mode_to_string(mode), op_to_string(op)));
+        emit status(smp_user_data, STATUS_ERROR, QString("Unexpected error (Mode: %1, op: %2)").arg(mode_to_string(mode), command_to_string(command)));
     }
 
     if (cleanup == true)
@@ -921,9 +921,9 @@ QString smp_group_img_mgmt::mode_to_string(uint8_t mode)
     }
 }
 
-QString smp_group_img_mgmt::op_to_string(uint8_t op)
+QString smp_group_img_mgmt::command_to_string(uint8_t command)
 {
-    switch (op)
+    switch (command)
     {
         case COMMAND_UPLOAD:
             return "Upload firmware";
