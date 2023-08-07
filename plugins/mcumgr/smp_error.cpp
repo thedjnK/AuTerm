@@ -21,29 +21,57 @@
 **
 *******************************************************************************/
 #include "smp_error.h"
+#include <QStringList>
 
 static QList<smp_error_lookup_list_t> lookup_functions;
+static QStringList smp_error_values = QStringList() <<
+    //Error index starts from 0
+    "No error" <<
+    "Unknown error" <<
+    "Insufficient memory" <<
+    "Error in input value" <<
+    "Operation timed out" <<
+    "No such file/entry" <<
+    "Current state disallows command" <<
+    "Response too large" <<
+    "Command not supported" <<
+    "Corrupt" <<
+    "Command blocked by processing of other command" <<
+    "Access to specific function, command or resource denied" <<
+    "Requested SMP MCUmgr protocol version is not supported (too old)" <<
+    "Requested SMP MCUmgr protocol version is not supported (too new)";
 
-const QString *smp_error::error_lookup_string(smp_error_t *error)
+QString smp_error::error_lookup_string(smp_error_t *error)
 {
-    QString *error_string = nullptr;
+    QString error_string;
     uint16_t i = 0;
 
     if (error->type == SMP_ERROR_RC)
     {
-        //TODO
+        if (error->rc < smp_error_values.length())
+        {
+            error_string = smp_error_values.at(error->rc);
+        }
     }
     else if (error->type == SMP_ERROR_RET)
     {
-        while (i < lookup_functions.length())
+        if (error->rc < 2)
         {
-            if (lookup_functions[i].group == error->group)
+            //Index 0 is reserved for no error, index 1 is reserved for unknown error
+            error_string = smp_error_values.at(error->rc);
+        }
+        else
+        {
+            while (i < lookup_functions.length())
             {
-                lookup_functions[i].lookup(error->rc, error_string);
-                break;
-            }
+                if (lookup_functions[i].group == error->group)
+                {
+                    (void)lookup_functions[i].lookup(error->rc, &error_string);
+                    break;
+                }
 
-            ++i;
+                ++i;
+            }
         }
     }
 

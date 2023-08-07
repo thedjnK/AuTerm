@@ -38,9 +38,42 @@ enum img_mgmt_commands : uint8_t {
     COMMAND_ERASE = 5
 };
 
-const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
-const uint16_t image_tlv_tag_sha256 = 0x10;
-const uint8_t sha256_size = 32;
+static const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
+static const uint16_t image_tlv_tag_sha256 = 0x10;
+static const uint8_t sha256_size = 32;
+
+static QStringList smp_error_values = QStringList() <<
+    //Error index starts from 2 (no error and unknown error are common and handled in the base code)
+    "Failed to query flash area configuration" <<
+    "There is no image in the slot" <<
+    "The image in the slot has no TLVs (tag, length, value)" <<
+    "The image in the slot has an invalid TLV type and/or length" <<
+    "The image in the slot has multiple hash TLVs, which is invalid" <<
+    "The image in the slot has an invalid TLV size" <<
+    "The image in the slot does not have a hash TLV, which is required"  <<
+    "There is no free slot to place the image" <<
+    "Flash area opening failed" <<
+    "Flash area reading failed" <<
+    "Flash area writing failed" <<
+    "Flash area erase failed" <<
+    "The provided slot is not valid" <<
+    "Insufficient heap memory (malloc failed)" <<
+    "The flash context is already set" <<
+    "The flash context is not set" <<
+    "The device for the flash area is NULL" <<
+    "The offset for a page number is invalid" <<
+    "The offset parameter was not provided and is required" <<
+    "The length parameter was not provided and is required" <<
+    "The image length is smaller than the size of an image header" <<
+    "The image header magic value does not match the expected value" <<
+    "The hash parameter provided is not valid" <<
+    "The image load address does not match the address of the flash area" <<
+    "Failed to get version of currently running application" <<
+    "The currently running application is newer than the version being uploaded" <<
+    "There is already an image operating pending" <<
+    "The image vector table is invalid" <<
+    "The image it too large to fit" <<
+    "The amount of data sent is larger than the provided image size";
 
 image_state_t image_state_buffer;
 slot_state_t slot_state_buffer;
@@ -905,5 +938,13 @@ QString smp_group_img_mgmt::op_to_string(uint8_t op)
 
 bool smp_group_img_mgmt::error_lookup(int32_t rc, QString *error)
 {
+    rc -= 2;
+
+    if (rc < smp_error_values.length())
+    {
+        *error = smp_error_values.at(rc);
+        return true;
+    }
+
     return false;
 }

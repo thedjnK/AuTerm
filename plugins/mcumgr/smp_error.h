@@ -47,7 +47,7 @@ struct smp_error_lookup_list_t {
 class smp_error
 {
 public:
-    static const QString *error_lookup_string(smp_error_t *error);
+    static QString error_lookup_string(smp_error_t *error);
     static void register_error_lookup_function(uint16_t group, smp_error_lookup lookup_function);
 };
 

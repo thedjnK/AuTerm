@@ -43,6 +43,10 @@ enum os_mgmt_commands : uint8_t {
     COMMAND_OS_APPLICATION_INFO,
 };
 
+static QStringList smp_error_values = QStringList() <<
+    //Error index starts from 2 (no error and unknown error are common and handled in the base code)
+    "The provided format value is not valid";
+
 smp_group_os_mgmt::smp_group_os_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_OS, error_lookup)
 {
     mode = MODE_IDLE;
@@ -264,5 +268,13 @@ QString smp_group_os_mgmt::op_to_string(uint8_t op)
 
 bool smp_group_os_mgmt::error_lookup(int32_t rc, QString *error)
 {
+    rc -= 2;
+
+    if (rc < smp_error_values.length())
+    {
+        *error = smp_error_values.at(rc);
+        return true;
+    }
+
     return false;
 }
