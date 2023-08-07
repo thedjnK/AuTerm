@@ -57,11 +57,9 @@ public:
     {
         processor = parent;
         processor->register_handler(group_id, this);
+        smp_error::register_error_lookup_function(group_id, this);
 
-        if (error_lookup_function != nullptr)
-        {
-            smp_error::register_error_lookup_function(group_id, error_lookup_function);
-        }
+        error_lookup = error_lookup_function;
     }
 
     void set_parameters(uint8_t version, uint16_t mtu, uint8_t retries, uint16_t timeout, uint8_t user_data)
@@ -73,6 +71,16 @@ public:
         smp_user_data = user_data;
     }
 
+    bool lookup_error(int32_t rc, QString *error)
+    {
+        if (error_lookup != nullptr)
+        {
+            return error_lookup(rc, error);
+        }
+
+        return false;
+    }
+
     virtual void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) = 0;
     virtual void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) = 0;
     virtual void timeout(smp_message *message) = 0;
@@ -82,7 +90,6 @@ signals:
     void status(uint8_t user_data, group_status status, QString error_string);
     void progress(uint8_t user_data, uint8_t percent);
 
-
 protected:
     smp_processor *processor;
     uint8_t smp_version;
@@ -90,6 +97,7 @@ protected:
     uint8_t smp_retries;
     uint16_t smp_timeout;
     uint8_t smp_user_data;
+    smp_error_lookup error_lookup;
 };
 
 #endif // SMP_GROUP_H

@@ -22,6 +22,7 @@
 *******************************************************************************/
 #include "smp_error.h"
 #include <QStringList>
+#include "smp_group.h"
 
 static QList<smp_error_lookup_list_t> lookup_functions;
 static QStringList smp_error_values = QStringList() <<
@@ -66,7 +67,8 @@ QString smp_error::error_lookup_string(smp_error_t *error)
             {
                 if (lookup_functions[i].group == error->group)
                 {
-                    (void)lookup_functions[i].lookup(error->rc, &error_string);
+                    //TODO: error handling?
+                    (void)lookup_functions[i].lookup->lookup_error(error->rc, &error_string);
                     break;
                 }
 
@@ -78,11 +80,11 @@ QString smp_error::error_lookup_string(smp_error_t *error)
     return error_string;
 }
 
-void smp_error::register_error_lookup_function(uint16_t group, smp_error_lookup lookup_function)
+void smp_error::register_error_lookup_function(uint16_t group, smp_group *group_object)
 {
     smp_error_lookup_list_t error_list_entry;
     error_list_entry.group = group;
-    error_list_entry.lookup = lookup_function;
+    error_list_entry.lookup = group_object;
 
     lookup_functions.append(error_list_entry);
 }
