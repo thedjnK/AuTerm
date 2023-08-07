@@ -45,7 +45,7 @@ const uint8_t sha256_size = 32;
 image_state_t image_state_buffer;
 slot_state_t slot_state_buffer;
 
-smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_IMG)
+smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_IMG, error_lookup)
 {
     mode = MODE_IDLE;
 }
@@ -901,4 +901,9 @@ QString smp_group_img_mgmt::op_to_string(uint8_t op)
         default:
             return "Invalid";
     }
+}
+
+bool smp_group_img_mgmt::error_lookup(int32_t rc, QString *error)
+{
+    return false;
 }

@@ -1,0 +1,54 @@
+/******************************************************************************
+** Copyright (C) 2023 Jamie M.
+**
+** Project: AuTerm
+**
+** Module:  smp_error.h
+**
+** Notes:
+**
+** License: This program is free software: you can redistribute it and/or
+**          modify it under the terms of the GNU General Public License as
+**          published by the Free Software Foundation, version 3.
+**
+**          This program is distributed in the hope that it will be useful,
+**          but WITHOUT ANY WARRANTY; without even the implied warranty of
+**          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**          GNU General Public License for more details.
+**
+**          You should have received a copy of the GNU General Public License
+**          along with this program.  If not, see http://www.gnu.org/licenses/
+**
+*******************************************************************************/
+#ifndef SMP_ERROR_H
+#define SMP_ERROR_H
+
+#include <QObject>
+
+enum smp_error_type {
+    SMP_ERROR_NONE,
+    SMP_ERROR_RC,
+    SMP_ERROR_RET,
+};
+
+struct smp_error_t {
+    smp_error_type type;
+    int32_t rc;
+    uint16_t group;
+};
+
+typedef bool (*smp_error_lookup)(int32_t rc, QString *error);
+
+struct smp_error_lookup_list_t {
+    uint16_t group;
+    smp_error_lookup lookup;
+};
+
+class smp_error
+{
+public:
+    static const QString *error_lookup_string(smp_error_t *error);
+    static void register_error_lookup_function(uint16_t group, smp_error_lookup lookup_function);
+};
+
+#endif // SMP_ERROR_H

@@ -25,12 +25,7 @@
 
 #include <QByteArray>
 #include <QCborStreamWriter>
-
-enum smp_error_type {
-    SMP_ERROR_NONE,
-    SMP_ERROR_RC,
-    SMP_ERROR_RET,
-};
+#include "smp_error.h"
 
 enum smp_op_t : uint8_t {
     SMP_OP_READ = 0,
@@ -58,12 +53,6 @@ struct smp_hdr {
 
 //Ensure header size is correct
 static_assert(sizeof(smp_hdr) == 8);
-
-struct smp_error_t {
-    smp_error_type type;
-    int32_t rc;
-    uint16_t group;
-};
 
 class smp_message
 {

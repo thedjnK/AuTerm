@@ -41,9 +41,26 @@ public:
     void timeout(smp_message *message);
     void cancel();
     bool start_echo(QString data);
+    static bool error_lookup(int32_t rc, QString *error);
+    /*
+    bool start_task_stats();
+    bool start_memory_pool();
+    bool start_date_time_get();
+    bool start_date_time_set();
+    bool start_mcumgr_parameters();
+    bool start_os_application_info();
+    */
 
 private:
     bool parse_echo_response(QCborStreamReader &reader, QString *response);
+    /*
+    bool parse_task_stats_response(QCborStreamReader &reader, );
+    bool parse_memory_pool_response(QCborStreamReader &reader, );
+    bool parse_date_time_response(QCborStreamReader &reader, );
+    bool parse_mcumgr_parameters_response(QCborStreamReader &reader, );
+    bool parse_os_application_info_response(QCborStreamReader &reader, );
+    */
+
     QString mode_to_string(uint8_t mode);
     QString op_to_string(uint8_t op);
 

@@ -26,6 +26,7 @@
 #include <QObject>
 #include "smp_message.h"
 #include "smp_processor.h"
+#include "smp_error.h"
 
 #include <QDebug>
 
@@ -52,10 +53,15 @@ class smp_group : public QObject
     Q_OBJECT
 
 public:
-    smp_group(smp_processor *parent, uint16_t group_id)
+    smp_group(smp_processor *parent, uint16_t group_id, smp_error_lookup error_lookup_function)
     {
         processor = parent;
         processor->register_handler(group_id, this);
+
+        if (error_lookup_function != nullptr)
+        {
+            smp_error::register_error_lookup_function(group_id, error_lookup_function);
+        }
     }
 
     void set_parameters(uint8_t version, uint16_t mtu, uint8_t retries, uint16_t timeout, uint8_t user_data)

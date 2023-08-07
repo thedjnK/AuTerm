@@ -43,7 +43,7 @@ enum os_mgmt_commands : uint8_t {
     COMMAND_OS_APPLICATION_INFO,
 };
 
-smp_group_os_mgmt::smp_group_os_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_OS)
+smp_group_os_mgmt::smp_group_os_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_OS, error_lookup)
 {
     mode = MODE_IDLE;
 }
@@ -260,4 +260,9 @@ QString smp_group_os_mgmt::op_to_string(uint8_t op)
     default:
         return "Invalid";
     }
+}
+
+bool smp_group_os_mgmt::error_lookup(int32_t rc, QString *error)
+{
+    return false;
 }
