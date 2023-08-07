@@ -16,6 +16,7 @@ TARGET          = $$qtLibraryTarget(plugin_mcumgr)
 
 SOURCES += \
     plugin_mcumgr.cpp \
+    smp_error.cpp \
     smp_group_os_mgmt.cpp \
     smp_message.cpp \
     smp_processor.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
     plugin_mcumgr.h \
+    smp_error.h \
     smp_group_os_mgmt.h \
     smp_message.h \
     smp_processor.h \
@@ -59,4 +61,9 @@ CONFIG(release, debug|release) {
 
     FORMS += \
         form.ui
+}
+
+# Do not prefix with lib for non-static builds
+!contains(CONFIG, static) {
+    CONFIG += no_plugin_name_prefix
 }
