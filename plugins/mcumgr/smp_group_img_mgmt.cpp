@@ -589,7 +589,7 @@ qDebug() << "Going in circles...";
         }
 
         smp_message *tmp_message = new smp_message();
-        tmp_message->start_message(SMP_OP_WRITE, smp_version, 0x01, 0x01, 0x01);
+        tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, 0x01, COMMAND_UPLOAD);
 
         if (this->file_upload_area == 0)
         {
@@ -806,7 +806,7 @@ bool smp_group_img_mgmt::start_image_get(QList<image_state_t> *images)
     host_images->clear();
 
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, 0x01, 0x01, 0x00);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_IMG, 0x01, COMMAND_STATE);
     tmp_message->end_message();
 
     mode = MODE_LIST_IMAGES;
@@ -821,7 +821,7 @@ bool smp_group_img_mgmt::start_image_get(QList<image_state_t> *images)
 bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, 0x01, 0x01, 0x00);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, 0x01, COMMAND_STATE);
 
     tmp_message->writer()->append("hash");
     tmp_message->writer()->append(*hash);
@@ -887,7 +887,7 @@ bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, 
 bool smp_group_img_mgmt::start_image_erase(uint8_t slot)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, 0x01, 0x01, 0x05);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, 0x01, COMMAND_ERASE);
 
     tmp_message->writer()->append("slot");
     tmp_message->writer()->append(slot);
