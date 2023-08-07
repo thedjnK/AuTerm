@@ -35,6 +35,18 @@ struct task_list_t {
     uint32_t priority;
     uint32_t id;
     uint32_t state;
+    uint32_t stack_size;
+    uint32_t stack_usage;
+    uint32_t context_switches;
+    uint32_t runtime;
+};
+
+struct memory_pool_t {
+    QString name;
+    int32_t size;
+    int32_t blocks;
+    int32_t free;
+    int32_t minimum;
 };
 
 class smp_group_os_mgmt : public smp_group
@@ -49,8 +61,8 @@ public:
     void cancel();
     bool start_echo(QString data);
     bool start_task_stats();
-    /*
     bool start_memory_pool();
+    /*
     bool start_date_time_get();
     bool start_date_time_set();
     bool start_mcumgr_parameters();
@@ -61,8 +73,8 @@ public:
 private:
     bool parse_echo_response(QCborStreamReader &reader, QString *response);
     bool parse_task_stats_response(QCborStreamReader &reader, bool *in_tasks, task_list_t *current_task, QList<task_list_t> *task_array);
+    bool parse_memory_pool_response(QCborStreamReader &reader, memory_pool_t *current_memory, QList<memory_pool_t> *memory_array);
     /*
-    bool parse_memory_pool_response(QCborStreamReader &reader, );
     bool parse_date_time_response(QCborStreamReader &reader, );
     bool parse_mcumgr_parameters_response(QCborStreamReader &reader, );
     bool parse_os_application_info_response(QCborStreamReader &reader, );

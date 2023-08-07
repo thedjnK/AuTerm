@@ -138,19 +138,40 @@ bool smp_group_os_mgmt::parse_task_stats_response(QCborStreamReader &reader, boo
         {
             case QCborStreamReader::UnsignedInteger:
             {
-                uint64_t task_value = reader.toUnsignedInteger();
+                uint32_t *var = nullptr;
 
                 if (key == "prio")
                 {
-                        current_task->priority = task_value;
+                    var = &current_task->priority;
                 }
                 else if (key == "tid")
                 {
-                        current_task->id = task_value;
+                    var = &current_task->id;
                 }
                 else if (key == "state")
                 {
-                        current_task->state = task_value;
+                    var = &current_task->state;
+                }
+                else if (key == "stkuse")
+                {
+                    var = &current_task->stack_usage;
+                }
+                else if (key == "stksiz")
+                {
+                    var = &current_task->stack_size;
+                }
+                else if (key == "cswcnt")
+                {
+                    var = &current_task->context_switches;
+                }
+                else if (key == "runtime")
+                {
+                    var = &current_task->runtime;
+                }
+
+                if (var != nullptr)
+                {
+                    *var = (uint32_t)reader.toUnsignedInteger();
                 }
 
                 reader.next();
@@ -202,6 +223,10 @@ bool smp_group_os_mgmt::parse_task_stats_response(QCborStreamReader &reader, boo
                             current_task->id = 0;
                             current_task->priority = 0;
                             current_task->state = 0;
+                            current_task->context_switches = 0;
+                            current_task->runtime = 0;
+                            current_task->stack_size = 0;
+                            current_task->stack_usage = 0;
                         }
 
                         parse_task_stats_response(reader, in_tasks, current_task, task_array);
@@ -215,6 +240,113 @@ bool smp_group_os_mgmt::parse_task_stats_response(QCborStreamReader &reader, boo
                             task_array->append(*current_task);
                             current_task->name.clear();
                         }
+                }
+                break;
+            }
+
+            default:
+            {
+                reader.next();
+            }
+        }
+
+        if (keyset == false && !key.isEmpty())
+        {
+            key = "";
+        }
+    }
+
+    return true;
+}
+
+bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, memory_pool_t *current_memory, QList<memory_pool_t> *memory_array)
+{
+    QString key = "";
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        bool keyset = false;
+        //	    qDebug() << "Key: " << key;
+        //	    qDebug() << "Type: " << reader.type();
+        switch (reader.type())
+        {
+            case QCborStreamReader::NegativeInteger:
+            {
+                int64_t task_value = reader.toInteger();
+
+                if (key == "blksiz")
+                {
+                            current_memory->size = task_value;
+                }
+                else if (key == "nblks")
+                {
+                            current_memory->blocks = task_value;
+                }
+                else if (key == "nfree")
+                {
+                            current_memory->free = task_value;
+                }
+                else if (key == "min")
+                {
+                            current_memory->minimum = task_value;
+                }
+
+                reader.next();
+                break;
+            }
+            case QCborStreamReader::String:
+            {
+                QString data;
+                auto r = reader.readString();
+
+                while (r.status == QCborStreamReader::Ok)
+                {
+                            data.append(r.data);
+                            r = reader.readString();
+                }
+
+                if (r.status == QCborStreamReader::Error)
+                {
+                            data.clear();
+                            qDebug("Error decoding string");
+                }
+                else
+                {
+                            if (key.isEmpty())
+                            {
+                                key = data;
+                                keyset = true;
+                            }
+                }
+
+                break;
+            }
+
+            case QCborStreamReader::Array:
+            case QCborStreamReader::Map:
+            {
+                reader.enterContainer();
+                while (reader.lastError() == QCborError::NoError && reader.hasNext())
+                {
+                            {
+                                current_memory->name = key;
+                                current_memory->blocks = 0;
+                                current_memory->free = 0;
+                                current_memory->minimum = 0;
+                                current_memory->size = 0;
+                            }
+
+                            parse_memory_pool_response(reader, current_memory, memory_array);
+                }
+                if (reader.lastError() == QCborError::NoError)
+                {
+                            reader.leaveContainer();
+
+                            if (!current_memory->name.isEmpty())
+                            {
+                                memory_array->append(*current_memory);
+                                current_memory->name.clear();
+                            }
                 }
                 break;
             }
@@ -282,11 +414,37 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         uint8_t i = 0;
         while (i < task_list.length())
         {
-            qDebug() << "Task #" << i << ": " << task_list[i].name << ", " << task_list[i].id << ", " << task_list[i].priority << ", " << task_list[i].state;
+            qDebug() << "Task #" << i << ": " << task_list[i].name << ", " << task_list[i].id << ", " << task_list[i].priority << ", " << task_list[i].state << ", " << task_list[i].context_switches << ", " << task_list[i].runtime << ", " << task_list[i].stack_size << ", " << task_list[i].stack_usage;
             ++i;
         }
+
         emit status(smp_user_data, STATUS_COMPLETE, nullptr);
     }
+    else if (mode == MODE_MEMORY_POOL && command == COMMAND_MEMORY_POOL)
+    {
+        if (version != smp_version)
+        {
+            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
+            smp_version = version;
+            //TODO: raise warning
+        }
+
+        //Response to set image state
+        QCborStreamReader cbor_reader(data);
+        QList<memory_pool_t> memory_list;
+        memory_pool_t current_memory;
+        bool good = parse_memory_pool_response(cbor_reader, &current_memory, &memory_list);
+
+        uint8_t i = 0;
+        while (i < memory_list.length())
+        {
+            qDebug() << "Pool #" << i << ": " << memory_list[i].name << ", " << memory_list[i].blocks << ", " << memory_list[i].free << ", " << memory_list[i].minimum << ", " << memory_list[i].size;
+            ++i;
+        }
+
+        emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+    }
+
     else
     {
         qDebug() << "Unsupported command received";
@@ -304,6 +462,11 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
     else if (command == COMMAND_TASK_STATS && mode == MODE_TASK_STATS)
+    {
+        //TODO
+        emit status(smp_user_data, STATUS_ERROR, nullptr);
+    }
+    else if (command == COMMAND_MEMORY_POOL && mode == MODE_MEMORY_POOL)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
@@ -364,6 +527,21 @@ bool smp_group_os_mgmt::start_task_stats()
     tmp_message->end_message();
 
     mode = MODE_TASK_STATS;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_os_mgmt::start_memory_pool()
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_MEMORY_POOL);
+    tmp_message->end_message();
+
+    mode = MODE_MEMORY_POOL;
 
     //	    qDebug() << "len: " << message.length();
 
