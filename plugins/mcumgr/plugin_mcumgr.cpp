@@ -1371,14 +1371,26 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     my_img->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false));
                     qDebug() << "do upload of " << upload_hash;
                 }
+                else
+                {
+                    edit_IMG_Log->appendPlainText("Finished");
+                }
             }
             else if (user_data == ACTION_IMG_UPLOAD_SET)
             {
-/*                if (check_IMG_Reset->isChecked())
+                if (check_IMG_Reset->isChecked())
                 {
                     //Reboot device
                     finished = false;
-                }*/
+
+                    my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_UPLOAD_RESET);
+                    my_os->start_reset(false);
+                    qDebug() << "do reset";
+                }
+                else
+                {
+                    edit_IMG_Log->appendPlainText("Finished and marked as test/confirm");
+                }
             }
             else if (user_data == ACTION_IMG_IMAGE_LIST)
             {
@@ -1400,6 +1412,10 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             if (user_data == ACTION_OS_ECHO)
             {
                 edit_OS_Echo_Output->appendPlainText(error_string);
+            }
+            else if (user_data == ACTION_OS_UPLOAD_RESET)
+            {
+                edit_IMG_Log->appendPlainText("Finished and reset");
             }
         }
     }

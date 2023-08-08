@@ -640,7 +640,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
     }
     else if (group != SMP_GROUP_ID_IMG)
     {
-        qDebug() << "Unexpected group, not 1";
+        qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_IMG;
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
     else
@@ -680,8 +680,9 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
         {
                 //Response to set image state
                 //            message.remove(0, 8);
-                QCborStreamReader cbor_reader(data);
-                bool good = parse_state_response(cbor_reader, "");
+//TODO:
+                //QCborStreamReader cbor_reader(data);
+                //bool good = parse_state_response(cbor_reader, "");
                 //		    qDebug() << "Got " << good << ", " << rc;
 
                 //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
@@ -824,6 +825,8 @@ bool smp_group_img_mgmt::start_image_get(QList<image_state_t> *images)
 
 bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm)
 {
+    host_images = nullptr;
+
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, COMMAND_STATE);
 

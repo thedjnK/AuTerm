@@ -535,7 +535,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
     }
     else if (group != SMP_GROUP_ID_OS)
     {
-        qDebug() << "Unexpected group, not 1";
+        qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_OS;
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
     else
