@@ -366,6 +366,79 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
     return true;
 }
 
+bool smp_group_os_mgmt::parse_os_application_info_response(QCborStreamReader &reader, QString *response)
+{
+    QString key = "";
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        bool keyset = false;
+        //	    qDebug() << "Key: " << key;
+        //	    qDebug() << "Type: " << reader.type();
+        switch (reader.type())
+        {
+            case QCborStreamReader::String:
+            {
+                QString data;
+                auto r = reader.readString();
+
+                while (r.status == QCborStreamReader::Ok)
+                {
+                    data.append(r.data);
+                    r = reader.readString();
+                }
+
+                if (r.status == QCborStreamReader::Error)
+                {
+                    data.clear();
+                    qDebug("Error decoding string");
+                }
+                else
+                {
+                    if (key.isEmpty())
+                    {
+                        key = data;
+                        keyset = true;
+                    }
+                    else if (key == "output")
+                    {
+                        *response = data;
+                    }
+                }
+
+                break;
+            }
+
+            case QCborStreamReader::Array:
+            case QCborStreamReader::Map:
+            {
+                reader.enterContainer();
+                while (reader.lastError() == QCborError::NoError && reader.hasNext())
+                {
+                    parse_os_application_info_response(reader, response);
+                }
+                if (reader.lastError() == QCborError::NoError)
+                {
+                    reader.leaveContainer();
+                }
+                break;
+            }
+
+            default:
+            {
+                reader.next();
+            }
+        }
+
+        if (keyset == false && !key.isEmpty())
+        {
+            key = "";
+        }
+    }
+
+    return true;
+}
+
 void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data)
 {
     qDebug() << "Got ok: " << version << ", " << op << ", " << group << ", "  << command << ", " << data;
@@ -444,6 +517,24 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
         emit status(smp_user_data, STATUS_COMPLETE, nullptr);
     }
+    else if (mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
+    {
+        if (version != smp_version)
+        {
+            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
+            smp_version = version;
+            //TODO: raise warning
+        }
+
+        //Response to set image state
+        QCborStreamReader cbor_reader(data);
+        QString response;
+        bool good = parse_os_application_info_response(cbor_reader, &response);
+
+        qDebug() << response;
+
+        emit status(smp_user_data, STATUS_COMPLETE, response);
+    }
 
     else
     {
@@ -467,6 +558,11 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
     else if (command == COMMAND_MEMORY_POOL && mode == MODE_MEMORY_POOL)
+    {
+        //TODO
+        emit status(smp_user_data, STATUS_ERROR, nullptr);
+    }
+    else if (command == COMMAND_OS_APPLICATION_INFO && mode == MODE_OS_APPLICATION_INFO)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
@@ -542,6 +638,26 @@ bool smp_group_os_mgmt::start_memory_pool()
     tmp_message->end_message();
 
     mode = MODE_MEMORY_POOL;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_os_mgmt::start_os_application_info(QString format)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_OS_APPLICATION_INFO);
+    if (format.isEmpty() == false)
+    {
+        tmp_message->writer()->append("format");
+        tmp_message->writer()->append(format);
+    }
+    tmp_message->end_message();
+
+    mode = MODE_OS_APPLICATION_INFO;
 
     //	    qDebug() << "len: " << message.length();
 

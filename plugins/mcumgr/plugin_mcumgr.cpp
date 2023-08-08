@@ -419,11 +419,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_13->addWidget(label_17, 0, 0, 1, 1);
 
-    edit_OS_UNam = new QLineEdit(tab_OS_Info);
-    edit_OS_UNam->setObjectName(QString::fromUtf8("edit_OS_UNam"));
-    edit_OS_UNam->setReadOnly(true);
+    edit_OS_UName = new QLineEdit(tab_OS_Info);
+    edit_OS_UName->setObjectName(QString::fromUtf8("edit_OS_UName"));
 
-    gridLayout_13->addWidget(edit_OS_UNam, 0, 1, 1, 1);
+    gridLayout_13->addWidget(edit_OS_UName, 0, 1, 1, 1);
 
     horizontalLayout_10 = new QHBoxLayout();
     horizontalLayout_10->setSpacing(2);
@@ -1188,25 +1187,31 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     {
         emit plugin_set_status(true, false);
 
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_ECHO);
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_TASK_STATS);
         my_os->start_task_stats();
 
-        edit_OS_Echo_Output->appendPlainText("Infoing...");
+        edit_OS_Echo_Output->appendPlainText("Tasking...");
     }
     else if (selector_OS->currentWidget() == tab_OS_Memory)
     {
         emit plugin_set_status(true, false);
 
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_ECHO);
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_MEMORY_POOL);
         my_os->start_memory_pool();
 
-        edit_OS_Echo_Output->appendPlainText("Reset");
+        edit_OS_Echo_Output->appendPlainText("Memorying...");
     }
     else if (selector_OS->currentWidget() == tab_OS_Reset)
     {
     }
     else if (selector_OS->currentWidget() == tab_OS_Info)
     {
+        emit plugin_set_status(true, false);
+
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_OS_APPLICATION_INFO);
+        my_os->start_os_application_info(edit_OS_UName->text());
+
+        edit_OS_Echo_Output->appendPlainText("Infoing...");
     }
 }
 

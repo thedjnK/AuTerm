@@ -69,6 +69,10 @@ enum mcumgr_action_t {
     ACTION_IMG_IMAGE_ERASE,
 
     ACTION_OS_ECHO,
+    ACTION_OS_TASK_STATS,
+    ACTION_OS_MEMORY_POOL,
+    ACTION_OS_RESET,
+    ACTION_OS_OS_APPLICATION_INFO,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin
@@ -206,7 +210,7 @@ private:
     QWidget *tab_OS_Info;
     QGridLayout *gridLayout_13;
     QLabel *label_17;
-    QLineEdit *edit_OS_UNam;
+    QLineEdit *edit_OS_UName;
     QHBoxLayout *horizontalLayout_10;
     QRadioButton *radio_FS_Upload_2;
     QRadioButton *radio_FS_Download_2;
