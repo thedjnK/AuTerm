@@ -88,6 +88,7 @@ public:
 signals:
     void status(uint8_t user_data, group_status status, QString error_string);
     void progress(uint8_t user_data, uint8_t percent);
+    void version_error(uint8_t supported_version);
 
 protected:
     smp_processor *processor;

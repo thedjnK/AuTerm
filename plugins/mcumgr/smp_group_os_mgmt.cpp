@@ -533,127 +533,95 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         qDebug() << "Unexpected response, not busy";
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (group != 0)
+    else if (group != SMP_GROUP_ID_OS)
     {
         qDebug() << "Unexpected group, not 1";
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (mode == MODE_ECHO && command == COMMAND_ECHO)
-    {
-        if (version != smp_version)
-        {
-            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
-            smp_version = version;
-            //TODO: raise warning
-        }
-
-        //Response to set image state
-        QString response;
-        QCborStreamReader cbor_reader(data);
-        bool good = parse_echo_response(cbor_reader, &response);
-        emit status(smp_user_data, STATUS_COMPLETE, response);
-    }
-    else if (mode == MODE_TASK_STATS && command == COMMAND_TASK_STATS)
-    {
-        if (version != smp_version)
-        {
-            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
-            smp_version = version;
-            //TODO: raise warning
-        }
-
-        //Response to set image state
-        QCborStreamReader cbor_reader(data);
-        bool in_tasks = false;
-        QList<task_list_t> task_list;
-        task_list_t current_task;
-        bool good = parse_task_stats_response(cbor_reader, &in_tasks, &current_task, &task_list);
-
-        uint8_t i = 0;
-        while (i < task_list.length())
-        {
-            qDebug() << "Task #" << i << ": " << task_list[i].name << ", " << task_list[i].id << ", " << task_list[i].priority << ", " << task_list[i].state << ", " << task_list[i].context_switches << ", " << task_list[i].runtime << ", " << task_list[i].stack_size << ", " << task_list[i].stack_usage;
-            ++i;
-        }
-
-        emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-    }
-    else if (mode == MODE_MEMORY_POOL && command == COMMAND_MEMORY_POOL)
-    {
-        if (version != smp_version)
-        {
-            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
-            smp_version = version;
-            //TODO: raise warning
-        }
-
-        //Response to set image state
-        QCborStreamReader cbor_reader(data);
-        QList<memory_pool_t> memory_list;
-        memory_pool_t current_memory;
-        bool good = parse_memory_pool_response(cbor_reader, &current_memory, &memory_list);
-
-        uint8_t i = 0;
-        while (i < memory_list.length())
-        {
-            qDebug() << "Pool #" << i << ": " << memory_list[i].name << ", " << memory_list[i].blocks << ", " << memory_list[i].free << ", " << memory_list[i].minimum << ", " << memory_list[i].size;
-            ++i;
-        }
-
-        emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-    }
-    else if (mode == MODE_RESET && command == COMMAND_RESET)
-    {
-        if (version != smp_version)
-        {
-            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
-            smp_version = version;
-            //TODO: raise warning
-        }
-
-        //No need to check response, it would have returned success to come through this callback
-        emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-    }
-    else if (mode == MODE_MCUMGR_PARAMETERS && command == COMMAND_MCUMGR_PARAMETERS)
-    {
-        if (version != smp_version)
-        {
-            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
-            smp_version = version;
-            //TODO: raise warning
-        }
-
-        //Response to MCUmgr buffer parameters
-        QCborStreamReader cbor_reader(data);
-        uint32_t buffer_size;
-        uint32_t buffer_count;
-        bool good = parse_mcumgr_parameters_response(cbor_reader, &buffer_size, &buffer_count);
-
-        qDebug() << "buffer size: " << buffer_size << ", buffer count: " << buffer_count;
-
-        emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-    }
-    else if (mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
-    {
-        if (version != smp_version)
-        {
-            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
-            smp_version = version;
-            //TODO: raise warning
-        }
-
-        //Response to OS/application info
-        QCborStreamReader cbor_reader(data);
-        QString response;
-        bool good = parse_os_application_info_response(cbor_reader, &response);
-
-        qDebug() << response;
-
-        emit status(smp_user_data, STATUS_COMPLETE, response);
-    }
     else
     {
-        qDebug() << "Unsupported command received";
+        if (version != smp_version)
+        {
+            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
+            smp_version = version;
+            emit version_error(version);
+        }
+
+        if (mode == MODE_ECHO && command == COMMAND_ECHO)
+        {
+            //Response to set image state
+            QString response;
+            QCborStreamReader cbor_reader(data);
+            bool good = parse_echo_response(cbor_reader, &response);
+            emit status(smp_user_data, STATUS_COMPLETE, response);
+        }
+        else if (mode == MODE_TASK_STATS && command == COMMAND_TASK_STATS)
+        {
+            //Response to set image state
+            QCborStreamReader cbor_reader(data);
+            bool in_tasks = false;
+            QList<task_list_t> task_list;
+            task_list_t current_task;
+            bool good = parse_task_stats_response(cbor_reader, &in_tasks, &current_task, &task_list);
+
+            uint8_t i = 0;
+            while (i < task_list.length())
+            {
+                qDebug() << "Task #" << i << ": " << task_list[i].name << ", " << task_list[i].id << ", " << task_list[i].priority << ", " << task_list[i].state << ", " << task_list[i].context_switches << ", " << task_list[i].runtime << ", " << task_list[i].stack_size << ", " << task_list[i].stack_usage;
+                ++i;
+            }
+
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
+        else if (mode == MODE_MEMORY_POOL && command == COMMAND_MEMORY_POOL)
+        {
+            //Response to set image state
+            QCborStreamReader cbor_reader(data);
+            QList<memory_pool_t> memory_list;
+            memory_pool_t current_memory;
+            bool good = parse_memory_pool_response(cbor_reader, &current_memory, &memory_list);
+
+            uint8_t i = 0;
+            while (i < memory_list.length())
+            {
+                qDebug() << "Pool #" << i << ": " << memory_list[i].name << ", " << memory_list[i].blocks << ", " << memory_list[i].free << ", " << memory_list[i].minimum << ", " << memory_list[i].size;
+                ++i;
+            }
+
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
+        else if (mode == MODE_RESET && command == COMMAND_RESET)
+        {
+            //No need to check response, it would have returned success to come through this callback
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
+        else if (mode == MODE_MCUMGR_PARAMETERS && command == COMMAND_MCUMGR_PARAMETERS)
+        {
+            //Response to MCUmgr buffer parameters
+            QCborStreamReader cbor_reader(data);
+            uint32_t buffer_size;
+            uint32_t buffer_count;
+            bool good = parse_mcumgr_parameters_response(cbor_reader, &buffer_size, &buffer_count);
+
+            qDebug() << "buffer size: " << buffer_size << ", buffer count: " << buffer_count;
+
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
+        else if (mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
+        {
+            //Response to OS/application info
+            QCborStreamReader cbor_reader(data);
+            QString response;
+            bool good = parse_os_application_info_response(cbor_reader, &response);
+
+            qDebug() << response;
+
+            emit status(smp_user_data, STATUS_COMPLETE, response);
+        }
+        else
+        {
+            qDebug() << "Unsupported command received";
+        }
     }
 }
 

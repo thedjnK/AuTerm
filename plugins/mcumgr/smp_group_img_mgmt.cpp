@@ -638,76 +638,80 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
         qDebug() << "Unexpected response, not busy";
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (group != 1)
+    else if (group != SMP_GROUP_ID_IMG)
     {
         qDebug() << "Unexpected group, not 1";
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
+    else
     {
         if (version != smp_version)
         {
             //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
             smp_version = version;
-//TODO: raise warning
+            emit version_error(version);
         }
-#if 0
-        if (command == 0x00)
+
+        else if (mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
         {
-            //Response to set image state
-            int32_t rc = -1;
-            QCborStreamReader cbor_reader(*data);
-            bool good = parse_state_response(cbor_reader, &rc, "");
-            //		    qDebug() << "Got " << good << ", " << rc;
+#if 0
+            if (command == 0x00)
+            {
+                //Response to set image state
+                int32_t rc = -1;
+                QCborStreamReader cbor_reader(*data);
+                bool good = parse_state_response(cbor_reader, &rc, "");
+                //		    qDebug() << "Got " << good << ", " << rc;
 
-            //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
-            lbl_IMG_Status->setText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
+                //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
+                lbl_IMG_Status->setText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
 
-            file_upload_in_progress = false;
-            this->upload_tmr.invalidate();
-            this->upload_hash.clear();
-            this->file_upload_area = 0;
-            emit plugin_set_status(false, false);
+                file_upload_in_progress = false;
+                this->upload_tmr.invalidate();
+                this->upload_hash.clear();
+                this->file_upload_area = 0;
+                emit plugin_set_status(false, false);
+            }
+#endif
+            file_upload(&data);
+        }
+#if 1
+        else if (mode == MODE_SET_IMAGE && command == COMMAND_STATE)
+        {
+                //Response to set image state
+                //            message.remove(0, 8);
+                QCborStreamReader cbor_reader(data);
+                bool good = parse_state_response(cbor_reader, "");
+                //		    qDebug() << "Got " << good << ", " << rc;
+
+                //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
+                //lbl_IMG_Status->setText("Finished.");
+
+                //file_list_in_progress = false;
+                //emit plugin_set_status(false, false);
+                emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
 #endif
-        file_upload(&data);
-    }
-#if 1
-    else if (mode == MODE_SET_IMAGE && command == COMMAND_STATE)
-    {
-            //Response to set image state
-            //            message.remove(0, 8);
-            QCborStreamReader cbor_reader(data);
-            bool good = parse_state_response(cbor_reader, "");
-            //		    qDebug() << "Got " << good << ", " << rc;
-
-            //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
-            //lbl_IMG_Status->setText("Finished.");
-
-            //file_list_in_progress = false;
-            //emit plugin_set_status(false, false);
-            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-    }
-#endif
-    else if (mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
-    {
+        else if (mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
+        {
 //TODO:
-            //Response to set image state
-            //            message.remove(0, 8);
-            QCborStreamReader cbor_reader(data);
-            bool good = parse_state_response(cbor_reader, "");
-            //		    qDebug() << "Got " << good << ", " << rc;
+                //Response to set image state
+                //            message.remove(0, 8);
+                QCborStreamReader cbor_reader(data);
+                bool good = parse_state_response(cbor_reader, "");
+                //		    qDebug() << "Got " << good << ", " << rc;
 
-            //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
-            //lbl_IMG_Status->setText("Finished.");
+                //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
+                //lbl_IMG_Status->setText("Finished.");
 
-            //file_list_in_progress = false;
-            //emit plugin_set_status(false, false);
-            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-    }
-    else
-    {
-        qDebug() << "Unsupported command received";
+                //file_list_in_progress = false;
+                //emit plugin_set_status(false, false);
+                emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
+        else
+        {
+            qDebug() << "Unsupported command received";
+        }
     }
 }
 
