@@ -719,6 +719,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     check_V2_Protocol = new QCheckBox(horizontalLayoutWidget);
     check_V2_Protocol->setObjectName(QString::fromUtf8("check_V2_Protocol"));
+    check_V2_Protocol->setChecked(true);
 
     horizontalLayout_7->addWidget(check_V2_Protocol);
 
