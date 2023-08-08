@@ -1212,12 +1212,26 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     }
     else if (selector_OS->currentWidget() == tab_OS_Info)
     {
-        emit plugin_set_status(true, false);
+        if (radio_FS_Download_2->isChecked())
+        {
+            //uname
+            emit plugin_set_status(true, false);
 
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_OS_APPLICATION_INFO);
-        my_os->start_os_application_info(edit_OS_UName->text());
+            my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_OS_APPLICATION_INFO);
+            my_os->start_os_application_info(edit_OS_UName->text());
 
-        edit_OS_Echo_Output->appendPlainText("Infoing...");
+            edit_OS_Echo_Output->appendPlainText("Infoing...");
+        }
+        else
+        {
+            //Buffer details
+            emit plugin_set_status(true, false);
+
+            my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_MCUMGR_BUFFER);
+            my_os->start_mcumgr_parameters();
+
+            edit_OS_Echo_Output->appendPlainText("Buffering...");
+        }
     }
 }
 

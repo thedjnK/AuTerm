@@ -366,6 +366,91 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
     return true;
 }
 
+bool smp_group_os_mgmt::parse_mcumgr_parameters_response(QCborStreamReader &reader, uint32_t *buffer_size, uint32_t *buffer_count)
+{
+    QString key = "";
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        bool keyset = false;
+        //	    qDebug() << "Key: " << key;
+        //	    qDebug() << "Type: " << reader.type();
+        switch (reader.type())
+        {
+            case QCborStreamReader::UnsignedInteger:
+            {
+                uint32_t buffer_value = (uint32_t)reader.toUnsignedInteger();
+
+                if (key == "buf_size")
+                {
+                    *buffer_size = buffer_value;
+                }
+                else if (key == "buf_count")
+                {
+                    *buffer_count = buffer_value;
+                }
+
+                reader.next();
+                break;
+            }
+            case QCborStreamReader::String:
+            {
+                QString data;
+                auto r = reader.readString();
+
+                while (r.status == QCborStreamReader::Ok)
+                {
+                    data.append(r.data);
+                    r = reader.readString();
+                }
+
+                if (r.status == QCborStreamReader::Error)
+                {
+                    data.clear();
+                    qDebug("Error decoding string");
+                }
+                else
+                {
+                    if (key.isEmpty())
+                    {
+                        key = data;
+                        keyset = true;
+                    }
+                }
+
+                break;
+            }
+
+            case QCborStreamReader::Array:
+            case QCborStreamReader::Map:
+            {
+                reader.enterContainer();
+                while (reader.lastError() == QCborError::NoError && reader.hasNext())
+                {
+                    parse_mcumgr_parameters_response(reader, buffer_size, buffer_count);
+                }
+                if (reader.lastError() == QCborError::NoError)
+                {
+                    reader.leaveContainer();
+                }
+                break;
+            }
+
+            default:
+            {
+                reader.next();
+            }
+        }
+
+        if (keyset == false && !key.isEmpty())
+        {
+            key = "";
+        }
+    }
+
+    return true;
+}
+
 bool smp_group_os_mgmt::parse_os_application_info_response(QCborStreamReader &reader, QString *response)
 {
     QString key = "";
@@ -517,24 +602,6 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
         emit status(smp_user_data, STATUS_COMPLETE, nullptr);
     }
-    else if (mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
-    {
-        if (version != smp_version)
-        {
-            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
-            smp_version = version;
-            //TODO: raise warning
-        }
-
-        //Response to set image state
-        QCborStreamReader cbor_reader(data);
-        QString response;
-        bool good = parse_os_application_info_response(cbor_reader, &response);
-
-        qDebug() << response;
-
-        emit status(smp_user_data, STATUS_COMPLETE, response);
-    }
     else if (mode == MODE_RESET && command == COMMAND_RESET)
     {
         if (version != smp_version)
@@ -546,6 +613,43 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
         //No need to check response, it would have returned success to come through this callback
         emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+    }
+    else if (mode == MODE_MCUMGR_PARAMETERS && command == COMMAND_MCUMGR_PARAMETERS)
+    {
+        if (version != smp_version)
+        {
+            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
+            smp_version = version;
+            //TODO: raise warning
+        }
+
+        //Response to MCUmgr buffer parameters
+        QCborStreamReader cbor_reader(data);
+        uint32_t buffer_size;
+        uint32_t buffer_count;
+        bool good = parse_mcumgr_parameters_response(cbor_reader, &buffer_size, &buffer_count);
+
+        qDebug() << "buffer size: " << buffer_size << ", buffer count: " << buffer_count;
+
+        emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+    }
+    else if (mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
+    {
+        if (version != smp_version)
+        {
+            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
+            smp_version = version;
+            //TODO: raise warning
+        }
+
+        //Response to OS/application info
+        QCborStreamReader cbor_reader(data);
+        QString response;
+        bool good = parse_os_application_info_response(cbor_reader, &response);
+
+        qDebug() << response;
+
+        emit status(smp_user_data, STATUS_COMPLETE, response);
     }
     else
     {
@@ -573,12 +677,17 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (command == COMMAND_OS_APPLICATION_INFO && mode == MODE_OS_APPLICATION_INFO)
+    else if (command == COMMAND_RESET && mode == MODE_RESET)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    else if (command == COMMAND_RESET && mode == MODE_RESET)
+    else if (command == COMMAND_MCUMGR_PARAMETERS && mode == MODE_MCUMGR_PARAMETERS)
+    {
+        //TODO
+        emit status(smp_user_data, STATUS_ERROR, nullptr);
+    }
+    else if (command == COMMAND_OS_APPLICATION_INFO && mode == MODE_OS_APPLICATION_INFO)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
@@ -662,26 +771,6 @@ bool smp_group_os_mgmt::start_memory_pool()
     return true;
 }
 
-bool smp_group_os_mgmt::start_os_application_info(QString format)
-{
-    smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_OS_APPLICATION_INFO);
-    if (format.isEmpty() == false)
-    {
-        tmp_message->writer()->append("format");
-        tmp_message->writer()->append(format);
-    }
-    tmp_message->end_message();
-
-    mode = MODE_OS_APPLICATION_INFO;
-
-    //	    qDebug() << "len: " << message.length();
-
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
-
-    return true;
-}
-
 bool smp_group_os_mgmt::start_reset(bool force)
 {
     smp_message *tmp_message = new smp_message();
@@ -694,6 +783,41 @@ bool smp_group_os_mgmt::start_reset(bool force)
     tmp_message->end_message();
 
     mode = MODE_RESET;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_os_mgmt::start_mcumgr_parameters()
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_MCUMGR_PARAMETERS);
+    tmp_message->end_message();
+
+    mode = MODE_MCUMGR_PARAMETERS;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_os_mgmt::start_os_application_info(QString format)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_OS_APPLICATION_INFO);
+    if (format.isEmpty() == false)
+    {
+        tmp_message->writer()->append("format");
+        tmp_message->writer()->append(format);
+    }
+    tmp_message->end_message();
+
+    mode = MODE_OS_APPLICATION_INFO;
 
     //	    qDebug() << "len: " << message.length();
 

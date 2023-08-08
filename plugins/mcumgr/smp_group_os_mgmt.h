@@ -62,12 +62,12 @@ public:
     bool start_echo(QString data);
     bool start_task_stats();
     bool start_memory_pool();
-    bool start_os_application_info(QString format);
     bool start_reset(bool force);
+    bool start_mcumgr_parameters();
+    bool start_os_application_info(QString format);
     /*
     bool start_date_time_get();
     bool start_date_time_set();
-    bool start_mcumgr_parameters();
     */
     static bool error_lookup(int32_t rc, QString *error);
 
@@ -75,10 +75,10 @@ private:
     bool parse_echo_response(QCborStreamReader &reader, QString *response);
     bool parse_task_stats_response(QCborStreamReader &reader, bool *in_tasks, task_list_t *current_task, QList<task_list_t> *task_array);
     bool parse_memory_pool_response(QCborStreamReader &reader, memory_pool_t *current_memory, QList<memory_pool_t> *memory_array);
+    bool parse_mcumgr_parameters_response(QCborStreamReader &reader, uint32_t *buffer_size, uint32_t *buffer_count);
     bool parse_os_application_info_response(QCborStreamReader &reader, QString *response);
     /*
     bool parse_date_time_response(QCborStreamReader &reader, );
-    bool parse_mcumgr_parameters_response(QCborStreamReader &reader, );
     */
 
     QString mode_to_string(uint8_t mode);
