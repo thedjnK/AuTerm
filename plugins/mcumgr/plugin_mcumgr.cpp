@@ -1203,6 +1203,12 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     }
     else if (selector_OS->currentWidget() == tab_OS_Reset)
     {
+        emit plugin_set_status(true, false);
+
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_RESET);
+        my_os->start_reset(check_OS_Force_Reboot->isChecked());
+
+        edit_OS_Echo_Output->appendPlainText("Resetting...");
     }
     else if (selector_OS->currentWidget() == tab_OS_Info)
     {

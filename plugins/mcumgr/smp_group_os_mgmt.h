@@ -63,6 +63,7 @@ public:
     bool start_task_stats();
     bool start_memory_pool();
     bool start_os_application_info(QString format);
+    bool start_reset(bool force);
     /*
     bool start_date_time_get();
     bool start_date_time_set();

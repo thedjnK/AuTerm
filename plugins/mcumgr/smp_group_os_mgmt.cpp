@@ -535,7 +535,18 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
         emit status(smp_user_data, STATUS_COMPLETE, response);
     }
+    else if (mode == MODE_RESET && command == COMMAND_RESET)
+    {
+        if (version != smp_version)
+        {
+            //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
+            smp_version = version;
+            //TODO: raise warning
+        }
 
+        //No need to check response, it would have returned success to come through this callback
+        emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+    }
     else
     {
         qDebug() << "Unsupported command received";
@@ -563,6 +574,11 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
     else if (command == COMMAND_OS_APPLICATION_INFO && mode == MODE_OS_APPLICATION_INFO)
+    {
+        //TODO
+        emit status(smp_user_data, STATUS_ERROR, nullptr);
+    }
+    else if (command == COMMAND_RESET && mode == MODE_RESET)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
@@ -658,6 +674,26 @@ bool smp_group_os_mgmt::start_os_application_info(QString format)
     tmp_message->end_message();
 
     mode = MODE_OS_APPLICATION_INFO;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_os_mgmt::start_reset(bool force)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_RESET);
+    if (force == true)
+    {
+        tmp_message->writer()->append("force");
+        tmp_message->writer()->append(true);
+    }
+    tmp_message->end_message();
+
+    mode = MODE_RESET;
 
     //	    qDebug() << "len: " << message.length();
 
