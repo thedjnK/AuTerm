@@ -38,6 +38,7 @@
 #include "smp_group.h"
 
 //Form includes
+///AUTOGEN_START_INCLUDES
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
@@ -60,6 +61,7 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+///AUTOGEN_END_INCLUDES
 
 enum mcumgr_action_t {
     ACTION_IMG_UPLOAD,
@@ -132,6 +134,7 @@ private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
 
     //Form items
+///AUTOGEN_START_OBJECTS
 //    QGridLayout *gridLayout;
 //    QTabWidget *tabWidget;
     QWidget *tab;
@@ -274,6 +277,7 @@ private:
     QSpinBox *edit_MTU;
     QCheckBox *check_V2_Protocol;
     QSpacerItem *horizontalSpacer_6;
+///AUTOGEN_END_OBJECTS
 
     //
     QByteArray file_upload_data;

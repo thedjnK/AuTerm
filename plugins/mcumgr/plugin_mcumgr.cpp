@@ -60,9 +60,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTabWidget *tabWidget_orig = parent_window->findChild<QTabWidget *>("selector_Tab");
 //    QPushButton *other = main_window->findChild<QPushButton *>("btn_TermClose");
 
-//    gridLayout = new QGridLayout();
+///AUTOGEN_START_INIT
+//    gridLayout = new QGridLayout(Form);
 //    gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-//    tabWidget = new QTabWidget(tabWidget_orig);
+//    tabWidget = new QTabWidget(Form);
 //    tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
     tab = new QWidget(tabWidget_orig);
     tab->setObjectName(QString::fromUtf8("tab"));
@@ -626,10 +627,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_2->addTab(tab_Shell, QString());
     verticalLayoutWidget = new QWidget();
-//    verticalLayoutWidget = new QWidget(tab);
     verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
     verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
-//    verticalLayoutWidget->setGeometry(QRect(410, 20, 229, 182));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
     verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -746,11 +745,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_2->setCurrentIndex(2);
     tabWidget_3->setCurrentIndex(0);
     selector_OS->setCurrentIndex(1);
-
-
-//    QMetaObject::connectSlotsByName(Form);
+///AUTOGEN_END_INIT
 
     //retranslate code
+///AUTOGEN_START_TRANSLATE
 //    Form->setWindowTitle(QCoreApplication::translate("Form", "Form", nullptr));
     lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
@@ -821,11 +819,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label->setText(QCoreApplication::translate("Form", "MTU:", nullptr));
     check_V2_Protocol->setText(QCoreApplication::translate("Form", "v2 protocol", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
+///AUTOGEN_END_TRANSLATE
 
     //Add code
     tabWidget_orig->addTab(tab, QString("MCUmgr"));
-
-    //QMetaObject::connectSlotsByName(Form);
 
 //Signals
     connect(uart, SIGNAL(serial_write(QByteArray*)), parent_window, SLOT(plugin_serial_transmit(QByteArray*)));
