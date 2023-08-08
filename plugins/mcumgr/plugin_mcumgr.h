@@ -136,7 +136,7 @@ private:
 //    QTabWidget *tabWidget;
     QWidget *tab;
     QTabWidget *tabWidget_2;
-    QWidget *tab_2;
+    QWidget *tab_FS;
     QGridLayout *gridLayout_2;
     QLabel *lbl_FS_Status;
     QLabel *label_2;
@@ -204,6 +204,8 @@ private:
     QLabel *label_11;
     QPlainTextEdit *edit_OS_Echo_Output;
     QWidget *tab_OS_Tasks;
+    QGridLayout *gridLayout_14;
+    QTableWidget *table_OS_Tasks;
     QWidget *tab_OS_Memory;
     QWidget *tab_OS_Reset;
     QGridLayout *gridLayout_12;
@@ -214,8 +216,8 @@ private:
     QLabel *label_17;
     QLineEdit *edit_OS_UName;
     QHBoxLayout *horizontalLayout_10;
-    QRadioButton *radio_FS_Upload_2;
-    QRadioButton *radio_FS_Download_2;
+    QRadioButton *radio_OS_Buffer_Info;
+    QRadioButton *radio_OS_uname;
     QLabel *label_18;
     QPlainTextEdit *edit_OS_Info_Output;
     QHBoxLayout *horizontalLayout_13;
@@ -237,7 +239,7 @@ private:
     QSpacerItem *horizontalSpacer_19;
     QPushButton *btn_STAT_Go;
     QSpacerItem *horizontalSpacer_20;
-    QWidget *tab_6;
+    QWidget *tab_Shell;
     QGridLayout *gridLayout_9;
     QVBoxLayout *verticalLayout_3;
     QToolButton *btn_SHELL_Clear;

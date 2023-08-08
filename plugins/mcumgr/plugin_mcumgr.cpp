@@ -68,53 +68,53 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab->setObjectName(QString::fromUtf8("tab"));
     tabWidget_2 = new QTabWidget(tab);
     tabWidget_2->setObjectName(QString::fromUtf8("tabWidget_2"));
-    tabWidget_2->setGeometry(QRect(10, 40, 380, 281));
+    tabWidget_2->setGeometry(QRect(10, 40, 401, 291));
     tabWidget_2->setTabPosition(QTabWidget::West);
-    tab_2 = new QWidget();
-    tab_2->setObjectName(QString::fromUtf8("tab_2"));
-    gridLayout_2 = new QGridLayout(tab_2);
+    tab_FS = new QWidget();
+    tab_FS->setObjectName(QString::fromUtf8("tab_FS"));
+    gridLayout_2 = new QGridLayout(tab_FS);
     gridLayout_2->setSpacing(2);
     gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
     gridLayout_2->setContentsMargins(6, 6, 6, 6);
-    lbl_FS_Status = new QLabel(tab_2);
+    lbl_FS_Status = new QLabel(tab_FS);
     lbl_FS_Status->setObjectName(QString::fromUtf8("lbl_FS_Status"));
 
     gridLayout_2->addWidget(lbl_FS_Status, 4, 0, 1, 2);
 
-    label_2 = new QLabel(tab_2);
+    label_2 = new QLabel(tab_FS);
     label_2->setObjectName(QString::fromUtf8("label_2"));
 
     gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
 
-    progress_FS_Complete = new QProgressBar(tab_2);
+    progress_FS_Complete = new QProgressBar(tab_FS);
     progress_FS_Complete->setObjectName(QString::fromUtf8("progress_FS_Complete"));
     progress_FS_Complete->setValue(0);
 
     gridLayout_2->addWidget(progress_FS_Complete, 3, 0, 1, 3);
 
-    edit_FS_Log = new QPlainTextEdit(tab_2);
+    edit_FS_Log = new QPlainTextEdit(tab_FS);
     edit_FS_Log->setObjectName(QString::fromUtf8("edit_FS_Log"));
     edit_FS_Log->setUndoRedoEnabled(false);
     edit_FS_Log->setReadOnly(true);
 
     gridLayout_2->addWidget(edit_FS_Log, 7, 0, 1, 3);
 
-    edit_FS_Remote = new QLineEdit(tab_2);
+    edit_FS_Remote = new QLineEdit(tab_FS);
     edit_FS_Remote->setObjectName(QString::fromUtf8("edit_FS_Remote"));
 
     gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
 
-    btn_FS_Local = new QToolButton(tab_2);
+    btn_FS_Local = new QToolButton(tab_FS);
     btn_FS_Local->setObjectName(QString::fromUtf8("btn_FS_Local"));
 
     gridLayout_2->addWidget(btn_FS_Local, 0, 2, 1, 1);
 
-    edit_FS_Local = new QLineEdit(tab_2);
+    edit_FS_Local = new QLineEdit(tab_FS);
     edit_FS_Local->setObjectName(QString::fromUtf8("edit_FS_Local"));
 
     gridLayout_2->addWidget(edit_FS_Local, 0, 1, 1, 1);
 
-    label_3 = new QLabel(tab_2);
+    label_3 = new QLabel(tab_FS);
     label_3->setObjectName(QString::fromUtf8("label_3"));
 
     gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
@@ -122,23 +122,23 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setSpacing(2);
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-    radio_FS_Upload = new QRadioButton(tab_2);
+    radio_FS_Upload = new QRadioButton(tab_FS);
     radio_FS_Upload->setObjectName(QString::fromUtf8("radio_FS_Upload"));
     radio_FS_Upload->setChecked(true);
 
     horizontalLayout->addWidget(radio_FS_Upload);
 
-    radio_FS_Download = new QRadioButton(tab_2);
+    radio_FS_Download = new QRadioButton(tab_FS);
     radio_FS_Download->setObjectName(QString::fromUtf8("radio_FS_Download"));
 
     horizontalLayout->addWidget(radio_FS_Download);
 
-    radio_FS_Size = new QRadioButton(tab_2);
+    radio_FS_Size = new QRadioButton(tab_FS);
     radio_FS_Size->setObjectName(QString::fromUtf8("radio_FS_Size"));
 
     horizontalLayout->addWidget(radio_FS_Size);
 
-    radio_FS_HashChecksum = new QRadioButton(tab_2);
+    radio_FS_HashChecksum = new QRadioButton(tab_FS);
     radio_FS_HashChecksum->setObjectName(QString::fromUtf8("radio_FS_HashChecksum"));
 
     horizontalLayout->addWidget(radio_FS_HashChecksum);
@@ -154,7 +154,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_2->addItem(horizontalSpacer);
 
-    btn_FS_Go = new QPushButton(tab_2);
+    btn_FS_Go = new QPushButton(tab_FS);
     btn_FS_Go->setObjectName(QString::fromUtf8("btn_FS_Go"));
 
     horizontalLayout_2->addWidget(btn_FS_Go);
@@ -166,7 +166,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_2->addLayout(horizontalLayout_2, 5, 0, 1, 3);
 
-    tabWidget_2->addTab(tab_2, QString());
+    tabWidget_2->addTab(tab_FS, QString());
     tab_IMG_Images_2 = new QWidget();
     tab_IMG_Images_2->setObjectName(QString::fromUtf8("tab_IMG_Images_2"));
     gridLayout_3 = new QGridLayout(tab_IMG_Images_2);
@@ -391,6 +391,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     selector_OS->addTab(tab_OS_Echo, QString());
     tab_OS_Tasks = new QWidget();
     tab_OS_Tasks->setObjectName(QString::fromUtf8("tab_OS_Tasks"));
+    gridLayout_14 = new QGridLayout(tab_OS_Tasks);
+    gridLayout_14->setObjectName(QString::fromUtf8("gridLayout_14"));
+    table_OS_Tasks = new QTableWidget(tab_OS_Tasks);
+    table_OS_Tasks->setObjectName(QString::fromUtf8("table_OS_Tasks"));
+
+    gridLayout_14->addWidget(table_OS_Tasks, 0, 0, 1, 1);
+
     selector_OS->addTab(tab_OS_Tasks, QString());
     tab_OS_Memory = new QWidget();
     tab_OS_Memory->setObjectName(QString::fromUtf8("tab_OS_Memory"));
@@ -421,22 +428,23 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     edit_OS_UName = new QLineEdit(tab_OS_Info);
     edit_OS_UName->setObjectName(QString::fromUtf8("edit_OS_UName"));
+    edit_OS_UName->setReadOnly(false);
 
     gridLayout_13->addWidget(edit_OS_UName, 0, 1, 1, 1);
 
     horizontalLayout_10 = new QHBoxLayout();
     horizontalLayout_10->setSpacing(2);
     horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
-    radio_FS_Upload_2 = new QRadioButton(tab_OS_Info);
-    radio_FS_Upload_2->setObjectName(QString::fromUtf8("radio_FS_Upload_2"));
-    radio_FS_Upload_2->setChecked(true);
+    radio_OS_Buffer_Info = new QRadioButton(tab_OS_Info);
+    radio_OS_Buffer_Info->setObjectName(QString::fromUtf8("radio_OS_Buffer_Info"));
+    radio_OS_Buffer_Info->setChecked(true);
 
-    horizontalLayout_10->addWidget(radio_FS_Upload_2);
+    horizontalLayout_10->addWidget(radio_OS_Buffer_Info);
 
-    radio_FS_Download_2 = new QRadioButton(tab_OS_Info);
-    radio_FS_Download_2->setObjectName(QString::fromUtf8("radio_FS_Download_2"));
+    radio_OS_uname = new QRadioButton(tab_OS_Info);
+    radio_OS_uname->setObjectName(QString::fromUtf8("radio_OS_uname"));
 
-    horizontalLayout_10->addWidget(radio_FS_Download_2);
+    horizontalLayout_10->addWidget(radio_OS_uname);
 
 
     gridLayout_13->addLayout(horizontalLayout_10, 1, 0, 1, 2);
@@ -549,19 +557,19 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_11->addLayout(horizontalLayout_14, 4, 0, 1, 2);
 
     tabWidget_2->addTab(tab_5, QString());
-    tab_6 = new QWidget();
-    tab_6->setObjectName(QString::fromUtf8("tab_6"));
-    gridLayout_9 = new QGridLayout(tab_6);
+    tab_Shell = new QWidget();
+    tab_Shell->setObjectName(QString::fromUtf8("tab_Shell"));
+    gridLayout_9 = new QGridLayout(tab_Shell);
     gridLayout_9->setSpacing(2);
     gridLayout_9->setObjectName(QString::fromUtf8("gridLayout_9"));
     verticalLayout_3 = new QVBoxLayout();
     verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
-    btn_SHELL_Clear = new QToolButton(tab_6);
+    btn_SHELL_Clear = new QToolButton(tab_Shell);
     btn_SHELL_Clear->setObjectName(QString::fromUtf8("btn_SHELL_Clear"));
 
     verticalLayout_3->addWidget(btn_SHELL_Clear);
 
-    btn_SHELL_Copy = new QToolButton(tab_6);
+    btn_SHELL_Copy = new QToolButton(tab_Shell);
     btn_SHELL_Copy->setObjectName(QString::fromUtf8("btn_SHELL_Copy"));
 
     verticalLayout_3->addWidget(btn_SHELL_Copy);
@@ -569,24 +577,24 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_9->addLayout(verticalLayout_3, 1, 2, 1, 1);
 
-    lbl_SHELL_Status = new QLabel(tab_6);
+    lbl_SHELL_Status = new QLabel(tab_Shell);
     lbl_SHELL_Status->setObjectName(QString::fromUtf8("lbl_SHELL_Status"));
 
     gridLayout_9->addWidget(lbl_SHELL_Status, 2, 0, 1, 3);
 
-    edit_SHELL_Output = new QPlainTextEdit(tab_6);
+    edit_SHELL_Output = new QPlainTextEdit(tab_Shell);
     edit_SHELL_Output->setObjectName(QString::fromUtf8("edit_SHELL_Output"));
     edit_SHELL_Output->setUndoRedoEnabled(false);
     edit_SHELL_Output->setReadOnly(true);
 
     gridLayout_9->addWidget(edit_SHELL_Output, 1, 1, 1, 1);
 
-    edit_SHELL_Input = new QLineEdit(tab_6);
+    edit_SHELL_Input = new QLineEdit(tab_Shell);
     edit_SHELL_Input->setObjectName(QString::fromUtf8("edit_SHELL_Input"));
 
     gridLayout_9->addWidget(edit_SHELL_Input, 0, 1, 1, 2);
 
-    label_12 = new QLabel(tab_6);
+    label_12 = new QLabel(tab_Shell);
     label_12->setObjectName(QString::fromUtf8("label_12"));
 
     gridLayout_9->addWidget(label_12, 0, 0, 1, 1);
@@ -599,7 +607,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_8->addItem(horizontalSpacer_7);
 
-    btn_SHELL_Go = new QPushButton(tab_6);
+    btn_SHELL_Go = new QPushButton(tab_Shell);
     btn_SHELL_Go->setObjectName(QString::fromUtf8("btn_SHELL_Go"));
 
     horizontalLayout_8->addWidget(btn_SHELL_Go);
@@ -611,17 +619,17 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_9->addLayout(horizontalLayout_8, 3, 0, 1, 3);
 
-    label_13 = new QLabel(tab_6);
+    label_13 = new QLabel(tab_Shell);
     label_13->setObjectName(QString::fromUtf8("label_13"));
 
     gridLayout_9->addWidget(label_13, 1, 0, 1, 1);
 
-    tabWidget_2->addTab(tab_6, QString());
-//    verticalLayoutWidget = new QWidget(tab);
+    tabWidget_2->addTab(tab_Shell, QString());
     verticalLayoutWidget = new QWidget();
+//    verticalLayoutWidget = new QWidget(tab);
     verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-//    verticalLayoutWidget->setGeometry(QRect(410, 20, 229, 182));
     verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
+//    verticalLayoutWidget->setGeometry(QRect(410, 20, 229, 182));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
     verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -735,9 +743,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(1);
+    tabWidget_2->setCurrentIndex(2);
     tabWidget_3->setCurrentIndex(0);
-    selector_OS->setCurrentIndex(2);
+    selector_OS->setCurrentIndex(1);
+
 
 //    QMetaObject::connectSlotsByName(Form);
 
@@ -752,7 +761,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_FS_Size->setText(QCoreApplication::translate("Form", "Size", nullptr));
     radio_FS_HashChecksum->setText(QCoreApplication::translate("Form", "Hash/checksum", nullptr));
     btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_2), QCoreApplication::translate("Form", "FS", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
     btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
@@ -775,13 +784,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_10->setText(QCoreApplication::translate("Form", "Input:", nullptr));
     label_11->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Echo), QCoreApplication::translate("Form", "Echo", nullptr));
-    selector_OS->setTabText(selector_OS->indexOf(tab_OS_Tasks), QCoreApplication::translate("Form", "Stats", nullptr));
+    selector_OS->setTabText(selector_OS->indexOf(tab_OS_Tasks), QCoreApplication::translate("Form", "Tasks", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Memory), QCoreApplication::translate("Form", "Memory", nullptr));
     check_OS_Force_Reboot->setText(QCoreApplication::translate("Form", "Force reboot", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Reset), QCoreApplication::translate("Form", "Reset", nullptr));
     label_17->setText(QCoreApplication::translate("Form", "uname:", nullptr));
-    radio_FS_Upload_2->setText(QCoreApplication::translate("Form", "Buffer info", nullptr));
-    radio_FS_Download_2->setText(QCoreApplication::translate("Form", "uname", nullptr));
+    radio_OS_Buffer_Info->setText(QCoreApplication::translate("Form", "Buffer info", nullptr));
+    radio_OS_uname->setText(QCoreApplication::translate("Form", "uname", nullptr));
     label_18->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Info), QCoreApplication::translate("Form", "Info", nullptr));
     btn_OS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
@@ -800,7 +809,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_12->setText(QCoreApplication::translate("Form", "Input:", nullptr));
     btn_SHELL_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_6), QCoreApplication::translate("Form", "Shell", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
     check_IMG_Preview_Confirmed->setText(QCoreApplication::translate("Form", "Confirmed", nullptr));
@@ -1213,7 +1222,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     }
     else if (selector_OS->currentWidget() == tab_OS_Info)
     {
-        if (radio_FS_Download_2->isChecked())
+        if (radio_OS_uname->isChecked())
         {
             //uname
             emit plugin_set_status(true, false);
