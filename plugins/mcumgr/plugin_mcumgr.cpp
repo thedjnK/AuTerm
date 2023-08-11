@@ -436,6 +436,26 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     selector_OS->addTab(tab_OS_Tasks, QString());
     tab_OS_Memory = new QWidget();
     tab_OS_Memory->setObjectName(QString::fromUtf8("tab_OS_Memory"));
+    table_OS_Memory = new QTableWidget(tab_OS_Memory);
+    if (table_OS_Memory->columnCount() < 4)
+        table_OS_Memory->setColumnCount(4);
+    QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
+    table_OS_Memory->setHorizontalHeaderItem(0, __qtablewidgetitem8);
+    QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
+    table_OS_Memory->setHorizontalHeaderItem(1, __qtablewidgetitem9);
+    QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
+    table_OS_Memory->setHorizontalHeaderItem(2, __qtablewidgetitem10);
+    QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
+    table_OS_Memory->setHorizontalHeaderItem(3, __qtablewidgetitem11);
+    table_OS_Memory->setObjectName(QString::fromUtf8("table_OS_Memory"));
+    table_OS_Memory->setGeometry(QRect(10, 10, 330, 172));
+    table_OS_Memory->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_OS_Memory->setProperty("showDropIndicator", QVariant(false));
+    table_OS_Memory->setDragDropOverwriteMode(false);
+    table_OS_Memory->setAlternatingRowColors(true);
+    table_OS_Memory->setSelectionMode(QAbstractItemView::NoSelection);
+    table_OS_Memory->setSortingEnabled(true);
+    table_OS_Memory->setCornerButtonEnabled(false);
     selector_OS->addTab(tab_OS_Memory, QString());
     tab_OS_Reset = new QWidget();
     tab_OS_Reset->setObjectName(QString::fromUtf8("tab_OS_Reset"));
@@ -778,7 +798,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    tabWidget->setCurrentIndex(0);
     tabWidget_2->setCurrentIndex(2);
     tabWidget_3->setCurrentIndex(1);
-    selector_OS->setCurrentIndex(1);
+    selector_OS->setCurrentIndex(2);
 ///AUTOGEN_END_INIT
 
     //retranslate code
@@ -834,6 +854,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *___qtablewidgetitem7 = table_OS_Tasks->horizontalHeaderItem(7);
     ___qtablewidgetitem7->setText(QCoreApplication::translate("Form", "Stack usage", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Tasks), QCoreApplication::translate("Form", "Tasks", nullptr));
+    QTableWidgetItem *___qtablewidgetitem8 = table_OS_Memory->horizontalHeaderItem(0);
+    ___qtablewidgetitem8->setText(QCoreApplication::translate("Form", "Name", nullptr));
+    QTableWidgetItem *___qtablewidgetitem9 = table_OS_Memory->horizontalHeaderItem(1);
+    ___qtablewidgetitem9->setText(QCoreApplication::translate("Form", "Size", nullptr));
+    QTableWidgetItem *___qtablewidgetitem10 = table_OS_Memory->horizontalHeaderItem(2);
+    ___qtablewidgetitem10->setText(QCoreApplication::translate("Form", "Free", nullptr));
+    QTableWidgetItem *___qtablewidgetitem11 = table_OS_Memory->horizontalHeaderItem(3);
+    ___qtablewidgetitem11->setText(QCoreApplication::translate("Form", "Minimum", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Memory), QCoreApplication::translate("Form", "Memory", nullptr));
     check_OS_Force_Reboot->setText(QCoreApplication::translate("Form", "Force reboot", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Reset), QCoreApplication::translate("Form", "Reset", nullptr));
@@ -1592,6 +1620,48 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             else if (user_data == ACTION_OS_UPLOAD_RESET)
             {
                 edit_IMG_Log->appendPlainText("Finished and reset");
+            }
+            else if (user_data == ACTION_OS_MEMORY_POOL)
+            {
+                uint16_t i = 0;
+                uint16_t l = table_OS_Memory->rowCount();
+
+                table_OS_Memory->setSortingEnabled(false);
+
+                while (i < memory_list.length())
+                {
+                    if (i >= l)
+                    {
+                        table_OS_Memory->insertRow(i);
+
+                        QTableWidgetItem *row_name = new QTableWidgetItem(memory_list[i].name);
+                        QTableWidgetItem *row_size = new QTableWidgetItem(QString::number(memory_list[i].blocks * memory_list[i].size));
+                        QTableWidgetItem *row_free = new QTableWidgetItem(QString::number(memory_list[i].free * memory_list[i].size));
+                        QTableWidgetItem *row_minimum = new QTableWidgetItem(QString::number(memory_list[i].minimum * memory_list[i].size));
+
+                        table_OS_Memory->setItem(i, 0, row_name);
+                        table_OS_Memory->setItem(i, 1, row_size);
+                        table_OS_Memory->setItem(i, 2, row_free);
+                        table_OS_Memory->setItem(i, 3, row_minimum);
+                    }
+                    else
+                    {
+                        table_OS_Memory->item(i, 0)->setText(memory_list[i].name);
+                        table_OS_Memory->item(i, 1)->setText(QString::number(memory_list[i].blocks * memory_list[i].size));
+                        table_OS_Memory->item(i, 2)->setText(QString::number(memory_list[i].free * memory_list[i].size));
+                        table_OS_Memory->item(i, 3)->setText(QString::number(memory_list[i].minimum * memory_list[i].size));
+                    }
+
+                    ++i;
+                }
+
+                while (i < l)
+                {
+                    table_OS_Memory->removeRow((table_OS_Memory->rowCount() - 1));
+                    ++i;
+                }
+
+                table_OS_Memory->setSortingEnabled(true);
             }
             else if (user_data == ACTION_OS_TASK_STATS)
             {

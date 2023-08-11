@@ -282,6 +282,7 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
         switch (reader.type())
         {
             case QCborStreamReader::NegativeInteger:
+            case QCborStreamReader::UnsignedInteger:
             {
                 int64_t task_value = reader.toInteger();
 
@@ -579,16 +580,8 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         {
             //Response to set image state
             QCborStreamReader cbor_reader(data);
-            QList<memory_pool_t> memory_list;
             memory_pool_t current_memory;
-            bool good = parse_memory_pool_response(cbor_reader, &current_memory, &memory_list);
-
-            uint8_t i = 0;
-            while (i < memory_list.length())
-            {
-                qDebug() << "Pool #" << i << ": " << memory_list[i].name << ", " << memory_list[i].blocks << ", " << memory_list[i].free << ", " << memory_list[i].minimum << ", " << memory_list[i].size;
-                ++i;
-            }
+            bool good = parse_memory_pool_response(cbor_reader, &current_memory, memory_list);
 
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }

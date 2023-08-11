@@ -220,6 +220,7 @@ private:
     QGridLayout *gridLayout_14;
     QTableWidget *table_OS_Tasks;
     QWidget *tab_OS_Memory;
+    QTableWidget *table_OS_Memory;
     QWidget *tab_OS_Reset;
     QGridLayout *gridLayout_12;
     QCheckBox *check_OS_Force_Reboot;
