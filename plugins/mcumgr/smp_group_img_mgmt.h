@@ -68,7 +68,7 @@ public:
     void timeout(smp_message *message);
     void cancel();
     bool start_image_get(QList<image_state_t> *images);
-    bool start_image_set(QByteArray *hash, bool confirm);
+    bool start_image_set(QByteArray *hash, bool confirm, QList<image_state_t> *images);
     bool start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash);
     bool start_image_erase(uint8_t slot);
     static bool error_lookup(int32_t rc, QString *error);

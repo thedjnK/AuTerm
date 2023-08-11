@@ -45,6 +45,7 @@
 #include <QtWidgets/QColumnView>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFormLayout>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -191,7 +192,9 @@ private:
     QHBoxLayout *horizontalLayout_6;
     QLabel *label_5;
     QRadioButton *radio_IMG_Get;
-    QRadioButton *radio_ING_Set;
+    QRadioButton *radio_IMG_Set;
+    QFrame *line;
+    QCheckBox *check_IMG_Confirm;
     QSpacerItem *horizontalSpacer_5;
     QWidget *tab_IMG_Erase;
     QGridLayout *gridLayout_10;
@@ -284,6 +287,10 @@ private:
     //
     QByteArray upload_hash;
     mcumgr_action_t mode;
+    int parent_row;
+    int parent_column;
+    int child_row;
+    int child_column;
 };
 
 #endif // PLUGIN_MCUMGR_H

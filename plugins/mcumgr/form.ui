@@ -36,7 +36,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_FS">
         <attribute name="title">
@@ -275,7 +275,7 @@
          <item row="0" column="0">
           <widget class="QTabWidget" name="tabWidget_3">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="tab_IMG_Upload">
             <attribute name="title">
@@ -424,6 +424,9 @@
              </item>
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <property name="spacing">
+                <number>2</number>
+               </property>
                <item>
                 <widget class="QLabel" name="label_5">
                  <property name="text">
@@ -442,9 +445,23 @@
                 </widget>
                </item>
                <item>
-                <widget class="QRadioButton" name="radio_ING_Set">
+                <widget class="QRadioButton" name="radio_IMG_Set">
                  <property name="text">
                   <string>Set</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="check_IMG_Confirm">
+                 <property name="text">
+                  <string>Confirm</string>
                  </property>
                 </widget>
                </item>

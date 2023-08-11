@@ -365,7 +365,6 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
                 if (key == "hash")
                 {
                     slot_state_buffer.hash = data;
-                    emit plugin_to_hex(&slot_state_buffer.hash);
                 }
 
                 break;
@@ -427,7 +426,7 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
                     {
                         image_state_t *image_state_ptr = nullptr;
 
-                        if (host_images->length() > 0)
+                        if (host_images != nullptr && host_images->length() > 0)
                         {
                             uint8_t i = 0;
                             while (i < host_images->length())
@@ -442,7 +441,7 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
                             }
                         }
 
-                        if (image_state_ptr == nullptr)
+                        if (host_images != nullptr && image_state_ptr == nullptr)
                         {
                             if (image_state_buffer.image_set == true)
                             {
@@ -685,16 +684,21 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
                 //Response to set image state
                 //            message.remove(0, 8);
 //TODO:
-                //QCborStreamReader cbor_reader(data);
-                //bool good = parse_state_response(cbor_reader, "");
-                //		    qDebug() << "Got " << good << ", " << rc;
+            if (host_images != nullptr)
+            {
+                host_images->clear();
+            }
 
-                //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
-                //lbl_IMG_Status->setText("Finished.");
+            QCborStreamReader cbor_reader(data);
+            bool good = parse_state_response(cbor_reader, "");
+            //		    qDebug() << "Got " << good << ", " << rc;
 
-                //file_list_in_progress = false;
-                //emit plugin_set_status(false, false);
-                emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+            //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
+            //lbl_IMG_Status->setText("Finished.");
+
+            //file_list_in_progress = false;
+            //emit plugin_set_status(false, false);
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
 #endif
         else if (mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
@@ -827,9 +831,9 @@ bool smp_group_img_mgmt::start_image_get(QList<image_state_t> *images)
     return true;
 }
 
-bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm)
+bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm, QList<image_state_t> *images)
 {
-    host_images = nullptr;
+    host_images = images;
 
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, COMMAND_STATE);

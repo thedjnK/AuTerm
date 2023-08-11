@@ -52,6 +52,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     processor = new smp_processor(this, uart);
     mode = ACTION_IDLE;
 
+    parent_row = -1;
+    parent_column = -1;
+    child_row = -1;
+    child_column = -1;
+
     parent_window = main_window;
     QTabWidget *tabWidget_orig = parent_window->findChild<QTabWidget *>("selector_Tab");
 //    QPushButton *other = main_window->findChild<QPushButton *>("btn_TermClose");
@@ -298,6 +303,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_5->addWidget(colview_IMG_Images, 0, 0, 1, 1);
 
     horizontalLayout_6 = new QHBoxLayout();
+    horizontalLayout_6->setSpacing(2);
     horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
     label_5 = new QLabel(tab_IMG_Images);
     label_5->setObjectName(QString::fromUtf8("label_5"));
@@ -310,10 +316,22 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_6->addWidget(radio_IMG_Get);
 
-    radio_ING_Set = new QRadioButton(tab_IMG_Images);
-    radio_ING_Set->setObjectName(QString::fromUtf8("radio_ING_Set"));
+    radio_IMG_Set = new QRadioButton(tab_IMG_Images);
+    radio_IMG_Set->setObjectName(QString::fromUtf8("radio_IMG_Set"));
 
-    horizontalLayout_6->addWidget(radio_ING_Set);
+    horizontalLayout_6->addWidget(radio_IMG_Set);
+
+    line = new QFrame(tab_IMG_Images);
+    line->setObjectName(QString::fromUtf8("line"));
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Sunken);
+
+    horizontalLayout_6->addWidget(line);
+
+    check_IMG_Confirm = new QCheckBox(tab_IMG_Images);
+    check_IMG_Confirm->setObjectName(QString::fromUtf8("check_IMG_Confirm"));
+
+    horizontalLayout_6->addWidget(check_IMG_Confirm);
 
     horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -738,8 +756,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(2);
-    tabWidget_3->setCurrentIndex(0);
+    tabWidget_2->setCurrentIndex(1);
+    tabWidget_3->setCurrentIndex(1);
     selector_OS->setCurrentIndex(1);
 ///AUTOGEN_END_INIT
 
@@ -770,7 +788,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Upload), QCoreApplication::translate("Form", "Upload", nullptr));
     label_5->setText(QCoreApplication::translate("Form", "State:", nullptr));
     radio_IMG_Get->setText(QCoreApplication::translate("Form", "Get", nullptr));
-    radio_ING_Set->setText(QCoreApplication::translate("Form", "Set", nullptr));
+    radio_IMG_Set->setText(QCoreApplication::translate("Form", "Set", nullptr));
+    check_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
@@ -1164,15 +1183,71 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         //Image list
         emit plugin_set_status(true, false);
 
-        colview_IMG_Images->previewWidget()->hide();
-        model_image_state.clear();
-        blaharray.clear();
-        mode = ACTION_IMG_IMAGE_LIST;
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_img->start_image_get(&blaharray);
+        if (radio_IMG_Get->isChecked())
+        {
+            colview_IMG_Images->previewWidget()->hide();
+            model_image_state.clear();
+            blaharray.clear();
+            mode = ACTION_IMG_IMAGE_LIST;
+            my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            my_img->start_image_get(&blaharray);
 
-        progress_IMG_Complete->setValue(0);
-        lbl_IMG_Status->setText("Querying...");
+            progress_IMG_Complete->setValue(0);
+            lbl_IMG_Status->setText("Querying...");
+        }
+        else
+        {
+            if (colview_IMG_Images->currentIndex().isValid() && colview_IMG_Images->currentIndex().parent().isValid())
+            {
+                uint8_t i = 0;
+                uint8_t l = 0;
+                bool found = false;
+
+                while (i < blaharray.length())
+                {
+                    if (blaharray[i].item == model_image_state.itemFromIndex(colview_IMG_Images->currentIndex())->parent())
+                    {
+                        l = 0;
+                        while (l < blaharray[i].slot_list.length())
+                        {
+                            if (model_image_state.itemFromIndex(colview_IMG_Images->currentIndex()) == blaharray[i].slot_list[l].item)
+                            {
+                                found = true;
+                                goto finished;
+                            }
+
+                            ++l;
+                        }
+                    }
+
+                    ++i;
+                }
+
+finished:
+                if (found == true)
+                {
+                    mode = ACTION_IMG_IMAGE_SET;
+                    my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+
+                    parent_row = colview_IMG_Images->currentIndex().parent().row();
+                    parent_column = colview_IMG_Images->currentIndex().parent().column();
+                    child_row = colview_IMG_Images->currentIndex().row();
+                    child_column = colview_IMG_Images->currentIndex().column();
+                    my_img->start_image_set(&blaharray[i].slot_list[l].hash, check_IMG_Confirm->isChecked(), &blaharray);
+
+                    progress_IMG_Complete->setValue(0);
+                    lbl_IMG_Status->setText("Setting...");
+                }
+                else
+                {
+                    lbl_IMG_Status->setText("Could not find item bounds");
+                }
+            }
+            else
+            {
+                lbl_IMG_Status->setText("Invalid selection");
+            }
+        }
     }
     else if (tabWidget_3->currentWidget() == tab_IMG_Erase)
     {
@@ -1339,7 +1414,9 @@ void plugin_mcumgr::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex 
             {
                 if (model_image_state.itemFromIndex(index) == blaharray[i].slot_list[l].item)
                 {
-                    edit_IMG_Preview_Hash->setText(blaharray[i].slot_list[l].hash);
+                    QByteArray escaped_hash = blaharray[i].slot_list[l].hash;
+                    emit plugin_to_hex(&escaped_hash);
+                    edit_IMG_Preview_Hash->setText(escaped_hash);
                     edit_IMG_Preview_Version->setText(blaharray[i].slot_list[l].version);
                     check_IMG_Preview_Active->setChecked(blaharray[i].slot_list[l].active);
                     check_IMG_Preview_Bootable->setChecked(blaharray[i].slot_list[l].bootable);
@@ -1397,7 +1474,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
                     mode = ACTION_IMG_UPLOAD_SET;
                     my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-                    my_img->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false));
+                    my_img->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false), nullptr);
                     qDebug() << "do upload of " << upload_hash;
                 }
                 else
@@ -1429,6 +1506,39 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 {
                     model_image_state.appendRow(blaharray[i].item);
                     ++i;
+                }
+            }
+            else if (user_data == ACTION_IMG_IMAGE_SET)
+            {
+                if (parent_row != -1 && parent_column != -1 && child_row != -1 && child_column != -1)
+                {
+                    uint8_t i = 0;
+
+                    model_image_state.clear();
+
+                    while (i < blaharray.length())
+                    {
+                        model_image_state.appendRow(blaharray[i].item);
+                        ++i;
+                    }
+
+                    if (model_image_state.hasIndex(parent_row, parent_column) == true && model_image_state.index(parent_row, parent_column).child(child_row, child_column).isValid() == true)
+                    {
+                        colview_IMG_Images->setCurrentIndex(model_image_state.index(parent_row, parent_column).child(child_row, child_column));
+                    }
+                    else
+                    {
+                        colview_IMG_Images->previewWidget()->hide();
+                    }
+
+                    parent_row = -1;
+                    parent_column = -1;
+                    child_row = -1;
+                    child_column = -1;
+                }
+                else
+                {
+                    colview_IMG_Images->previewWidget()->hide();
                 }
             }
         }
