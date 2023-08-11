@@ -1,6 +1,8 @@
 <?PHP
 //Copyright (C) 2023 Jamie M.
 //Take built ui form file and split into .h and .cpp file for AuTerm plugins
+
+//File (including path) to generated ui_form.h file
 $File = 'ui_form.h';
 
 //Text to find, text to add/replace, 0 = replace | 1 = prepend (start of line) | 2 = append (to next line)
