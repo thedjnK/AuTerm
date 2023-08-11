@@ -24,11 +24,6 @@
 #include "plugin_mcumgr.h"
 #include <QDebug>
 #include <QFileDialog>
-#include "smp_uart.h"
-#include "smp_processor.h"
-#include "smp_group_img_mgmt.h"
-#include "smp_group_os_mgmt.h"
-#include "smp_error.h"
 
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -409,7 +404,32 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_14 = new QGridLayout(tab_OS_Tasks);
     gridLayout_14->setObjectName(QString::fromUtf8("gridLayout_14"));
     table_OS_Tasks = new QTableWidget(tab_OS_Tasks);
+    if (table_OS_Tasks->columnCount() < 8)
+        table_OS_Tasks->setColumnCount(8);
+    QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
+    table_OS_Tasks->setHorizontalHeaderItem(0, __qtablewidgetitem);
+    QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
+    table_OS_Tasks->setHorizontalHeaderItem(1, __qtablewidgetitem1);
+    QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
+    table_OS_Tasks->setHorizontalHeaderItem(2, __qtablewidgetitem2);
+    QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
+    table_OS_Tasks->setHorizontalHeaderItem(3, __qtablewidgetitem3);
+    QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
+    table_OS_Tasks->setHorizontalHeaderItem(4, __qtablewidgetitem4);
+    QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
+    table_OS_Tasks->setHorizontalHeaderItem(5, __qtablewidgetitem5);
+    QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
+    table_OS_Tasks->setHorizontalHeaderItem(6, __qtablewidgetitem6);
+    QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
+    table_OS_Tasks->setHorizontalHeaderItem(7, __qtablewidgetitem7);
     table_OS_Tasks->setObjectName(QString::fromUtf8("table_OS_Tasks"));
+    table_OS_Tasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_OS_Tasks->setProperty("showDropIndicator", QVariant(false));
+    table_OS_Tasks->setDragDropOverwriteMode(false);
+    table_OS_Tasks->setAlternatingRowColors(true);
+    table_OS_Tasks->setSelectionMode(QAbstractItemView::NoSelection);
+    table_OS_Tasks->setSortingEnabled(true);
+    table_OS_Tasks->setCornerButtonEnabled(false);
 
     gridLayout_14->addWidget(table_OS_Tasks, 0, 0, 1, 1);
 
@@ -756,7 +776,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(1);
+    tabWidget_2->setCurrentIndex(2);
     tabWidget_3->setCurrentIndex(1);
     selector_OS->setCurrentIndex(1);
 ///AUTOGEN_END_INIT
@@ -797,6 +817,22 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_10->setText(QCoreApplication::translate("Form", "Input:", nullptr));
     label_11->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Echo), QCoreApplication::translate("Form", "Echo", nullptr));
+    QTableWidgetItem *___qtablewidgetitem = table_OS_Tasks->horizontalHeaderItem(0);
+    ___qtablewidgetitem->setText(QCoreApplication::translate("Form", "Task", nullptr));
+    QTableWidgetItem *___qtablewidgetitem1 = table_OS_Tasks->horizontalHeaderItem(1);
+    ___qtablewidgetitem1->setText(QCoreApplication::translate("Form", "ID", nullptr));
+    QTableWidgetItem *___qtablewidgetitem2 = table_OS_Tasks->horizontalHeaderItem(2);
+    ___qtablewidgetitem2->setText(QCoreApplication::translate("Form", "Priority", nullptr));
+    QTableWidgetItem *___qtablewidgetitem3 = table_OS_Tasks->horizontalHeaderItem(3);
+    ___qtablewidgetitem3->setText(QCoreApplication::translate("Form", "State", nullptr));
+    QTableWidgetItem *___qtablewidgetitem4 = table_OS_Tasks->horizontalHeaderItem(4);
+    ___qtablewidgetitem4->setText(QCoreApplication::translate("Form", "Context Switches", nullptr));
+    QTableWidgetItem *___qtablewidgetitem5 = table_OS_Tasks->horizontalHeaderItem(5);
+    ___qtablewidgetitem5->setText(QCoreApplication::translate("Form", "Runtime", nullptr));
+    QTableWidgetItem *___qtablewidgetitem6 = table_OS_Tasks->horizontalHeaderItem(6);
+    ___qtablewidgetitem6->setText(QCoreApplication::translate("Form", "Stack size", nullptr));
+    QTableWidgetItem *___qtablewidgetitem7 = table_OS_Tasks->horizontalHeaderItem(7);
+    ___qtablewidgetitem7->setText(QCoreApplication::translate("Form", "Stack usage", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Tasks), QCoreApplication::translate("Form", "Tasks", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Memory), QCoreApplication::translate("Form", "Memory", nullptr));
     check_OS_Force_Reboot->setText(QCoreApplication::translate("Form", "Force reboot", nullptr));
@@ -1288,7 +1324,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 
         mode = ACTION_OS_TASK_STATS;
         my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_os->start_task_stats();
+        my_os->start_task_stats(&task_list);
 
         edit_OS_Echo_Output->appendPlainText("Tasking...");
     }
@@ -1298,7 +1334,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 
         mode = ACTION_OS_MEMORY_POOL;
         my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_os->start_memory_pool();
+        my_os->start_memory_pool(&memory_list);
 
         edit_OS_Echo_Output->appendPlainText("Memorying...");
     }
@@ -1556,6 +1592,60 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             else if (user_data == ACTION_OS_UPLOAD_RESET)
             {
                 edit_IMG_Log->appendPlainText("Finished and reset");
+            }
+            else if (user_data == ACTION_OS_TASK_STATS)
+            {
+                uint16_t i = 0;
+                uint16_t l = table_OS_Tasks->rowCount();
+
+                table_OS_Tasks->setSortingEnabled(false);
+
+                while (i < task_list.length())
+                {
+                    if (i >= l)
+                    {
+                        table_OS_Tasks->insertRow(i);
+
+                        QTableWidgetItem *row_name = new QTableWidgetItem(task_list[i].name);
+                        QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(task_list[i].id));
+                        QTableWidgetItem *row_priority = new QTableWidgetItem(QString::number(task_list[i].priority));
+                        QTableWidgetItem *row_state = new QTableWidgetItem(QString::number(task_list[i].state));
+                        QTableWidgetItem *row_context_switches = new QTableWidgetItem(QString::number(task_list[i].context_switches));
+                        QTableWidgetItem *row_runtime = new QTableWidgetItem(QString::number(task_list[i].runtime));
+                        QTableWidgetItem *row_stack_size = new QTableWidgetItem(QString::number(task_list[i].stack_size * 4));
+                        QTableWidgetItem *row_stack_usage = new QTableWidgetItem(QString::number(task_list[i].stack_usage * 4));
+
+                        table_OS_Tasks->setItem(i, 0, row_name);
+                        table_OS_Tasks->setItem(i, 1, row_id);
+                        table_OS_Tasks->setItem(i, 2, row_priority);
+                        table_OS_Tasks->setItem(i, 3, row_state);
+                        table_OS_Tasks->setItem(i, 4, row_context_switches);
+                        table_OS_Tasks->setItem(i, 5, row_runtime);
+                        table_OS_Tasks->setItem(i, 6, row_stack_size);
+                        table_OS_Tasks->setItem(i, 7, row_stack_usage);
+                    }
+                    else
+                    {
+                        table_OS_Tasks->item(i, 0)->setText(task_list[i].name);
+                        table_OS_Tasks->item(i, 1)->setText(QString::number(task_list[i].id));
+                        table_OS_Tasks->item(i, 2)->setText(QString::number(task_list[i].priority));
+                        table_OS_Tasks->item(i, 3)->setText(QString::number(task_list[i].state));
+                        table_OS_Tasks->item(i, 4)->setText(QString::number(task_list[i].context_switches));
+                        table_OS_Tasks->item(i, 5)->setText(QString::number(task_list[i].runtime));
+                        table_OS_Tasks->item(i, 6)->setText(QString::number(task_list[i].stack_size * sizeof(uint32_t)));
+                        table_OS_Tasks->item(i, 7)->setText(QString::number(task_list[i].stack_usage * sizeof(uint32_t)));
+                    }
+
+                    ++i;
+                }
+
+                while (i < l)
+                {
+                    table_OS_Tasks->removeRow((table_OS_Tasks->rowCount() - 1));
+                    ++i;
+                }
+
+                table_OS_Tasks->setSortingEnabled(true);
             }
         }
     }

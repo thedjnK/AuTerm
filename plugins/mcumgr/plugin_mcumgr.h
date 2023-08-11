@@ -37,6 +37,11 @@
 #include "smp_processor.h"
 #include "smp_group.h"
 
+#include "smp_uart.h"
+#include "smp_group_img_mgmt.h"
+#include "smp_group_os_mgmt.h"
+#include "smp_error.h"
+
 //Form includes
 ///AUTOGEN_START_INCLUDES
 #include <QtCore/QVariant>
@@ -291,6 +296,8 @@ private:
     int parent_column;
     int child_row;
     int child_column;
+    QList<task_list_t> task_list;
+    QList<memory_pool_t> memory_list;
 };
 
 #endif // PLUGIN_MCUMGR_H

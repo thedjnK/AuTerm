@@ -570,16 +570,8 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             //Response to set image state
             QCborStreamReader cbor_reader(data);
             bool in_tasks = false;
-            QList<task_list_t> task_list;
             task_list_t current_task;
-            bool good = parse_task_stats_response(cbor_reader, &in_tasks, &current_task, &task_list);
-
-            uint8_t i = 0;
-            while (i < task_list.length())
-            {
-                qDebug() << "Task #" << i << ": " << task_list[i].name << ", " << task_list[i].id << ", " << task_list[i].priority << ", " << task_list[i].state << ", " << task_list[i].context_switches << ", " << task_list[i].runtime << ", " << task_list[i].stack_size << ", " << task_list[i].stack_usage;
-                ++i;
-            }
+            bool good = parse_task_stats_response(cbor_reader, &in_tasks, &current_task, task_list);
 
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
@@ -719,12 +711,14 @@ bool smp_group_os_mgmt::start_echo(QString data)
     return true;
 }
 
-bool smp_group_os_mgmt::start_task_stats()
+bool smp_group_os_mgmt::start_task_stats(QList<task_list_t> *tasks)
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_TASK_STATS);
     tmp_message->end_message();
 
+    task_list = tasks;
+    tasks->clear();
     mode = MODE_TASK_STATS;
 
     //	    qDebug() << "len: " << message.length();
@@ -734,12 +728,14 @@ bool smp_group_os_mgmt::start_task_stats()
     return true;
 }
 
-bool smp_group_os_mgmt::start_memory_pool()
+bool smp_group_os_mgmt::start_memory_pool(QList<memory_pool_t> *memory)
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_MEMORY_POOL);
     tmp_message->end_message();
 
+    memory_list = memory;
+    memory->clear();
     mode = MODE_MEMORY_POOL;
 
     //	    qDebug() << "len: " << message.length();

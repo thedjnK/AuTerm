@@ -60,8 +60,8 @@ public:
     void timeout(smp_message *message);
     void cancel();
     bool start_echo(QString data);
-    bool start_task_stats();
-    bool start_memory_pool();
+    bool start_task_stats(QList<task_list_t> *tasks);
+    bool start_memory_pool(QList<memory_pool_t> *memory);
     bool start_reset(bool force);
     bool start_mcumgr_parameters();
     bool start_os_application_info(QString format);
@@ -86,6 +86,8 @@ private:
 
     //
     uint8_t mode;
+    QList<task_list_t> *task_list;
+    QList<memory_pool_t> *memory_list;
 };
 
 #endif // SMP_GROUP_OS_MGMT_H
