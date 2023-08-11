@@ -64,6 +64,8 @@
 ///AUTOGEN_END_INCLUDES
 
 enum mcumgr_action_t {
+    ACTION_IDLE,
+
     ACTION_IMG_UPLOAD,
     ACTION_IMG_UPLOAD_SET,
     ACTION_OS_UPLOAD_RESET,
@@ -280,14 +282,8 @@ private:
 ///AUTOGEN_END_OBJECTS
 
     //
-    QByteArray file_upload_data;
-    bool file_upload_in_progress;
-    bool file_list_in_progress;
-    uint32_t file_upload_area;
-    QElapsedTimer upload_tmr;
-    const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
     QByteArray upload_hash;
-    bool shell_in_progress;
+    mcumgr_action_t mode;
 };
 
 #endif // PLUGIN_MCUMGR_H

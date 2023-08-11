@@ -56,10 +56,17 @@ smp_group_os_mgmt::smp_group_os_mgmt(smp_processor *parent) : smp_group(parent, 
 bool smp_group_os_mgmt::parse_echo_response(QCborStreamReader &reader, QString *response)
 {
     QString key = "";
+    bool keyset = true;
 
     while (!reader.lastError() && reader.hasNext())
     {
-        bool keyset = false;
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
         //	    qDebug() << "Key: " << key;
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
@@ -115,11 +122,6 @@ bool smp_group_os_mgmt::parse_echo_response(QCborStreamReader &reader, QString *
                 reader.next();
             }
         }
-
-        if (keyset == false && !key.isEmpty())
-        {
-            key = "";
-        }
     }
 
     return true;
@@ -128,10 +130,17 @@ bool smp_group_os_mgmt::parse_echo_response(QCborStreamReader &reader, QString *
 bool smp_group_os_mgmt::parse_task_stats_response(QCborStreamReader &reader, bool *in_tasks, task_list_t *current_task, QList<task_list_t> *task_array)
 {
     QString key = "";
+    bool keyset = true;
 
     while (!reader.lastError() && reader.hasNext())
     {
-        bool keyset = false;
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
         //	    qDebug() << "Key: " << key;
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
@@ -249,11 +258,6 @@ bool smp_group_os_mgmt::parse_task_stats_response(QCborStreamReader &reader, boo
                 reader.next();
             }
         }
-
-        if (keyset == false && !key.isEmpty())
-        {
-            key = "";
-        }
     }
 
     return true;
@@ -262,10 +266,17 @@ bool smp_group_os_mgmt::parse_task_stats_response(QCborStreamReader &reader, boo
 bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, memory_pool_t *current_memory, QList<memory_pool_t> *memory_array)
 {
     QString key = "";
+    bool keyset = true;
 
     while (!reader.lastError() && reader.hasNext())
     {
-        bool keyset = false;
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
         //	    qDebug() << "Key: " << key;
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
@@ -356,11 +367,6 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
                 reader.next();
             }
         }
-
-        if (keyset == false && !key.isEmpty())
-        {
-            key = "";
-        }
     }
 
     return true;
@@ -369,10 +375,17 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
 bool smp_group_os_mgmt::parse_mcumgr_parameters_response(QCborStreamReader &reader, uint32_t *buffer_size, uint32_t *buffer_count)
 {
     QString key = "";
+    bool keyset = true;
 
     while (!reader.lastError() && reader.hasNext())
     {
-        bool keyset = false;
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
         //	    qDebug() << "Key: " << key;
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
@@ -441,11 +454,6 @@ bool smp_group_os_mgmt::parse_mcumgr_parameters_response(QCborStreamReader &read
                 reader.next();
             }
         }
-
-        if (keyset == false && !key.isEmpty())
-        {
-            key = "";
-        }
     }
 
     return true;
@@ -454,10 +462,17 @@ bool smp_group_os_mgmt::parse_mcumgr_parameters_response(QCborStreamReader &read
 bool smp_group_os_mgmt::parse_os_application_info_response(QCborStreamReader &reader, QString *response)
 {
     QString key = "";
+    bool keyset = true;
 
     while (!reader.lastError() && reader.hasNext())
     {
-        bool keyset = false;
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
         //	    qDebug() << "Key: " << key;
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
@@ -513,11 +528,6 @@ bool smp_group_os_mgmt::parse_os_application_info_response(QCborStreamReader &re
             {
                 reader.next();
             }
-        }
-
-        if (keyset == false && !key.isEmpty())
-        {
-            key = "";
         }
     }
 

@@ -52,6 +52,7 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repe
 
     last_message = message;
     last_message_header = message->get_header();
+
     //Set message sequence
     last_message_header->nh_seq = sequence;
     last_message_version_check = allow_version_check;
@@ -263,7 +264,7 @@ void smp_processor::message_received(smp_message *response)
 
         if (error.type != SMP_ERROR_NONE)
         {
-            //Received either "rc" (legacy) error or "ret" error
+            //Received either "rc" (legacy/SMP version 1) error or "err" error (SMP version 2)
             group_handlers[i].handler->receive_error(version, op, group, command, error);
         }
         else
@@ -277,10 +278,17 @@ void smp_processor::message_received(smp_message *response)
 bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, uint16_t level, QString *parent, smp_error_t *error)
 {
     QString key = "";
+    bool keyset = true;
 
     while (!reader.lastError() && reader.hasNext())
     {
-        bool keyset = false;
+        if (keyset == false && !key.isEmpty())
+        {
+            key = "";
+        }
+
+        keyset = false;
+
         switch (reader.type())
         {
             case QCborStreamReader::UnsignedInteger:
@@ -291,12 +299,12 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
                     error->rc = reader.toInteger();
                     error->type = SMP_ERROR_RC;
                 }
-                else if (key == "rc" && version == 1 && level == 2 && parent != nullptr && *parent == "ret")
+                else if (key == "rc" && version == 1 && level == 2 && parent != nullptr && *parent == "err")
                 {
                     error->rc = reader.toUnsignedInteger();
                     error->type = SMP_ERROR_RET;
                 }
-                else if (key == "group" && version == 1 && level == 2 && parent != nullptr && *parent == "ret")
+                else if (key == "group" && version == 1 && level == 2 && parent != nullptr && *parent == "err")
                 {
                     error->group = reader.toUnsignedInteger();
                     error->type = SMP_ERROR_RET;
@@ -348,11 +356,6 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
             {
                 reader.next();
                 break;
-            }
-
-            if (keyset == false && !key.isEmpty())
-            {
-                key = "";
             }
         }
     }

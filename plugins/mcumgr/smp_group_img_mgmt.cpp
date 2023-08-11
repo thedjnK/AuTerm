@@ -151,10 +151,17 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
 bool smp_group_img_mgmt::parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match)
 {
     QString key = "";
+    bool keyset = true;
 
     while (!reader.lastError() && reader.hasNext())
     {
-        bool keyset = false;
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
         //	    qDebug() << "Key: " << key;
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
@@ -251,11 +258,6 @@ bool smp_group_img_mgmt::parse_upload_response(QCborStreamReader &reader, int64_
                 reader.next();
             }
         }
-
-        if (keyset == false && !key.isEmpty())
-        {
-            key = "";
-        }
     }
 
     return true;
@@ -265,6 +267,7 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
 {
     QString array_name_dupe = array_name;
     QString key = "";
+    bool keyset = true;
 
     image_state_buffer.image = 0;
     image_state_buffer.image_set = false;
@@ -283,7 +286,13 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
 
     while (!reader.lastError() && reader.hasNext())
     {
-        bool keyset = false;
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
         //	    qDebug() << "Key: " << key;
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
@@ -460,11 +469,6 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
             {
                 reader.next();
             }
-        }
-
-        if (keyset == false && !key.isEmpty())
-        {
-            key = "";
         }
     }
 

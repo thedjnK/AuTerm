@@ -50,11 +50,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 {
     uart = new smp_uart(this);
     processor = new smp_processor(this, uart);
-
-    file_upload_in_progress = false;
-    file_list_in_progress = false;
-    file_upload_area = 0;
-    shell_in_progress = false;
+    mode = ACTION_IDLE;
 
     parent_window = main_window;
     QTabWidget *tabWidget_orig = parent_window->findChild<QTabWidget *>("selector_Tab");
@@ -1082,19 +1078,36 @@ void plugin_mcumgr::serial_opened()
 
 void plugin_mcumgr::serial_closed()
 {
-    if (file_upload_in_progress == true)
+    switch (mode)
     {
-        file_upload_data.clear();
-        file_upload_in_progress = false;
-        file_upload_area = 0;
-        upload_tmr.invalidate();
-        upload_hash.clear();
+        case ACTION_IMG_UPLOAD:
+        case ACTION_IMG_UPLOAD_SET:
+        case ACTION_IMG_IMAGE_LIST:
+        case ACTION_IMG_IMAGE_SET:
+        case ACTION_IMG_IMAGE_ERASE:
+        {
+            my_img->cancel();
+            break;
+        }
+
+        case ACTION_OS_UPLOAD_RESET:
+        case ACTION_OS_ECHO:
+        case ACTION_OS_TASK_STATS:
+        case ACTION_OS_MEMORY_POOL:
+        case ACTION_OS_RESET:
+        case ACTION_OS_MCUMGR_BUFFER:
+        case ACTION_OS_OS_APPLICATION_INFO:
+        {
+            my_os->cancel();
+            break;
+        }
+
+        default:
+        {
+        }
     }
 
-    if (file_list_in_progress == true)
-    {
-        file_list_in_progress = false;
-    }
+    mode = ACTION_IDLE;
 }
 
 //Form actions
@@ -1139,7 +1152,8 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         //Upload
         emit plugin_set_status(true, false);
 
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_UPLOAD);
+        mode = ACTION_IMG_UPLOAD;
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         my_img->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
 
         progress_IMG_Complete->setValue(0);
@@ -1153,7 +1167,8 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         colview_IMG_Images->previewWidget()->hide();
         model_image_state.clear();
         blaharray.clear();
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_IMAGE_LIST);
+        mode = ACTION_IMG_IMAGE_LIST;
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         my_img->start_image_get(&blaharray);
 
         progress_IMG_Complete->setValue(0);
@@ -1163,7 +1178,8 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
     {
         //Erase
         emit plugin_set_status(true, false);
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, ACTION_IMG_IMAGE_ERASE);
+        mode = ACTION_IMG_IMAGE_ERASE;
+        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
         my_img->start_image_erase(edit_IMG_Erase_Slot->value());
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Erasing...");
@@ -1185,7 +1201,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         emit plugin_set_status(true, false);
 
         edit_OS_Echo_Output->clear();
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_ECHO);
+        mode = ACTION_OS_ECHO;
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         my_os->start_echo(edit_OS_Echo_Input->toPlainText());
 
         lbl_OS_Status->setText("Echoing...");
@@ -1194,7 +1211,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     {
         emit plugin_set_status(true, false);
 
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_TASK_STATS);
+        mode = ACTION_OS_TASK_STATS;
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         my_os->start_task_stats();
 
         edit_OS_Echo_Output->appendPlainText("Tasking...");
@@ -1203,7 +1221,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     {
         emit plugin_set_status(true, false);
 
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_MEMORY_POOL);
+        mode = ACTION_OS_MEMORY_POOL;
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         my_os->start_memory_pool();
 
         edit_OS_Echo_Output->appendPlainText("Memorying...");
@@ -1212,7 +1231,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     {
         emit plugin_set_status(true, false);
 
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_RESET);
+        mode = ACTION_OS_RESET;
+        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         my_os->start_reset(check_OS_Force_Reboot->isChecked());
 
         edit_OS_Echo_Output->appendPlainText("Resetting...");
@@ -1224,7 +1244,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             //uname
             emit plugin_set_status(true, false);
 
-            my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_OS_APPLICATION_INFO);
+            mode = ACTION_OS_OS_APPLICATION_INFO;
+            my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
             my_os->start_os_application_info(edit_OS_UName->text());
 
             edit_OS_Echo_Output->appendPlainText("Infoing...");
@@ -1234,7 +1255,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             //Buffer details
             emit plugin_set_status(true, false);
 
-            my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_MCUMGR_BUFFER);
+            mode = ACTION_OS_MCUMGR_BUFFER;
+            my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
             my_os->start_mcumgr_parameters();
 
             edit_OS_Echo_Output->appendPlainText("Buffering...");
@@ -1373,7 +1395,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     //Mark image for test or confirmation
                     finished = false;
 
-                    my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_IMG_UPLOAD_SET);
+                    mode = ACTION_IMG_UPLOAD_SET;
+                    my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
                     my_img->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false));
                     qDebug() << "do upload of " << upload_hash;
                 }
@@ -1389,7 +1412,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     //Reboot device
                     finished = false;
 
-                    my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, ACTION_OS_UPLOAD_RESET);
+                    mode = ACTION_OS_UPLOAD_RESET;
+                    my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
                     my_os->start_reset(false);
                     qDebug() << "do reset";
                 }
@@ -1428,6 +1452,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
     if (finished == true)
     {
+        mode = ACTION_IDLE;
         emit plugin_set_status(false, false);
     }
 
@@ -1439,7 +1464,10 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
 void plugin_mcumgr::progress(uint8_t user_data, uint8_t percent)
 {
-    progress_IMG_Complete->setValue(percent);
+    if (this->sender() == my_img)
+    {
+        progress_IMG_Complete->setValue(percent);
+    }
 }
 
 void plugin_mcumgr::group_to_hex(QByteArray *data)
