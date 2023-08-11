@@ -5801,7 +5801,6 @@ MainWindow::plugin_set_status(
     }
     else
     {
-        ui->selector_Tab->setCurrentIndex(0);
         gbPluginRunning = busy;
         gbPluginHideTerminalOutput = hide_terminal_output;
     }

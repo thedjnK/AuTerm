@@ -1005,12 +1005,12 @@ void plugin_mcumgr::serial_receive(QByteArray *data)
 
 void plugin_mcumgr::serial_bytes_written(qint64 bytes)
 {
-    qDebug() << "written: " << bytes;
+//    qDebug() << "written: " << bytes;
 }
 
 void plugin_mcumgr::serial_about_to_close()
 {
-    qDebug() << "about to close";
+//    qDebug() << "about to close";
 }
 
 bool plugin_mcumgr::handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data)

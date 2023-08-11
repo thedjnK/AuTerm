@@ -634,7 +634,7 @@ qDebug() << "Going in circles...";
 
 void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data)
 {
-    qDebug() << "Got ok: " << version << ", " << op << ", " << group << ", "  << command << ", " << data;
+//    qDebug() << "Got ok: " << version << ", " << op << ", " << group << ", "  << command << ", " << data;
 
     if (mode == MODE_IDLE)
     {

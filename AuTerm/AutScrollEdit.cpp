@@ -121,49 +121,49 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
             case 37:
             case 47:
             {
-                tmp_col = &col_light_gray;
+                tmp_col = &col_white;
                 break;
             }
             case 90:
             case 100:
             {
-                tmp_col = &col_black;
+                tmp_col = &col_dark_gray;
                 break;
             }
             case 91:
             case 101:
             {
-                tmp_col = &col_red;
+                tmp_col = &col_light_red;
                 break;
             }
             case 92:
             case 102:
             {
-                tmp_col = &col_green;
+                tmp_col = &col_light_green;
                 break;
             }
             case 93:
             case 103:
             {
-                tmp_col = &col_yellow;
+                tmp_col = &col_light_yellow;
                 break;
             }
             case 94:
             case 104:
             {
-                tmp_col = &col_blue;
+                tmp_col = &col_light_blue;
                 break;
             }
             case 95:
             case 105:
             {
-                tmp_col = &col_magenta;
+                tmp_col = &col_light_magenta;
                 break;
             }
             case 96:
             case 106:
             {
-                tmp_col = &col_cyan;
+                tmp_col = &col_light_cyan;
                 break;
             }
             case 97:
@@ -241,6 +241,14 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
     {
         format->clear_formatting = true;
     }
+    else if (code == 9999)
+    {
+        format->temp = FORMAT_ENABLE;
+    }
+    else if (code == 9998)
+    {
+        format->temp = FORMAT_DISABLE;
+    }
 }
 
 //=============================================================================
@@ -250,8 +258,9 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
 // checked due to insufficient data, in which case `checked_pos` will be
 // updated with the length of the data (after removals) that has been checked
 //=============================================================================
-bool AutScrollEdit::vt100_process(QString *buffer, int32_t start, QList<vt100_format_code> *formats, int32_t *checked_pos)
+bool AutScrollEdit::vt100_process(QString *buffer, QList<vt100_format_code> *formats, int32_t *checked_pos)
 {
+    int32_t start = 0;
     int32_t l = buffer->length();
     vt100_format_code tmp_format;
     int32_t prev_pos = -1;
@@ -309,7 +318,6 @@ bool AutScrollEdit::vt100_process(QString *buffer, int32_t start, QList<vt100_fo
                     --l;
                     continue;
                 }
-                //else if (pos >= l)
                 else if (pos >= buffer->length())
                 {
                     //Not enough bytes to check
@@ -323,13 +331,13 @@ bool AutScrollEdit::vt100_process(QString *buffer, int32_t start, QList<vt100_fo
                         //assume that no data means clear formatting?
                         format = 0;
                     }
-
-                    if (prev_pos == start)
+                    else if (prev_pos == start)
                     {
-                        //Append to existing one
-                        tmp_format = formats->last();
+                        //Append to existing one by merging the two
+                        vt100_format_combine(&tmp_format, &formats->last());
                         formats->pop_back();
                     }
+
                     vt100_colour_process(format, &tmp_format);
 
                     tmp_format.start = start;
@@ -344,13 +352,11 @@ bool AutScrollEdit::vt100_process(QString *buffer, int32_t start, QList<vt100_fo
                     //Replace with spaces
                     if (found_digit == true)
                     {
-                    int32_t changes = (pos - start + 1) - format;
-                    qDebug() << "replacing: " <<  buffer->mid(start, (pos - start + 1));
-                    buffer->replace(start, (pos - start + 1), QString(" ").repeated(format));
-                    l -= changes;
-                    start -= changes;
-                    qDebug() << "next char is " << buffer->at(start);
-                    continue;
+                        int32_t changes = (pos - start + 1) - format;
+                        buffer->replace(start, (pos - start + 1), QString(" ").repeated(format));
+                        l -= changes;
+                        start -= changes;
+                        continue;
                     }
                     else
                     {
@@ -376,152 +382,6 @@ bool AutScrollEdit::vt100_process(QString *buffer, int32_t start, QList<vt100_fo
 
         ++start;
     }
-
-    return true;
-}
-
-bool AutScrollEdit::vt100_process_no_rem(
-    QString *buffer,
-    int32_t start,
-    QList<vt100_format_code> *formats,
-    int32_t *checked_pos
-    )
-{
-    int32_t l = buffer->length();
-    vt100_format_code tmp_format;
-    int32_t prev_pos = -1;
-
-    while (start < l)
-    {
-        if (buffer->at(start) == (QChar)0x1b)
-        {
-            int32_t pos = start + 1;
-
-            if (pos >= l)
-            {
-                //Not enough bytes to check
-                *checked_pos = start;
-//                qDebug() << "Not enough";
-                return false;
-            }
-
-            if (buffer->at(pos) == '[')
-            {
-                bool found_digit = false;
-                uint32_t format = 0;
-                ++pos;
-                memset(&tmp_format, 0, sizeof(tmp_format));
-
-                while (pos < l && (buffer->at(pos) == ';' || (buffer->at(pos) >= '0' && buffer->at(pos) <= '9')))
-                {
-                    if (buffer->at(pos) == ';')
-                    {
-                        if (found_digit == true)
-                        {
-//                            qDebug() << "Got " << format;
-                            vt100_colour_process(format, &tmp_format);
-
-                            format = 0;
-                            found_digit = false;
-                        }
-                        else
-                        {
-//                            qDebug() << "Did not get any values";
-                            //buffer->remove(start, 1);
-                            //--l;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        found_digit = true;
-                        format = (format * 10) + (uint32_t)(buffer->at(pos).toLatin1() - '0');
-                    }
-
-                    ++pos;
-                }
-
-                if ((pos - start) > 10)
-                {
-                    //Too long, probably garbage
-//                    qDebug() << "garbage?";
-                    //buffer->remove(start, 1);
-                    //--l;
-//                    continue;
-                }
-                else if (pos >= l)
-                {
-                    //Not enough bytes to check
-//                    qDebug() << "Not enough2";
-                    *checked_pos = start;
-                    return false;
-                }
-                else if (buffer->at(pos) == 'm')
-                {
-                    if (found_digit == false)
-                    {
-                        //assume that no data means clear formatting?
-                        format = 0;
-                    }
-
-                    if (prev_pos == start)
-                    {
-                        //Append to existing one
-                        tmp_format = formats->last();
-                        formats->pop_back();
-                    }
-                    vt100_colour_process(format, &tmp_format);
-                    tmp_format.start = start;
-                    formats->append(tmp_format);
-
-//                    qDebug() << "Got " << format;
-//                    qDebug() << "Valid!";
-//                    buffer->remove(start, (pos - start + 1));
-//                    l -= (pos - start + 1);
-//                    prev_pos = start;
-                    //continue;
-                }
-                else if (buffer->at(pos) == 'C')
-                {
-                    //Replace with spaces
-                    if (found_digit == true)
-                    {
-                    int32_t changes = (pos - start + 1) - format;
-                    qDebug() << "replacing: " <<  buffer->mid(start, (pos - start + 1));
-                    buffer->replace(start, (pos - start + 1), QString(" ").repeated(format));
-                    l -= changes;
-                    start -= changes;
-                    qDebug() << "next char is " << buffer->at(start);
-                    continue;
-                    }
-                    else
-                    {
-                        //todo?
-                    }
-                }
-                else
-                {
-//                    qDebug() << "Invalid";
-                    //buffer->remove(start, 1);
-                    //--l;
-//                    continue;
-                }
-
-                start = pos;
-            }
-            else
-            {
-//                qDebug() << "Random";
-//                buffer->remove(start, 1);
-  //              --l;
-//                continue;
-            }
-        }
-
-        ++start;
-    }
-
-    qDebug() << "l = " << l << ", len = " << buffer->length();
 
     return true;
 }
@@ -884,9 +744,13 @@ void AutScrollEdit::add_dat_in_text(QByteArray *baDat, bool apply_formatting)
 //TODO: a better way to deal with this "hack"
             if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
             {
-                mstrDatIn += "\x1b[0m";
+                mstrDatIn += "\x1b[9999m";
             }
             mstrDatIn += baDat->mid(i).replace("\r\n", "\n").replace("\r", "\n");
+            if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
+            {
+                mstrDatIn += "\x1b[9998m";
+            }
             added = true;
         }
     }
@@ -895,9 +759,13 @@ void AutScrollEdit::add_dat_in_text(QByteArray *baDat, bool apply_formatting)
     {
         if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
         {
-            mstrDatIn += "\x1b[0m";
+            mstrDatIn += "\x1b[9999m";
         }
         mstrDatIn += baDat->replace("\r\n", "\n").replace("\r", "\n");
+        if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
+        {
+            mstrDatIn += "\x1b[9998m";
+        }
     }
 
     had_dat_in_data = true;
@@ -1116,7 +984,7 @@ void AutScrollEdit::update_display()
                 append_data.remove((append_data.length() - end), end);
             }
 
-            if (vt100_control_mode == VT100_MODE_DECODE && vt100_process(&append_data, 0, &format, &end) == false)
+            if (vt100_control_mode == VT100_MODE_DECODE && vt100_process(&append_data, &format, &end) == false)
             {
                 cannot_parse_bytes += append_data.length() - end;
                 append_data.remove(end, (append_data.length() - end));
@@ -1171,81 +1039,7 @@ void AutScrollEdit::update_display()
 
                     if (next_entry != -1 && next_entry < format.length())
                     {
-                        bool changed = false;
-                        QTextCharFormat new_format;
-
-                        if (format[next_entry].clear_formatting == true)
-                        {
-                            tcTmpCur.setCharFormat(pre);
-                        }
-
-                        new_format = tcTmpCur.charFormat();
-
-                        if (format[next_entry].foreground_color_set == true)
-                        {
-                            new_format.setForeground(QBrush(format[next_entry].foreground_color));
-                            changed = true;
-                        }
-
-                        if (format[next_entry].background_color_set == true)
-                        {
-                            new_format.setBackground(QBrush(format[next_entry].background_color));
-                            changed = true;
-                        }
-
-                        if (format[next_entry].weight == FORMAT_DUAL_DOUBLE)
-                        {
-                            new_format.setFontWeight(100);
-                            changed = true;
-                        }
-                        else if (format[next_entry].weight == FORMAT_DUAL_HALF)
-                        {
-                            new_format.setFontWeight(25);
-                            changed = true;
-                        }
-                        else if (format[next_entry].weight == FORMAT_DUAL_DISABLE)
-                        {
-                            new_format.setFontWeight(50);
-                            changed = true;
-                        }
-
-                        if (format[next_entry].italic == FORMAT_ENABLE)
-                        {
-                            new_format.setFontItalic(true);
-                            changed = true;
-                        }
-                        else if (format[next_entry].italic == FORMAT_DISABLE)
-                        {
-                            new_format.setFontItalic(false);
-                            changed = true;
-                        }
-
-                        if (format[next_entry].underline == FORMAT_ENABLE)
-                        {
-                            new_format.setFontUnderline(true);
-                            changed = true;
-                        }
-                        else if (format[next_entry].underline == FORMAT_DISABLE)
-                        {
-                            new_format.setFontUnderline(false);
-                            changed = true;
-                        }
-
-                        if (format[next_entry].strikethrough == FORMAT_ENABLE)
-                        {
-                            new_format.setFontStrikeOut(true);
-                            changed = true;
-                        }
-                        else if (format[next_entry].strikethrough == FORMAT_DISABLE)
-                        {
-                            new_format.setFontStrikeOut(false);
-                            changed = true;
-                        }
-
-                        if (changed == true)
-                        {
-                            tcTmpCur.setCharFormat(new_format);
-                        }
+                        vt100_format_apply(&tcTmpCur, &format[next_entry]);
                     }
 
                     this->setTextCursor(tcTmpCur);
@@ -1258,29 +1052,7 @@ void AutScrollEdit::update_display()
                 if (next_entry < format.length())
                 {
                     tcTmpCur.setPosition(format[next_entry].start);
-
-                    if (format[next_entry].clear_formatting == true)
-                    {
-                        tcTmpCur.setCharFormat(pre);
-                        last_format = pre;
-                    }
-
-                    if (format[next_entry].foreground_color_set == true)
-                    {
-                        QTextCharFormat lolz = tcTmpCur.charFormat();
-                        lolz.setForeground(QBrush(format[next_entry].foreground_color));
-                        last_format = lolz;
-                        tcTmpCur.setCharFormat(lolz);
-                    }
-
-                    if (format[next_entry].background_color_set == true)
-                    {
-                        QTextCharFormat lolz = tcTmpCur.charFormat();
-                        lolz.setBackground(QBrush(format[next_entry].background_color));
-                        last_format = lolz;
-                        tcTmpCur.setCharFormat(lolz);
-                    }
-
+                    vt100_format_apply(&tcTmpCur, &format[next_entry]);
                     this->setTextCursor(tcTmpCur);
                 }
                 else
@@ -1391,6 +1163,123 @@ void AutScrollEdit::trim_dat_in(qint32 intThreshold, quint32 intSize)
 void AutScrollEdit::set_vt100_mode(vt100_mode mode)
 {
     vt100_control_mode = mode;
+}
+
+//=============================================================================
+//=============================================================================
+void AutScrollEdit::vt100_format_apply(QTextCursor *cursor, vt100_format_code *format)
+{
+    bool changed = false;
+    QTextCharFormat new_format;
+
+    if (format->clear_formatting == true)
+    {
+        new_format = pre;
+        changed = true;
+    }
+    else if (format->temp == FORMAT_ENABLE)
+    {
+        pre_dat_in_format_backup = cursor->charFormat();
+        new_format = pre;
+        changed = true;
+    }
+    else if (format->temp == FORMAT_DISABLE)
+    {
+        new_format = pre_dat_in_format_backup;
+        changed = true;
+    }
+    else
+    {
+        new_format = cursor->charFormat();
+    }
+
+    if (format->foreground_color_set == true)
+    {
+        new_format.setForeground(QBrush(format->foreground_color));
+        changed = true;
+    }
+
+    if (format->background_color_set == true)
+    {
+        new_format.setBackground(QBrush(format->background_color));
+        changed = true;
+    }
+
+    if (format->weight != FORMAT_DUAL_UNSET)
+    {
+        new_format.setFontWeight((format->weight == FORMAT_DUAL_DOUBLE ? 100 : (format->weight == FORMAT_DUAL_HALF ? 25 : 50)));
+        changed = true;
+    }
+
+    if (format->italic != FORMAT_UNSET)
+    {
+        new_format.setFontItalic((format->italic == FORMAT_ENABLE ? true : false));
+        changed = true;
+    }
+
+    if (format->underline != FORMAT_UNSET)
+    {
+        new_format.setFontUnderline((format->underline == FORMAT_ENABLE ? true : false));
+        changed = true;
+    }
+
+    if (format->strikethrough != FORMAT_UNSET)
+    {
+        new_format.setFontStrikeOut((format->strikethrough == FORMAT_ENABLE ? true : false));
+        changed = true;
+    }
+
+    if (changed == true)
+    {
+        cursor->setCharFormat(new_format);
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void AutScrollEdit::vt100_format_combine(vt100_format_code *original, vt100_format_code *merge)
+{
+    if (merge->background_color_set == true)
+    {
+        original->background_color = merge->background_color;
+        original->background_color_set = true;
+    }
+
+    if (merge->foreground_color_set == true)
+    {
+        original->foreground_color = merge->foreground_color;
+        original->foreground_color_set = true;
+    }
+
+    if (merge->weight != FORMAT_DUAL_UNSET)
+    {
+        original->weight = merge->weight;
+    }
+
+    if (merge->italic != FORMAT_UNSET)
+    {
+        original->italic = merge->italic;
+    }
+
+    if (merge->underline != FORMAT_UNSET)
+    {
+        original->underline = merge->underline;
+    }
+
+    if (merge->strikethrough != FORMAT_UNSET)
+    {
+        original->strikethrough = merge->strikethrough;
+    }
+
+    if (merge->clear_formatting == true)
+    {
+        original->clear_formatting = merge->clear_formatting;
+    }
+
+    if (merge->temp != FORMAT_UNSET)
+    {
+        original->temp = merge->temp;
+    }
 }
 
 /******************************************************************************/
