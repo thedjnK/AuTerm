@@ -49,6 +49,13 @@ enum vt100_format_type {
     FORMAT_ENABLE,
 };
 
+enum vt100_dual_format_type {
+    FORMAT_DUAL_UNSET = 0,
+    FORMAT_DUAL_DISABLE,
+    FORMAT_DUAL_HALF,
+    FORMAT_DUAL_DOUBLE,
+};
+
 struct vt100_format_code {
     int32_t start;
     QColor background_color;
@@ -56,10 +63,10 @@ struct vt100_format_code {
     QColor foreground_color;
     bool foreground_color_set;
 
-    vt100_format_type bold;
-    vt100_format_type dim;
+    vt100_dual_format_type weight;
     vt100_format_type italic;
     vt100_format_type underline;
+    vt100_format_type strikethrough;
 
     bool clear_formatting;
     uint8_t options;

@@ -72,7 +72,7 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
 {
     const QColor *tmp_col;
 
-    if ((code >= 30 && code <= 37 || code >= 40 && code <= 47) || (code >= 90 && code <= 97 || code >= 100 && code <= 107))
+    if ((code >= 30 && code <= 37) || (code >= 40 && code <= 47) || (code >= 90 && code <= 97) || (code >= 100 && code <= 107))
     {
         switch (code)
         {
@@ -175,7 +175,7 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
             }
         };
 
-        if ((code >= 30 && code <= 37) || code >= 90 && code <= 97)
+        if ((code >= 30 && code <= 37) || (code >= 90 && code <= 97))
         {
             format->foreground_color = *tmp_col;
             format->foreground_color_set = true;
@@ -185,6 +185,57 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
             format->background_color = *tmp_col;
             format->background_color_set = true;
         }
+    }
+    else if ((code >= 1 && code <= 9) || (code >= 22 && code <= 29))
+    {
+        switch (code)
+        {
+            case 1:
+            {
+                format->weight = FORMAT_DUAL_DOUBLE;
+                break;
+            }
+            case 2:
+            {
+                format->weight = FORMAT_DUAL_HALF;
+                break;
+            }
+            case 3:
+            {
+                format->italic = FORMAT_ENABLE;
+                break;
+            }
+            case 4:
+            {
+                format->underline = FORMAT_ENABLE;
+                break;
+            }
+            case 9:
+            {
+                format->strikethrough = FORMAT_ENABLE;
+                break;
+            }
+            case 22:
+            {
+                format->weight = FORMAT_DUAL_DISABLE;
+                break;
+            }
+            case 23:
+            {
+                format->italic = FORMAT_DISABLE;
+                break;
+            }
+            case 24:
+            {
+                format->underline = FORMAT_DISABLE;
+                break;
+            }
+            case 29:
+            {
+                format->strikethrough = FORMAT_DISABLE;
+                break;
+            }
+        };
     }
     else if (code == 0)
     {
@@ -1120,21 +1171,80 @@ void AutScrollEdit::update_display()
 
                     if (next_entry != -1 && next_entry < format.length())
                     {
+                        bool changed = false;
+                        QTextCharFormat new_format;
+
                         if (format[next_entry].clear_formatting == true)
                         {
                             tcTmpCur.setCharFormat(pre);
                         }
+
+                        new_format = tcTmpCur.charFormat();
+
                         if (format[next_entry].foreground_color_set == true)
                         {
-                            QTextCharFormat lolz = tcTmpCur.charFormat();
-                            lolz.setForeground(QBrush(format[next_entry].foreground_color));
-                            tcTmpCur.setCharFormat(lolz);
+                            new_format.setForeground(QBrush(format[next_entry].foreground_color));
+                            changed = true;
                         }
+
                         if (format[next_entry].background_color_set == true)
                         {
-                            QTextCharFormat lolz = tcTmpCur.charFormat();
-                            lolz.setBackground(QBrush(format[next_entry].background_color));
-                            tcTmpCur.setCharFormat(lolz);
+                            new_format.setBackground(QBrush(format[next_entry].background_color));
+                            changed = true;
+                        }
+
+                        if (format[next_entry].weight == FORMAT_DUAL_DOUBLE)
+                        {
+                            new_format.setFontWeight(100);
+                            changed = true;
+                        }
+                        else if (format[next_entry].weight == FORMAT_DUAL_HALF)
+                        {
+                            new_format.setFontWeight(25);
+                            changed = true;
+                        }
+                        else if (format[next_entry].weight == FORMAT_DUAL_DISABLE)
+                        {
+                            new_format.setFontWeight(50);
+                            changed = true;
+                        }
+
+                        if (format[next_entry].italic == FORMAT_ENABLE)
+                        {
+                            new_format.setFontItalic(true);
+                            changed = true;
+                        }
+                        else if (format[next_entry].italic == FORMAT_DISABLE)
+                        {
+                            new_format.setFontItalic(false);
+                            changed = true;
+                        }
+
+                        if (format[next_entry].underline == FORMAT_ENABLE)
+                        {
+                            new_format.setFontUnderline(true);
+                            changed = true;
+                        }
+                        else if (format[next_entry].underline == FORMAT_DISABLE)
+                        {
+                            new_format.setFontUnderline(false);
+                            changed = true;
+                        }
+
+                        if (format[next_entry].strikethrough == FORMAT_ENABLE)
+                        {
+                            new_format.setFontStrikeOut(true);
+                            changed = true;
+                        }
+                        else if (format[next_entry].strikethrough == FORMAT_DISABLE)
+                        {
+                            new_format.setFontStrikeOut(false);
+                            changed = true;
+                        }
+
+                        if (changed == true)
+                        {
+                            tcTmpCur.setCharFormat(new_format);
                         }
                     }
 
