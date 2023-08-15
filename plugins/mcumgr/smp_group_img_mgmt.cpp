@@ -648,6 +648,9 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
     }
     else
     {
+        uint8_t finished_mode = mode;
+        mode = MODE_IDLE;
+
         if (version != smp_version)
         {
             //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
@@ -655,7 +658,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             emit version_error(version);
         }
 
-        else if (mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
+        else if (finished_mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
         {
 #if 0
             if (command == 0x00)
@@ -679,7 +682,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             file_upload(&data);
         }
 #if 1
-        else if (mode == MODE_SET_IMAGE && command == COMMAND_STATE)
+        else if (finished_mode == MODE_SET_IMAGE && command == COMMAND_STATE)
         {
                 //Response to set image state
                 //            message.remove(0, 8);
@@ -701,7 +704,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
 #endif
-        else if (mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
+        else if (finished_mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
         {
 //TODO:
                 //Response to set image state
@@ -721,6 +724,8 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
         {
             qDebug() << "Unsupported command received";
         }
+
+        mode = MODE_IDLE;
     }
 }
 

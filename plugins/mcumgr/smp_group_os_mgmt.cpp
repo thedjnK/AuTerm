@@ -551,6 +551,9 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
     }
     else
     {
+        uint8_t finished_mode = mode;
+        mode = MODE_IDLE;
+
         if (version != smp_version)
         {
             //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
@@ -558,7 +561,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             emit version_error(version);
         }
 
-        if (mode == MODE_ECHO && command == COMMAND_ECHO)
+        if (finished_mode == MODE_ECHO && command == COMMAND_ECHO)
         {
             //Response to set image state
             QString response;
@@ -566,7 +569,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             bool good = parse_echo_response(cbor_reader, &response);
             emit status(smp_user_data, STATUS_COMPLETE, response);
         }
-        else if (mode == MODE_TASK_STATS && command == COMMAND_TASK_STATS)
+        else if (finished_mode == MODE_TASK_STATS && command == COMMAND_TASK_STATS)
         {
             //Response to set image state
             QCborStreamReader cbor_reader(data);
@@ -576,7 +579,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
-        else if (mode == MODE_MEMORY_POOL && command == COMMAND_MEMORY_POOL)
+        else if (finished_mode == MODE_MEMORY_POOL && command == COMMAND_MEMORY_POOL)
         {
             //Response to set image state
             QCborStreamReader cbor_reader(data);
@@ -585,12 +588,12 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
-        else if (mode == MODE_RESET && command == COMMAND_RESET)
+        else if (finished_mode == MODE_RESET && command == COMMAND_RESET)
         {
             //No need to check response, it would have returned success to come through this callback
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
-        else if (mode == MODE_MCUMGR_PARAMETERS && command == COMMAND_MCUMGR_PARAMETERS)
+        else if (finished_mode == MODE_MCUMGR_PARAMETERS && command == COMMAND_MCUMGR_PARAMETERS)
         {
             //Response to MCUmgr buffer parameters
             QCborStreamReader cbor_reader(data);
@@ -602,7 +605,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
-        else if (mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
+        else if (finished_mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
         {
             //Response to OS/application info
             QCborStreamReader cbor_reader(data);
