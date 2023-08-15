@@ -39,6 +39,7 @@ smp_processor *processor;
 QStandardItemModel model_image_state;
 smp_group_img_mgmt *my_img;
 smp_group_os_mgmt *my_os;
+smp_group_shell_mgmt *my_shell;
 QList<image_state_t> blaharray;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
@@ -942,6 +943,7 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
     emit plugin_add_open_close_button(btn_FS_Go);
     my_img = new smp_group_img_mgmt(processor);
     my_os = new smp_group_os_mgmt(processor);
+    my_shell = new smp_group_shell_mgmt(processor);
 
     connect(my_img, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(my_img, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
@@ -950,10 +952,15 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
     connect(my_os, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(my_os, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 //    connect(my_os, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+
+    connect(my_shell, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(my_shell, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(my_shell, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 }
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+    delete my_shell;
     delete my_os;
     delete my_img;
     delete processor;
@@ -1011,147 +1018,6 @@ void plugin_mcumgr::serial_bytes_written(qint64 bytes)
 void plugin_mcumgr::serial_about_to_close()
 {
 //    qDebug() << "about to close";
-}
-
-bool plugin_mcumgr::handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data)
-{
-//    qDebug() << reader.lastError() << reader.hasNext();
-
-    QString key = "";
-    int32_t rc = -1;
-    int32_t ret = -1;
-
-    while (!reader.lastError() && reader.hasNext())
-    {
-        bool keyset = false;
-//	    qDebug() << "Key: " << key;
-//	    qDebug() << "Type: " << reader.type();
-        switch (reader.type())
-        {
-        case QCborStreamReader::UnsignedInteger:
-        case QCborStreamReader::NegativeInteger:
-        case QCborStreamReader::SimpleType:
-        case QCborStreamReader::Float16:
-        case QCborStreamReader::Float:
-        case QCborStreamReader::Double:
-        {
-            //	handleFixedWidth(reader);
-            if (key == "rc")
-            {
-//			    qDebug() << "found rc";
-                rc = reader.toInteger();
-            }
-            else if (key == "ret")
-            {
-//			    qDebug() << "found off";
-                ret = reader.toInteger();
-            }
-
-            reader.next();
-            break;
-        }
-        case QCborStreamReader::ByteArray:
-        {
-            auto r = reader.readByteArray();
-            while (r.status == QCborStreamReader::Ok)
-            {
-                r = reader.readByteArray();
-            }
-        }
-        break;
-        case QCborStreamReader::String:
-        {
-            QString data;
-            auto r = reader.readString();
-            while (r.status == QCborStreamReader::Ok)
-            {
-                data.append(r.data);
-                r = reader.readString();
-            }
-
-            if (r.status == QCborStreamReader::Error)
-            {
-                data.clear();
-                qDebug("Error decoding string");
-            }
-            else
-            {
-                if (key.isEmpty())
-                {
-                    key = data;
-                    keyset = true;
-                }
-                else if (key == "o")
-                {
-                    new_data->append(data);
-                }
-            }
-            break;
-        }
-        case QCborStreamReader::Array:
-        case QCborStreamReader::Map:
-            reader.enterContainer();
-            while (reader.lastError() == QCborError::NoError && reader.hasNext())
-            {
-                handleStream_shell(reader, new_rc, new_ret, new_data);
-            }
-            if (reader.lastError() == QCborError::NoError)
-            {
-                reader.leaveContainer();
-            }
-            break;
-        }
-
-        if (keyset == false && !key.isEmpty())
-        {
-            key = "";
-        }
-    }
-
-    if (new_rc != NULL && rc != -1)
-    {
-        *new_rc = rc;
-    }
-
-    if (new_ret != NULL && ret != -1)
-    {
-        *new_ret = ret;
-    }
-
-    return true;
-}
-
-void plugin_mcumgr::receive_waiting(QByteArray message)
-{
-#if 0
-    else if (shell_in_progress == true && group == 9 && command == 0)
-    {
-        int32_t rc = -1;
-        int32_t ret = -1;
-        QString data;
-        message.remove(0, 8);
-        QCborStreamReader cbor_reader(message);
-        bool good = handleStream_shell(cbor_reader, &rc, &ret, &data);
-
-        shell_in_progress = false;
-        emit plugin_set_status(false, false);
-
-        if (rc != -1)
-        {
-            lbl_SHELL_Status->setText(QString("Finished, error (rc): ").append(QString::number(rc)));
-        }
-        else if (ret != -1)
-        {
-            lbl_SHELL_Status->setText(QString("Finished, error (ret): ").append(QString::number(ret)));
-        }
-        else
-        {
-            lbl_SHELL_Status->setText("Finished");
-        }
-
-        edit_SHELL_Output->appendPlainText(data);
-    }
-#endif
 }
 
 void plugin_mcumgr::serial_opened()
@@ -1405,45 +1271,17 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 
 void plugin_mcumgr::on_btn_SHELL_Go_clicked()
 {
-#if 0
-        //Execute shell command
-        emit plugin_set_status(true, false);
+    //Execute shell command
+    emit plugin_set_status(true, false);
 
-        QByteArray message;
-        QByteArray smp_data;
-        QCborStreamWriter smp_stream(&smp_data);
+    QRegularExpression reTempRE("\\s+");
+    QStringList list_arguments = edit_SHELL_Input->text().split(reTempRE);
 
-        setup_smp_message(message, smp_stream, true, 0x09, 0x00);
+    mode = ACTION_SHELL_EXECUTE;
+    my_shell->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+    my_shell->start_execute(&list_arguments, &shell_rc);
 
-        smp_stream.append("argv");
-        smp_stream.startArray();
-
-        QRegularExpression reTempRE("\\s+");
-        QStringList list_arguments = edit_SHELL_Input->text().split(reTempRE);
-
-        uint8_t i = 0;
-        while (i < list_arguments.length())
-        {
-            smp_stream.append(list_arguments.at(i));
-            ++i;
-        }
-
-        smp_stream.endArray();
-
-        finish_smp_message(message, smp_stream, smp_data);
-
-        smp_message *tmp_message = new smp_message();
-        tmp_message->append(message);
-
-        shell_in_progress = true;
-
-//	    qDebug() << "len: " << message.length();
-
-//        uart->send(&message);
-        processor->send(tmp_message, timeout_ms, 3, true);
-
-        lbl_SHELL_Status->setText("Executing...");
-#endif
+    lbl_SHELL_Status->setText("Executing...");
 }
 
 void plugin_mcumgr::on_btn_STAT_Go_clicked()
@@ -1716,6 +1554,27 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 }
 
                 table_OS_Tasks->setSortingEnabled(true);
+            }
+        }
+    }
+    else if (sender() == my_shell)
+    {
+        qDebug() << "shell sender";
+        if (status == STATUS_COMPLETE)
+        {
+            qDebug() << "complete";
+            if (user_data == ACTION_SHELL_EXECUTE)
+            {
+                if (shell_rc == 0)
+                {
+                    lbl_SHELL_Status->setText("Finished");
+                }
+                else
+                {
+                    lbl_SHELL_Status->setText(QString("Finished, error (ret): ").append(QString::number(shell_rc)));
+                }
+
+                edit_SHELL_Output->appendPlainText(error_string);
             }
         }
     }

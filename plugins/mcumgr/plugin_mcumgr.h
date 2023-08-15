@@ -40,6 +40,7 @@
 #include "smp_uart.h"
 #include "smp_group_img_mgmt.h"
 #include "smp_group_os_mgmt.h"
+#include "smp_group_shell_mgmt.h"
 #include "smp_error.h"
 
 //Form includes
@@ -85,6 +86,8 @@ enum mcumgr_action_t {
     ACTION_OS_RESET,
     ACTION_OS_MCUMGR_BUFFER,
     ACTION_OS_OS_APPLICATION_INFO,
+
+    ACTION_SHELL_EXECUTE,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin
@@ -113,7 +116,6 @@ signals:
     void plugin_to_hex(QByteArray *data);
 
 private slots:
-    void receive_waiting(QByteArray data);
     bool eventFilter(QObject *object, QEvent *event);
     void group_to_hex(QByteArray *data);
 
@@ -299,6 +301,7 @@ private:
     int child_column;
     QList<task_list_t> task_list;
     QList<memory_pool_t> memory_list;
+    int32_t shell_rc;
 };
 
 #endif // PLUGIN_MCUMGR_H
