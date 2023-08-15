@@ -1588,6 +1588,15 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
                 table_OS_Tasks->setSortingEnabled(true);
             }
+            else if (user_data == ACTION_OS_MCUMGR_BUFFER)
+            {
+                //TODO
+            }
+            else if (user_data == ACTION_OS_OS_APPLICATION_INFO)
+            {
+                edit_OS_Info_Output->clear();
+                edit_OS_Info_Output->appendPlainText(error_string);
+            }
         }
     }
     else if (sender() == my_shell)
