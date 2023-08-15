@@ -36,7 +36,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="tab_FS">
         <attribute name="title">
@@ -883,7 +883,18 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QTableWidget" name="table_STAT_Values"/>
+          <widget class="QTableWidget" name="table_STAT_Values">
+           <column>
+            <property name="text">
+             <string>Name</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Value</string>
+            </property>
+           </column>
+          </widget>
          </item>
          <item row="2" column="0" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_9">

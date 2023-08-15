@@ -41,6 +41,7 @@
 #include "smp_group_img_mgmt.h"
 #include "smp_group_os_mgmt.h"
 #include "smp_group_shell_mgmt.h"
+#include "smp_group_stat_mgmt.h"
 #include "smp_error.h"
 
 //Form includes
@@ -88,6 +89,9 @@ enum mcumgr_action_t {
     ACTION_OS_OS_APPLICATION_INFO,
 
     ACTION_SHELL_EXECUTE,
+
+    ACTION_STAT_GROUP_DATA,
+    ACTION_STAT_LIST_GROUPS,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin
@@ -302,6 +306,8 @@ private:
     QList<task_list_t> task_list;
     QList<memory_pool_t> memory_list;
     int32_t shell_rc;
+    QStringList group_list;
+    QList<stat_value_t> stat_list;
 };
 
 #endif // PLUGIN_MCUMGR_H

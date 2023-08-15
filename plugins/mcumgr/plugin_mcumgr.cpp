@@ -40,6 +40,7 @@ QStandardItemModel model_image_state;
 smp_group_img_mgmt *my_img;
 smp_group_os_mgmt *my_os;
 smp_group_shell_mgmt *my_shell;
+smp_group_stat_mgmt *my_stat;
 QList<image_state_t> blaharray;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
@@ -566,6 +567,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_11->addWidget(label_16, 1, 0, 1, 1);
 
     table_STAT_Values = new QTableWidget(tab_5);
+    if (table_STAT_Values->columnCount() < 2)
+        table_STAT_Values->setColumnCount(2);
+    QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
+    table_STAT_Values->setHorizontalHeaderItem(0, __qtablewidgetitem12);
+    QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
+    table_STAT_Values->setHorizontalHeaderItem(1, __qtablewidgetitem13);
     table_STAT_Values->setObjectName(QString::fromUtf8("table_STAT_Values"));
 
     gridLayout_11->addWidget(table_STAT_Values, 1, 1, 1, 1);
@@ -797,7 +804,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(2);
+    tabWidget_2->setCurrentIndex(3);
     tabWidget_3->setCurrentIndex(1);
     selector_OS->setCurrentIndex(2);
 ///AUTOGEN_END_INIT
@@ -876,6 +883,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_OS), QCoreApplication::translate("Form", "OS", nullptr));
     label_15->setText(QCoreApplication::translate("Form", "Group:", nullptr));
     label_16->setText(QCoreApplication::translate("Form", "Values:", nullptr));
+    QTableWidgetItem *___qtablewidgetitem12 = table_STAT_Values->horizontalHeaderItem(0);
+    ___qtablewidgetitem12->setText(QCoreApplication::translate("Form", "Name", nullptr));
+    QTableWidgetItem *___qtablewidgetitem13 = table_STAT_Values->horizontalHeaderItem(1);
+    ___qtablewidgetitem13->setText(QCoreApplication::translate("Form", "Value", nullptr));
     radio_STAT_List->setText(QCoreApplication::translate("Form", "List Groups", nullptr));
     radio_STAT_Fetch->setText(QCoreApplication::translate("Form", "Fetch Stats", nullptr));
     lbl_STAT_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
@@ -944,6 +955,7 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
     my_img = new smp_group_img_mgmt(processor);
     my_os = new smp_group_os_mgmt(processor);
     my_shell = new smp_group_shell_mgmt(processor);
+    my_stat = new smp_group_stat_mgmt(processor);
 
     connect(my_img, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(my_img, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
@@ -956,10 +968,15 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
     connect(my_shell, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(my_shell, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 //    connect(my_shell, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+
+    connect(my_stat, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(my_stat, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(my_shell, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 }
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+    delete my_stat;
     delete my_shell;
     delete my_os;
     delete my_img;
@@ -1288,9 +1305,25 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
 {
     if (radio_STAT_List->isChecked())
     {
+        //Execute stat list command
+        emit plugin_set_status(true, false);
+
+        mode = ACTION_STAT_LIST_GROUPS;
+        my_stat->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        my_stat->start_list_groups(&group_list);
+
+        lbl_STAT_Status->setText("Listing...");
     }
-    else if (radio_STAT_Fetch->isChecked())
+    else if (radio_STAT_Fetch->isChecked() && !combo_STAT_Group->currentText().isEmpty())
     {
+        //Execute stat get command
+        emit plugin_set_status(true, false);
+
+        mode = ACTION_STAT_GROUP_DATA;
+        my_stat->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        my_stat->start_group_data(combo_STAT_Group->currentText(), &stat_list);
+
+        lbl_STAT_Status->setText("Fetching...");
     }
 }
 
@@ -1575,6 +1608,38 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 }
 
                 edit_SHELL_Output->appendPlainText(error_string);
+            }
+        }
+    }
+    else if (sender() == my_stat)
+    {
+        qDebug() << "stat sender";
+        if (status == STATUS_COMPLETE)
+        {
+            qDebug() << "complete";
+            if (user_data == ACTION_STAT_GROUP_DATA)
+            {
+                uint8_t i = 0;
+
+//TODO: optimise
+                table_STAT_Values->clearContents();
+
+                while (i < stat_list.length())
+                {
+                    QTableWidgetItem *row_name = new QTableWidgetItem(stat_list[i].name);
+                    QTableWidgetItem *row_value = new QTableWidgetItem(QString::number(stat_list[i].value));
+
+                    table_STAT_Values->insertRow(table_STAT_Values->rowCount());
+                    table_STAT_Values->setItem((table_STAT_Values->rowCount() - 1), 0, row_name);
+                    table_STAT_Values->setItem((table_STAT_Values->rowCount() - 1), 1, row_value);
+
+                    ++i;
+                }
+            }
+            else if (user_data == ACTION_STAT_LIST_GROUPS)
+            {
+                combo_STAT_Group->clear();
+                combo_STAT_Group->addItems(group_list);
             }
         }
     }
