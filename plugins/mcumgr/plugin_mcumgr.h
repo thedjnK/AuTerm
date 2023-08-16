@@ -42,6 +42,7 @@
 #include "smp_group_os_mgmt.h"
 #include "smp_group_shell_mgmt.h"
 #include "smp_group_stat_mgmt.h"
+#include "smp_group_fs_mgmt.h"
 #include "smp_error.h"
 
 //Form includes
@@ -92,6 +93,11 @@ enum mcumgr_action_t {
 
     ACTION_STAT_GROUP_DATA,
     ACTION_STAT_LIST_GROUPS,
+
+    ACTION_FS_UPLOAD,
+    ACTION_FS_DOWNLOAD,
+    ACTION_FS_STATUS,
+    ACTION_FS_HASH_CHECKSUM,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin

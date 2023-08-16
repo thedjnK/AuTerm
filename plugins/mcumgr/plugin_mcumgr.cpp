@@ -41,6 +41,7 @@ smp_group_img_mgmt *my_img;
 smp_group_os_mgmt *my_os;
 smp_group_shell_mgmt *my_shell;
 smp_group_stat_mgmt *my_stat;
+smp_group_fs_mgmt *my_fs;
 QList<image_state_t> blaharray;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
@@ -951,11 +952,12 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
 
 
     //test
-    emit plugin_add_open_close_button(btn_FS_Go);
+//    emit plugin_add_open_close_button(btn_FS_Go);
     my_img = new smp_group_img_mgmt(processor);
     my_os = new smp_group_os_mgmt(processor);
     my_shell = new smp_group_shell_mgmt(processor);
     my_stat = new smp_group_stat_mgmt(processor);
+    my_fs = new smp_group_fs_mgmt(processor);
 
     connect(my_img, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(my_img, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
@@ -972,10 +974,15 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
     connect(my_stat, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(my_stat, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 //    connect(my_shell, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+
+    connect(my_fs, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(my_fs, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(my_fs, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 }
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+    delete my_fs;
     delete my_stat;
     delete my_shell;
     delete my_os;
@@ -1083,6 +1090,50 @@ void plugin_mcumgr::on_btn_FS_Local_clicked()
 
 void plugin_mcumgr::on_btn_FS_Go_clicked()
 {
+    if (radio_FS_Upload->isChecked())
+    {
+        emit plugin_set_status(true, false);
+
+        mode = ACTION_FS_UPLOAD;
+        my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        my_fs->start_upload(edit_FS_Local->text(), edit_FS_Remote->text());
+
+        progress_FS_Complete->setValue(0);
+        lbl_FS_Status->setText("Uploading...");
+    }
+    else if (radio_FS_Download->isChecked())
+    {
+        emit plugin_set_status(true, false);
+
+        mode = ACTION_FS_DOWNLOAD;
+        my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        my_fs->start_download(edit_FS_Remote->text(), edit_FS_Local->text());
+
+        progress_FS_Complete->setValue(0);
+        lbl_FS_Status->setText("Downloading...");
+    }
+    else if (radio_FS_Size->isChecked())
+    {
+        emit plugin_set_status(true, false);
+
+        mode = ACTION_FS_STATUS;
+        my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        my_fs->start_status(edit_FS_Remote->text());
+
+        progress_FS_Complete->setValue(0);
+        lbl_FS_Status->setText("Statusing...");
+    }
+    else if (radio_FS_HashChecksum->isChecked())
+    {
+        emit plugin_set_status(true, false);
+
+        mode = ACTION_FS_HASH_CHECKSUM;
+        my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        my_fs->start_hash_checksum(edit_FS_Remote->text());
+
+        progress_FS_Complete->setValue(0);
+        lbl_FS_Status->setText("Hashing...");
+    }
 }
 
 void plugin_mcumgr::on_radio_FS_Upload_clicked()
@@ -1649,6 +1700,18 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             {
                 combo_STAT_Group->clear();
                 combo_STAT_Group->addItems(group_list);
+            }
+        }
+    }
+    else if (sender() == my_fs)
+    {
+        qDebug() << "stat sender";
+        if (status == STATUS_COMPLETE)
+        {
+            qDebug() << "complete";
+            if (user_data == ACTION_FS_UPLOAD)
+            {
+                edit_FS_Log->appendPlainText("todo");
             }
         }
     }

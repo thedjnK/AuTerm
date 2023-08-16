@@ -17,6 +17,7 @@ TARGET          = $$qtLibraryTarget(plugin_mcumgr)
 SOURCES += \
     plugin_mcumgr.cpp \
     smp_error.cpp \
+    smp_group_fs_mgmt.cpp \
     smp_group_os_mgmt.cpp \
     smp_group_shell_mgmt.cpp \
     smp_group_stat_mgmt.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
     ../../AuTerm/AutPlugin.h \
     plugin_mcumgr.h \
     smp_error.h \
+    smp_group_fs_mgmt.h \
     smp_group_os_mgmt.h \
     smp_group_shell_mgmt.h \
     smp_group_stat_mgmt.h \
