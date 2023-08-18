@@ -357,6 +357,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->image_DSRb->setPixmap(*gpEmptyCirclePixmap);
     ui->image_RIb->setPixmap(*gpEmptyCirclePixmap);
 
+    //Set window icon
+    QMainWindow::setWindowIcon(QIcon(*gpUw16Pixmap));
+
     //Enable custom context menu policy
     ui->text_TermEditData->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -370,7 +373,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Connect file drag/drop signal
 
     //Initialise popup message
-    gpmErrorForm = new PopupMessage();
+    gpmErrorForm = new PopupMessage(this);
 
     //Populate the list of devices
     RefreshSerialDevices();
