@@ -456,9 +456,12 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
                             image_state_ptr = &host_images->last();
                         }
 
-                        slot_state_buffer.item = new QStandardItem(QString("Slot ").append(QString::number(slot_state_buffer.slot)));
-                        image_state_ptr->slot_list.append(slot_state_buffer);
-                        image_state_ptr->item->appendRow(slot_state_buffer.item);
+                        if (image_state_ptr != nullptr)
+                        {
+                            slot_state_buffer.item = new QStandardItem(QString("Slot ").append(QString::number(slot_state_buffer.slot)));
+                            image_state_ptr->slot_list.append(slot_state_buffer);
+                            image_state_ptr->item->appendRow(slot_state_buffer.item);
+                        }
                     }
                 }
                 break;
@@ -648,9 +651,6 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
     }
     else
     {
-        uint8_t finished_mode = mode;
-        mode = MODE_IDLE;
-
         if (version != smp_version)
         {
             //The target device does not support the SMP version being used, adjust for duration of transfer and raise a warning to the parent
@@ -658,7 +658,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             emit version_error(version);
         }
 
-        else if (finished_mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
+        else if (mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
         {
 #if 0
             if (command == 0x00)
@@ -682,7 +682,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             file_upload(&data);
         }
 #if 1
-        else if (finished_mode == MODE_SET_IMAGE && command == COMMAND_STATE)
+        else if (mode == MODE_SET_IMAGE && command == COMMAND_STATE)
         {
                 //Response to set image state
                 //            message.remove(0, 8);
@@ -702,9 +702,10 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             //file_list_in_progress = false;
             //emit plugin_set_status(false, false);
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+            mode = MODE_IDLE;
         }
 #endif
-        else if (finished_mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
+        else if (mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
         {
 //TODO:
                 //Response to set image state
@@ -719,13 +720,13 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
                 //file_list_in_progress = false;
                 //emit plugin_set_status(false, false);
                 emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+                mode = MODE_IDLE;
         }
         else
         {
             qDebug() << "Unsupported command received";
+            mode = MODE_IDLE;
         }
-
-        mode = MODE_IDLE;
     }
 }
 
