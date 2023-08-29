@@ -294,12 +294,7 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
             case QCborStreamReader::UnsignedInteger:
             case QCborStreamReader::NegativeInteger:
             {
-                if (key == "rc" && version == 0 && level == 1)
-                {
-                    error->rc = reader.toInteger();
-                    error->type = SMP_ERROR_RC;
-                }
-                else if (key == "rc" && version == 1 && level == 2 && parent != nullptr && *parent == "err")
+                if (key == "rc" && version == 1 && level == 2 && parent != nullptr && *parent == "err")
                 {
                     error->rc = reader.toUnsignedInteger();
                     error->type = SMP_ERROR_RET;
@@ -308,6 +303,11 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
                 {
                     error->group = reader.toUnsignedInteger();
                     error->type = SMP_ERROR_RET;
+                }
+                else if (key == "rc" && level == 1)
+                {
+                    error->rc = reader.toInteger();
+                    error->type = SMP_ERROR_RC;
                 }
 
                 reader.next();

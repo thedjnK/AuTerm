@@ -15,6 +15,7 @@ TARGET          = $$qtLibraryTarget(plugin_mcumgr)
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    error_lookup.cpp \
     plugin_mcumgr.cpp \
     smp_error.cpp \
     smp_group_fs_mgmt.cpp \
@@ -28,8 +29,10 @@ SOURCES += \
 
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
+    error_lookup.h \
     plugin_mcumgr.h \
     smp_error.h \
+    smp_group_array.h \
     smp_group_fs_mgmt.h \
     smp_group_os_mgmt.h \
     smp_group_shell_mgmt.h \
@@ -73,3 +76,6 @@ CONFIG(release, debug|release) {
 !contains(CONFIG, static) {
     CONFIG += no_plugin_name_prefix
 }
+
+FORMS += \
+	error_lookup.ui

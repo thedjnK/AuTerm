@@ -24,6 +24,8 @@
 #include "plugin_mcumgr.h"
 #include <QDebug>
 #include <QFileDialog>
+#include "smp_group_array.h"
+#include "error_lookup.h"
 
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -37,11 +39,9 @@ QMainWindow *parent_window;
 smp_uart *uart;
 smp_processor *processor;
 QStandardItemModel model_image_state;
-smp_group_img_mgmt *my_img;
-smp_group_os_mgmt *my_os;
-smp_group_shell_mgmt *my_shell;
-smp_group_stat_mgmt *my_stat;
-smp_group_fs_mgmt *my_fs;
+
+smp_group_array smp_groups;
+error_lookup *error_lookup_form;
 QList<image_state_t> blaharray;
 QList<hash_checksum_t> what;
 
@@ -62,101 +62,41 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 ///AUTOGEN_START_INIT
 //    gridLayout = new QGridLayout(Form);
-//    gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+//    gridLayout->setObjectName("gridLayout");
 //    tabWidget = new QTabWidget(Form);
-//    tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+//    tabWidget->setObjectName("tabWidget");
     tab = new QWidget(tabWidget_orig);
-    tab->setObjectName(QString::fromUtf8("tab"));
+    tab->setObjectName("tab");
     tabWidget_2 = new QTabWidget(tab);
-    tabWidget_2->setObjectName(QString::fromUtf8("tabWidget_2"));
+    tabWidget_2->setObjectName("tabWidget_2");
     tabWidget_2->setGeometry(QRect(10, 40, 401, 291));
     tabWidget_2->setTabPosition(QTabWidget::West);
     tab_FS = new QWidget();
-    tab_FS->setObjectName(QString::fromUtf8("tab_FS"));
+    tab_FS->setObjectName("tab_FS");
     gridLayout_2 = new QGridLayout(tab_FS);
     gridLayout_2->setSpacing(2);
-    gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
+    gridLayout_2->setObjectName("gridLayout_2");
     gridLayout_2->setContentsMargins(6, 6, 6, 6);
-    lbl_FS_Status = new QLabel(tab_FS);
-    lbl_FS_Status->setObjectName(QString::fromUtf8("lbl_FS_Status"));
-
-    gridLayout_2->addWidget(lbl_FS_Status, 4, 0, 1, 2);
-
-    label_2 = new QLabel(tab_FS);
-    label_2->setObjectName(QString::fromUtf8("label_2"));
-
-    gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
-
-    progress_FS_Complete = new QProgressBar(tab_FS);
-    progress_FS_Complete->setObjectName(QString::fromUtf8("progress_FS_Complete"));
-    progress_FS_Complete->setValue(0);
-
-    gridLayout_2->addWidget(progress_FS_Complete, 3, 0, 1, 3);
-
-    edit_FS_Log = new QPlainTextEdit(tab_FS);
-    edit_FS_Log->setObjectName(QString::fromUtf8("edit_FS_Log"));
-    edit_FS_Log->setUndoRedoEnabled(false);
-    edit_FS_Log->setReadOnly(true);
-
-    gridLayout_2->addWidget(edit_FS_Log, 7, 0, 1, 3);
-
-    edit_FS_Remote = new QLineEdit(tab_FS);
-    edit_FS_Remote->setObjectName(QString::fromUtf8("edit_FS_Remote"));
-
-    gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
-
-    btn_FS_Local = new QToolButton(tab_FS);
-    btn_FS_Local->setObjectName(QString::fromUtf8("btn_FS_Local"));
-
-    gridLayout_2->addWidget(btn_FS_Local, 0, 2, 1, 1);
-
     edit_FS_Local = new QLineEdit(tab_FS);
-    edit_FS_Local->setObjectName(QString::fromUtf8("edit_FS_Local"));
+    edit_FS_Local->setObjectName("edit_FS_Local");
 
     gridLayout_2->addWidget(edit_FS_Local, 0, 1, 1, 1);
 
-    label_3 = new QLabel(tab_FS);
-    label_3->setObjectName(QString::fromUtf8("label_3"));
+    btn_FS_Local = new QToolButton(tab_FS);
+    btn_FS_Local->setObjectName("btn_FS_Local");
 
-    gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
-
-    horizontalLayout = new QHBoxLayout();
-    horizontalLayout->setSpacing(2);
-    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-    radio_FS_Upload = new QRadioButton(tab_FS);
-    radio_FS_Upload->setObjectName(QString::fromUtf8("radio_FS_Upload"));
-    radio_FS_Upload->setChecked(true);
-
-    horizontalLayout->addWidget(radio_FS_Upload);
-
-    radio_FS_Download = new QRadioButton(tab_FS);
-    radio_FS_Download->setObjectName(QString::fromUtf8("radio_FS_Download"));
-
-    horizontalLayout->addWidget(radio_FS_Download);
-
-    radio_FS_Size = new QRadioButton(tab_FS);
-    radio_FS_Size->setObjectName(QString::fromUtf8("radio_FS_Size"));
-
-    horizontalLayout->addWidget(radio_FS_Size);
-
-    radio_FS_HashChecksum = new QRadioButton(tab_FS);
-    radio_FS_HashChecksum->setObjectName(QString::fromUtf8("radio_FS_HashChecksum"));
-
-    horizontalLayout->addWidget(radio_FS_HashChecksum);
-
-
-    gridLayout_2->addLayout(horizontalLayout, 2, 0, 1, 3);
+    gridLayout_2->addWidget(btn_FS_Local, 0, 2, 1, 1);
 
     horizontalLayout_2 = new QHBoxLayout();
     horizontalLayout_2->setSpacing(2);
-    horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+    horizontalLayout_2->setObjectName("horizontalLayout_2");
     horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_2->addItem(horizontalSpacer);
 
     btn_FS_Go = new QPushButton(tab_FS);
-    btn_FS_Go->setObjectName(QString::fromUtf8("btn_FS_Go"));
+    btn_FS_Go->setObjectName("btn_FS_Go");
 
     horizontalLayout_2->addWidget(btn_FS_Go);
 
@@ -165,17 +105,93 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_2->addItem(horizontalSpacer_2);
 
 
-    gridLayout_2->addLayout(horizontalLayout_2, 5, 0, 1, 3);
+    gridLayout_2->addLayout(horizontalLayout_2, 6, 0, 1, 3);
+
+    horizontalLayout = new QHBoxLayout();
+    horizontalLayout->setSpacing(2);
+    horizontalLayout->setObjectName("horizontalLayout");
+    radio_FS_Upload = new QRadioButton(tab_FS);
+    radio_FS_Upload->setObjectName("radio_FS_Upload");
+    radio_FS_Upload->setChecked(true);
+
+    horizontalLayout->addWidget(radio_FS_Upload);
+
+    radio_FS_Download = new QRadioButton(tab_FS);
+    radio_FS_Download->setObjectName("radio_FS_Download");
+
+    horizontalLayout->addWidget(radio_FS_Download);
+
+    radio_FS_Size = new QRadioButton(tab_FS);
+    radio_FS_Size->setObjectName("radio_FS_Size");
+
+    horizontalLayout->addWidget(radio_FS_Size);
+
+    radio_FS_HashChecksum = new QRadioButton(tab_FS);
+    radio_FS_HashChecksum->setObjectName("radio_FS_HashChecksum");
+
+    horizontalLayout->addWidget(radio_FS_HashChecksum);
+
+    radio_FS_Hash_Checksum_Types = new QRadioButton(tab_FS);
+    radio_FS_Hash_Checksum_Types->setObjectName("radio_FS_Hash_Checksum_Types");
+
+    horizontalLayout->addWidget(radio_FS_Hash_Checksum_Types);
+
+
+    gridLayout_2->addLayout(horizontalLayout, 3, 0, 1, 3);
+
+    lbl_FS_Status = new QLabel(tab_FS);
+    lbl_FS_Status->setObjectName("lbl_FS_Status");
+
+    gridLayout_2->addWidget(lbl_FS_Status, 5, 0, 1, 2);
+
+    label_2 = new QLabel(tab_FS);
+    label_2->setObjectName("label_2");
+
+    gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
+
+    edit_FS_Log = new QPlainTextEdit(tab_FS);
+    edit_FS_Log->setObjectName("edit_FS_Log");
+    edit_FS_Log->setUndoRedoEnabled(false);
+    edit_FS_Log->setReadOnly(true);
+
+    gridLayout_2->addWidget(edit_FS_Log, 8, 0, 1, 3);
+
+    label_3 = new QLabel(tab_FS);
+    label_3->setObjectName("label_3");
+
+    gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
+
+    progress_FS_Complete = new QProgressBar(tab_FS);
+    progress_FS_Complete->setObjectName("progress_FS_Complete");
+    progress_FS_Complete->setValue(0);
+
+    gridLayout_2->addWidget(progress_FS_Complete, 4, 0, 1, 3);
+
+    edit_FS_Remote = new QLineEdit(tab_FS);
+    edit_FS_Remote->setObjectName("edit_FS_Remote");
+
+    gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
+
+    label_19 = new QLabel(tab_FS);
+    label_19->setObjectName("label_19");
+
+    gridLayout_2->addWidget(label_19, 2, 0, 1, 1);
+
+    combo_FS_Hash_Checksum = new QComboBox(tab_FS);
+    combo_FS_Hash_Checksum->setObjectName("combo_FS_Hash_Checksum");
+    combo_FS_Hash_Checksum->setEditable(true);
+
+    gridLayout_2->addWidget(combo_FS_Hash_Checksum, 2, 1, 1, 2);
 
     tabWidget_2->addTab(tab_FS, QString());
     tab_IMG_Images_2 = new QWidget();
-    tab_IMG_Images_2->setObjectName(QString::fromUtf8("tab_IMG_Images_2"));
+    tab_IMG_Images_2->setObjectName("tab_IMG_Images_2");
     gridLayout_3 = new QGridLayout(tab_IMG_Images_2);
     gridLayout_3->setSpacing(2);
-    gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
+    gridLayout_3->setObjectName("gridLayout_3");
     gridLayout_3->setContentsMargins(6, 6, 6, 6);
     edit_IMG_Log = new QPlainTextEdit(tab_IMG_Images_2);
-    edit_IMG_Log->setObjectName(QString::fromUtf8("edit_IMG_Log"));
+    edit_IMG_Log->setObjectName("edit_IMG_Log");
     edit_IMG_Log->setUndoRedoEnabled(false);
     edit_IMG_Log->setReadOnly(true);
 
@@ -183,14 +199,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_3 = new QHBoxLayout();
     horizontalLayout_3->setSpacing(2);
-    horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+    horizontalLayout_3->setObjectName("horizontalLayout_3");
     horizontalLayout_3->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_3->addItem(horizontalSpacer_3);
 
     btn_IMG_Go = new QPushButton(tab_IMG_Images_2);
-    btn_IMG_Go->setObjectName(QString::fromUtf8("btn_IMG_Go"));
+    btn_IMG_Go->setObjectName("btn_IMG_Go");
 
     horizontalLayout_3->addWidget(btn_IMG_Go);
 
@@ -202,39 +218,39 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_3->addLayout(horizontalLayout_3, 5, 0, 1, 3);
 
     lbl_IMG_Status = new QLabel(tab_IMG_Images_2);
-    lbl_IMG_Status->setObjectName(QString::fromUtf8("lbl_IMG_Status"));
+    lbl_IMG_Status->setObjectName("lbl_IMG_Status");
 
     gridLayout_3->addWidget(lbl_IMG_Status, 3, 0, 1, 2);
 
     tabWidget_3 = new QTabWidget(tab_IMG_Images_2);
-    tabWidget_3->setObjectName(QString::fromUtf8("tabWidget_3"));
+    tabWidget_3->setObjectName("tabWidget_3");
     tab_IMG_Upload = new QWidget();
-    tab_IMG_Upload->setObjectName(QString::fromUtf8("tab_IMG_Upload"));
+    tab_IMG_Upload->setObjectName("tab_IMG_Upload");
     gridLayout_4 = new QGridLayout(tab_IMG_Upload);
     gridLayout_4->setSpacing(2);
-    gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
+    gridLayout_4->setObjectName("gridLayout_4");
     gridLayout_4->setContentsMargins(6, 6, 6, 6);
     progress_IMG_Complete = new QProgressBar(tab_IMG_Upload);
-    progress_IMG_Complete->setObjectName(QString::fromUtf8("progress_IMG_Complete"));
+    progress_IMG_Complete->setObjectName("progress_IMG_Complete");
     progress_IMG_Complete->setValue(0);
 
     gridLayout_4->addWidget(progress_IMG_Complete, 3, 1, 1, 1);
 
     label_6 = new QLabel(tab_IMG_Upload);
-    label_6->setObjectName(QString::fromUtf8("label_6"));
+    label_6->setObjectName("label_6");
 
     gridLayout_4->addWidget(label_6, 3, 0, 1, 1);
 
     horizontalLayout_5 = new QHBoxLayout();
     horizontalLayout_5->setSpacing(2);
-    horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+    horizontalLayout_5->setObjectName("horizontalLayout_5");
     edit_IMG_Local = new QLineEdit(tab_IMG_Upload);
-    edit_IMG_Local->setObjectName(QString::fromUtf8("edit_IMG_Local"));
+    edit_IMG_Local->setObjectName("edit_IMG_Local");
 
     horizontalLayout_5->addWidget(edit_IMG_Local);
 
     btn_IMG_Local = new QToolButton(tab_IMG_Upload);
-    btn_IMG_Local->setObjectName(QString::fromUtf8("btn_IMG_Local"));
+    btn_IMG_Local->setObjectName("btn_IMG_Local");
 
     horizontalLayout_5->addWidget(btn_IMG_Local);
 
@@ -242,32 +258,32 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_4->addLayout(horizontalLayout_5, 0, 1, 1, 1);
 
     label_4 = new QLabel(tab_IMG_Upload);
-    label_4->setObjectName(QString::fromUtf8("label_4"));
+    label_4->setObjectName("label_4");
 
     gridLayout_4->addWidget(label_4, 0, 0, 1, 1);
 
     horizontalLayout_4 = new QHBoxLayout();
     horizontalLayout_4->setSpacing(2);
-    horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+    horizontalLayout_4->setObjectName("horizontalLayout_4");
     edit_IMG_Image = new QSpinBox(tab_IMG_Upload);
-    edit_IMG_Image->setObjectName(QString::fromUtf8("edit_IMG_Image"));
+    edit_IMG_Image->setObjectName("edit_IMG_Image");
     edit_IMG_Image->setMaximumSize(QSize(60, 16777215));
 
     horizontalLayout_4->addWidget(edit_IMG_Image);
 
     radio_IMG_No_Action = new QRadioButton(tab_IMG_Upload);
-    radio_IMG_No_Action->setObjectName(QString::fromUtf8("radio_IMG_No_Action"));
+    radio_IMG_No_Action->setObjectName("radio_IMG_No_Action");
 
     horizontalLayout_4->addWidget(radio_IMG_No_Action);
 
     radio_IMG_Test = new QRadioButton(tab_IMG_Upload);
-    radio_IMG_Test->setObjectName(QString::fromUtf8("radio_IMG_Test"));
+    radio_IMG_Test->setObjectName("radio_IMG_Test");
     radio_IMG_Test->setChecked(true);
 
     horizontalLayout_4->addWidget(radio_IMG_Test);
 
     radio_IMG_Confirm = new QRadioButton(tab_IMG_Upload);
-    radio_IMG_Confirm->setObjectName(QString::fromUtf8("radio_IMG_Confirm"));
+    radio_IMG_Confirm->setObjectName("radio_IMG_Confirm");
 
     horizontalLayout_4->addWidget(radio_IMG_Confirm);
 
@@ -275,60 +291,60 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_4->addLayout(horizontalLayout_4, 1, 1, 1, 1);
 
     label_41 = new QLabel(tab_IMG_Upload);
-    label_41->setObjectName(QString::fromUtf8("label_41"));
+    label_41->setObjectName("label_41");
 
     gridLayout_4->addWidget(label_41, 1, 0, 1, 1);
 
     label_9 = new QLabel(tab_IMG_Upload);
-    label_9->setObjectName(QString::fromUtf8("label_9"));
+    label_9->setObjectName("label_9");
 
     gridLayout_4->addWidget(label_9, 2, 0, 1, 1);
 
     check_IMG_Reset = new QCheckBox(tab_IMG_Upload);
-    check_IMG_Reset->setObjectName(QString::fromUtf8("check_IMG_Reset"));
+    check_IMG_Reset->setObjectName("check_IMG_Reset");
 
     gridLayout_4->addWidget(check_IMG_Reset, 2, 1, 1, 1);
 
     tabWidget_3->addTab(tab_IMG_Upload, QString());
     tab_IMG_Images = new QWidget();
-    tab_IMG_Images->setObjectName(QString::fromUtf8("tab_IMG_Images"));
+    tab_IMG_Images->setObjectName("tab_IMG_Images");
     gridLayout_5 = new QGridLayout(tab_IMG_Images);
     gridLayout_5->setSpacing(2);
-    gridLayout_5->setObjectName(QString::fromUtf8("gridLayout_5"));
+    gridLayout_5->setObjectName("gridLayout_5");
     gridLayout_5->setContentsMargins(6, 6, 6, 6);
     colview_IMG_Images = new QColumnView(tab_IMG_Images);
-    colview_IMG_Images->setObjectName(QString::fromUtf8("colview_IMG_Images"));
+    colview_IMG_Images->setObjectName("colview_IMG_Images");
 
     gridLayout_5->addWidget(colview_IMG_Images, 0, 0, 1, 1);
 
     horizontalLayout_6 = new QHBoxLayout();
     horizontalLayout_6->setSpacing(2);
-    horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+    horizontalLayout_6->setObjectName("horizontalLayout_6");
     label_5 = new QLabel(tab_IMG_Images);
-    label_5->setObjectName(QString::fromUtf8("label_5"));
+    label_5->setObjectName("label_5");
 
     horizontalLayout_6->addWidget(label_5);
 
     radio_IMG_Get = new QRadioButton(tab_IMG_Images);
-    radio_IMG_Get->setObjectName(QString::fromUtf8("radio_IMG_Get"));
+    radio_IMG_Get->setObjectName("radio_IMG_Get");
     radio_IMG_Get->setChecked(true);
 
     horizontalLayout_6->addWidget(radio_IMG_Get);
 
     radio_IMG_Set = new QRadioButton(tab_IMG_Images);
-    radio_IMG_Set->setObjectName(QString::fromUtf8("radio_IMG_Set"));
+    radio_IMG_Set->setObjectName("radio_IMG_Set");
 
     horizontalLayout_6->addWidget(radio_IMG_Set);
 
     line = new QFrame(tab_IMG_Images);
-    line->setObjectName(QString::fromUtf8("line"));
+    line->setObjectName("line");
     line->setFrameShape(QFrame::VLine);
     line->setFrameShadow(QFrame::Sunken);
 
     horizontalLayout_6->addWidget(line);
 
     check_IMG_Confirm = new QCheckBox(tab_IMG_Images);
-    check_IMG_Confirm->setObjectName(QString::fromUtf8("check_IMG_Confirm"));
+    check_IMG_Confirm->setObjectName("check_IMG_Confirm");
 
     horizontalLayout_6->addWidget(check_IMG_Confirm);
 
@@ -341,11 +357,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_3->addTab(tab_IMG_Images, QString());
     tab_IMG_Erase = new QWidget();
-    tab_IMG_Erase->setObjectName(QString::fromUtf8("tab_IMG_Erase"));
+    tab_IMG_Erase->setObjectName("tab_IMG_Erase");
     gridLayout_10 = new QGridLayout(tab_IMG_Erase);
-    gridLayout_10->setObjectName(QString::fromUtf8("gridLayout_10"));
+    gridLayout_10->setObjectName("gridLayout_10");
     label_14 = new QLabel(tab_IMG_Erase);
-    label_14->setObjectName(QString::fromUtf8("label_14"));
+    label_14->setObjectName("label_14");
 
     gridLayout_10->addWidget(label_14, 0, 0, 1, 1);
 
@@ -354,7 +370,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_10->addItem(horizontalSpacer_9, 0, 2, 1, 1);
 
     edit_IMG_Erase_Slot = new QSpinBox(tab_IMG_Erase);
-    edit_IMG_Erase_Slot->setObjectName(QString::fromUtf8("edit_IMG_Erase_Slot"));
+    edit_IMG_Erase_Slot->setObjectName("edit_IMG_Erase_Slot");
     edit_IMG_Erase_Slot->setMinimumSize(QSize(40, 0));
     edit_IMG_Erase_Slot->setMaximumSize(QSize(16777215, 16777215));
 
@@ -370,33 +386,33 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_2->addTab(tab_IMG_Images_2, QString());
     tab_OS = new QWidget();
-    tab_OS->setObjectName(QString::fromUtf8("tab_OS"));
+    tab_OS->setObjectName("tab_OS");
     gridLayout_7 = new QGridLayout(tab_OS);
     gridLayout_7->setSpacing(2);
-    gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
+    gridLayout_7->setObjectName("gridLayout_7");
     selector_OS = new QTabWidget(tab_OS);
-    selector_OS->setObjectName(QString::fromUtf8("selector_OS"));
+    selector_OS->setObjectName("selector_OS");
     tab_OS_Echo = new QWidget();
-    tab_OS_Echo->setObjectName(QString::fromUtf8("tab_OS_Echo"));
+    tab_OS_Echo->setObjectName("tab_OS_Echo");
     gridLayout_8 = new QGridLayout(tab_OS_Echo);
-    gridLayout_8->setObjectName(QString::fromUtf8("gridLayout_8"));
+    gridLayout_8->setObjectName("gridLayout_8");
     label_10 = new QLabel(tab_OS_Echo);
-    label_10->setObjectName(QString::fromUtf8("label_10"));
+    label_10->setObjectName("label_10");
 
     gridLayout_8->addWidget(label_10, 0, 0, 1, 1);
 
     edit_OS_Echo_Input = new QPlainTextEdit(tab_OS_Echo);
-    edit_OS_Echo_Input->setObjectName(QString::fromUtf8("edit_OS_Echo_Input"));
+    edit_OS_Echo_Input->setObjectName("edit_OS_Echo_Input");
 
     gridLayout_8->addWidget(edit_OS_Echo_Input, 0, 1, 1, 1);
 
     label_11 = new QLabel(tab_OS_Echo);
-    label_11->setObjectName(QString::fromUtf8("label_11"));
+    label_11->setObjectName("label_11");
 
     gridLayout_8->addWidget(label_11, 1, 0, 1, 1);
 
     edit_OS_Echo_Output = new QPlainTextEdit(tab_OS_Echo);
-    edit_OS_Echo_Output->setObjectName(QString::fromUtf8("edit_OS_Echo_Output"));
+    edit_OS_Echo_Output->setObjectName("edit_OS_Echo_Output");
     edit_OS_Echo_Output->setUndoRedoEnabled(false);
     edit_OS_Echo_Output->setReadOnly(true);
 
@@ -404,9 +420,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     selector_OS->addTab(tab_OS_Echo, QString());
     tab_OS_Tasks = new QWidget();
-    tab_OS_Tasks->setObjectName(QString::fromUtf8("tab_OS_Tasks"));
+    tab_OS_Tasks->setObjectName("tab_OS_Tasks");
     gridLayout_14 = new QGridLayout(tab_OS_Tasks);
-    gridLayout_14->setObjectName(QString::fromUtf8("gridLayout_14"));
+    gridLayout_14->setObjectName("gridLayout_14");
     table_OS_Tasks = new QTableWidget(tab_OS_Tasks);
     if (table_OS_Tasks->columnCount() < 8)
         table_OS_Tasks->setColumnCount(8);
@@ -426,7 +442,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     table_OS_Tasks->setHorizontalHeaderItem(6, __qtablewidgetitem6);
     QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
     table_OS_Tasks->setHorizontalHeaderItem(7, __qtablewidgetitem7);
-    table_OS_Tasks->setObjectName(QString::fromUtf8("table_OS_Tasks"));
+    table_OS_Tasks->setObjectName("table_OS_Tasks");
     table_OS_Tasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table_OS_Tasks->setProperty("showDropIndicator", QVariant(false));
     table_OS_Tasks->setDragDropOverwriteMode(false);
@@ -439,7 +455,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     selector_OS->addTab(tab_OS_Tasks, QString());
     tab_OS_Memory = new QWidget();
-    tab_OS_Memory->setObjectName(QString::fromUtf8("tab_OS_Memory"));
+    tab_OS_Memory->setObjectName("tab_OS_Memory");
     table_OS_Memory = new QTableWidget(tab_OS_Memory);
     if (table_OS_Memory->columnCount() < 4)
         table_OS_Memory->setColumnCount(4);
@@ -451,7 +467,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     table_OS_Memory->setHorizontalHeaderItem(2, __qtablewidgetitem10);
     QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
     table_OS_Memory->setHorizontalHeaderItem(3, __qtablewidgetitem11);
-    table_OS_Memory->setObjectName(QString::fromUtf8("table_OS_Memory"));
+    table_OS_Memory->setObjectName("table_OS_Memory");
     table_OS_Memory->setGeometry(QRect(10, 10, 330, 172));
     table_OS_Memory->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table_OS_Memory->setProperty("showDropIndicator", QVariant(false));
@@ -462,11 +478,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     table_OS_Memory->setCornerButtonEnabled(false);
     selector_OS->addTab(tab_OS_Memory, QString());
     tab_OS_Reset = new QWidget();
-    tab_OS_Reset->setObjectName(QString::fromUtf8("tab_OS_Reset"));
+    tab_OS_Reset->setObjectName("tab_OS_Reset");
     gridLayout_12 = new QGridLayout(tab_OS_Reset);
-    gridLayout_12->setObjectName(QString::fromUtf8("gridLayout_12"));
+    gridLayout_12->setObjectName("gridLayout_12");
     check_OS_Force_Reboot = new QCheckBox(tab_OS_Reset);
-    check_OS_Force_Reboot->setObjectName(QString::fromUtf8("check_OS_Force_Reboot"));
+    check_OS_Force_Reboot->setObjectName("check_OS_Force_Reboot");
 
     gridLayout_12->addWidget(check_OS_Force_Reboot, 0, 0, 1, 1);
 
@@ -476,32 +492,32 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     selector_OS->addTab(tab_OS_Reset, QString());
     tab_OS_Info = new QWidget();
-    tab_OS_Info->setObjectName(QString::fromUtf8("tab_OS_Info"));
+    tab_OS_Info->setObjectName("tab_OS_Info");
     gridLayout_13 = new QGridLayout(tab_OS_Info);
     gridLayout_13->setSpacing(2);
-    gridLayout_13->setObjectName(QString::fromUtf8("gridLayout_13"));
+    gridLayout_13->setObjectName("gridLayout_13");
     label_17 = new QLabel(tab_OS_Info);
-    label_17->setObjectName(QString::fromUtf8("label_17"));
+    label_17->setObjectName("label_17");
 
     gridLayout_13->addWidget(label_17, 0, 0, 1, 1);
 
     edit_OS_UName = new QLineEdit(tab_OS_Info);
-    edit_OS_UName->setObjectName(QString::fromUtf8("edit_OS_UName"));
+    edit_OS_UName->setObjectName("edit_OS_UName");
     edit_OS_UName->setReadOnly(false);
 
     gridLayout_13->addWidget(edit_OS_UName, 0, 1, 1, 1);
 
     horizontalLayout_10 = new QHBoxLayout();
     horizontalLayout_10->setSpacing(2);
-    horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
+    horizontalLayout_10->setObjectName("horizontalLayout_10");
     radio_OS_Buffer_Info = new QRadioButton(tab_OS_Info);
-    radio_OS_Buffer_Info->setObjectName(QString::fromUtf8("radio_OS_Buffer_Info"));
+    radio_OS_Buffer_Info->setObjectName("radio_OS_Buffer_Info");
     radio_OS_Buffer_Info->setChecked(true);
 
     horizontalLayout_10->addWidget(radio_OS_Buffer_Info);
 
     radio_OS_uname = new QRadioButton(tab_OS_Info);
-    radio_OS_uname->setObjectName(QString::fromUtf8("radio_OS_uname"));
+    radio_OS_uname->setObjectName("radio_OS_uname");
 
     horizontalLayout_10->addWidget(radio_OS_uname);
 
@@ -509,12 +525,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_13->addLayout(horizontalLayout_10, 1, 0, 1, 2);
 
     label_18 = new QLabel(tab_OS_Info);
-    label_18->setObjectName(QString::fromUtf8("label_18"));
+    label_18->setObjectName("label_18");
 
     gridLayout_13->addWidget(label_18, 2, 0, 1, 1);
 
     edit_OS_Info_Output = new QPlainTextEdit(tab_OS_Info);
-    edit_OS_Info_Output->setObjectName(QString::fromUtf8("edit_OS_Info_Output"));
+    edit_OS_Info_Output->setObjectName("edit_OS_Info_Output");
 
     gridLayout_13->addWidget(edit_OS_Info_Output, 2, 1, 1, 1);
 
@@ -524,14 +540,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_13 = new QHBoxLayout();
     horizontalLayout_13->setSpacing(2);
-    horizontalLayout_13->setObjectName(QString::fromUtf8("horizontalLayout_13"));
+    horizontalLayout_13->setObjectName("horizontalLayout_13");
     horizontalLayout_13->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer_17 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_13->addItem(horizontalSpacer_17);
 
     btn_OS_Go = new QPushButton(tab_OS);
-    btn_OS_Go->setObjectName(QString::fromUtf8("btn_OS_Go"));
+    btn_OS_Go->setObjectName("btn_OS_Go");
 
     horizontalLayout_13->addWidget(btn_OS_Go);
 
@@ -543,28 +559,28 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_7->addLayout(horizontalLayout_13, 2, 0, 1, 1);
 
     lbl_OS_Status = new QLabel(tab_OS);
-    lbl_OS_Status->setObjectName(QString::fromUtf8("lbl_OS_Status"));
+    lbl_OS_Status->setObjectName("lbl_OS_Status");
 
     gridLayout_7->addWidget(lbl_OS_Status, 1, 0, 1, 1);
 
     tabWidget_2->addTab(tab_OS, QString());
     tab_5 = new QWidget();
-    tab_5->setObjectName(QString::fromUtf8("tab_5"));
+    tab_5->setObjectName("tab_5");
     gridLayout_11 = new QGridLayout(tab_5);
-    gridLayout_11->setObjectName(QString::fromUtf8("gridLayout_11"));
+    gridLayout_11->setObjectName("gridLayout_11");
     label_15 = new QLabel(tab_5);
-    label_15->setObjectName(QString::fromUtf8("label_15"));
+    label_15->setObjectName("label_15");
 
     gridLayout_11->addWidget(label_15, 0, 0, 1, 1);
 
     combo_STAT_Group = new QComboBox(tab_5);
-    combo_STAT_Group->setObjectName(QString::fromUtf8("combo_STAT_Group"));
+    combo_STAT_Group->setObjectName("combo_STAT_Group");
     combo_STAT_Group->setEditable(true);
 
     gridLayout_11->addWidget(combo_STAT_Group, 0, 1, 1, 1);
 
     label_16 = new QLabel(tab_5);
-    label_16->setObjectName(QString::fromUtf8("label_16"));
+    label_16->setObjectName("label_16");
 
     gridLayout_11->addWidget(label_16, 1, 0, 1, 1);
 
@@ -575,21 +591,21 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     table_STAT_Values->setHorizontalHeaderItem(0, __qtablewidgetitem12);
     QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
     table_STAT_Values->setHorizontalHeaderItem(1, __qtablewidgetitem13);
-    table_STAT_Values->setObjectName(QString::fromUtf8("table_STAT_Values"));
+    table_STAT_Values->setObjectName("table_STAT_Values");
 
     gridLayout_11->addWidget(table_STAT_Values, 1, 1, 1, 1);
 
     horizontalLayout_9 = new QHBoxLayout();
     horizontalLayout_9->setSpacing(2);
-    horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
+    horizontalLayout_9->setObjectName("horizontalLayout_9");
     radio_STAT_List = new QRadioButton(tab_5);
-    radio_STAT_List->setObjectName(QString::fromUtf8("radio_STAT_List"));
+    radio_STAT_List->setObjectName("radio_STAT_List");
     radio_STAT_List->setChecked(true);
 
     horizontalLayout_9->addWidget(radio_STAT_List);
 
     radio_STAT_Fetch = new QRadioButton(tab_5);
-    radio_STAT_Fetch->setObjectName(QString::fromUtf8("radio_STAT_Fetch"));
+    radio_STAT_Fetch->setObjectName("radio_STAT_Fetch");
 
     horizontalLayout_9->addWidget(radio_STAT_Fetch);
 
@@ -597,20 +613,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_11->addLayout(horizontalLayout_9, 2, 0, 1, 2);
 
     lbl_STAT_Status = new QLabel(tab_5);
-    lbl_STAT_Status->setObjectName(QString::fromUtf8("lbl_STAT_Status"));
+    lbl_STAT_Status->setObjectName("lbl_STAT_Status");
 
     gridLayout_11->addWidget(lbl_STAT_Status, 3, 0, 1, 2);
 
     horizontalLayout_14 = new QHBoxLayout();
     horizontalLayout_14->setSpacing(2);
-    horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
+    horizontalLayout_14->setObjectName("horizontalLayout_14");
     horizontalLayout_14->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer_19 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_14->addItem(horizontalSpacer_19);
 
     btn_STAT_Go = new QPushButton(tab_5);
-    btn_STAT_Go->setObjectName(QString::fromUtf8("btn_STAT_Go"));
+    btn_STAT_Go->setObjectName("btn_STAT_Go");
 
     horizontalLayout_14->addWidget(btn_STAT_Go);
 
@@ -623,19 +639,19 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_2->addTab(tab_5, QString());
     tab_Shell = new QWidget();
-    tab_Shell->setObjectName(QString::fromUtf8("tab_Shell"));
+    tab_Shell->setObjectName("tab_Shell");
     gridLayout_9 = new QGridLayout(tab_Shell);
     gridLayout_9->setSpacing(2);
-    gridLayout_9->setObjectName(QString::fromUtf8("gridLayout_9"));
+    gridLayout_9->setObjectName("gridLayout_9");
     verticalLayout_3 = new QVBoxLayout();
-    verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+    verticalLayout_3->setObjectName("verticalLayout_3");
     btn_SHELL_Clear = new QToolButton(tab_Shell);
-    btn_SHELL_Clear->setObjectName(QString::fromUtf8("btn_SHELL_Clear"));
+    btn_SHELL_Clear->setObjectName("btn_SHELL_Clear");
 
     verticalLayout_3->addWidget(btn_SHELL_Clear);
 
     btn_SHELL_Copy = new QToolButton(tab_Shell);
-    btn_SHELL_Copy->setObjectName(QString::fromUtf8("btn_SHELL_Copy"));
+    btn_SHELL_Copy->setObjectName("btn_SHELL_Copy");
 
     verticalLayout_3->addWidget(btn_SHELL_Copy);
 
@@ -643,37 +659,37 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_9->addLayout(verticalLayout_3, 1, 2, 1, 1);
 
     lbl_SHELL_Status = new QLabel(tab_Shell);
-    lbl_SHELL_Status->setObjectName(QString::fromUtf8("lbl_SHELL_Status"));
+    lbl_SHELL_Status->setObjectName("lbl_SHELL_Status");
 
     gridLayout_9->addWidget(lbl_SHELL_Status, 2, 0, 1, 3);
 
     edit_SHELL_Output = new QPlainTextEdit(tab_Shell);
-    edit_SHELL_Output->setObjectName(QString::fromUtf8("edit_SHELL_Output"));
+    edit_SHELL_Output->setObjectName("edit_SHELL_Output");
     edit_SHELL_Output->setUndoRedoEnabled(false);
     edit_SHELL_Output->setReadOnly(true);
 
     gridLayout_9->addWidget(edit_SHELL_Output, 1, 1, 1, 1);
 
     edit_SHELL_Input = new QLineEdit(tab_Shell);
-    edit_SHELL_Input->setObjectName(QString::fromUtf8("edit_SHELL_Input"));
+    edit_SHELL_Input->setObjectName("edit_SHELL_Input");
 
     gridLayout_9->addWidget(edit_SHELL_Input, 0, 1, 1, 2);
 
     label_12 = new QLabel(tab_Shell);
-    label_12->setObjectName(QString::fromUtf8("label_12"));
+    label_12->setObjectName("label_12");
 
     gridLayout_9->addWidget(label_12, 0, 0, 1, 1);
 
     horizontalLayout_8 = new QHBoxLayout();
     horizontalLayout_8->setSpacing(2);
-    horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
+    horizontalLayout_8->setObjectName("horizontalLayout_8");
     horizontalLayout_8->setContentsMargins(-1, -1, -1, 0);
     horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_8->addItem(horizontalSpacer_7);
 
     btn_SHELL_Go = new QPushButton(tab_Shell);
-    btn_SHELL_Go->setObjectName(QString::fromUtf8("btn_SHELL_Go"));
+    btn_SHELL_Go->setObjectName("btn_SHELL_Go");
 
     horizontalLayout_8->addWidget(btn_SHELL_Go);
 
@@ -685,41 +701,41 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_9->addLayout(horizontalLayout_8, 3, 0, 1, 3);
 
     label_13 = new QLabel(tab_Shell);
-    label_13->setObjectName(QString::fromUtf8("label_13"));
+    label_13->setObjectName("label_13");
 
     gridLayout_9->addWidget(label_13, 1, 0, 1, 1);
 
     tabWidget_2->addTab(tab_Shell, QString());
     verticalLayoutWidget = new QWidget();
-    verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
+    verticalLayoutWidget->setObjectName("verticalLayoutWidget");
     verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
-    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+    verticalLayout->setObjectName("verticalLayout");
     verticalLayout->setContentsMargins(0, 0, 0, 0);
     formLayout = new QFormLayout();
-    formLayout->setObjectName(QString::fromUtf8("formLayout"));
+    formLayout->setObjectName("formLayout");
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     formLayout->setHorizontalSpacing(2);
     formLayout->setVerticalSpacing(2);
     label_7 = new QLabel(verticalLayoutWidget);
-    label_7->setObjectName(QString::fromUtf8("label_7"));
+    label_7->setObjectName("label_7");
 
     formLayout->setWidget(0, QFormLayout::LabelRole, label_7);
 
     edit_IMG_Preview_Hash = new QLineEdit(verticalLayoutWidget);
-    edit_IMG_Preview_Hash->setObjectName(QString::fromUtf8("edit_IMG_Preview_Hash"));
+    edit_IMG_Preview_Hash->setObjectName("edit_IMG_Preview_Hash");
     edit_IMG_Preview_Hash->setReadOnly(true);
 
     formLayout->setWidget(0, QFormLayout::FieldRole, edit_IMG_Preview_Hash);
 
     label_8 = new QLabel(verticalLayoutWidget);
-    label_8->setObjectName(QString::fromUtf8("label_8"));
+    label_8->setObjectName("label_8");
 
     formLayout->setWidget(1, QFormLayout::LabelRole, label_8);
 
     edit_IMG_Preview_Version = new QLineEdit(verticalLayoutWidget);
-    edit_IMG_Preview_Version->setObjectName(QString::fromUtf8("edit_IMG_Preview_Version"));
+    edit_IMG_Preview_Version->setObjectName("edit_IMG_Preview_Version");
     edit_IMG_Preview_Version->setReadOnly(true);
 
     formLayout->setWidget(1, QFormLayout::FieldRole, edit_IMG_Preview_Version);
@@ -729,31 +745,31 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_6 = new QGridLayout();
     gridLayout_6->setSpacing(2);
-    gridLayout_6->setObjectName(QString::fromUtf8("gridLayout_6"));
+    gridLayout_6->setObjectName("gridLayout_6");
     check_IMG_Preview_Confirmed = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Confirmed->setObjectName(QString::fromUtf8("check_IMG_Preview_Confirmed"));
+    check_IMG_Preview_Confirmed->setObjectName("check_IMG_Preview_Confirmed");
 
     gridLayout_6->addWidget(check_IMG_Preview_Confirmed, 1, 0, 1, 1);
 
     check_IMG_Preview_Active = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Active->setObjectName(QString::fromUtf8("check_IMG_Preview_Active"));
+    check_IMG_Preview_Active->setObjectName("check_IMG_Preview_Active");
     check_IMG_Preview_Active->setEnabled(true);
     check_IMG_Preview_Active->setCheckable(true);
 
     gridLayout_6->addWidget(check_IMG_Preview_Active, 0, 0, 1, 1);
 
     check_IMG_Preview_Pending = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Pending->setObjectName(QString::fromUtf8("check_IMG_Preview_Pending"));
+    check_IMG_Preview_Pending->setObjectName("check_IMG_Preview_Pending");
 
     gridLayout_6->addWidget(check_IMG_Preview_Pending, 1, 1, 1, 1);
 
     check_IMG_Preview_Bootable = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Bootable->setObjectName(QString::fromUtf8("check_IMG_Preview_Bootable"));
+    check_IMG_Preview_Bootable->setObjectName("check_IMG_Preview_Bootable");
 
     gridLayout_6->addWidget(check_IMG_Preview_Bootable, 0, 1, 1, 1);
 
     check_IMG_Preview_Permanent = new QCheckBox(verticalLayoutWidget);
-    check_IMG_Preview_Permanent->setObjectName(QString::fromUtf8("check_IMG_Preview_Permanent"));
+    check_IMG_Preview_Permanent->setObjectName("check_IMG_Preview_Permanent");
 
     gridLayout_6->addWidget(check_IMG_Preview_Permanent, 2, 0, 1, 1);
 
@@ -761,7 +777,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout->addLayout(gridLayout_6);
 
     btn_IMG_Preview_Copy = new QPushButton(verticalLayoutWidget);
-    btn_IMG_Preview_Copy->setObjectName(QString::fromUtf8("btn_IMG_Preview_Copy"));
+    btn_IMG_Preview_Copy->setObjectName("btn_IMG_Preview_Copy");
 
     verticalLayout->addWidget(btn_IMG_Preview_Copy);
 
@@ -770,18 +786,18 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout->addItem(verticalSpacer);
 
     horizontalLayoutWidget = new QWidget(tab);
-    horizontalLayoutWidget->setObjectName(QString::fromUtf8("horizontalLayoutWidget"));
+    horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
     horizontalLayoutWidget->setGeometry(QRect(10, 10, 341, 31));
     horizontalLayout_7 = new QHBoxLayout(horizontalLayoutWidget);
-    horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+    horizontalLayout_7->setObjectName("horizontalLayout_7");
     horizontalLayout_7->setContentsMargins(0, 0, 0, 0);
     label = new QLabel(horizontalLayoutWidget);
-    label->setObjectName(QString::fromUtf8("label"));
+    label->setObjectName("label");
 
     horizontalLayout_7->addWidget(label);
 
     edit_MTU = new QSpinBox(horizontalLayoutWidget);
-    edit_MTU->setObjectName(QString::fromUtf8("edit_MTU"));
+    edit_MTU->setObjectName("edit_MTU");
     edit_MTU->setMinimum(32);
     edit_MTU->setMaximum(2048);
     edit_MTU->setValue(128);
@@ -789,7 +805,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_7->addWidget(edit_MTU);
 
     check_V2_Protocol = new QCheckBox(horizontalLayoutWidget);
-    check_V2_Protocol->setObjectName(QString::fromUtf8("check_V2_Protocol"));
+    check_V2_Protocol->setObjectName("check_V2_Protocol");
     check_V2_Protocol->setChecked(true);
 
     horizontalLayout_7->addWidget(check_V2_Protocol);
@@ -806,7 +822,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(3);
+    tabWidget_2->setCurrentIndex(0);
     tabWidget_3->setCurrentIndex(1);
     selector_OS->setCurrentIndex(2);
 ///AUTOGEN_END_INIT
@@ -814,15 +830,17 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     //retranslate code
 ///AUTOGEN_START_TRANSLATE
 //    Form->setWindowTitle(QCoreApplication::translate("Form", "Form", nullptr));
-    lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
     btn_FS_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
-    label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
+    btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     radio_FS_Upload->setText(QCoreApplication::translate("Form", "Upload", nullptr));
     radio_FS_Download->setText(QCoreApplication::translate("Form", "Download", nullptr));
     radio_FS_Size->setText(QCoreApplication::translate("Form", "Size", nullptr));
     radio_FS_HashChecksum->setText(QCoreApplication::translate("Form", "Hash/checksum", nullptr));
-    btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    radio_FS_Hash_Checksum_Types->setText(QCoreApplication::translate("Form", "Types", nullptr));
+    lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
+    label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
+    label_19->setText(QCoreApplication::translate("Form", "Hash/checksum:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
     btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
@@ -954,40 +972,42 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
 
     //test
 //    emit plugin_add_open_close_button(btn_FS_Go);
-    my_img = new smp_group_img_mgmt(processor);
-    my_os = new smp_group_os_mgmt(processor);
-    my_shell = new smp_group_shell_mgmt(processor);
-    my_stat = new smp_group_stat_mgmt(processor);
-    my_fs = new smp_group_fs_mgmt(processor);
+    smp_groups.img_mgmt = new smp_group_img_mgmt(processor);
+    smp_groups.os_mgmt = new smp_group_os_mgmt(processor);
+    smp_groups.shell_mgmt = new smp_group_shell_mgmt(processor);
+    smp_groups.stat_mgmt = new smp_group_stat_mgmt(processor);
+    smp_groups.fs_mgmt = new smp_group_fs_mgmt(processor);
+    error_lookup_form = new error_lookup(parent_window, &smp_groups);
 
-    connect(my_img, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(my_img, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-    connect(my_img, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+    connect(smp_groups.img_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.img_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.img_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 
-    connect(my_os, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(my_os, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(my_os, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+    connect(smp_groups.os_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.os_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(smp_groups.os_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 
-    connect(my_shell, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(my_shell, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(my_shell, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+    connect(smp_groups.shell_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.shell_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(smp_groups.shell_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 
-    connect(my_stat, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(my_stat, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(my_shell, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+    connect(smp_groups.stat_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.stat_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(smp_groups.shell_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 
-    connect(my_fs, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(my_fs, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(my_fs, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+    connect(smp_groups.fs_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.fs_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(smp_groups.fs_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 }
 
 plugin_mcumgr::~plugin_mcumgr()
 {
-    delete my_fs;
-    delete my_stat;
-    delete my_shell;
-    delete my_os;
-    delete my_img;
+    delete error_lookup_form;
+    delete smp_groups.fs_mgmt;
+    delete smp_groups.stat_mgmt;
+    delete smp_groups.shell_mgmt;
+    delete smp_groups.os_mgmt;
+    delete smp_groups.img_mgmt;
     delete processor;
     delete uart;
 }
@@ -1060,7 +1080,7 @@ void plugin_mcumgr::serial_closed()
         case ACTION_IMG_IMAGE_SET:
         case ACTION_IMG_IMAGE_ERASE:
         {
-            my_img->cancel();
+            smp_groups.img_mgmt->cancel();
             break;
         }
 
@@ -1072,7 +1092,7 @@ void plugin_mcumgr::serial_closed()
         case ACTION_OS_MCUMGR_BUFFER:
         case ACTION_OS_OS_APPLICATION_INFO:
         {
-            my_os->cancel();
+            smp_groups.os_mgmt->cancel();
             break;
         }
 
@@ -1087,6 +1107,23 @@ void plugin_mcumgr::serial_closed()
 //Form actions
 void plugin_mcumgr::on_btn_FS_Local_clicked()
 {
+    QString filename;
+
+    if (radio_FS_Upload->isChecked())
+    {
+        //TODO: load path
+        filename = QFileDialog::getOpenFileName(parent_window, "Select source/target file for transfer", "", "All Files (*.*)");
+    }
+    else
+    {
+        //TODO: load path
+        filename = QFileDialog::getSaveFileName(parent_window, "Select source/target file for transfer", "", "All Files (*)");
+    }
+
+    if (!filename.isEmpty())
+    {
+        edit_FS_Local->setText(filename);
+    }
 }
 
 void plugin_mcumgr::on_btn_FS_Go_clicked()
@@ -1096,8 +1133,8 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_FS_UPLOAD;
-        my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_fs->start_upload(edit_FS_Local->text(), edit_FS_Remote->text());
+        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.fs_mgmt->start_upload(edit_FS_Local->text(), edit_FS_Remote->text());
 
         progress_FS_Complete->setValue(0);
         lbl_FS_Status->setText("Uploading...");
@@ -1107,8 +1144,8 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_FS_DOWNLOAD;
-        my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_fs->start_download(edit_FS_Remote->text(), edit_FS_Local->text());
+        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.fs_mgmt->start_download(edit_FS_Remote->text(), edit_FS_Local->text());
 
         progress_FS_Complete->setValue(0);
         lbl_FS_Status->setText("Downloading...");
@@ -1118,8 +1155,8 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_FS_STATUS;
-        my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_fs->start_status(edit_FS_Remote->text());
+        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.fs_mgmt->start_status(edit_FS_Remote->text());
 
         progress_FS_Complete->setValue(0);
         lbl_FS_Status->setText("Statusing...");
@@ -1128,11 +1165,20 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     {
         emit plugin_set_status(true, false);
 
-//        mode = ACTION_FS_HASH_CHECKSUM;
+        mode = ACTION_FS_HASH_CHECKSUM;
+        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.fs_mgmt->start_hash_checksum(edit_FS_Remote->text(), combo_FS_Hash_Checksum->currentText());
+
+        progress_FS_Complete->setValue(0);
+        lbl_FS_Status->setText("Hashing...");
+    }
+    else if (radio_FS_Hash_Checksum_Types->isChecked())
+    {
+        emit plugin_set_status(true, false);
+
         mode = ACTION_FS_SUPPORTED_HASHES_CHECKSUMS;
-        my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-//        my_fs->start_hash_checksum(edit_FS_Remote->text());
-        my_fs->start_supported_hashes_checksums(&what);
+        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.fs_mgmt->start_supported_hashes_checksums(&what);
 
         progress_FS_Complete->setValue(0);
         lbl_FS_Status->setText("Supported...");
@@ -1173,8 +1219,8 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_IMG_UPLOAD;
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_img->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
+        smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.img_mgmt->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
 
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Uploading...");
@@ -1190,8 +1236,8 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
             model_image_state.clear();
             blaharray.clear();
             mode = ACTION_IMG_IMAGE_LIST;
-            my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-            my_img->start_image_get(&blaharray);
+            smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            smp_groups.img_mgmt->start_image_get(&blaharray);
 
             progress_IMG_Complete->setValue(0);
             lbl_IMG_Status->setText("Querying...");
@@ -1228,13 +1274,13 @@ finished:
                 if (found == true)
                 {
                     mode = ACTION_IMG_IMAGE_SET;
-                    my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+                    smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
 
                     parent_row = colview_IMG_Images->currentIndex().parent().row();
                     parent_column = colview_IMG_Images->currentIndex().parent().column();
                     child_row = colview_IMG_Images->currentIndex().row();
                     child_column = colview_IMG_Images->currentIndex().column();
-                    my_img->start_image_set(&blaharray[i].slot_list[l].hash, check_IMG_Confirm->isChecked(), &blaharray);
+                    smp_groups.img_mgmt->start_image_set(&blaharray[i].slot_list[l].hash, check_IMG_Confirm->isChecked(), &blaharray);
 
                     progress_IMG_Complete->setValue(0);
                     lbl_IMG_Status->setText("Setting...");
@@ -1255,8 +1301,8 @@ finished:
         //Erase
         emit plugin_set_status(true, false);
         mode = ACTION_IMG_IMAGE_ERASE;
-        my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
-        my_img->start_image_erase(edit_IMG_Erase_Slot->value());
+        smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
+        smp_groups.img_mgmt->start_image_erase(edit_IMG_Erase_Slot->value());
         progress_IMG_Complete->setValue(0);
         lbl_IMG_Status->setText("Erasing...");
     }
@@ -1278,8 +1324,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 
         edit_OS_Echo_Output->clear();
         mode = ACTION_OS_ECHO;
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_os->start_echo(edit_OS_Echo_Input->toPlainText());
+        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.os_mgmt->start_echo(edit_OS_Echo_Input->toPlainText());
 
         lbl_OS_Status->setText("Echoing...");
     }
@@ -1288,8 +1334,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_OS_TASK_STATS;
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_os->start_task_stats(&task_list);
+        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.os_mgmt->start_task_stats(&task_list);
 
         edit_OS_Echo_Output->appendPlainText("Tasking...");
     }
@@ -1298,8 +1344,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_OS_MEMORY_POOL;
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_os->start_memory_pool(&memory_list);
+        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.os_mgmt->start_memory_pool(&memory_list);
 
         edit_OS_Echo_Output->appendPlainText("Memorying...");
     }
@@ -1308,8 +1354,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_OS_RESET;
-        my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_os->start_reset(check_OS_Force_Reboot->isChecked());
+        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.os_mgmt->start_reset(check_OS_Force_Reboot->isChecked());
 
         edit_OS_Echo_Output->appendPlainText("Resetting...");
     }
@@ -1321,8 +1367,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             emit plugin_set_status(true, false);
 
             mode = ACTION_OS_OS_APPLICATION_INFO;
-            my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-            my_os->start_os_application_info(edit_OS_UName->text());
+            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            smp_groups.os_mgmt->start_os_application_info(edit_OS_UName->text());
 
             edit_OS_Echo_Output->appendPlainText("Infoing...");
         }
@@ -1332,8 +1378,8 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             emit plugin_set_status(true, false);
 
             mode = ACTION_OS_MCUMGR_BUFFER;
-            my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-            my_os->start_mcumgr_parameters();
+            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            smp_groups.os_mgmt->start_mcumgr_parameters();
 
             edit_OS_Echo_Output->appendPlainText("Buffering...");
         }
@@ -1349,8 +1395,8 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
     QStringList list_arguments = edit_SHELL_Input->text().split(reTempRE);
 
     mode = ACTION_SHELL_EXECUTE;
-    my_shell->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-    my_shell->start_execute(&list_arguments, &shell_rc);
+    smp_groups.shell_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+    smp_groups.shell_mgmt->start_execute(&list_arguments, &shell_rc);
 
     lbl_SHELL_Status->setText("Executing...");
 }
@@ -1363,8 +1409,8 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_STAT_LIST_GROUPS;
-        my_stat->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_stat->start_list_groups(&group_list);
+        smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.stat_mgmt->start_list_groups(&group_list);
 
         lbl_STAT_Status->setText("Listing...");
     }
@@ -1374,8 +1420,8 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_STAT_GROUP_DATA;
-        my_stat->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_stat->start_group_data(combo_STAT_Group->currentText(), &stat_list);
+        smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        smp_groups.stat_mgmt->start_group_data(combo_STAT_Group->currentText(), &stat_list);
 
         lbl_STAT_Status->setText("Fetching...");
     }
@@ -1446,7 +1492,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     bool finished = true;
 
     qDebug() << "Status: " << status << "Sender: " << sender();
-    if (sender() == my_img)
+    if (sender() == smp_groups.img_mgmt)
     {
         qDebug() << "img sender";
         if (status == STATUS_COMPLETE)
@@ -1462,8 +1508,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     finished = false;
 
                     mode = ACTION_IMG_UPLOAD_SET;
-                    my_img->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-                    my_img->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false), nullptr);
+                    smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+                    smp_groups.img_mgmt->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false), nullptr);
                     qDebug() << "do upload of " << upload_hash;
                 }
                 else
@@ -1479,8 +1525,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     finished = false;
 
                     mode = ACTION_OS_UPLOAD_RESET;
-                    my_os->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-                    my_os->start_reset(false);
+                    smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+                    smp_groups.os_mgmt->start_reset(false);
                     qDebug() << "do reset";
                 }
                 else
@@ -1511,9 +1557,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                         ++i;
                     }
 
-                    if (model_image_state.hasIndex(parent_row, parent_column) == true && model_image_state.index(parent_row, parent_column).child(child_row, child_column).isValid() == true)
+                    if (model_image_state.hasIndex(parent_row, parent_column) == true && model_image_state.index(child_row, child_column, model_image_state.index(parent_row, parent_column)).isValid() == true)
                     {
-                        colview_IMG_Images->setCurrentIndex(model_image_state.index(parent_row, parent_column).child(child_row, child_column));
+                        colview_IMG_Images->setCurrentIndex(model_image_state.index(child_row, child_column, model_image_state.index(parent_row, parent_column)));
                     }
                     else
                     {
@@ -1532,7 +1578,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
         }
     }
-    else if (sender() == my_os)
+    else if (sender() == smp_groups.os_mgmt)
     {
         qDebug() << "os sender";
         if (status == STATUS_COMPLETE)
@@ -1653,7 +1699,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
         }
     }
-    else if (sender() == my_shell)
+    else if (sender() == smp_groups.shell_mgmt)
     {
         qDebug() << "shell sender";
         if (status == STATUS_COMPLETE)
@@ -1674,7 +1720,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
         }
     }
-    else if (sender() == my_stat)
+    else if (sender() == smp_groups.stat_mgmt)
     {
         qDebug() << "stat sender";
         if (status == STATUS_COMPLETE)
@@ -1706,7 +1752,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
         }
     }
-    else if (sender() == my_fs)
+    else if (sender() == smp_groups.fs_mgmt)
     {
         qDebug() << "stat sender";
         if (status == STATUS_COMPLETE)
@@ -1727,8 +1773,12 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             else if (user_data == ACTION_FS_SUPPORTED_HASHES_CHECKSUMS)
             {
                 uint8_t i = 0;
+
+                combo_FS_Hash_Checksum->clear();
+
                 while (i < what.length())
                 {
+                    combo_FS_Hash_Checksum->addItem(what.at(i).name);
                     qDebug() << what.at(i).format << ", " << what.at(i).size;
                     edit_FS_Log->appendPlainText(QString("Has %1, %2, %3").arg(what[i].name, QString::number(what[i].format), QString::number(what[i].size)));
                     ++i;
@@ -1756,7 +1806,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
 void plugin_mcumgr::progress(uint8_t user_data, uint8_t percent)
 {
-    if (this->sender() == my_img)
+    if (this->sender() == smp_groups.img_mgmt)
     {
         progress_IMG_Complete->setValue(percent);
     }

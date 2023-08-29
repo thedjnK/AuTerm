@@ -21,6 +21,7 @@
 **
 *******************************************************************************/
 #include "smp_message.h"
+#include <QIODevice>
 
 const uint8_t SMP_VERSION_1_HEADER = 0x00;
 const uint8_t SMP_VERSION_2_HEADER = 0x08;
