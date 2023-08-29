@@ -98,6 +98,7 @@ enum mcumgr_action_t {
     ACTION_FS_DOWNLOAD,
     ACTION_FS_STATUS,
     ACTION_FS_HASH_CHECKSUM,
+    ACTION_FS_SUPPORTED_HASHES_CHECKSUMS,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin

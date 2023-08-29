@@ -31,6 +31,12 @@
 #include <QCborValue>
 #include <QFile>
 
+struct hash_checksum_t {
+    QString name;
+    uint8_t format;
+    uint16_t size;
+};
+
 class smp_group_fs_mgmt : public smp_group
 {
     Q_OBJECT
@@ -44,8 +50,8 @@ public:
     bool start_upload(QString file_name, QString destination_name);
     bool start_download(QString file_name, QString destination_name);
     bool start_status(QString file_name);
-    bool start_hash_checksum(QString file_name);
-//    bool start_supported_hashes_checksums(QStringList *arguments, int32_t *ret);
+    bool start_hash_checksum(QString file_name, QString hash_checksum);
+    bool start_supported_hashes_checksums(QList<hash_checksum_t> *hash_checksum_list);
     bool start_file_close();
     static bool error_lookup(int32_t rc, QString *error);
 
@@ -53,8 +59,8 @@ private:
     bool parse_upload_response(QCborStreamReader &reader, uint32_t *off, bool *off_found);
     bool parse_download_response(QCborStreamReader &reader, uint32_t *off, uint32_t *len, QByteArray *file_data);
     bool parse_status_response(QCborStreamReader &reader, uint32_t *len);
-//    bool parse_hash_checksum_response(QCborStreamReader &reader, int32_t *ret, QString *response);
-//    bool parse_supported_hashes_checksums_response(QCborStreamReader &reader, int32_t *ret, QString *response);
+    bool parse_hash_checksum_response(QCborStreamReader &reader, QString *type, QByteArray *hash_checksum);
+    bool parse_supported_hashes_checksums_response(QCborStreamReader &reader, bool in_data, QString *key_name, hash_checksum_t *current_item);
 //    bool parse_file_close_response(QCborStreamReader &reader, int32_t *ret, QString *response);
     void upload_chunk();
     void download_chunk();
@@ -70,6 +76,7 @@ private:
     uint32_t file_upload_area;
     QElapsedTimer upload_tmr;
     QString device_file_name;
+    QList<hash_checksum_t> *hash_checksum_object;
 };
 
 #endif // SMP_GROUP_FS_MGMT_H

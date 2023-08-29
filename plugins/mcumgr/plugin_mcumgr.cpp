@@ -43,6 +43,7 @@ smp_group_shell_mgmt *my_shell;
 smp_group_stat_mgmt *my_stat;
 smp_group_fs_mgmt *my_fs;
 QList<image_state_t> blaharray;
+QList<hash_checksum_t> what;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
@@ -1127,12 +1128,14 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     {
         emit plugin_set_status(true, false);
 
-        mode = ACTION_FS_HASH_CHECKSUM;
+//        mode = ACTION_FS_HASH_CHECKSUM;
+        mode = ACTION_FS_SUPPORTED_HASHES_CHECKSUMS;
         my_fs->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        my_fs->start_hash_checksum(edit_FS_Remote->text());
+//        my_fs->start_hash_checksum(edit_FS_Remote->text());
+        my_fs->start_supported_hashes_checksums(&what);
 
         progress_FS_Complete->setValue(0);
-        lbl_FS_Status->setText("Hashing...");
+        lbl_FS_Status->setText("Supported...");
     }
 }
 
@@ -1712,6 +1715,29 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             if (user_data == ACTION_FS_UPLOAD)
             {
                 edit_FS_Log->appendPlainText("todo");
+            }
+            else if (user_data == ACTION_FS_DOWNLOAD)
+            {
+                edit_FS_Log->appendPlainText("todo2");
+            }
+            else if (user_data == ACTION_FS_HASH_CHECKSUM)
+            {
+                edit_FS_Log->appendPlainText("todo3");
+            }
+            else if (user_data == ACTION_FS_SUPPORTED_HASHES_CHECKSUMS)
+            {
+                uint8_t i = 0;
+                while (i < what.length())
+                {
+                    qDebug() << what.at(i).format << ", " << what.at(i).size;
+                    edit_FS_Log->appendPlainText(QString("Has %1, %2, %3").arg(what[i].name, QString::number(what[i].format), QString::number(what[i].size)));
+                    ++i;
+                }
+                edit_FS_Log->appendPlainText("todo4");
+            }
+            else if (user_data == ACTION_FS_STATUS)
+            {
+                edit_FS_Log->appendPlainText("todo5");
             }
         }
     }

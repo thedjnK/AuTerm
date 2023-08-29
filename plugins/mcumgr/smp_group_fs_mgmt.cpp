@@ -353,6 +353,218 @@ bool smp_group_fs_mgmt::parse_status_response(QCborStreamReader &reader, uint32_
     return true;
 }
 
+bool smp_group_fs_mgmt::parse_hash_checksum_response(QCborStreamReader &reader, QString *type, QByteArray *hash_checksum)
+{
+    //    qDebug() << reader.lastError() << reader.hasNext();
+
+    QString key = "";
+    bool keyset = true;
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
+        switch (reader.type())
+        {
+            case QCborStreamReader::UnsignedInteger:
+            {
+                    if (key == "output")
+                    {
+                        uint32_t tmp_hash_checksum = (uint32_t)reader.toUnsignedInteger();
+                        hash_checksum->append(tmp_hash_checksum);
+                    }
+
+                    reader.next();
+                    break;
+            }
+            case QCborStreamReader::ByteArray:
+            {
+                    QByteArray data;
+                    auto r = reader.readByteArray();
+                    while (r.status == QCborStreamReader::Ok)
+                    {
+                        data.append(r.data);
+                        r = reader.readByteArray();
+                    }
+
+                    if (r.status == QCborStreamReader::Error)
+                    {
+                        qDebug("Error decoding byte array");
+                    }
+                    else
+                    {
+                        if (key == "output")
+                        {
+                            *hash_checksum = data;
+                        }
+                    }
+
+                    break;
+            }
+            case QCborStreamReader::String:
+            {
+                    QString data;
+                    auto r = reader.readString();
+                    while (r.status == QCborStreamReader::Ok)
+                    {
+                        data.append(r.data);
+                        r = reader.readString();
+                    }
+
+                    if (r.status == QCborStreamReader::Error)
+                    {
+                        data.clear();
+                        qDebug("Error decoding string");
+                    }
+                    else
+                    {
+                        if (key.isEmpty())
+                        {
+                            key = data;
+                            keyset = true;
+                        }
+                        else if (key == "type")
+                        {
+                            *type = data;
+                        }
+                    }
+
+                    break;
+            }
+            case QCborStreamReader::Array:
+            case QCborStreamReader::Map:
+            {
+                    reader.enterContainer();
+
+                    while (reader.lastError() == QCborError::NoError && reader.hasNext())
+                    {
+                        parse_hash_checksum_response(reader, type, hash_checksum);
+                    }
+
+                    if (reader.lastError() == QCborError::NoError)
+                    {
+                        reader.leaveContainer();
+                    }
+
+                    break;
+            }
+            default:
+            {
+                    reader.next();
+                    continue;
+            }
+        };
+    }
+
+    return true;
+}
+
+bool smp_group_fs_mgmt::parse_supported_hashes_checksums_response(QCborStreamReader &reader, bool in_data, QString *key_name, hash_checksum_t *current_item)
+{
+    //    qDebug() << reader.lastError() << reader.hasNext();
+
+    QString key = "";
+    bool keyset = true;
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
+        switch (reader.type())
+        {
+            case QCborStreamReader::UnsignedInteger:
+            {
+                if (key == "format")
+                {
+                    current_item->format = (uint8_t)reader.toUnsignedInteger();
+                }
+                else if (key == "size")
+                {
+                    current_item->size = (uint16_t)reader.toUnsignedInteger();
+                }
+
+                reader.next();
+                break;
+            }
+            case QCborStreamReader::String:
+            {
+                QString data;
+                auto r = reader.readString();
+                while (r.status == QCborStreamReader::Ok)
+                {
+                    data.append(r.data);
+                    r = reader.readString();
+                }
+
+                if (r.status == QCborStreamReader::Error)
+                {
+                    data.clear();
+                    qDebug("Error decoding string");
+                }
+                else
+                {
+                    if (key.isEmpty())
+                    {
+                        key = data;
+                        keyset = true;
+
+                        if (in_data == false && key == "types")
+                        {
+                            in_data = true;
+                        }
+                        else if (in_data == true && current_item->name.isEmpty())
+                        {
+                            current_item->name = data;
+                        }
+                    }
+                }
+
+                break;
+            }
+            case QCborStreamReader::Array:
+            case QCborStreamReader::Map:
+            {
+                reader.enterContainer();
+
+                while (reader.lastError() == QCborError::NoError && reader.hasNext())
+                {
+                    parse_supported_hashes_checksums_response(reader, in_data, &key, current_item);
+                }
+
+                if (reader.lastError() == QCborError::NoError)
+                {
+                    reader.leaveContainer();
+                }
+
+                break;
+            }
+            default:
+            {
+                reader.next();
+                continue;
+            }
+        };
+    }
+
+    if (in_data == true && !current_item->name.isEmpty())
+    {
+        hash_checksum_object->append(*current_item);
+        current_item->name.clear();
+    }
+
+    return true;
+}
+
 void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data)
 {
     //    qDebug() << "Got ok: " << version << ", " << op << ", " << group << ", "  << command << ", " << data;
@@ -479,11 +691,28 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         }
         else if (mode == MODE_HASH_CHECKSUM && command == COMMAND_HASH_CHECKSUM)
         {
+            QString type;
+            QByteArray hash_checksum;
+
+            QCborStreamReader cbor_reader(data);
+            bool good = parse_hash_checksum_response(cbor_reader, &type, &hash_checksum);
             mode = MODE_IDLE;
-            qDebug() << "checksum done";
+
+            qDebug() << "checksum done, got " << type << " und " << hash_checksum;
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
-        //supported
+        else if (mode == MODE_SUPPORTED_HASHES_CHECKSUMS && command == COMMAND_SUPPORTED_HASHES_CHECKSUMS)
+        {
+            hash_checksum_t temp_item;
+
+            QCborStreamReader cbor_reader(data);
+            hash_checksum_object->clear();
+            bool good = parse_supported_hashes_checksums_response(cbor_reader, false, nullptr, &temp_item);
+            mode = MODE_IDLE;
+
+            qDebug() << "supported hash/checksum done";
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
         else if (mode == MODE_FILE_CLOSE && command == COMMAND_FILE_CLOSE)
         {
             mode = MODE_IDLE;
@@ -528,7 +757,11 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         //TODO
         emit status(smp_user_data, STATUS_ERROR, nullptr);
     }
-    //supported
+    else if (command == COMMAND_SUPPORTED_HASHES_CHECKSUMS && mode == MODE_SUPPORTED_HASHES_CHECKSUMS)
+    {
+        //TODO
+        emit status(smp_user_data, STATUS_ERROR, nullptr);
+    }
     else if (command == COMMAND_FILE_CLOSE && mode == MODE_FILE_CLOSE)
     {
         //TODO
@@ -678,18 +911,31 @@ bool smp_group_fs_mgmt::start_status(QString file_name)
     return true;
 }
 
-bool smp_group_fs_mgmt::start_hash_checksum(QString file_name)
+bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_checksum)
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_HASH_CHECKSUM);
     tmp_message->writer()->append("name");
     tmp_message->writer()->append(file_name);
     tmp_message->writer()->append("type");
-//TODO:
-    tmp_message->writer()->append("crc32");
+    tmp_message->writer()->append(hash_checksum);;
     tmp_message->end_message();
 
     mode = MODE_HASH_CHECKSUM;
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_fs_mgmt::start_supported_hashes_checksums(QList<hash_checksum_t> *hash_checksum_list)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_SUPPORTED_HASHES_CHECKSUMS);
+    tmp_message->end_message();
+
+    mode = MODE_SUPPORTED_HASHES_CHECKSUMS;
+    hash_checksum_object = hash_checksum_list;
 
     processor->send(tmp_message, smp_timeout, smp_retries, true);
 
@@ -708,36 +954,6 @@ bool smp_group_fs_mgmt::start_file_close()
 
     return true;
 }
-
-#if 0
-bool smp_group_fs_mgmt::start_execute(QStringList *arguments, int32_t *ret)
-{
-    smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SHELL, COMMAND_EXECUTE);
-    tmp_message->writer()->append("argv");
-    tmp_message->writer()->startArray();
-
-    uint8_t i = 0;
-    while (i < arguments->length())
-    {
-        tmp_message->writer()->append(arguments->at(i));
-        ++i;
-    }
-
-    tmp_message->writer()->endArray();
-    tmp_message->end_message();
-
-    return_ret = ret;
-    *return_ret = 0;
-    mode = MODE_EXECUTE;
-
-    //	    qDebug() << "len: " << message.length();
-
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
-
-    return true;
-}
-#endif
 
 QString smp_group_fs_mgmt::mode_to_string(uint8_t mode)
 {
