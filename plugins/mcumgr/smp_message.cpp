@@ -101,8 +101,26 @@ int smp_message::data_size(void)
 
 bool smp_message::is_valid(void)
 {
-//TODO
-return true;
+    uint16_t data_size;
+
+    if (this->buffer.size() < sizeof(smp_hdr))
+    {
+        return false;
+    }
+
+    data_size = ((smp_hdr *)this->buffer.data())->nh_len;
+
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+    data_size = ((data_size & 0xff) << 8) | ((data_size & 0xff00) >> 8);
+#endif
+
+    if (this->buffer.size() >= data_size + sizeof(smp_hdr))
+    {
+        return true;
+    }
+
+//TODO: additional verification?
+    return false;
 }
 
 void smp_message::set_header(const smp_hdr *data)

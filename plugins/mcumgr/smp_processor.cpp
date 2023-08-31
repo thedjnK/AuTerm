@@ -24,10 +24,9 @@
 #include "smp_processor.h"
 #include "smp_group.h"
 
-smp_processor::smp_processor(QObject *parent, smp_uart *uart_driver)
+smp_processor::smp_processor(QObject *parent)
 {
     sequence = 0;
-    uart = uart_driver;
     last_message = nullptr;
     last_message_header = nullptr;
     repeat_times = 0;
@@ -61,7 +60,7 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repe
     repeat_times = repeats;
     busy = true;
 
-    uart->send(last_message);
+    transport->send(last_message);
     repeat_timer.start();
     ++sequence;
 
@@ -180,7 +179,7 @@ void smp_processor::message_timeout()
     //Resend message
     --repeat_times;
     repeat_timer.start();
-    uart->send(last_message);
+    transport->send(last_message);
 }
 
 void smp_processor::message_received(smp_message *response)
@@ -367,4 +366,9 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
     }
 
     return true;
+}
+
+void smp_processor::set_transport(smp_transport *transport_object)
+{
+    transport = transport_object;
 }

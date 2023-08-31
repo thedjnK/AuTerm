@@ -213,7 +213,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_IMG_Images_2">
+       <widget class="QWidget" name="tab_IMG">
         <attribute name="title">
          <string>Img</string>
         </attribute>
@@ -296,7 +296,7 @@
          <item row="0" column="0">
           <widget class="QTabWidget" name="tabWidget_3">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="tab_IMG_Upload">
             <attribute name="title">
@@ -877,7 +877,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_5">
+       <widget class="QWidget" name="tab_Stats">
         <attribute name="title">
          <string>Stats</string>
         </attribute>
@@ -1098,6 +1098,11 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="tab_Settings">
+        <attribute name="title">
+         <string>Settings</string>
+        </attribute>
+       </widget>
       </widget>
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
@@ -1228,7 +1233,7 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>341</width>
+         <width>391</width>
          <height>31</height>
         </rect>
        </property>
@@ -1260,6 +1265,30 @@
           </property>
           <property name="checked">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radio_transport_uart">
+          <property name="text">
+           <string>UART</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radio_transport_udp">
+          <property name="text">
+           <string>UDP</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_transport_connect">
+          <property name="text">
+           <string>Connect</string>
           </property>
          </widget>
         </item>

@@ -1,6 +1,6 @@
 include(../../AuTerm-includes.pri)
 
-QT += gui widgets serialport
+QT += gui widgets serialport network
 
 TEMPLATE = lib
 
@@ -26,6 +26,7 @@ SOURCES += \
     smp_processor.cpp \
     smp_uart.cpp \
     smp_group_img_mgmt.cpp \
+    smp_udp.cpp
 
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
@@ -39,9 +40,11 @@ HEADERS += \
     smp_group_stat_mgmt.h \
     smp_message.h \
     smp_processor.h \
+    smp_transport.h \
     smp_uart.h \
     smp_group.h \
-    smp_group_img_mgmt.h
+    smp_group_img_mgmt.h \
+    smp_udp.h
 
 DISTFILES += plugin_mcumgr.json
 

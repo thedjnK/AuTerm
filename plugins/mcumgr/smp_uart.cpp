@@ -228,7 +228,7 @@ uint16_t smp_uart::crc16(const QByteArray *src, size_t i, size_t len, uint16_t p
     return crc;
 }
 
-void smp_uart::send(smp_message *message)
+int smp_uart::send(smp_message *message)
 {
     //127 bytes = 3 + base 64 message
     //base64 = 4 bytes output per 3 byte input
@@ -278,4 +278,6 @@ end:
         inbase.append(smp_continuation_header);
         output.clear();
     }
+
+    return 0;
 }

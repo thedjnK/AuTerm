@@ -149,10 +149,12 @@ private slots:
     void on_btn_STAT_Go_clicked();
     void on_btn_SHELL_Clear_clicked();
     void on_btn_SHELL_Copy_clicked();
+    void on_btn_transport_connect_clicked();
     void on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
+    smp_transport *active_transport();
 
     //Form items
 ///AUTOGEN_START_OBJECTS
@@ -182,7 +184,7 @@ private:
     QLineEdit *edit_FS_Remote;
     QLabel *label_19;
     QComboBox *combo_FS_Hash_Checksum;
-    QWidget *tab_IMG_Images_2;
+    QWidget *tab_IMG;
     QGridLayout *gridLayout_3;
     QPlainTextEdit *edit_IMG_Log;
     QHBoxLayout *horizontalLayout_3;
@@ -255,7 +257,7 @@ private:
     QPushButton *btn_OS_Go;
     QSpacerItem *horizontalSpacer_18;
     QLabel *lbl_OS_Status;
-    QWidget *tab_5;
+    QWidget *tab_Stats;
     QGridLayout *gridLayout_11;
     QLabel *label_15;
     QComboBox *combo_STAT_Group;
@@ -283,6 +285,7 @@ private:
     QPushButton *btn_SHELL_Go;
     QSpacerItem *horizontalSpacer_8;
     QLabel *label_13;
+    QWidget *tab_Settings;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
     QFormLayout *formLayout;
@@ -303,6 +306,9 @@ private:
     QLabel *label;
     QSpinBox *edit_MTU;
     QCheckBox *check_V2_Protocol;
+    QRadioButton *radio_transport_uart;
+    QRadioButton *radio_transport_udp;
+    QPushButton *btn_transport_connect;
     QSpacerItem *horizontalSpacer_6;
 ///AUTOGEN_END_OBJECTS
 

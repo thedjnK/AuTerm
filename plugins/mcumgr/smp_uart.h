@@ -20,28 +20,28 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef smp_uart_H
-#define smp_uart_H
+#ifndef SMP_UART_H
+#define SMP_UART_H
 
 #include <QObject>
+#include "smp_transport.h"
 #include "smp_message.h"
 
-class smp_uart : public QObject
+class smp_uart : public smp_transport
 {
     Q_OBJECT
 
 public:
     smp_uart(QObject *parent);
     ~smp_uart();
-    void send(smp_message *message);
-    int get_mtu();
+    int send(smp_message *message);
+    //int get_mtu();
 
 private:
     void data_received(QByteArray *message);
 
 signals:
     void serial_write(QByteArray *data);
-    void receive_waiting(smp_message *message);
 
 public slots:
     void serial_read(QByteArray *rec_data);
@@ -59,4 +59,4 @@ private:
     uint16_t waiting_packet_length = 0;
 };
 
-#endif // smp_uart_H
+#endif // SMP_UART_H

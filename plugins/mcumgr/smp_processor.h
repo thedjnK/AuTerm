@@ -44,12 +44,13 @@ class smp_processor : public QObject
     Q_OBJECT
 
 public:
-    smp_processor(QObject *parent, smp_uart *uart_driver);
+    smp_processor(QObject *parent);
     ~smp_processor();
     bool send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check);
     bool is_busy();
     void register_handler(uint16_t group, smp_group *handler);
     void unregister_handler(uint16_t group);
+    void set_transport(smp_transport *transport_object);
 
 private:
     void cleanup();
@@ -61,7 +62,7 @@ public slots:
 
 private:
     uint8_t sequence;
-    smp_uart *uart;
+    smp_transport *transport;
     smp_message *last_message;
     smp_hdr *last_message_header;
     bool last_message_version_check;

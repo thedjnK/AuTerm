@@ -26,6 +26,7 @@
 #include <QFileDialog>
 #include "smp_group_array.h"
 #include "error_lookup.h"
+#include "smp_udp.h"
 
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -44,11 +45,13 @@ smp_group_array smp_groups;
 error_lookup *error_lookup_form;
 QList<image_state_t> blaharray;
 QList<hash_checksum_t> what;
+smp_udp *my_udp;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
     uart = new smp_uart(this);
-    processor = new smp_processor(this, uart);
+    my_udp = new smp_udp(this);
+    processor = new smp_processor(this);
     mode = ACTION_IDLE;
 
     parent_row = -1;
@@ -184,13 +187,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_2->addWidget(combo_FS_Hash_Checksum, 2, 1, 1, 2);
 
     tabWidget_2->addTab(tab_FS, QString());
-    tab_IMG_Images_2 = new QWidget();
-    tab_IMG_Images_2->setObjectName("tab_IMG_Images_2");
-    gridLayout_3 = new QGridLayout(tab_IMG_Images_2);
+    tab_IMG = new QWidget();
+    tab_IMG->setObjectName("tab_IMG");
+    gridLayout_3 = new QGridLayout(tab_IMG);
     gridLayout_3->setSpacing(2);
     gridLayout_3->setObjectName("gridLayout_3");
     gridLayout_3->setContentsMargins(6, 6, 6, 6);
-    edit_IMG_Log = new QPlainTextEdit(tab_IMG_Images_2);
+    edit_IMG_Log = new QPlainTextEdit(tab_IMG);
     edit_IMG_Log->setObjectName("edit_IMG_Log");
     edit_IMG_Log->setUndoRedoEnabled(false);
     edit_IMG_Log->setReadOnly(true);
@@ -205,7 +208,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_3->addItem(horizontalSpacer_3);
 
-    btn_IMG_Go = new QPushButton(tab_IMG_Images_2);
+    btn_IMG_Go = new QPushButton(tab_IMG);
     btn_IMG_Go->setObjectName("btn_IMG_Go");
 
     horizontalLayout_3->addWidget(btn_IMG_Go);
@@ -217,12 +220,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_3->addLayout(horizontalLayout_3, 5, 0, 1, 3);
 
-    lbl_IMG_Status = new QLabel(tab_IMG_Images_2);
+    lbl_IMG_Status = new QLabel(tab_IMG);
     lbl_IMG_Status->setObjectName("lbl_IMG_Status");
 
     gridLayout_3->addWidget(lbl_IMG_Status, 3, 0, 1, 2);
 
-    tabWidget_3 = new QTabWidget(tab_IMG_Images_2);
+    tabWidget_3 = new QTabWidget(tab_IMG);
     tabWidget_3->setObjectName("tabWidget_3");
     tab_IMG_Upload = new QWidget();
     tab_IMG_Upload->setObjectName("tab_IMG_Upload");
@@ -384,7 +387,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_3->addWidget(tabWidget_3, 0, 0, 1, 1);
 
-    tabWidget_2->addTab(tab_IMG_Images_2, QString());
+    tabWidget_2->addTab(tab_IMG, QString());
     tab_OS = new QWidget();
     tab_OS->setObjectName("tab_OS");
     gridLayout_7 = new QGridLayout(tab_OS);
@@ -564,27 +567,27 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_7->addWidget(lbl_OS_Status, 1, 0, 1, 1);
 
     tabWidget_2->addTab(tab_OS, QString());
-    tab_5 = new QWidget();
-    tab_5->setObjectName("tab_5");
-    gridLayout_11 = new QGridLayout(tab_5);
+    tab_Stats = new QWidget();
+    tab_Stats->setObjectName("tab_Stats");
+    gridLayout_11 = new QGridLayout(tab_Stats);
     gridLayout_11->setObjectName("gridLayout_11");
-    label_15 = new QLabel(tab_5);
+    label_15 = new QLabel(tab_Stats);
     label_15->setObjectName("label_15");
 
     gridLayout_11->addWidget(label_15, 0, 0, 1, 1);
 
-    combo_STAT_Group = new QComboBox(tab_5);
+    combo_STAT_Group = new QComboBox(tab_Stats);
     combo_STAT_Group->setObjectName("combo_STAT_Group");
     combo_STAT_Group->setEditable(true);
 
     gridLayout_11->addWidget(combo_STAT_Group, 0, 1, 1, 1);
 
-    label_16 = new QLabel(tab_5);
+    label_16 = new QLabel(tab_Stats);
     label_16->setObjectName("label_16");
 
     gridLayout_11->addWidget(label_16, 1, 0, 1, 1);
 
-    table_STAT_Values = new QTableWidget(tab_5);
+    table_STAT_Values = new QTableWidget(tab_Stats);
     if (table_STAT_Values->columnCount() < 2)
         table_STAT_Values->setColumnCount(2);
     QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
@@ -598,13 +601,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_9 = new QHBoxLayout();
     horizontalLayout_9->setSpacing(2);
     horizontalLayout_9->setObjectName("horizontalLayout_9");
-    radio_STAT_List = new QRadioButton(tab_5);
+    radio_STAT_List = new QRadioButton(tab_Stats);
     radio_STAT_List->setObjectName("radio_STAT_List");
     radio_STAT_List->setChecked(true);
 
     horizontalLayout_9->addWidget(radio_STAT_List);
 
-    radio_STAT_Fetch = new QRadioButton(tab_5);
+    radio_STAT_Fetch = new QRadioButton(tab_Stats);
     radio_STAT_Fetch->setObjectName("radio_STAT_Fetch");
 
     horizontalLayout_9->addWidget(radio_STAT_Fetch);
@@ -612,7 +615,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_11->addLayout(horizontalLayout_9, 2, 0, 1, 2);
 
-    lbl_STAT_Status = new QLabel(tab_5);
+    lbl_STAT_Status = new QLabel(tab_Stats);
     lbl_STAT_Status->setObjectName("lbl_STAT_Status");
 
     gridLayout_11->addWidget(lbl_STAT_Status, 3, 0, 1, 2);
@@ -625,7 +628,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_14->addItem(horizontalSpacer_19);
 
-    btn_STAT_Go = new QPushButton(tab_5);
+    btn_STAT_Go = new QPushButton(tab_Stats);
     btn_STAT_Go->setObjectName("btn_STAT_Go");
 
     horizontalLayout_14->addWidget(btn_STAT_Go);
@@ -637,7 +640,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_11->addLayout(horizontalLayout_14, 4, 0, 1, 2);
 
-    tabWidget_2->addTab(tab_5, QString());
+    tabWidget_2->addTab(tab_Stats, QString());
     tab_Shell = new QWidget();
     tab_Shell->setObjectName("tab_Shell");
     gridLayout_9 = new QGridLayout(tab_Shell);
@@ -706,6 +709,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_9->addWidget(label_13, 1, 0, 1, 1);
 
     tabWidget_2->addTab(tab_Shell, QString());
+    tab_Settings = new QWidget();
+    tab_Settings->setObjectName("tab_Settings");
+    tabWidget_2->addTab(tab_Settings, QString());
     verticalLayoutWidget = new QWidget();
     verticalLayoutWidget->setObjectName("verticalLayoutWidget");
     verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
@@ -787,7 +793,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayoutWidget = new QWidget(tab);
     horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-    horizontalLayoutWidget->setGeometry(QRect(10, 10, 341, 31));
+    horizontalLayoutWidget->setGeometry(QRect(10, 10, 391, 31));
     horizontalLayout_7 = new QHBoxLayout(horizontalLayoutWidget);
     horizontalLayout_7->setObjectName("horizontalLayout_7");
     horizontalLayout_7->setContentsMargins(0, 0, 0, 0);
@@ -810,6 +816,22 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_7->addWidget(check_V2_Protocol);
 
+    radio_transport_uart = new QRadioButton(horizontalLayoutWidget);
+    radio_transport_uart->setObjectName("radio_transport_uart");
+    radio_transport_uart->setChecked(true);
+
+    horizontalLayout_7->addWidget(radio_transport_uart);
+
+    radio_transport_udp = new QRadioButton(horizontalLayoutWidget);
+    radio_transport_udp->setObjectName("radio_transport_udp");
+
+    horizontalLayout_7->addWidget(radio_transport_udp);
+
+    btn_transport_connect = new QPushButton(horizontalLayoutWidget);
+    btn_transport_connect->setObjectName("btn_transport_connect");
+
+    horizontalLayout_7->addWidget(btn_transport_connect);
+
     horizontalSpacer_6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_7->addItem(horizontalSpacer_6);
@@ -823,7 +845,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 //    tabWidget->setCurrentIndex(0);
     tabWidget_2->setCurrentIndex(0);
-    tabWidget_3->setCurrentIndex(1);
+    tabWidget_3->setCurrentIndex(0);
     selector_OS->setCurrentIndex(2);
 ///AUTOGEN_END_INIT
 
@@ -861,7 +883,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_IMG_Images_2), QCoreApplication::translate("Form", "Img", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_IMG), QCoreApplication::translate("Form", "Img", nullptr));
     label_10->setText(QCoreApplication::translate("Form", "Input:", nullptr));
     label_11->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Echo), QCoreApplication::translate("Form", "Echo", nullptr));
@@ -911,7 +933,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_STAT_Fetch->setText(QCoreApplication::translate("Form", "Fetch Stats", nullptr));
     lbl_STAT_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_STAT_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_5), QCoreApplication::translate("Form", "Stats", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Stats), QCoreApplication::translate("Form", "Stats", nullptr));
     btn_SHELL_Clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
     btn_SHELL_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
     lbl_SHELL_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
@@ -919,6 +941,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_SHELL_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
     check_IMG_Preview_Confirmed->setText(QCoreApplication::translate("Form", "Confirmed", nullptr));
@@ -929,6 +952,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_IMG_Preview_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
     label->setText(QCoreApplication::translate("Form", "MTU:", nullptr));
     check_V2_Protocol->setText(QCoreApplication::translate("Form", "v2 protocol", nullptr));
+    radio_transport_uart->setText(QCoreApplication::translate("Form", "UART", nullptr));
+    radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
+    btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
 ///AUTOGEN_END_TRANSLATE
 
@@ -941,6 +967,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(uart, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
     //connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     //connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
+    connect(my_udp, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
 
 //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
@@ -958,6 +985,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_STAT_Go, SIGNAL(clicked()), this, SLOT(on_btn_STAT_Go_clicked()));
     connect(btn_SHELL_Clear, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Clear_clicked()));
     connect(btn_SHELL_Copy, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Copy_clicked()));
+    connect(btn_transport_connect, SIGNAL(clicked()), this, SLOT(on_btn_transport_connect_clicked()));
 
 connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT(on_colview_IMG_Images_updatePreviewWidget(QModelIndex)));
     colview_IMG_Images->setModel(&model_image_state);
@@ -1002,6 +1030,7 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+    delete my_udp;
     delete error_lookup_form;
     delete smp_groups.fs_mgmt;
     delete smp_groups.stat_mgmt;
@@ -1133,6 +1162,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_FS_UPLOAD;
+        processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.fs_mgmt->start_upload(edit_FS_Local->text(), edit_FS_Remote->text());
 
@@ -1144,6 +1174,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_FS_DOWNLOAD;
+        processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.fs_mgmt->start_download(edit_FS_Remote->text(), edit_FS_Local->text());
 
@@ -1155,6 +1186,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_FS_STATUS;
+        processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.fs_mgmt->start_status(edit_FS_Remote->text());
 
@@ -1166,6 +1198,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_FS_HASH_CHECKSUM;
+        processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.fs_mgmt->start_hash_checksum(edit_FS_Remote->text(), combo_FS_Hash_Checksum->currentText());
 
@@ -1177,6 +1210,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_FS_SUPPORTED_HASHES_CHECKSUMS;
+        processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.fs_mgmt->start_supported_hashes_checksums(&what);
 
@@ -1219,6 +1253,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_IMG_UPLOAD;
+        processor->set_transport(active_transport());
         smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.img_mgmt->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
 
@@ -1236,6 +1271,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
             model_image_state.clear();
             blaharray.clear();
             mode = ACTION_IMG_IMAGE_LIST;
+            processor->set_transport(active_transport());
             smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
             smp_groups.img_mgmt->start_image_get(&blaharray);
 
@@ -1274,6 +1310,7 @@ finished:
                 if (found == true)
                 {
                     mode = ACTION_IMG_IMAGE_SET;
+                    processor->set_transport(active_transport());
                     smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
 
                     parent_row = colview_IMG_Images->currentIndex().parent().row();
@@ -1301,6 +1338,7 @@ finished:
         //Erase
         emit plugin_set_status(true, false);
         mode = ACTION_IMG_IMAGE_ERASE;
+        processor->set_transport(active_transport());
         smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
         smp_groups.img_mgmt->start_image_erase(edit_IMG_Erase_Slot->value());
         progress_IMG_Complete->setValue(0);
@@ -1324,6 +1362,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 
         edit_OS_Echo_Output->clear();
         mode = ACTION_OS_ECHO;
+        processor->set_transport(active_transport());
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.os_mgmt->start_echo(edit_OS_Echo_Input->toPlainText());
 
@@ -1334,6 +1373,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_OS_TASK_STATS;
+        processor->set_transport(active_transport());
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.os_mgmt->start_task_stats(&task_list);
 
@@ -1344,6 +1384,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_OS_MEMORY_POOL;
+        processor->set_transport(active_transport());
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.os_mgmt->start_memory_pool(&memory_list);
 
@@ -1354,6 +1395,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_OS_RESET;
+        processor->set_transport(active_transport());
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.os_mgmt->start_reset(check_OS_Force_Reboot->isChecked());
 
@@ -1367,6 +1409,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             emit plugin_set_status(true, false);
 
             mode = ACTION_OS_OS_APPLICATION_INFO;
+            processor->set_transport(active_transport());
             smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
             smp_groups.os_mgmt->start_os_application_info(edit_OS_UName->text());
 
@@ -1378,6 +1421,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             emit plugin_set_status(true, false);
 
             mode = ACTION_OS_MCUMGR_BUFFER;
+            processor->set_transport(active_transport());
             smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
             smp_groups.os_mgmt->start_mcumgr_parameters();
 
@@ -1395,6 +1439,7 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
     QStringList list_arguments = edit_SHELL_Input->text().split(reTempRE);
 
     mode = ACTION_SHELL_EXECUTE;
+    processor->set_transport(active_transport());
     smp_groups.shell_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
     smp_groups.shell_mgmt->start_execute(&list_arguments, &shell_rc);
 
@@ -1409,6 +1454,7 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_STAT_LIST_GROUPS;
+        processor->set_transport(active_transport());
         smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.stat_mgmt->start_list_groups(&group_list);
 
@@ -1420,6 +1466,7 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         emit plugin_set_status(true, false);
 
         mode = ACTION_STAT_GROUP_DATA;
+        processor->set_transport(active_transport());
         smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.stat_mgmt->start_group_data(combo_STAT_Group->currentText(), &stat_list);
 
@@ -1508,6 +1555,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     finished = false;
 
                     mode = ACTION_IMG_UPLOAD_SET;
+                    processor->set_transport(active_transport());
                     smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
                     smp_groups.img_mgmt->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false), nullptr);
                     qDebug() << "do upload of " << upload_hash;
@@ -1525,6 +1573,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     finished = false;
 
                     mode = ACTION_OS_UPLOAD_RESET;
+                    processor->set_transport(active_transport());
                     smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
                     smp_groups.os_mgmt->start_reset(false);
                     qDebug() << "do reset";
@@ -1815,4 +1864,28 @@ void plugin_mcumgr::progress(uint8_t user_data, uint8_t percent)
 void plugin_mcumgr::group_to_hex(QByteArray *data)
 {
     emit plugin_to_hex(data);
+}
+
+void plugin_mcumgr::on_btn_transport_connect_clicked()
+{
+    smp_transport *transport = active_transport();
+
+    if (transport->is_connected() == 1)
+    {
+        transport->disconnect(true);
+    }
+
+    transport->connect();
+}
+
+smp_transport *plugin_mcumgr::active_transport()
+{
+    if (radio_transport_udp->isChecked() == true)
+    {
+        return my_udp;
+    }
+    else
+    {
+        return uart;
+    }
 }
