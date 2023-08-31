@@ -799,8 +799,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_MTU = new QSpinBox(horizontalLayoutWidget);
     edit_MTU->setObjectName("edit_MTU");
     edit_MTU->setMinimum(32);
-    edit_MTU->setMaximum(2048);
-    edit_MTU->setValue(128);
+    edit_MTU->setMaximum(8192);
+    edit_MTU->setValue(256);
 
     horizontalLayout_7->addWidget(edit_MTU);
 

@@ -186,3 +186,25 @@ QCborStreamWriter *smp_message::writer()
 {
     return &cbor_writer;
 }
+
+uint smp_message::max_message_data_size(uint16_t mtu)
+{
+    //16-bit packet size, SMP header, 16-bit CRC
+    uint16_t data_size = sizeof(smp_hdr) + 2 + 2;
+
+    //Base64 encoded
+    data_size = data_size * 4 / 3;
+
+    //16-bit start/continuation mark and newline
+    data_size += 2 + 1;
+
+    if (mtu <= data_size)
+    {
+        return 0;
+    }
+
+    mtu -= data_size;
+
+    //Return un-base64'd length for available size
+    return (mtu * 3 / 4);
+}

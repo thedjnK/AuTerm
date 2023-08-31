@@ -75,6 +75,7 @@ public:
     static smp_op_t response_op(smp_op_t op);
     void end_message();
     QCborStreamWriter *writer();
+    static uint max_message_data_size(uint16_t mtu);
 
 private:
     QByteArray buffer;

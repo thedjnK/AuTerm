@@ -619,7 +619,7 @@ qDebug() << "Going in circles...";
         tmp_message->writer()->append("off");
         tmp_message->writer()->append(this->file_upload_area);
         tmp_message->writer()->append("data");
-        tmp_message->writer()->append(this->file_upload_data.mid(this->file_upload_area, smp_mtu));
+        tmp_message->writer()->append(this->file_upload_data.mid(this->file_upload_area, (smp_message::max_message_data_size(smp_mtu) - tmp_message->size() - 2)));
 
         //	    qDebug() << "off: " << this->file_upload_area << ", left: " << this->file_upload_data.length();
 
