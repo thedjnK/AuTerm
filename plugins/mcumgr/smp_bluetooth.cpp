@@ -101,6 +101,7 @@ void smp_bluetooth::deviceUpdated(const QBluetoothDeviceInfo &info, QBluetoothDe
 void smp_bluetooth::finished()
 {
     bluetooth_window->add_debug("finished");
+    bluetooth_service_mcumgr->discoverDetails();
 }
 
 void smp_bluetooth::connected()
@@ -108,7 +109,7 @@ void smp_bluetooth::connected()
     bluetooth_window->add_debug("Connected!");
     controller->discoverServices();
     device_connected = true;
-    mtu = 512;
+    mtu = 500;
     mtu_max_worked = 0;
 }
 
@@ -138,7 +139,7 @@ void smp_bluetooth::discovery_finished()
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(stateChanged(QLowEnergyService::ServiceState)), this, SLOT(mcumgr_service_state_changed(QLowEnergyService::ServiceState)));
 
         //Discover service details
-        bluetooth_service_mcumgr->discoverDetails();
+        //bluetooth_service_mcumgr->discoverDetails();
     }
 }
 
@@ -192,7 +193,7 @@ void smp_bluetooth::mcumgr_service_state_changed(QLowEnergyService::ServiceState
     bluetooth_window->add_debug(QString("State: ").append(QString::number(nNewState)));
 
     //Service state changed
-    if (nNewState == QLowEnergyService::ServiceDiscovered || nNewState == QLowEnergyService::DiscoveringServices)
+    if (nNewState == QLowEnergyService::ServiceDiscovered)
     {
         QLowEnergyService *svcBLEService = qobject_cast<QLowEnergyService *>(sender());
         if (svcBLEService && svcBLEService->serviceUuid() == QBluetoothUuid(QString("8D53DC1D-1DB7-4CD3-868B-8A527460AA84")))
@@ -227,6 +228,10 @@ void smp_bluetooth::mcumgr_service_state_changed(QLowEnergyService::ServiceState
             //Enable Tx descriptor notifications
             bluetooth_service_mcumgr->writeDescriptor(descTXDesc, QByteArray::fromHex("0100"));
         }
+    }
+    else if (nNewState == QLowEnergyService::DiscoveryRequired)
+    {
+//        bluetooth_service_mcumgr->discoverDetails();
     }
 }
 
@@ -280,9 +285,17 @@ void smp_bluetooth::mcumgr_service_error(QLowEnergyService::ServiceError error)
         {
             retry_count = 0;
 
-            if (mtu > 20)
+            if (mtu >= 25)
             {
-                mtu /= 2;
+                if (mtu >= 100)
+                {
+                    mtu -= 32;
+                }
+                else
+                {
+                    mtu -= 16;
+                }
+
                 bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, sendbuffer.left(mtu));
             }
             else
