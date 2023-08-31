@@ -1,6 +1,6 @@
 include(../../AuTerm-includes.pri)
 
-QT += gui widgets serialport network
+QT += gui widgets serialport network bluetooth
 
 TEMPLATE = lib
 
@@ -15,8 +15,10 @@ TARGET          = $$qtLibraryTarget(plugin_mcumgr)
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    bluetooth_setup.cpp \
     error_lookup.cpp \
     plugin_mcumgr.cpp \
+    smp_bluetooth.cpp \
     smp_error.cpp \
     smp_group_fs_mgmt.cpp \
     smp_group_os_mgmt.cpp \
@@ -30,8 +32,10 @@ SOURCES += \
 
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
+    bluetooth_setup.h \
     error_lookup.h \
     plugin_mcumgr.h \
+    smp_bluetooth.h \
     smp_error.h \
     smp_group_array.h \
     smp_group_fs_mgmt.h \
@@ -81,4 +85,5 @@ CONFIG(release, debug|release) {
 }
 
 FORMS += \
+	bluetooth_setup.ui \
 	error_lookup.ui

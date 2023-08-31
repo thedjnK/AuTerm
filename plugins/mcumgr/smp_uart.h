@@ -32,7 +32,7 @@ class smp_uart : public smp_transport
     Q_OBJECT
 
 public:
-    smp_uart(QObject *parent);
+    smp_uart(QObject *parent = nullptr);
     ~smp_uart();
     int send(smp_message *message);
     //int get_mtu();

@@ -27,6 +27,7 @@
 #include "smp_group_array.h"
 #include "error_lookup.h"
 #include "smp_udp.h"
+#include "smp_bluetooth.h"
 
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -46,11 +47,13 @@ error_lookup *error_lookup_form;
 QList<image_state_t> blaharray;
 QList<hash_checksum_t> what;
 smp_udp *my_udp;
+smp_bluetooth *my_bluetooth;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
     uart = new smp_uart(this);
     my_udp = new smp_udp(this);
+    my_bluetooth = new smp_bluetooth(this);
     processor = new smp_processor(this);
     mode = ACTION_IDLE;
 
@@ -793,7 +796,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayoutWidget = new QWidget(tab);
     horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-    horizontalLayoutWidget->setGeometry(QRect(10, 10, 391, 31));
+    horizontalLayoutWidget->setGeometry(QRect(10, 10, 448, 31));
     horizontalLayout_7 = new QHBoxLayout(horizontalLayoutWidget);
     horizontalLayout_7->setObjectName("horizontalLayout_7");
     horizontalLayout_7->setContentsMargins(0, 0, 0, 0);
@@ -826,6 +829,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_udp->setObjectName("radio_transport_udp");
 
     horizontalLayout_7->addWidget(radio_transport_udp);
+
+    radio_transport_bluetooth = new QRadioButton(horizontalLayoutWidget);
+    radio_transport_bluetooth->setObjectName("radio_transport_bluetooth");
+
+    horizontalLayout_7->addWidget(radio_transport_bluetooth);
 
     btn_transport_connect = new QPushButton(horizontalLayoutWidget);
     btn_transport_connect->setObjectName("btn_transport_connect");
@@ -954,6 +962,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     check_V2_Protocol->setText(QCoreApplication::translate("Form", "v2 protocol", nullptr));
     radio_transport_uart->setText(QCoreApplication::translate("Form", "UART", nullptr));
     radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
+    radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
 ///AUTOGEN_END_TRANSLATE
@@ -968,6 +977,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     //connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     //connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
     connect(my_udp, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+    connect(my_bluetooth, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
 
 //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
@@ -1007,6 +1017,8 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
     smp_groups.fs_mgmt = new smp_group_fs_mgmt(processor);
     error_lookup_form = new error_lookup(parent_window, &smp_groups);
 
+    //error_lookup_form->show();
+
     connect(smp_groups.img_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.img_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
     connect(smp_groups.img_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
@@ -1030,6 +1042,7 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+    delete my_bluetooth;
     delete my_udp;
     delete error_lookup_form;
     delete smp_groups.fs_mgmt;
@@ -1883,6 +1896,10 @@ smp_transport *plugin_mcumgr::active_transport()
     if (radio_transport_udp->isChecked() == true)
     {
         return my_udp;
+    }
+    else if (radio_transport_bluetooth->isChecked() == true)
+    {
+        return my_bluetooth;
     }
     else
     {

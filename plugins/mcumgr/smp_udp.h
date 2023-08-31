@@ -31,7 +31,7 @@ class smp_udp : public smp_transport
     Q_OBJECT
 
 public:
-    smp_udp(QObject *parent);
+    smp_udp(QObject *parent = nullptr);
     ~smp_udp();
     int connect(void) override;
     int disconnect(bool force) override;

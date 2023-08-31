@@ -1233,7 +1233,7 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>391</width>
+         <width>448</width>
          <height>31</height>
         </rect>
        </property>
@@ -1282,6 +1282,13 @@
          <widget class="QRadioButton" name="radio_transport_udp">
           <property name="text">
            <string>UDP</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radio_transport_bluetooth">
+          <property name="text">
+           <string>Bluetooth</string>
           </property>
          </widget>
         </item>

@@ -2,7 +2,7 @@
 
 include(../AuTerm-includes.pri)
 
-QT       += core gui widgets serialport network
+QT       += core gui widgets serialport network bluetooth
 
 TARGET = AuTerm
 TEMPLATE = app

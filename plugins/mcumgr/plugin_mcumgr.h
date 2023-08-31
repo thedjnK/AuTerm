@@ -308,6 +308,7 @@ private:
     QCheckBox *check_V2_Protocol;
     QRadioButton *radio_transport_uart;
     QRadioButton *radio_transport_udp;
+    QRadioButton *radio_transport_bluetooth;
     QPushButton *btn_transport_connect;
     QSpacerItem *horizontalSpacer_6;
 ///AUTOGEN_END_OBJECTS
