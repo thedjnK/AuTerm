@@ -53,12 +53,14 @@ class smp_group : public QObject
     Q_OBJECT
 
 public:
-    smp_group(smp_processor *parent, uint16_t group_id, smp_error_lookup error_lookup_function)
+    smp_group(smp_processor *parent, QString group_name, uint16_t group_id, smp_error_lookup error_lookup_function, smp_error_define_lookup error_define_lookup_function)
     {
         processor = parent;
         processor->register_handler(group_id, this);
         smp_error::register_error_lookup_function(group_id, this);
+        name = group_name;
         error_lookup = error_lookup_function;
+        error_define_lookup = error_define_lookup_function;
     }
 
     void set_parameters(uint8_t version, uint16_t mtu, uint8_t retries, uint16_t timeout, uint8_t user_data)
@@ -80,6 +82,23 @@ public:
         return false;
     }
 
+    bool lookup_error_define(int32_t rc, QString *define)
+    {
+        if (error_define_lookup != nullptr)
+        {
+            bool good = error_define_lookup(rc, define);
+
+            if (good == true)
+            {
+                define->prepend(name.append("_MGMT_"));
+            }
+
+            return good;
+        }
+
+        return false;
+    }
+
     virtual void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) = 0;
     virtual void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) = 0;
     virtual void timeout(smp_message *message) = 0;
@@ -91,6 +110,7 @@ signals:
     void version_error(uint8_t supported_version);
 
 protected:
+    QString name;
     smp_processor *processor;
     uint8_t smp_version;
     uint16_t smp_mtu;
@@ -98,6 +118,7 @@ protected:
     uint16_t smp_timeout;
     uint8_t smp_user_data;
     smp_error_lookup error_lookup;
+    smp_error_define_lookup error_define_lookup;
 };
 
 #endif // SMP_GROUP_H

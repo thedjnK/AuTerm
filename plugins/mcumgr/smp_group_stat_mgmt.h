@@ -48,6 +48,7 @@ public:
     bool start_group_data(QString name, QList<stat_value_t> *stats);
     bool start_list_groups(QStringList *groups);
     static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
 
 private:
     bool parse_group_data_response(QCborStreamReader &reader, QString *key_name, QList<stat_value_t> *stats);

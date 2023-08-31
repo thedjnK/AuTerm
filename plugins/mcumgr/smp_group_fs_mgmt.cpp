@@ -41,21 +41,36 @@ enum fs_mgmt_commands : uint8_t {
 };
 
 enum fs_mgmt_errs : uint16_t {
-    FS_MGMT_RET_RC_OK = 0,
-    FS_MGMT_RET_RC_UNKNOWN,
-    FS_MGMT_RET_RC_FILE_INVALID_NAME,
-    FS_MGMT_RET_RC_FILE_NOT_FOUND,
-    FS_MGMT_RET_RC_FILE_IS_DIRECTORY,
-    FS_MGMT_RET_RC_FILE_OPEN_FAILED,
-    FS_MGMT_RET_RC_FILE_SEEK_FAILED,
-    FS_MGMT_RET_RC_FILE_READ_FAILED,
-    FS_MGMT_RET_RC_FILE_TRUNCATE_FAILED,
-    FS_MGMT_RET_RC_FILE_DELETE_FAILED,
-    FS_MGMT_RET_RC_FILE_WRITE_FAILED,
-    FS_MGMT_RET_RC_FILE_OFFSET_NOT_VALID,
-    FS_MGMT_RET_RC_FILE_OFFSET_LARGER_THAN_FILE,
-    FS_MGMT_RET_RC_CHECKSUM_HASH_NOT_FOUND
+    FS_MGMT_ERR_OK = 0,
+    FS_MGMT_ERR_UNKNOWN,
+    FS_MGMT_ERR_FILE_INVALID_NAME,
+    FS_MGMT_ERR_FILE_NOT_FOUND,
+    FS_MGMT_ERR_FILE_IS_DIRECTORY,
+    FS_MGMT_ERR_FILE_OPEN_FAILED,
+    FS_MGMT_ERR_FILE_SEEK_FAILED,
+    FS_MGMT_ERR_FILE_READ_FAILED,
+    FS_MGMT_ERR_FILE_TRUNCATE_FAILED,
+    FS_MGMT_ERR_FILE_DELETE_FAILED,
+    FS_MGMT_ERR_FILE_WRITE_FAILED,
+    FS_MGMT_ERR_FILE_OFFSET_NOT_VALID,
+    FS_MGMT_ERR_FILE_OFFSET_LARGER_THAN_FILE,
+    FS_MGMT_ERR_CHECKSUM_HASH_NOT_FOUND
 };
+
+static QStringList smp_error_defines = QStringList() <<
+    //Error index starts from 2 (no error and unknown error are common and handled in the base code)
+    "FILE_INVALID_NAME" <<
+    "FILE_NOT_FOUND" <<
+    "FILE_IS_DIRECTORY" <<
+    "FILE_OPEN_FAILED" <<
+    "FILE_SEEK_FAILED" <<
+    "FILE_READ_FAILED" <<
+    "FILE_TRUNCATE_FAILED" <<
+    "FILE_DELETE_FAILED" <<
+    "FILE_WRITE_FAILED" <<
+    "FILE_OFFSET_NOT_VALID" <<
+    "FILE_OFFSET_LARGER_THAN_FILE" <<
+    "CHECKSUM_HASH_NOT_FOUND";
 
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
@@ -72,7 +87,7 @@ static QStringList smp_error_values = QStringList() <<
     "The requested offset is larger than the size of the file on the device" <<
     "The requested checksum or hash type was not found or is not supported by this build";
 
-smp_group_fs_mgmt::smp_group_fs_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_FS, error_lookup)
+smp_group_fs_mgmt::smp_group_fs_mgmt(smp_processor *parent) : smp_group(parent, "FS", SMP_GROUP_ID_FS, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
 }
@@ -734,7 +749,7 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
     if (command == COMMAND_UPLOAD_DOWNLOAD && mode == MODE_UPLOAD)
     {
         //TODO
-        if (error.type == SMP_ERROR_RET && error.group == SMP_GROUP_ID_FS && error.rc == FS_MGMT_RET_RC_FILE_OFFSET_NOT_VALID)
+        if (error.type == SMP_ERROR_RET && error.group == SMP_GROUP_ID_FS && error.rc == FS_MGMT_ERR_FILE_OFFSET_NOT_VALID)
         {
             //TODO - Possible indication that another transport (or the device itself) has modified the underlying file
             qDebug() << "Possible MCUmgr FS upload transport clash";
@@ -1004,6 +1019,19 @@ bool smp_group_fs_mgmt::error_lookup(int32_t rc, QString *error)
     if (rc < smp_error_values.length())
     {
         *error = smp_error_values.at(rc);
+        return true;
+    }
+
+    return false;
+}
+
+bool smp_group_fs_mgmt::error_define_lookup(int32_t rc, QString *error)
+{
+    rc -= 2;
+
+    if (rc < smp_error_defines.length())
+    {
+        *error = smp_error_defines.at(rc);
         return true;
     }
 

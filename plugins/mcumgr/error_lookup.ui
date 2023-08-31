@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>309</width>
+    <height>234</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,7 +66,11 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="combo_group"/>
+      <widget class="QComboBox" name="combo_group">
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
@@ -107,7 +111,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="edit_error_id"/>
+      <widget class="QLineEdit" name="edit_error_id">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -119,7 +127,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="edit_error_description"/>
+    <widget class="QPlainTextEdit" name="edit_error_description">
+     <property name="undoRedoEnabled">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

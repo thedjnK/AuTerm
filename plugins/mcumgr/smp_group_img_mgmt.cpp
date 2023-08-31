@@ -42,6 +42,39 @@ static const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
 static const uint16_t image_tlv_tag_sha256 = 0x10;
 static const uint8_t sha256_size = 32;
 
+static QStringList smp_error_defines = QStringList() <<
+    //Error index starts from 2 (no error and unknown error are common and handled in the base code)
+    "FLASH_CONFIG_QUERY_FAIL" <<
+    "NO_IMAGE" <<
+    "NO_TLVS" <<
+    "INVALID_TLV" <<
+    "TLV_MULTIPLE_HASHES_FOUND" <<
+    "TLV_INVALID_SIZE" <<
+    "HASH_NOT_FOUND" <<
+    "NO_FREE_SLOT" <<
+    "FLASH_OPEN_FAILED" <<
+    "FLASH_READ_FAILED" <<
+    "FLASH_WRITE_FAILED" <<
+    "FLASH_ERASE_FAILED" <<
+    "INVALID_SLOT" <<
+    "NO_FREE_MEMORY" <<
+    "FLASH_CONTEXT_ALREADY_SET" <<
+    "FLASH_CONTEXT_NOT_SET" <<
+    "FLASH_AREA_DEVICE_NULL" <<
+    "INVALID_PAGE_OFFSET" <<
+    "INVALID_OFFSET" <<
+    "INVALID_LENGTH" <<
+    "INVALID_IMAGE_HEADER" <<
+    "INVALID_IMAGE_HEADER_MAGIC" <<
+    "INVALID_HASH" <<
+    "INVALID_FLASH_ADDRESS" <<
+    "VERSION_GET_FAILED" <<
+    "CURRENT_VERSION_IS_NEWER" <<
+    "IMAGE_ALREADY_PENDING" <<
+    "INVALID_IMAGE_VECTOR_TABLE" <<
+    "INVALID_IMAGE_TOO_LARGE" <<
+    "INVALID_IMAGE_DATA_OVERRUN";
+
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "Failed to query flash area configuration" <<
@@ -78,7 +111,7 @@ static QStringList smp_error_values = QStringList() <<
 image_state_t image_state_buffer;
 slot_state_t slot_state_buffer;
 
-smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_IMG, error_lookup)
+smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent, "IMG", SMP_GROUP_ID_IMG, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
 }
@@ -964,6 +997,19 @@ bool smp_group_img_mgmt::error_lookup(int32_t rc, QString *error)
     if (rc < smp_error_values.length())
     {
         *error = smp_error_values.at(rc);
+        return true;
+    }
+
+    return false;
+}
+
+bool smp_group_img_mgmt::error_define_lookup(int32_t rc, QString *error)
+{
+    rc -= 2;
+
+    if (rc < smp_error_defines.length())
+    {
+        *error = smp_error_defines.at(rc);
         return true;
     }
 

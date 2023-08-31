@@ -72,6 +72,7 @@ public:
     bool start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash);
     bool start_image_erase(uint8_t slot);
     static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
 
 signals:
     void plugin_to_hex(QByteArray *data);

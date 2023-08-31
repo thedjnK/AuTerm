@@ -25,6 +25,23 @@
 #include "smp_group.h"
 
 static QList<smp_error_lookup_list_t> lookup_functions;
+static QStringList smp_error_defines = QStringList() <<
+    //Error index starts from 0
+    "EOK" <<
+    "EUNKNOWN" <<
+    "ENOMEM" <<
+    "EINVAL" <<
+    "ETIMEOUT" <<
+    "ENOENT" <<
+    "EBADSTATE" <<
+    "EMSGSIZE" <<
+    "ENOTSUP" <<
+    "ECORRUPT" <<
+    "EBUSY" <<
+    "EACCESSDENIED" <<
+    "UNSUPPORTED_TOO_OLD" <<
+    "UNSUPPORTED_TOO_NEW";
+
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 0
     "No error" <<
@@ -78,6 +95,44 @@ QString smp_error::error_lookup_string(smp_error_t *error)
     }
 
     return error_string;
+}
+
+QString smp_error::error_lookup_define(smp_error_t *error)
+{
+    QString error_define;
+    uint16_t i = 0;
+
+    if (error->type == SMP_ERROR_RC)
+    {
+        if (error->rc < smp_error_defines.length())
+        {
+            error_define = smp_error_defines.at(error->rc);
+        }
+    }
+    else if (error->type == SMP_ERROR_RET)
+    {
+        if (error->rc < 2)
+        {
+            //Index 0 is reserved for no error, index 1 is reserved for unknown error
+            error_define = smp_error_defines.at(error->rc);
+        }
+        else
+        {
+            while (i < lookup_functions.length())
+            {
+                if (lookup_functions[i].group == error->group)
+                {
+                    //TODO: error handling?
+                    (void)lookup_functions[i].lookup->lookup_error_define(error->rc, &error_define);
+                    break;
+                }
+
+                ++i;
+            }
+        }
+    }
+
+    return error_define;
 }
 
 void smp_error::register_error_lookup_function(uint16_t group, smp_group *group_object)

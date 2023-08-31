@@ -33,6 +33,13 @@ enum stat_mgmt_commands : uint8_t {
     COMMAND_LIST_GROUPS,
 };
 
+static QStringList smp_error_defines = QStringList() <<
+    //Error index starts from 2 (no error and unknown error are common and handled in the base code)
+    "INVALID_GROUP" <<
+    "INVALID_STAT_NAME" <<
+    "INVALID_STAT_SIZE" <<
+    "WALK_ABORTED";
+
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "The provided statistic group name was not found" <<
@@ -40,7 +47,7 @@ static QStringList smp_error_values = QStringList() <<
     "The size of the statistic cannot be handled" <<
     "Walk through of statistics was aborted";
 
-smp_group_stat_mgmt::smp_group_stat_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_STATS, error_lookup)
+smp_group_stat_mgmt::smp_group_stat_mgmt(smp_processor *parent) : smp_group(parent, "STAT", SMP_GROUP_ID_STATS, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
 }
@@ -387,6 +394,19 @@ bool smp_group_stat_mgmt::error_lookup(int32_t rc, QString *error)
     if (rc < smp_error_values.length())
     {
         *error = smp_error_values.at(rc);
+        return true;
+    }
+
+    return false;
+}
+
+bool smp_group_stat_mgmt::error_define_lookup(int32_t rc, QString *error)
+{
+    rc -= 2;
+
+    if (rc < smp_error_defines.length())
+    {
+        *error = smp_error_defines.at(rc);
         return true;
     }
 

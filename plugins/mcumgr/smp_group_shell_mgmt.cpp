@@ -31,12 +31,17 @@ enum shell_mgmt_commands : uint8_t {
     COMMAND_EXECUTE = 0,
 };
 
+static QStringList smp_error_defines = QStringList() <<
+    //Error index starts from 2 (no error and unknown error are common and handled in the base code)
+    "COMMAND_TOO_LONG" <<
+    "EMPTY_COMMAND";
+
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "The provided command to execute is too long" <<
     "No command to execute was provided";
 
-smp_group_shell_mgmt::smp_group_shell_mgmt(smp_processor *parent) : smp_group(parent, SMP_GROUP_ID_SHELL, error_lookup)
+smp_group_shell_mgmt::smp_group_shell_mgmt(smp_processor *parent) : smp_group(parent, "SHELL", SMP_GROUP_ID_SHELL, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
 }
@@ -283,6 +288,19 @@ bool smp_group_shell_mgmt::error_lookup(int32_t rc, QString *error)
     if (rc < smp_error_values.length())
     {
         *error = smp_error_values.at(rc);
+        return true;
+    }
+
+    return false;
+}
+
+bool smp_group_shell_mgmt::error_define_lookup(int32_t rc, QString *error)
+{
+    rc -= 2;
+
+    if (rc < smp_error_defines.length())
+    {
+        *error = smp_error_defines.at(rc);
         return true;
     }
 

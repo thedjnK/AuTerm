@@ -40,6 +40,7 @@ struct smp_error_t {
 class smp_group;
 
 typedef bool (*smp_error_lookup)(int32_t rc, QString *error);
+typedef bool (*smp_error_define_lookup)(int32_t rc, QString *define);
 
 struct smp_error_lookup_list_t {
     uint16_t group;
@@ -50,6 +51,7 @@ class smp_error
 {
 public:
     static QString error_lookup_string(smp_error_t *error);
+    static QString error_lookup_define(smp_error_t *define);
     static void register_error_lookup_function(uint16_t group, smp_group *group_object);
 };
 

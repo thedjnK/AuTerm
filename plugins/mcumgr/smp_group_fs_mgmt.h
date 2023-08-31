@@ -54,6 +54,7 @@ public:
     bool start_supported_hashes_checksums(QList<hash_checksum_t> *hash_checksum_list);
     bool start_file_close();
     static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
 
 private:
     bool parse_upload_response(QCborStreamReader &reader, uint32_t *off, bool *off_found);

@@ -70,6 +70,7 @@ public:
     bool start_date_time_set();
     */
     static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
 
 private:
     bool parse_echo_response(QCborStreamReader &reader, QString *response);
