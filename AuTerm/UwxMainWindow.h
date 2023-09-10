@@ -375,6 +375,8 @@ public slots:
     plugin_to_hex(
         QByteArray *data
         );
+    void plugin_save_setting(QString name, QVariant data);
+    void plugin_load_setting(QString name, QVariant *data, bool *found);
 #endif
 
 private:

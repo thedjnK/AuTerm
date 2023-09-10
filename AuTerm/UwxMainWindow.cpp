@@ -5853,6 +5853,30 @@ MainWindow::plugin_to_hex(
 {
     AutEscape::to_hex(data);
 }
+
+//=============================================================================
+//=============================================================================
+void MainWindow::plugin_save_setting(QString name, QVariant data)
+{
+    name.prepend("plugin_");
+
+    gpTermSettings->setValue(name, data);
+}
+
+//=============================================================================
+//=============================================================================
+
+void MainWindow::plugin_load_setting(QString name, QVariant *data, bool *found)
+{
+    name.prepend("plugin_");
+
+    if (found != nullptr)
+    {
+        *found = gpTermSettings->contains(name);
+    }
+
+    *data = gpTermSettings->value(name);
+}
 #endif
 
 //=============================================================================
