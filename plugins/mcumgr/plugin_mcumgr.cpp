@@ -26,8 +26,14 @@
 #include <QFileDialog>
 #include "smp_group_array.h"
 #include "error_lookup.h"
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
 #include "smp_udp.h"
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
 #include "smp_bluetooth.h"
+#endif
 
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -46,14 +52,27 @@ smp_group_array smp_groups;
 error_lookup *error_lookup_form;
 QList<image_state_t> blaharray;
 QList<hash_checksum_t> what;
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
 smp_udp *my_udp;
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
 smp_bluetooth *my_bluetooth;
+#endif
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
     uart = new smp_uart(this);
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     my_udp = new smp_udp(this);
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     my_bluetooth = new smp_bluetooth(this);
+#endif
+
     processor = new smp_processor(this);
     mode = ACTION_IDLE;
 
@@ -976,8 +995,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(uart, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
     //connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     //connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     connect(my_udp, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     connect(my_bluetooth, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+#endif
 
 //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
@@ -1042,8 +1067,14 @@ connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     delete my_bluetooth;
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     delete my_udp;
+#endif
+
     delete error_lookup_form;
     delete smp_groups.fs_mgmt;
     delete smp_groups.stat_mgmt;
@@ -1893,14 +1924,21 @@ void plugin_mcumgr::on_btn_transport_connect_clicked()
 
 smp_transport *plugin_mcumgr::active_transport()
 {
-    if (radio_transport_udp->isChecked() == true)
+    if (0)
+    {
+    }
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    else if (radio_transport_udp->isChecked() == true)
     {
         return my_udp;
     }
+#endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     else if (radio_transport_bluetooth->isChecked() == true)
     {
         return my_bluetooth;
     }
+#endif
     else
     {
         return uart;
