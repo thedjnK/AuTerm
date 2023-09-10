@@ -119,6 +119,7 @@ public:
     void serial_about_to_close();
     void serial_opened();
     void serial_closed();
+    static QMainWindow *get_main_window();
 
 signals:
     void show_message_box(QString str_message);

@@ -63,6 +63,8 @@ smp_bluetooth *my_bluetooth;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
+    parent_window = main_window;
+
     uart = new smp_uart(this);
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
@@ -81,7 +83,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     child_row = -1;
     child_column = -1;
 
-    parent_window = main_window;
     QTabWidget *tabWidget_orig = parent_window->findChild<QTabWidget *>("selector_Tab");
 //    QPushButton *other = main_window->findChild<QPushButton *>("btn_TermClose");
 
@@ -1943,4 +1944,9 @@ smp_transport *plugin_mcumgr::active_transport()
     {
         return uart;
     }
+}
+
+QMainWindow *plugin_mcumgr::get_main_window()
+{
+    return parent_window;
 }
