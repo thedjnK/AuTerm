@@ -19,5 +19,17 @@
 #Uncomment to disable plugin support
 #DEFINES += "SKIPPLUGINS"
 
-#Uncomment so skip building MCUmgr plugin
+#Uncomment to skip building MCUmgr plugin
 #DEFINES += "SKIPPLUGIN_MCUMGR"
+
+#Uncomment to build MCUmgr plugin transports (note: UDP requires Qt network, Bluetooth requires Qt Connectivity - note: static builds need those in the base AuTerm build also)
+#DEFINES += "PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH"
+DEFINES += "PLUGIN_MCUMGR_TRANSPORT_UDP"
+
+contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) {
+    ADDITIONAL_MODULES += "bluetooth"
+}
+
+contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_UDP) {
+    ADDITIONAL_MODULES += "network"
+}

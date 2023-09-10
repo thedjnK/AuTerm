@@ -1,6 +1,6 @@
 include(../../AuTerm-includes.pri)
 
-QT += gui widgets serialport network bluetooth
+QT += gui widgets serialport $$ADDITIONAL_MODULES
 
 TEMPLATE = lib
 
@@ -15,10 +15,8 @@ TARGET          = $$qtLibraryTarget(plugin_mcumgr)
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    bluetooth_setup.cpp \
     error_lookup.cpp \
     plugin_mcumgr.cpp \
-    smp_bluetooth.cpp \
     smp_error.cpp \
     smp_group_fs_mgmt.cpp \
     smp_group_os_mgmt.cpp \
@@ -27,15 +25,12 @@ SOURCES += \
     smp_message.cpp \
     smp_processor.cpp \
     smp_uart.cpp \
-    smp_group_img_mgmt.cpp \
-    smp_udp.cpp
+    smp_group_img_mgmt.cpp
 
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
-    bluetooth_setup.h \
     error_lookup.h \
     plugin_mcumgr.h \
-    smp_bluetooth.h \
     smp_error.h \
     smp_group_array.h \
     smp_group_fs_mgmt.h \
@@ -47,8 +42,7 @@ HEADERS += \
     smp_transport.h \
     smp_uart.h \
     smp_group.h \
-    smp_group_img_mgmt.h \
-    smp_udp.h
+    smp_group_img_mgmt.h
 
 DISTFILES += plugin_mcumgr.json
 
@@ -85,5 +79,26 @@ CONFIG(release, debug|release) {
 }
 
 FORMS += \
-	bluetooth_setup.ui \
-	error_lookup.ui
+    error_lookup.ui
+
+
+contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) {
+    SOURCES += \
+	bluetooth_setup.cpp \
+	smp_bluetooth.cpp
+
+    HEADERS += \
+	bluetooth_setup.h \
+	smp_bluetooth.h
+
+    FORMS += \
+	bluetooth_setup.ui
+}
+
+contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_UDP) {
+    SOURCES += \
+	smp_udp.cpp
+
+    HEADERS += \
+	smp_udp.h
+}

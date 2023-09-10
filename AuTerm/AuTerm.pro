@@ -2,7 +2,7 @@
 
 include(../AuTerm-includes.pri)
 
-QT       += core gui widgets serialport network bluetooth
+QT       += core gui widgets serialport
 
 TARGET = AuTerm
 TEMPLATE = app
@@ -77,6 +77,8 @@ CONFIG(release, debug|release) {
     HEADERS += AutPlugin.h
 
     contains(CONFIG, static) {
+	QT += $$ADDITIONAL_MODULES
+
         !contains(DEFINES, SKIPPLUGIN_MCUMGR) {
             exists(../plugins/mcumgr) {
                 DEFINES += "STATICPLUGIN_MCUMGR"
