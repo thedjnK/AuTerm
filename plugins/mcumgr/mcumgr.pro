@@ -81,7 +81,6 @@ CONFIG(release, debug|release) {
 FORMS += \
     error_lookup.ui
 
-
 contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) {
     SOURCES += \
 	bluetooth_setup.cpp \
@@ -97,8 +96,13 @@ contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) {
 
 contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_UDP) {
     SOURCES += \
+	udp_setup.cpp \
 	smp_udp.cpp
 
     HEADERS += \
+	udp_setup.h \
 	smp_udp.h
+
+    FORMS += \
+	udp_setup.ui
 }
