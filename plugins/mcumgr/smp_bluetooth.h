@@ -63,6 +63,7 @@ private slots:
     void errorz(QLowEnergyController::Error error);
 
     void timeout_timer();
+    void discover_timer_timeout();
 
     void form_refresh_devices();
     void form_connect_to_device(uint16_t index);
@@ -75,7 +76,7 @@ signals:
 
 private:
 //    Ui::bluetooth *ui;
-    QBluetoothDeviceDiscoveryAgent *discoveryAgent;
+    QBluetoothDeviceDiscoveryAgent *discoveryAgent = nullptr;
 //    DeviceInfo currentDevice;
     QLowEnergyController *controller = nullptr;
     bool device_connected;
