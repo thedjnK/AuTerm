@@ -41,6 +41,11 @@ enum img_mgmt_commands : uint8_t {
 static const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
 static const uint16_t image_tlv_tag_sha256 = 0x10;
 static const uint8_t sha256_size = 32;
+static const uint8_t image_tlv_magic_size = 2;
+static const uint8_t image_tlv_legnth_offset_1 = 2;
+static const uint8_t image_tlv_legnth_offset_2 = 3;
+static const uint8_t image_tlv_header_size = 4;
+static const uint8_t image_tlv_data_header_size = 4;
 
 static QStringList smp_error_defines = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
@@ -121,14 +126,15 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
     bool found = false;
     bool hash_found = false;
 
-    int32_t pos = file_data->length() - 4;
-    int16_t length;
+    int32_t pos = file_data->length() - image_tlv_header_size;
+    uint16_t length;
+
     while (pos >= 0)
     {
-        if (file_data->mid(pos, 2) == image_tlv_magic)
+        if (file_data->mid(pos, image_tlv_magic_size) == image_tlv_magic)
         {
-            length = file_data->at(pos + 2);
-            length |= ((uint16_t)file_data->at(pos + 3)) << 8;
+            length = (uint8_t)file_data->at(pos + image_tlv_legnth_offset_1);
+            length |= (uint16_t)((uint8_t)file_data->at(pos + image_tlv_legnth_offset_2)) << 8;
 
             if ((pos + length) == file_data->length())
             {
@@ -142,13 +148,14 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
 
     if (found == true)
     {
-        int32_t new_pos = pos + 4;
+        uint32_t new_pos = pos + image_tlv_header_size;
 
         while (new_pos < file_data->length())
         {
+            //TODO: TLVs are > 8-bit
             uint8_t type = file_data->at(new_pos);
-            int16_t local_length = file_data->at(new_pos + 2);
-            local_length |= ((uint16_t)file_data->at(new_pos + 3)) << 8;
+            uint16_t local_length = (uint8_t)file_data->at(new_pos + image_tlv_legnth_offset_1);
+            local_length |= (uint16_t)((uint8_t)file_data->at(new_pos + image_tlv_legnth_offset_2)) << 8;
 
             //		    qDebug() << "Type " << type << ", length " << local_length;
 
