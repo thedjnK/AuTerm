@@ -21,13 +21,12 @@
 **
 *******************************************************************************/
 #include "smp_bluetooth.h"
+#include "bluetooth_setup.h"
 #include <QDebug>
 #include <QBluetoothUuid>
 #include <QLowEnergyConnectionParameters>
 #include <QLowEnergyCharacteristic>
 #include <QTimer>
-
-#include "bluetooth_setup.h"
 
 //Aim for a connection interval of between 7.5us-30us with a 4 second supervision timeout
 const double connection_interval_min = 7.5;
@@ -85,6 +84,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
 smp_bluetooth::~smp_bluetooth()
 {
     delete bluetooth_window;
+
     if (discoveryAgent != nullptr)
     {
         QObject::disconnect(discoveryAgent, SIGNAL(deviceDiscovered(QBluetoothDeviceInfo)), this, SLOT(deviceDiscovered(QBluetoothDeviceInfo)));
