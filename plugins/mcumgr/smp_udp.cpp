@@ -21,12 +21,17 @@
 **
 *******************************************************************************/
 #include "smp_udp.h"
+#include "udp_setup.h"
 #include <QNetworkDatagram>
 #include <QInputDialog>
+
+udp_setup *udp_window;
 
 smp_udp::smp_udp(QObject *parent)
 {
     Q_UNUSED(parent);
+
+    udp_window = new udp_setup(nullptr);
 
     socket = new QUdpSocket(this);
     socket_is_connected = false;
@@ -39,10 +44,14 @@ smp_udp::smp_udp(QObject *parent)
 //    QObject::connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socket_statechanged(QAbstractSocket::SocketState)));
 //    QObject::connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socket_error(QAbstractSocket::SocketError)));
 //    QObject::connect(socket, SIGNAL(readChannelFinished()), this, SLOT(socket_readchannelfinished()));
+
+    QObject::connect(udp_window, SIGNAL(connect_to_device(QString,uint16_t)), this, SLOT(connect_to_device(QString,uint16_t)));
 }
 
 smp_udp::~smp_udp()
 {
+    delete udp_window;
+
 //    QObject::disconnect(this, SLOT(socket_abouttoclose()));
     QObject::disconnect(this, SLOT(socket_readyread()));
 //    QObject::disconnect(this, SLOT(socket_byteswritten(qint64)));
@@ -68,11 +77,7 @@ int smp_udp::connect(void)
         return SMP_TRANSPORT_ERROR_ALREADY_CONNECTED;
     }
 
-    setting_host = QInputDialog::getText(nullptr, "Enter IP/hostname", "IP/hostname:");
-    setting_port = QInputDialog::getInt(nullptr, "Enter Port", "Port:", 1337, 1, 65535);
-
-    socket->connectToHost(setting_host, setting_port);
-    socket_is_connected = true;
+    udp_window->show();
 
     return SMP_TRANSPORT_ERROR_OK;
 }
@@ -258,3 +263,18 @@ int smp_udp::has_data(void)
 	return socket->hasPendingDatagrams();
 }
 #endif
+
+void smp_udp::connect_to_device(QString host, uint16_t port)
+{
+    socket->connectToHost(host, port);
+    socket_is_connected = true;
+    //TODO: need to alert parent
+}
+
+void smp_udp::close_connect_dialog()
+{
+    if (udp_window->isVisible())
+    {
+        udp_window->close();
+    }
+}

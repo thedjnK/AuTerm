@@ -32,6 +32,9 @@ private slots:
     void on_btn_SHELL_Clear_clicked();
     void on_btn_SHELL_Copy_clicked();
     void on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index);
+    void on_radio_transport_uart_toggled(bool checked);
+    void on_radio_transport_udp_toggled(bool checked);
+    void on_radio_transport_bluetooth_toggled(bool checked);
 
 private:
     Ui::Form *ui;

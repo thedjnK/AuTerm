@@ -44,6 +44,9 @@ private slots:
     void on_check_save_history_stateChanged(int arg1);
     void on_btn_clear_history_clicked();
 
+signals:
+    void connect_to_device(QString host, uint16_t port);
+
 private:
     Ui::udp_setup *ui;
 };

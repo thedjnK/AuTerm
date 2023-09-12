@@ -1022,8 +1022,15 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_SHELL_Clear, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Clear_clicked()));
     connect(btn_SHELL_Copy, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Copy_clicked()));
     connect(btn_transport_connect, SIGNAL(clicked()), this, SLOT(on_btn_transport_connect_clicked()));
+    connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT(on_colview_IMG_Images_updatePreviewWidget(QModelIndex)));
+    connect(radio_transport_uart, SIGNAL(toggled(bool)), this, SLOT(on_radio_transport_uart_toggled(bool)));
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    connect(radio_transport_udp, SIGNAL(toggled(bool)), this, SLOT(on_radio_transport_udp_toggled(bool)));
+#endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    connect(radio_transport_bluetooth, SIGNAL(toggled(bool)), this, SLOT(on_radio_transport_bluetooth_toggled(bool)));
+#endif
 
-connect(colview_IMG_Images, SIGNAL(updatePreviewWidget(QModelIndex)), this, SLOT(on_colview_IMG_Images_updatePreviewWidget(QModelIndex)));
     colview_IMG_Images->setModel(&model_image_state);
 
     check_IMG_Preview_Confirmed->setChecked(true);
@@ -1996,3 +2003,31 @@ QMainWindow *plugin_mcumgr::get_main_window()
 {
     return parent_window;
 }
+
+void plugin_mcumgr::on_radio_transport_uart_toggled(bool checked)
+{
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    my_udp->close_connect_dialog();
+#endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    my_bluetooth->close_connect_dialog();
+#endif
+}
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+void plugin_mcumgr::on_radio_transport_udp_toggled(bool checked)
+{
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    my_bluetooth->close_connect_dialog();
+#endif
+}
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+void plugin_mcumgr::on_radio_transport_bluetooth_toggled(bool checked)
+{
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    my_udp->close_connect_dialog();
+#endif
+}
+#endif

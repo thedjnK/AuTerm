@@ -466,3 +466,11 @@ void smp_bluetooth::discover_timer_timeout()
 {
     bluetooth_service_mcumgr->discoverDetails();
 }
+
+void smp_bluetooth::close_connect_dialog()
+{
+    if (bluetooth_window->isVisible())
+    {
+        bluetooth_window->close();
+    }
+}

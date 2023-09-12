@@ -152,6 +152,13 @@ private slots:
     void on_btn_SHELL_Copy_clicked();
     void on_btn_transport_connect_clicked();
     void on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index);
+    void on_radio_transport_uart_toggled(bool checked);
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    void on_radio_transport_udp_toggled(bool checked);
+#endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    void on_radio_transport_bluetooth_toggled(bool checked);
+#endif
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);

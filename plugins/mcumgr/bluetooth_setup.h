@@ -47,7 +47,6 @@ private slots:
     void on_btn_disconnect_clicked();
     void on_btn_close_clicked();
     void on_list_devices_itemDoubleClicked(QListWidgetItem *item);
-
     void on_btn_min_params_clicked();
 
 signals:

@@ -23,6 +23,7 @@
 #ifndef SMP_UDP_H
 #define SMP_UDP_H
 
+#include "plugin_mcumgr.h"
 #include "smp_transport.h"
 #include <QUdpSocket>
 
@@ -37,6 +38,7 @@ public:
     int disconnect(bool force) override;
     int is_connected() override;
     int send(smp_message *message);
+    void close_connect_dialog();
 /*    int receive(QByteArray *data, uint16_t max_size) override;
     int receive_data_size() override;
     int get_mtu() override;
@@ -46,6 +48,7 @@ public:
     int has_data(void);*/
 
 private slots:
+    void connect_to_device(QString host, uint16_t port);
 //    void socket_abouttoclose();
     void socket_readyread();
 //    void socket_byteswritten(qint64 bytes);
@@ -55,7 +58,7 @@ private slots:
 //    void socket_error(QAbstractSocket::SocketError error);
 //    void socket_readchannelfinished();
 
-//signals:
+signals:
 //    void receive_waiting(smp_message *message);
 
 private:
@@ -64,9 +67,9 @@ private:
 //    QByteArray socket_received_data;
     smp_message received_data;
 
-    QString setting_host;
-    uint32_t setting_port;
-    uint32_t setting_mtu;
+//    QString setting_host;
+//    uint32_t setting_port;
+//    uint32_t setting_mtu;
 };
 
 #endif // SMP_UDP_H

@@ -37,21 +37,26 @@ udp_setup::~udp_setup()
 
 void udp_setup::on_btn_connect_clicked()
 {
+    if (ui->combo_address->currentText().length() == 0)
+    {
+        return;
+    }
 
+    emit connect_to_device(ui->combo_address->currentText(), ui->edit_port->value());
+
+    this->close();
 }
 
 void udp_setup::on_btn_close_clicked()
 {
-
+    this->close();
 }
 
 void udp_setup::on_check_save_history_stateChanged(int arg1)
 {
-
 }
 
 void udp_setup::on_btn_clear_history_clicked()
 {
-
 }
 

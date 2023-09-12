@@ -93,3 +93,18 @@ void Form::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index)
 
 }
 
+void Form::on_radio_transport_uart_toggled(bool checked)
+{
+
+}
+
+void Form::on_radio_transport_udp_toggled(bool checked)
+{
+
+}
+
+void Form::on_radio_transport_bluetooth_toggled(bool checked)
+{
+
+}
+

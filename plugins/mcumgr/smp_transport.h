@@ -60,6 +60,10 @@ public:
     virtual int send(smp_message *message) = 0;
 //    virtual int receive(QByteArray *data, uint16_t max_size) = 0;
 
+    virtual void close_connect_dialog()
+    {
+    }
+
 signals:
 //    void connected();
 //    void disconnected();

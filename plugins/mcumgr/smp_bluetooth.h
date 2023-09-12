@@ -47,6 +47,7 @@ public:
     int disconnect(bool force);
     int is_connected();
     int send(smp_message *message);
+    void close_connect_dialog();
 
 private slots:
     void deviceDiscovered(const QBluetoothDeviceInfo &info);
