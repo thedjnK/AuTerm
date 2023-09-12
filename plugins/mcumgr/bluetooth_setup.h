@@ -47,13 +47,11 @@ private slots:
     void on_btn_disconnect_clicked();
     void on_btn_close_clicked();
     void on_list_devices_itemDoubleClicked(QListWidgetItem *item);
-    void on_btn_min_params_clicked();
 
 signals:
     void refresh_devices();
     void connect_to_device(uint16_t index);
     void disconnect_from_device();
-    void min_params();
 
 private:
     Ui::bluetooth_setup *ui;

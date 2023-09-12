@@ -69,13 +69,14 @@ private slots:
     void form_refresh_devices();
     void form_connect_to_device(uint16_t index);
     void form_disconnect_from_device();
-    void form_min_params();
 //    void connection_updated(QLowEnergyConnectionParameters parameters);
 
 signals:
 //    void read(QByteArray *message);
 
 private:
+    void form_min_params();
+
 //    Ui::bluetooth *ui;
     QBluetoothDeviceDiscoveryAgent *discoveryAgent = nullptr;
 //    DeviceInfo currentDevice;

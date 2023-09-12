@@ -78,8 +78,3 @@ void bluetooth_setup::add_debug(QString data)
     ui->edit_debug->appendPlainText(data);
 }
 
-void bluetooth_setup::on_btn_min_params_clicked()
-{
-    emit min_params();
-}
-

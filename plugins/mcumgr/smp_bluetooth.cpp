@@ -60,7 +60,6 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
     QObject::connect(bluetooth_window, SIGNAL(refresh_devices()), this, SLOT(form_refresh_devices()));
     QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t)), this, SLOT(form_connect_to_device(uint16_t)));
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
-    QObject::connect(bluetooth_window, SIGNAL(min_params()), this, SLOT(form_min_params()));
 
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
     discoveryAgent->setLowEnergyDiscoveryTimeout(8000);
