@@ -49,6 +49,7 @@ public:
 
     virtual int disconnect(bool force)
     {
+        Q_UNUSED(force);
         return SMP_TRANSPORT_ERROR_UNSUPPORTED;
     }
 

@@ -27,6 +27,7 @@
 
 smp_uart::smp_uart(QObject *parent)
 {
+    Q_UNUSED(parent);
 }
 
 smp_uart::~smp_uart()

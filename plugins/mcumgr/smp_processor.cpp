@@ -26,6 +26,8 @@
 
 smp_processor::smp_processor(QObject *parent)
 {
+    Q_UNUSED(parent);
+
     sequence = 0;
     last_message = nullptr;
     last_message_header = nullptr;

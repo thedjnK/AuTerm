@@ -151,6 +151,13 @@ void smp_message::set_header(const QByteArray data)
 
 void smp_message::set_header(const smp_op_t operation, const uint8_t version, const uint8_t flags, const uint16_t length, const uint16_t group, const uint8_t sequence, const uint8_t command)
 {
+    Q_UNUSED(operation);
+    Q_UNUSED(version);
+    Q_UNUSED(flags);
+    Q_UNUSED(length);
+    Q_UNUSED(group);
+    Q_UNUSED(sequence);
+    Q_UNUSED(command);
 //TODO: MSVC cannot cope with a simple piece of code like this
 #if 0
     const struct smp_hdr data = {
@@ -189,7 +196,7 @@ void smp_message::end_message()
     {
         cbor_writer.endMap();
 
-        uint16_t data_size = this->buffer.length() - sizeof(sizeof(smp_hdr));
+        uint16_t data_size = (uint16_t)(this->buffer.length() - sizeof(sizeof(smp_hdr)));
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
         this->buffer[2] = (uint8_t)(data_size >> 8);
         this->buffer[3] = (uint8_t)data_size;

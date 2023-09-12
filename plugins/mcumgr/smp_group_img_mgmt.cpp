@@ -150,7 +150,7 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
     {
         uint32_t new_pos = pos + image_tlv_header_size;
 
-        while (new_pos < file_data->length())
+        while (new_pos < (uint32_t)file_data->length())
         {
             //TODO: TLVs are > 8-bit
             uint8_t type = file_data->at(new_pos);
@@ -566,7 +566,7 @@ qDebug() << "Going in circles...";
     if (good == true)
     {
         //Upload next chunk
-        if (this->file_upload_area >= this->file_upload_data.length())
+        if (this->file_upload_area >= (uint32_t)this->file_upload_data.length())
         {
             float blah = this->file_upload_data.length();
             uint8_t prefix = 0;
@@ -677,6 +677,8 @@ qDebug() << "Going in circles...";
 
 void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data)
 {
+    Q_UNUSED(op);
+
 //    qDebug() << "Got ok: " << version << ", " << op << ", " << group << ", "  << command << ", " << data;
 
     if (mode == MODE_IDLE)
@@ -772,6 +774,11 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
 
 void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error)
 {
+    Q_UNUSED(version);
+    Q_UNUSED(op);
+    Q_UNUSED(group);
+    Q_UNUSED(error);
+
     bool cleanup = true;
     qDebug() << "error :(";
 

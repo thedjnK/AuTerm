@@ -26,6 +26,8 @@
 
 smp_udp::smp_udp(QObject *parent)
 {
+    Q_UNUSED(parent);
+
     socket = new QUdpSocket(this);
     socket_is_connected = false;
 

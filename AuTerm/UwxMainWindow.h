@@ -546,13 +546,13 @@ private:
     quint64 gintSpeedBytesReceived10s; //Number of bytes received from device in the past 10 seconds in speed test mode
     quint64 gintSpeedBytesSent; //Number of bytes sent to the device in speed test mode
     quint64 gintSpeedBytesSent10s; //Number of bytes sent to the device in the past 10 seconds in speed test mode
-    quint32 gintSpeedBufferCount; //Number of bytes waiting to be sent to the device (waiting in the buffer) in speed test mode
-    quint32 gintSpeedTestMatchDataLength; //Length of MatchData
-    quint32 gintSpeedTestReceiveIndex; //Current index for RecData
-    quint32 gintSpeedTestStatErrors; //Number of errors in packets recieved in speed test mode
-    quint32 gintSpeedTestStatSuccess; //Number of successful packets received in speed test mode
-    quint32 gintSpeedTestStatPacketsSent; //Numbers of packets sent in speed test mode
-    quint32 gintSpeedTestStatPacketsReceived; //Number of packets received in speed test mode
+    qint32 gintSpeedBufferCount; //Number of bytes waiting to be sent to the device (waiting in the buffer) in speed test mode
+    qint32 gintSpeedTestMatchDataLength; //Length of MatchData
+    qint32 gintSpeedTestReceiveIndex; //Current index for RecData
+    qint32 gintSpeedTestStatErrors; //Number of errors in packets recieved in speed test mode
+    qint32 gintSpeedTestStatSuccess; //Number of successful packets received in speed test mode
+    qint32 gintSpeedTestStatPacketsSent; //Numbers of packets sent in speed test mode
+    qint32 gintSpeedTestStatPacketsReceived; //Number of packets received in speed test mode
     quint8 gintSpeedTestDataBits; //Number of data bits (per byte) for speed testing
     quint8 gintSpeedTestStartStopParityBits; //Number of bits for start/stop/parity (per byte) for speed testing
     quint8 gintSpeedTestBytesBits; //Holds the current speed test combo selection option

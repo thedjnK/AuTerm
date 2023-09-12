@@ -582,6 +582,8 @@ bool smp_group_fs_mgmt::parse_supported_hashes_checksums_response(QCborStreamRea
 
 void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data)
 {
+    Q_UNUSED(op);
+
     //    qDebug() << "Got ok: " << version << ", " << op << ", " << group << ", "  << command << ", " << data;
 
     if (mode == MODE_IDLE)
@@ -743,6 +745,11 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
 void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error)
 {
+    Q_UNUSED(version);
+    Q_UNUSED(op);
+    Q_UNUSED(group);
+    Q_UNUSED(error);
+
     bool cleanup = true;
     qDebug() << "error :(";
 

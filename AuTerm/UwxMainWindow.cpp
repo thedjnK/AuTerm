@@ -4082,6 +4082,9 @@ MainWindow::UpdateSettings(
     QChar qcDelta
     )
 {
+    Q_UNUSED(intMajor);
+    Q_UNUSED(intMinor);
+    Q_UNUSED(qcDelta);
 }
 
 //=============================================================================

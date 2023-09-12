@@ -53,6 +53,8 @@ int retry_count;
 
 smp_bluetooth::smp_bluetooth(QObject *parent)
 {
+    Q_UNUSED(parent);
+
     bluetooth_window = new bluetooth_setup(nullptr);
 
     QObject::connect(bluetooth_window, SIGNAL(refresh_devices()), this, SLOT(form_refresh_devices()));
