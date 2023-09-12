@@ -642,8 +642,12 @@ qDebug() << "Going in circles...";
             //Initial packet, extra data is needed: generate upload hash
             QByteArray session_hash = QCryptographicHash::hash(this->file_upload_data, QCryptographicHash::Sha256);
 
-            tmp_message->writer()->append("image");
-            tmp_message->writer()->append(this->upload_image);
+            if (this->upload_image != 0)
+            {
+                tmp_message->writer()->append("image");
+                tmp_message->writer()->append(this->upload_image);
+            }
+
             tmp_message->writer()->append("len");
             tmp_message->writer()->append(this->file_upload_data.length());
             tmp_message->writer()->append("sha");
