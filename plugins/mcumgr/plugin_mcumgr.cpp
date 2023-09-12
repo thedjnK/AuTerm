@@ -1131,6 +1131,7 @@ void plugin_mcumgr::serial_receive(QByteArray *data)
 
 void plugin_mcumgr::serial_bytes_written(qint64 bytes)
 {
+    Q_UNUSED(bytes);
 //    qDebug() << "written: " << bytes;
 }
 
@@ -1581,12 +1582,15 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     STATUS_CANCELLED
 */
 
+    QLabel *label_status = nullptr;
     bool finished = true;
 
     qDebug() << "Status: " << status << "Sender: " << sender();
     if (sender() == smp_groups.img_mgmt)
     {
         qDebug() << "img sender";
+        label_status = lbl_IMG_Status;
+
         if (status == STATUS_COMPLETE)
         {
             qDebug() << "complete";
@@ -1675,12 +1679,15 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     else if (sender() == smp_groups.os_mgmt)
     {
         qDebug() << "os sender";
+        label_status = lbl_OS_Status;
+
         if (status == STATUS_COMPLETE)
         {
             qDebug() << "complete";
             if (user_data == ACTION_OS_ECHO)
             {
                 edit_OS_Echo_Output->appendPlainText(error_string);
+                error_string = nullptr;
             }
             else if (user_data == ACTION_OS_UPLOAD_RESET)
             {
@@ -1796,6 +1803,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     else if (sender() == smp_groups.shell_mgmt)
     {
         qDebug() << "shell sender";
+        label_status = lbl_SHELL_Status;
+
         if (status == STATUS_COMPLETE)
         {
             qDebug() << "complete";
@@ -1817,6 +1826,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     else if (sender() == smp_groups.stat_mgmt)
     {
         qDebug() << "stat sender";
+        label_status = lbl_STAT_Status;
+
         if (status == STATUS_COMPLETE)
         {
             qDebug() << "complete";
@@ -1849,6 +1860,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     else if (sender() == smp_groups.fs_mgmt)
     {
         qDebug() << "stat sender";
+        label_status = lbl_FS_Status;
+
         if (status == STATUS_COMPLETE)
         {
             qDebug() << "complete";
@@ -1890,19 +1903,52 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     {
         mode = ACTION_IDLE;
         emit plugin_set_status(false, false);
+
+        if (error_string == nullptr)
+        {
+            if (status == STATUS_COMPLETE)
+            {
+                error_string = QString("Finished");
+            }
+            else if (status == STATUS_ERROR)
+            {
+                error_string = QString("Error");
+            }
+            else if (status == STATUS_TIMEOUT)
+            {
+                error_string = QString("Command timed out");
+            }
+            else if (status == STATUS_CANCELLED)
+            {
+                error_string = QString("Cancelled");
+            }
+        }
     }
 
     if (error_string != nullptr)
     {
-        qDebug() << "Status message: " << error_string;
+        if (label_status != nullptr)
+        {
+            label_status->setText(error_string);
+        }
+        else
+        {
+            qDebug() << "Status message (no receiver): " << error_string;
+        }
     }
 }
 
 void plugin_mcumgr::progress(uint8_t user_data, uint8_t percent)
 {
+    Q_UNUSED(user_data);
+
     if (this->sender() == smp_groups.img_mgmt)
     {
         progress_IMG_Complete->setValue(percent);
+    }
+    else if (this->sender() == smp_groups.fs_mgmt)
+    {
+        progress_FS_Complete->setValue(percent);
     }
 }
 
