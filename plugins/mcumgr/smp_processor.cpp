@@ -365,6 +365,12 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
         return false;
     }
 
+    //Check if an error was received with value 0, which is not an error and is a success code
+    if (level == 0 && error->type != SMP_ERROR_NONE && error->rc == 0)
+    {
+        error->type = SMP_ERROR_NONE;
+    }
+
     return true;
 }
 
