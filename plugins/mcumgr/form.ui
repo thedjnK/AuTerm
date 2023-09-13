@@ -481,6 +481,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="check_IMG_Confirm">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>Confirm</string>
                  </property>

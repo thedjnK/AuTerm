@@ -161,6 +161,8 @@ private slots:
 #endif
     void on_radio_OS_Buffer_Info_toggled(bool checked);
     void on_radio_OS_uname_toggled(bool checked);
+    void on_radio_IMG_Get_toggled(bool checked);
+    void on_radio_IMG_Set_toggled(bool checked);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);

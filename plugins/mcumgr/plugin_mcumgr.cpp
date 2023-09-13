@@ -371,6 +371,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     check_IMG_Confirm = new QCheckBox(tab_IMG_Images);
     check_IMG_Confirm->setObjectName("check_IMG_Confirm");
+    check_IMG_Confirm->setEnabled(false);
 
     horizontalLayout_6->addWidget(check_IMG_Confirm);
 
@@ -1033,6 +1034,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 #endif
     connect(radio_OS_Buffer_Info, SIGNAL(toggled(bool)), this, SLOT(on_radio_OS_Buffer_Info_toggled(bool)));
     connect(radio_OS_uname, SIGNAL(toggled(bool)), this, SLOT(on_radio_OS_uname_toggled(bool)));
+    connect(radio_IMG_Get, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_Get_toggled(bool)));
+    connect(radio_IMG_Set, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_Set_toggled(bool)));
 
     colview_IMG_Images->setModel(&model_image_state);
 
@@ -2051,5 +2054,21 @@ void plugin_mcumgr::on_radio_OS_uname_toggled(bool checked)
     if (checked == true)
     {
         edit_OS_UName->setEnabled(true);
+    }
+}
+
+void plugin_mcumgr::on_radio_IMG_Get_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        check_IMG_Confirm->setEnabled(false);
+    }
+}
+
+void plugin_mcumgr::on_radio_IMG_Set_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        check_IMG_Confirm->setEnabled(true);
     }
 }

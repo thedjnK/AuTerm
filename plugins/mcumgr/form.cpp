@@ -118,3 +118,13 @@ void Form::on_radio_OS_uname_toggled(bool checked)
 
 }
 
+void Form::on_radio_IMG_Get_toggled(bool checked)
+{
+
+}
+
+void Form::on_radio_IMG_Set_toggled(bool checked)
+{
+
+}
+

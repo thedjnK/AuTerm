@@ -37,6 +37,8 @@ private slots:
     void on_radio_transport_bluetooth_toggled(bool checked);
     void on_radio_OS_Buffer_Info_toggled(bool checked);
     void on_radio_OS_uname_toggled(bool checked);
+    void on_radio_IMG_Get_toggled(bool checked);
+    void on_radio_IMG_Set_toggled(bool checked);
 
 private:
     Ui::Form *ui;
