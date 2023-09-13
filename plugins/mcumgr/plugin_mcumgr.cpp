@@ -530,6 +530,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     selector_OS->addTab(tab_OS_Tasks, QString());
     tab_OS_Memory = new QWidget();
     tab_OS_Memory->setObjectName("tab_OS_Memory");
+    verticalLayout_4 = new QVBoxLayout(tab_OS_Memory);
+    verticalLayout_4->setObjectName("verticalLayout_4");
     table_OS_Memory = new QTableWidget(tab_OS_Memory);
     if (table_OS_Memory->columnCount() < 4)
         table_OS_Memory->setColumnCount(4);
@@ -542,7 +544,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
     table_OS_Memory->setHorizontalHeaderItem(3, __qtablewidgetitem11);
     table_OS_Memory->setObjectName("table_OS_Memory");
-    table_OS_Memory->setGeometry(QRect(10, 10, 330, 172));
     table_OS_Memory->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table_OS_Memory->setProperty("showDropIndicator", QVariant(false));
     table_OS_Memory->setDragDropOverwriteMode(false);
@@ -550,6 +551,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     table_OS_Memory->setSelectionMode(QAbstractItemView::NoSelection);
     table_OS_Memory->setSortingEnabled(true);
     table_OS_Memory->setCornerButtonEnabled(false);
+
+    verticalLayout_4->addWidget(table_OS_Memory);
+
     selector_OS->addTab(tab_OS_Memory, QString());
     tab_OS_Reset = new QWidget();
     tab_OS_Reset->setObjectName("tab_OS_Reset");
@@ -879,7 +883,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    tabWidget->setCurrentIndex(0);
     tabWidget_2->setCurrentIndex(1);
     tabWidget_3->setCurrentIndex(0);
-    selector_OS->setCurrentIndex(0);
+    selector_OS->setCurrentIndex(2);
 ///AUTOGEN_END_INIT
 
     //retranslate code
