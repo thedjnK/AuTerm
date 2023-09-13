@@ -153,12 +153,12 @@ void smp_group_shell_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t grou
     if (mode == MODE_IDLE)
     {
         qDebug() << "Unexpected response, not busy";
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_SHELL)
     {
         qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_SHELL;
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not shell mgmt");
     }
     else
     {
@@ -201,7 +201,7 @@ void smp_group_shell_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t g
     if (command == COMMAND_EXECUTE && mode == MODE_EXECUTE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else
     {

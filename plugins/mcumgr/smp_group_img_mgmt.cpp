@@ -688,12 +688,12 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
     if (mode == MODE_IDLE)
     {
         qDebug() << "Unexpected response, not busy";
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_IMG)
     {
         qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_IMG;
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not img mgmt");
     }
     else
     {
@@ -789,22 +789,22 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
     if (command == COMMAND_STATE && mode == MODE_LIST_IMAGES)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_STATE && mode == MODE_SET_IMAGE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_UPLOAD && mode == MODE_UPLOAD_FIRMWARE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_ERASE && mode == MODE_ERASE_IMAGE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else
     {

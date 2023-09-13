@@ -24,6 +24,7 @@
 #define SMP_GROUP_IMG_MGMT_H
 
 #include "smp_group.h"
+#include "smp_error.h"
 #include <QCborStreamReader>
 #include <QCborStreamWriter>
 #include <QCborArray>

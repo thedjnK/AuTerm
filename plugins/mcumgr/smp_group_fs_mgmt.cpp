@@ -589,12 +589,12 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
     if (mode == MODE_IDLE)
     {
         qDebug() << "Unexpected response, not busy";
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_FS)
     {
         qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_FS;
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not fs mgmt");
     }
     else
     {
@@ -762,32 +762,32 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
             qDebug() << "Possible MCUmgr FS upload transport clash";
         }
 
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_UPLOAD_DOWNLOAD && mode == MODE_DOWNLOAD)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_STATUS && mode == MODE_STATUS)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_HASH_CHECKSUM && mode == MODE_HASH_CHECKSUM)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_SUPPORTED_HASHES_CHECKSUMS && mode == MODE_SUPPORTED_HASHES_CHECKSUMS)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_FILE_CLOSE && mode == MODE_FILE_CLOSE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, nullptr);
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else
     {
