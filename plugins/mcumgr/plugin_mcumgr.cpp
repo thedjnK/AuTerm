@@ -93,9 +93,59 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    tabWidget->setObjectName("tabWidget");
     tab = new QWidget(tabWidget_orig);
     tab->setObjectName("tab");
+    verticalLayout_2 = new QVBoxLayout(tab);
+    verticalLayout_2->setObjectName("verticalLayout_2");
+    horizontalLayout_7 = new QHBoxLayout();
+    horizontalLayout_7->setObjectName("horizontalLayout_7");
+    label = new QLabel(tab);
+    label->setObjectName("label");
+
+    horizontalLayout_7->addWidget(label);
+
+    edit_MTU = new QSpinBox(tab);
+    edit_MTU->setObjectName("edit_MTU");
+    edit_MTU->setMinimum(32);
+    edit_MTU->setMaximum(8192);
+    edit_MTU->setValue(256);
+
+    horizontalLayout_7->addWidget(edit_MTU);
+
+    check_V2_Protocol = new QCheckBox(tab);
+    check_V2_Protocol->setObjectName("check_V2_Protocol");
+    check_V2_Protocol->setChecked(true);
+
+    horizontalLayout_7->addWidget(check_V2_Protocol);
+
+    radio_transport_uart = new QRadioButton(tab);
+    radio_transport_uart->setObjectName("radio_transport_uart");
+    radio_transport_uart->setChecked(true);
+
+    horizontalLayout_7->addWidget(radio_transport_uart);
+
+    radio_transport_udp = new QRadioButton(tab);
+    radio_transport_udp->setObjectName("radio_transport_udp");
+
+    horizontalLayout_7->addWidget(radio_transport_udp);
+
+    radio_transport_bluetooth = new QRadioButton(tab);
+    radio_transport_bluetooth->setObjectName("radio_transport_bluetooth");
+
+    horizontalLayout_7->addWidget(radio_transport_bluetooth);
+
+    btn_transport_connect = new QPushButton(tab);
+    btn_transport_connect->setObjectName("btn_transport_connect");
+
+    horizontalLayout_7->addWidget(btn_transport_connect);
+
+    horizontalSpacer_6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_7->addItem(horizontalSpacer_6);
+
+
+    verticalLayout_2->addLayout(horizontalLayout_7);
+
     tabWidget_2 = new QTabWidget(tab);
     tabWidget_2->setObjectName("tabWidget_2");
-    tabWidget_2->setGeometry(QRect(10, 40, 411, 291));
     tabWidget_2->setTabPosition(QTabWidget::West);
     tab_FS = new QWidget();
     tab_FS->setObjectName("tab_FS");
@@ -312,7 +362,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_5->setContentsMargins(6, 6, 6, 6);
     colview_IMG_Images = new QColumnView(tab_IMG_Images);
     colview_IMG_Images->setObjectName("colview_IMG_Images");
-    colview_IMG_Images->setResizeGripsVisible(false);
 
     gridLayout_5->addWidget(colview_IMG_Images, 0, 0, 1, 1);
 
@@ -735,7 +784,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_Settings = new QWidget();
     tab_Settings->setObjectName("tab_Settings");
     tabWidget_2->addTab(tab_Settings, QString());
-    verticalLayoutWidget = new QWidget();
+
+    verticalLayout_2->addWidget(tabWidget_2);
+
+//    tabWidget->addTab(tab, QString());
+    tab_2 = new QWidget();
+    tab_2->setObjectName("tab_2");
+    verticalLayoutWidget = new QWidget(tab_2);
     verticalLayoutWidget->setObjectName("verticalLayoutWidget");
     verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
@@ -814,57 +869,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     verticalLayout->addItem(verticalSpacer);
 
-    horizontalLayoutWidget = new QWidget(tab);
-    horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-    horizontalLayoutWidget->setGeometry(QRect(10, 10, 448, 31));
-    horizontalLayout_7 = new QHBoxLayout(horizontalLayoutWidget);
-    horizontalLayout_7->setObjectName("horizontalLayout_7");
-    horizontalLayout_7->setContentsMargins(0, 0, 0, 0);
-    label = new QLabel(horizontalLayoutWidget);
-    label->setObjectName("label");
-
-    horizontalLayout_7->addWidget(label);
-
-    edit_MTU = new QSpinBox(horizontalLayoutWidget);
-    edit_MTU->setObjectName("edit_MTU");
-    edit_MTU->setMinimum(32);
-    edit_MTU->setMaximum(8192);
-    edit_MTU->setValue(256);
-
-    horizontalLayout_7->addWidget(edit_MTU);
-
-    check_V2_Protocol = new QCheckBox(horizontalLayoutWidget);
-    check_V2_Protocol->setObjectName("check_V2_Protocol");
-    check_V2_Protocol->setChecked(true);
-
-    horizontalLayout_7->addWidget(check_V2_Protocol);
-
-    radio_transport_uart = new QRadioButton(horizontalLayoutWidget);
-    radio_transport_uart->setObjectName("radio_transport_uart");
-    radio_transport_uart->setChecked(true);
-
-    horizontalLayout_7->addWidget(radio_transport_uart);
-
-    radio_transport_udp = new QRadioButton(horizontalLayoutWidget);
-    radio_transport_udp->setObjectName("radio_transport_udp");
-
-    horizontalLayout_7->addWidget(radio_transport_udp);
-
-    radio_transport_bluetooth = new QRadioButton(horizontalLayoutWidget);
-    radio_transport_bluetooth->setObjectName("radio_transport_bluetooth");
-
-    horizontalLayout_7->addWidget(radio_transport_bluetooth);
-
-    btn_transport_connect = new QPushButton(horizontalLayoutWidget);
-    btn_transport_connect->setObjectName("btn_transport_connect");
-
-    horizontalLayout_7->addWidget(btn_transport_connect);
-
-    horizontalSpacer_6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    horizontalLayout_7->addItem(horizontalSpacer_6);
-
-//    tabWidget->addTab(tab, QString());
+//    tabWidget->addTab(tab_2, QString());
 
 //    gridLayout->addWidget(tabWidget, 0, 0, 1, 1);
 
@@ -880,6 +885,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     //retranslate code
 ///AUTOGEN_START_TRANSLATE
 //    Form->setWindowTitle(QCoreApplication::translate("Form", "Form", nullptr));
+    label->setText(QCoreApplication::translate("Form", "MTU:", nullptr));
+    check_V2_Protocol->setText(QCoreApplication::translate("Form", "v2 protocol", nullptr));
+    radio_transport_uart->setText(QCoreApplication::translate("Form", "UART", nullptr));
+    radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
+    radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
+    btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
     btn_FS_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
     btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     radio_FS_Upload->setText(QCoreApplication::translate("Form", "Upload", nullptr));
@@ -970,6 +981,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
+//    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
     check_IMG_Preview_Confirmed->setText(QCoreApplication::translate("Form", "Confirmed", nullptr));
@@ -978,13 +990,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     check_IMG_Preview_Bootable->setText(QCoreApplication::translate("Form", "Bootable", nullptr));
     check_IMG_Preview_Permanent->setText(QCoreApplication::translate("Form", "Permanent", nullptr));
     btn_IMG_Preview_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
-    label->setText(QCoreApplication::translate("Form", "MTU:", nullptr));
-    check_V2_Protocol->setText(QCoreApplication::translate("Form", "v2 protocol", nullptr));
-    radio_transport_uart->setText(QCoreApplication::translate("Form", "UART", nullptr));
-    radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
-    radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
-    btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
-//    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
+//    tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("Form", "Page", nullptr));
 ///AUTOGEN_END_TRANSLATE
 
     //Add code

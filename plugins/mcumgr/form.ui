@@ -23,606 +23,756 @@
       <attribute name="title">
        <string>MCUmgr</string>
       </attribute>
-      <widget class="QTabWidget" name="tabWidget_2">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>411</width>
-         <height>291</height>
-        </rect>
-       </property>
-       <property name="tabPosition">
-        <enum>QTabWidget::West</enum>
-       </property>
-       <property name="currentIndex">
-        <number>1</number>
-       </property>
-       <widget class="QWidget" name="tab_FS">
-        <attribute name="title">
-         <string>FS</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <property name="leftMargin">
-          <number>6</number>
-         </property>
-         <property name="topMargin">
-          <number>6</number>
-         </property>
-         <property name="rightMargin">
-          <number>6</number>
-         </property>
-         <property name="bottomMargin">
-          <number>6</number>
-         </property>
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="edit_FS_Local"/>
-         </item>
-         <item row="0" column="2">
-          <widget class="QToolButton" name="btn_FS_Local">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label">
            <property name="text">
-            <string>...</string>
+            <string>MTU:</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="0" colspan="3">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <property name="spacing">
-            <number>2</number>
+         <item>
+          <widget class="QSpinBox" name="edit_MTU">
+           <property name="minimum">
+            <number>32</number>
            </property>
-           <property name="bottomMargin">
-            <number>0</number>
+           <property name="maximum">
+            <number>8192</number>
            </property>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btn_FS_Go">
-             <property name="text">
-              <string>Go</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="3" column="0" colspan="3">
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <item>
-            <widget class="QRadioButton" name="radio_FS_Upload">
-             <property name="text">
-              <string>Upload</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radio_FS_Download">
-             <property name="text">
-              <string>Download</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radio_FS_Size">
-             <property name="text">
-              <string>Size</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radio_FS_HashChecksum">
-             <property name="text">
-              <string>Hash/checksum</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radio_FS_Hash_Checksum_Types">
-             <property name="text">
-              <string>Types</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="5" column="0" colspan="2">
-          <widget class="QLabel" name="lbl_FS_Status">
-           <property name="text">
-            <string>[Status]</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Local file:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0" colspan="3">
-          <widget class="QPlainTextEdit" name="edit_FS_Log">
-           <property name="undoRedoEnabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Device file:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="3">
-          <widget class="QProgressBar" name="progress_FS_Complete">
            <property name="value">
-            <number>0</number>
+            <number>256</number>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" colspan="2">
-          <widget class="QLineEdit" name="edit_FS_Remote"/>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_19">
+         <item>
+          <widget class="QCheckBox" name="check_V2_Protocol">
            <property name="text">
-            <string>Hash/checksum:</string>
+            <string>v2 protocol</string>
            </property>
-          </widget>
-         </item>
-         <item row="2" column="1" colspan="2">
-          <widget class="QComboBox" name="combo_FS_Hash_Checksum">
-           <property name="editable">
+           <property name="checked">
             <bool>true</bool>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_transport_uart">
+           <property name="text">
+            <string>UART</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_transport_udp">
+           <property name="text">
+            <string>UDP</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_transport_bluetooth">
+           <property name="text">
+            <string>Bluetooth</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_transport_connect">
+           <property name="text">
+            <string>Connect</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
-       </widget>
-       <widget class="QWidget" name="tab_IMG">
-        <attribute name="title">
-         <string>Img</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <property name="leftMargin">
-          <number>6</number>
+       </item>
+       <item>
+        <widget class="QTabWidget" name="tabWidget_2">
+         <property name="tabPosition">
+          <enum>QTabWidget::West</enum>
          </property>
-         <property name="topMargin">
-          <number>6</number>
+         <property name="currentIndex">
+          <number>1</number>
          </property>
-         <property name="rightMargin">
-          <number>6</number>
-         </property>
-         <property name="bottomMargin">
-          <number>6</number>
-         </property>
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QTabWidget" name="tabWidget_3">
-           <property name="currentIndex">
-            <number>0</number>
+         <widget class="QWidget" name="tab_FS">
+          <attribute name="title">
+           <string>FS</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <property name="leftMargin">
+            <number>6</number>
            </property>
-           <widget class="QWidget" name="tab_IMG_Upload">
-            <attribute name="title">
-             <string>Upload</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_4">
-             <property name="leftMargin">
-              <number>6</number>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="edit_FS_Local"/>
+           </item>
+           <item row="0" column="2">
+            <widget class="QToolButton" name="btn_FS_Local">
+             <property name="text">
+              <string>...</string>
              </property>
-             <property name="topMargin">
-              <number>6</number>
-             </property>
-             <property name="rightMargin">
-              <number>6</number>
-             </property>
-             <property name="bottomMargin">
-              <number>6</number>
-             </property>
+            </widget>
+           </item>
+           <item row="6" column="0" colspan="3">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
              <property name="spacing">
               <number>2</number>
              </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>File:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QCheckBox" name="check_IMG_Reset">
-               <property name="text">
-                <string>After upload</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_6">
-               <property name="text">
-                <string>Progress:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <item>
-                <widget class="QLineEdit" name="edit_IMG_Local"/>
-               </item>
-               <item>
-                <widget class="QToolButton" name="btn_IMG_Local">
-                 <property name="text">
-                  <string>...</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Image:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <item>
-                <widget class="QSpinBox" name="edit_IMG_Image">
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radio_IMG_No_Action">
-                 <property name="text">
-                  <string>No action</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radio_IMG_Test">
-                 <property name="text">
-                  <string>Test</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radio_IMG_Confirm">
-                 <property name="text">
-                  <string>Confirm</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="3" column="1">
-              <widget class="QProgressBar" name="progress_IMG_Complete">
-               <property name="value">
-                <number>0</number>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_9">
-               <property name="text">
-                <string>Reset:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <spacer name="verticalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="tab_IMG_Images">
-            <attribute name="title">
-             <string>Images</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_5">
-             <property name="leftMargin">
-              <number>6</number>
-             </property>
-             <property name="topMargin">
-              <number>6</number>
-             </property>
-             <property name="rightMargin">
-              <number>6</number>
-             </property>
              <property name="bottomMargin">
-              <number>6</number>
+              <number>0</number>
              </property>
-             <property name="spacing">
-              <number>2</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="QColumnView" name="colview_IMG_Images"/>
-             </item>
-             <item row="1" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="label_5">
-                 <property name="text">
-                  <string>State:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radio_IMG_Get">
-                 <property name="text">
-                  <string>Get</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radio_IMG_Set">
-                 <property name="text">
-                  <string>Set</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="Line" name="line">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_IMG_Confirm">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>Confirm</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_5">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="tab_IMG_Erase">
-            <attribute name="title">
-             <string>Erase</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_10">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_14">
-               <property name="text">
-                <string>Slot:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <spacer name="horizontalSpacer_9">
+             <item>
+              <spacer name="horizontalSpacer">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>235</width>
+                 <width>40</width>
                  <height>20</height>
                 </size>
                </property>
               </spacer>
              </item>
-             <item row="0" column="1">
-              <widget class="QSpinBox" name="edit_IMG_Erase_Slot">
-               <property name="minimumSize">
-                <size>
-                 <width>40</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
+             <item>
+              <widget class="QPushButton" name="btn_FS_Go">
+               <property name="text">
+                <string>Go</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <spacer name="verticalSpacer_2">
+             <item>
+              <spacer name="horizontalSpacer_2">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>20</width>
-                 <height>40</height>
+                 <width>40</width>
+                 <height>20</height>
                 </size>
                </property>
               </spacer>
              </item>
             </layout>
-           </widget>
-          </widget>
-         </item>
-         <item row="5" column="0" colspan="3">
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
-           <item>
-            <widget class="QPushButton" name="btn_IMG_Go">
-             <property name="text">
-              <string>Go</string>
+           <item row="3" column="0" colspan="3">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="spacing">
+              <number>2</number>
              </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QLabel" name="lbl_IMG_Status">
-           <property name="text">
-            <string>[Status]</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_OS">
-        <attribute name="title">
-         <string>OS</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_7">
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QTabWidget" name="selector_OS">
-           <property name="currentIndex">
-            <number>0</number>
-           </property>
-           <widget class="QWidget" name="tab_OS_Echo">
-            <attribute name="title">
-             <string>Echo</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_8">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_10">
+             <item>
+              <widget class="QRadioButton" name="radio_FS_Upload">
                <property name="text">
-                <string>Input:</string>
+                <string>Upload</string>
                </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPlainTextEdit" name="edit_OS_Echo_Input"/>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_11">
-               <property name="text">
-                <string>Output:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPlainTextEdit" name="edit_OS_Echo_Output">
-               <property name="undoRedoEnabled">
-                <bool>false</bool>
-               </property>
-               <property name="readOnly">
+               <property name="checked">
                 <bool>true</bool>
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_Download">
+               <property name="text">
+                <string>Download</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_Size">
+               <property name="text">
+                <string>Size</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_HashChecksum">
+               <property name="text">
+                <string>Hash/checksum</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_Hash_Checksum_Types">
+               <property name="text">
+                <string>Types</string>
+               </property>
+              </widget>
+             </item>
             </layout>
-           </widget>
-           <widget class="QWidget" name="tab_OS_Tasks">
-            <attribute name="title">
-             <string>Tasks</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_14">
-             <item row="0" column="0">
-              <widget class="QTableWidget" name="table_OS_Tasks">
+           </item>
+           <item row="5" column="0" colspan="2">
+            <widget class="QLabel" name="lbl_FS_Status">
+             <property name="text">
+              <string>[Status]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Local file:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0" colspan="3">
+            <widget class="QPlainTextEdit" name="edit_FS_Log">
+             <property name="undoRedoEnabled">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Device file:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="3">
+            <widget class="QProgressBar" name="progress_FS_Complete">
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="QLineEdit" name="edit_FS_Remote"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>Hash/checksum:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" colspan="2">
+            <widget class="QComboBox" name="combo_FS_Hash_Checksum">
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_IMG">
+          <attribute name="title">
+           <string>Img</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QTabWidget" name="tabWidget_3">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="tab_IMG_Upload">
+              <attribute name="title">
+               <string>Upload</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_4">
+               <property name="leftMargin">
+                <number>6</number>
+               </property>
+               <property name="topMargin">
+                <number>6</number>
+               </property>
+               <property name="rightMargin">
+                <number>6</number>
+               </property>
+               <property name="bottomMargin">
+                <number>6</number>
+               </property>
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>File:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QCheckBox" name="check_IMG_Reset">
+                 <property name="text">
+                  <string>After upload</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Progress:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <item>
+                  <widget class="QLineEdit" name="edit_IMG_Local"/>
+                 </item>
+                 <item>
+                  <widget class="QToolButton" name="btn_IMG_Local">
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Image:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <item>
+                  <widget class="QSpinBox" name="edit_IMG_Image">
+                   <property name="maximumSize">
+                    <size>
+                     <width>60</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radio_IMG_No_Action">
+                   <property name="text">
+                    <string>No action</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radio_IMG_Test">
+                   <property name="text">
+                    <string>Test</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radio_IMG_Confirm">
+                   <property name="text">
+                    <string>Confirm</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="3" column="1">
+                <widget class="QProgressBar" name="progress_IMG_Complete">
+                 <property name="value">
+                  <number>0</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_9">
+                 <property name="text">
+                  <string>Reset:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <spacer name="verticalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_IMG_Images">
+              <attribute name="title">
+               <string>Images</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_5">
+               <property name="leftMargin">
+                <number>6</number>
+               </property>
+               <property name="topMargin">
+                <number>6</number>
+               </property>
+               <property name="rightMargin">
+                <number>6</number>
+               </property>
+               <property name="bottomMargin">
+                <number>6</number>
+               </property>
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QColumnView" name="colview_IMG_Images"/>
+               </item>
+               <item row="1" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_5">
+                   <property name="text">
+                    <string>State:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radio_IMG_Get">
+                   <property name="text">
+                    <string>Get</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radio_IMG_Set">
+                   <property name="text">
+                    <string>Set</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="line">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="check_IMG_Confirm">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Confirm</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_5">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_IMG_Erase">
+              <attribute name="title">
+               <string>Erase</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_10">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_14">
+                 <property name="text">
+                  <string>Slot:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <spacer name="horizontalSpacer_9">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>235</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="edit_IMG_Erase_Slot">
+                 <property name="minimumSize">
+                  <size>
+                   <width>40</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <spacer name="verticalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="3">
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_IMG_Go">
+               <property name="text">
+                <string>Go</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QLabel" name="lbl_IMG_Status">
+             <property name="text">
+              <string>[Status]</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_OS">
+          <attribute name="title">
+           <string>OS</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_7">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QTabWidget" name="selector_OS">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="tab_OS_Echo">
+              <attribute name="title">
+               <string>Echo</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_8">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string>Input:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QPlainTextEdit" name="edit_OS_Echo_Input"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>Output:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QPlainTextEdit" name="edit_OS_Echo_Output">
+                 <property name="undoRedoEnabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_OS_Tasks">
+              <attribute name="title">
+               <string>Tasks</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_14">
+               <item row="0" column="0">
+                <widget class="QTableWidget" name="table_OS_Tasks">
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="showDropIndicator" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>false</bool>
+                 </property>
+                 <property name="alternatingRowColors">
+                  <bool>true</bool>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                 </property>
+                 <property name="sortingEnabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="cornerButtonEnabled">
+                  <bool>false</bool>
+                 </property>
+                 <column>
+                  <property name="text">
+                   <string>Task</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>ID</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Priority</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>State</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Context Switches</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Runtime</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Stack size</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Stack usage</string>
+                  </property>
+                 </column>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_OS_Memory">
+              <attribute name="title">
+               <string>Memory</string>
+              </attribute>
+              <widget class="QTableWidget" name="table_OS_Memory">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>10</y>
+                 <width>330</width>
+                 <height>172</height>
+                </rect>
+               </property>
                <property name="editTriggers">
                 <set>QAbstractItemView::NoEditTriggers</set>
                </property>
@@ -646,82 +796,196 @@
                </property>
                <column>
                 <property name="text">
-                 <string>Task</string>
+                 <string>Name</string>
                 </property>
                </column>
                <column>
                 <property name="text">
-                 <string>ID</string>
+                 <string>Size</string>
                 </property>
                </column>
                <column>
                 <property name="text">
-                 <string>Priority</string>
+                 <string>Free</string>
                 </property>
                </column>
                <column>
                 <property name="text">
-                 <string>State</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Context Switches</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Runtime</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Stack size</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Stack usage</string>
+                 <string>Minimum</string>
                 </property>
                </column>
               </widget>
+             </widget>
+             <widget class="QWidget" name="tab_OS_Reset">
+              <attribute name="title">
+               <string>Reset</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_12">
+               <item row="0" column="0">
+                <widget class="QCheckBox" name="check_OS_Force_Reboot">
+                 <property name="text">
+                  <string>Force reboot</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <spacer name="verticalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_OS_Info">
+              <attribute name="title">
+               <string>Info</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_13">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_17">
+                 <property name="text">
+                  <string>uname:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="edit_OS_UName">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="readOnly">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0" colspan="2">
+                <layout class="QHBoxLayout" name="horizontalLayout_10">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <item>
+                  <widget class="QRadioButton" name="radio_OS_Buffer_Info">
+                   <property name="text">
+                    <string>Buffer info</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radio_OS_uname">
+                   <property name="text">
+                    <string>uname</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_18">
+                 <property name="text">
+                  <string>Output:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QPlainTextEdit" name="edit_OS_Info_Output"/>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <layout class="QHBoxLayout" name="horizontalLayout_13">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_17">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_OS_Go">
+               <property name="text">
+                <string>Go</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_18">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
-           </widget>
-           <widget class="QWidget" name="tab_OS_Memory">
-            <attribute name="title">
-             <string>Memory</string>
-            </attribute>
-            <widget class="QTableWidget" name="table_OS_Memory">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>10</y>
-               <width>330</width>
-               <height>172</height>
-              </rect>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lbl_OS_Status">
+             <property name="text">
+              <string>[Status]</string>
              </property>
-             <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_Stats">
+          <attribute name="title">
+           <string>Stats</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_11">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>Group:</string>
              </property>
-             <property name="showDropIndicator" stdset="0">
-              <bool>false</bool>
-             </property>
-             <property name="dragDropOverwriteMode">
-              <bool>false</bool>
-             </property>
-             <property name="alternatingRowColors">
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="combo_STAT_Group">
+             <property name="editable">
               <bool>true</bool>
              </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::NoSelection</enum>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Values:</string>
              </property>
-             <property name="sortingEnabled">
-              <bool>true</bool>
-             </property>
-             <property name="cornerButtonEnabled">
-              <bool>false</bool>
-             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QTableWidget" name="table_STAT_Values">
              <column>
               <property name="text">
                <string>Name</string>
@@ -729,395 +993,210 @@
              </column>
              <column>
               <property name="text">
-               <string>Size</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Free</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Minimum</string>
+               <string>Value</string>
               </property>
              </column>
             </widget>
-           </widget>
-           <widget class="QWidget" name="tab_OS_Reset">
-            <attribute name="title">
-             <string>Reset</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_12">
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="check_OS_Force_Reboot">
+           </item>
+           <item row="2" column="0" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QRadioButton" name="radio_STAT_List">
                <property name="text">
-                <string>Force reboot</string>
+                <string>List Groups</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <spacer name="verticalSpacer_3">
+             <item>
+              <widget class="QRadioButton" name="radio_STAT_Fetch">
+               <property name="text">
+                <string>Fetch Stats</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QLabel" name="lbl_STAT_Status">
+             <property name="text">
+              <string>[Status]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout_14">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_19">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>20</width>
-                 <height>40</height>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_STAT_Go">
+               <property name="text">
+                <string>Go</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_20">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
                 </size>
                </property>
               </spacer>
              </item>
             </layout>
-           </widget>
-           <widget class="QWidget" name="tab_OS_Info">
-            <attribute name="title">
-             <string>Info</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_13">
-             <property name="spacing">
-              <number>2</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_17">
-               <property name="text">
-                <string>uname:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLineEdit" name="edit_OS_UName">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="readOnly">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" colspan="2">
-              <layout class="QHBoxLayout" name="horizontalLayout_10">
-               <property name="spacing">
-                <number>2</number>
-               </property>
-               <item>
-                <widget class="QRadioButton" name="radio_OS_Buffer_Info">
-                 <property name="text">
-                  <string>Buffer info</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radio_OS_uname">
-                 <property name="text">
-                  <string>uname</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_18">
-               <property name="text">
-                <string>Output:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QPlainTextEdit" name="edit_OS_Info_Output"/>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_Shell">
+          <attribute name="title">
+           <string>Shell</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_9">
            <property name="spacing">
             <number>2</number>
            </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <spacer name="horizontalSpacer_17">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+           <item row="1" column="2">
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="QToolButton" name="btn_SHELL_Clear">
+               <property name="text">
+                <string>Clear</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="btn_SHELL_Copy">
+               <property name="text">
+                <string>Copy</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
-           <item>
-            <widget class="QPushButton" name="btn_OS_Go">
+           <item row="2" column="0" colspan="3">
+            <widget class="QLabel" name="lbl_SHELL_Status">
              <property name="text">
-              <string>Go</string>
+              <string>[Status]</string>
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_18">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+           <item row="1" column="1">
+            <widget class="QPlainTextEdit" name="edit_SHELL_Output">
+             <property name="undoRedoEnabled">
+              <bool>false</bool>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="lbl_OS_Status">
-           <property name="text">
-            <string>[Status]</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_Stats">
-        <attribute name="title">
-         <string>Stats</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_11">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_15">
-           <property name="text">
-            <string>Group:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="combo_STAT_Group">
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Values:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QTableWidget" name="table_STAT_Values">
-           <column>
-            <property name="text">
-             <string>Name</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Value</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="2">
-          <layout class="QHBoxLayout" name="horizontalLayout_9">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <item>
-            <widget class="QRadioButton" name="radio_STAT_List">
-             <property name="text">
-              <string>List Groups</string>
-             </property>
-             <property name="checked">
+             <property name="readOnly">
               <bool>true</bool>
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QRadioButton" name="radio_STAT_Fetch">
+           <item row="0" column="1" colspan="2">
+            <widget class="QLineEdit" name="edit_SHELL_Input"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_12">
              <property name="text">
-              <string>Fetch Stats</string>
+              <string>Input:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" colspan="3">
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_SHELL_Go">
+               <property name="text">
+                <string>Go</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Output:</string>
              </property>
             </widget>
            </item>
           </layout>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QLabel" name="lbl_STAT_Status">
-           <property name="text">
-            <string>[Status]</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="2">
-          <layout class="QHBoxLayout" name="horizontalLayout_14">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <spacer name="horizontalSpacer_19">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btn_STAT_Go">
-             <property name="text">
-              <string>Go</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_20">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_Shell">
-        <attribute name="title">
-         <string>Shell</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_9">
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <item row="1" column="2">
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QToolButton" name="btn_SHELL_Clear">
-             <property name="text">
-              <string>Clear</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="btn_SHELL_Copy">
-             <property name="text">
-              <string>Copy</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="QLabel" name="lbl_SHELL_Status">
-           <property name="text">
-            <string>[Status]</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QPlainTextEdit" name="edit_SHELL_Output">
-           <property name="undoRedoEnabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" colspan="2">
-          <widget class="QLineEdit" name="edit_SHELL_Input"/>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Input:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0" colspan="3">
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btn_SHELL_Go">
-             <property name="text">
-              <string>Go</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_8">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_13">
-           <property name="text">
-            <string>Output:</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_Settings">
-        <attribute name="title">
-         <string>Settings</string>
-        </attribute>
-       </widget>
-      </widget>
+         </widget>
+         <widget class="QWidget" name="tab_Settings">
+          <attribute name="title">
+           <string>Settings</string>
+          </attribute>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Page</string>
+      </attribute>
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>410</x>
-         <y>20</y>
+         <x>210</x>
+         <y>120</y>
          <width>229</width>
          <height>182</height>
         </rect>
@@ -1231,92 +1310,6 @@
            <size>
             <width>20</width>
             <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="horizontalLayoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>448</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>MTU:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="edit_MTU">
-          <property name="minimum">
-           <number>32</number>
-          </property>
-          <property name="maximum">
-           <number>8192</number>
-          </property>
-          <property name="value">
-           <number>256</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="check_V2_Protocol">
-          <property name="text">
-           <string>v2 protocol</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radio_transport_uart">
-          <property name="text">
-           <string>UART</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radio_transport_udp">
-          <property name="text">
-           <string>UDP</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radio_transport_bluetooth">
-          <property name="text">
-           <string>Bluetooth</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_transport_connect">
-          <property name="text">
-           <string>Connect</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_6">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
            </size>
           </property>
          </spacer>

@@ -173,6 +173,16 @@ private:
 //    QGridLayout *gridLayout;
 //    QTabWidget *tabWidget;
     QWidget *tab;
+    QVBoxLayout *verticalLayout_2;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *label;
+    QSpinBox *edit_MTU;
+    QCheckBox *check_V2_Protocol;
+    QRadioButton *radio_transport_uart;
+    QRadioButton *radio_transport_udp;
+    QRadioButton *radio_transport_bluetooth;
+    QPushButton *btn_transport_connect;
+    QSpacerItem *horizontalSpacer_6;
     QTabWidget *tabWidget_2;
     QWidget *tab_FS;
     QGridLayout *gridLayout_2;
@@ -298,6 +308,7 @@ private:
     QSpacerItem *horizontalSpacer_8;
     QLabel *label_13;
     QWidget *tab_Settings;
+    QWidget *tab_2;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
     QFormLayout *formLayout;
@@ -313,16 +324,6 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QWidget *horizontalLayoutWidget;
-    QHBoxLayout *horizontalLayout_7;
-    QLabel *label;
-    QSpinBox *edit_MTU;
-    QCheckBox *check_V2_Protocol;
-    QRadioButton *radio_transport_uart;
-    QRadioButton *radio_transport_udp;
-    QRadioButton *radio_transport_bluetooth;
-    QPushButton *btn_transport_connect;
-    QSpacerItem *horizontalSpacer_6;
 ///AUTOGEN_END_OBJECTS
 
     //

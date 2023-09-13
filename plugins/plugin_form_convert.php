@@ -21,6 +21,7 @@ $Replacement2 = array(
 	array('tab = new QWidget();', 'tab = new QWidget(tabWidget_orig);', 0),
 	array('verticalLayoutWidget = new QWidget(tab);', 'verticalLayoutWidget = new QWidget();', 0),
 	array('verticalLayoutWidget->setGeometry(QRect(410, 20, 229, 182));', 'verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));', 0),
+	array('verticalLayoutWidget->setGeometry(QRect(210, 128, 229, 182));', 'verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));', 0),
 	array('tabWidget->addTab(tab, QString());', '//', 1),
 	array('gridLayout->addWidget(tabWidget, 0, 0, 1, 1);', '//', 1),
 	array('retranslateUi(Form);', '//', 1),
