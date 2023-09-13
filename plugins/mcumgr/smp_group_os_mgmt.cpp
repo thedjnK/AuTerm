@@ -608,7 +608,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
             qDebug() << "buffer size: " << buffer_size << ", buffer count: " << buffer_count;
 
-            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+            emit status(smp_user_data, STATUS_COMPLETE, QString("Buffer size: %1\nBuffer count: %2").arg(QString::number(buffer_size), QString::number(buffer_count)));
         }
         else if (finished_mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
         {
