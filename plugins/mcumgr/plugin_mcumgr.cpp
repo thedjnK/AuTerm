@@ -216,38 +216,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_3->setSpacing(2);
     gridLayout_3->setObjectName("gridLayout_3");
     gridLayout_3->setContentsMargins(6, 6, 6, 6);
-    edit_IMG_Log = new QPlainTextEdit(tab_IMG);
-    edit_IMG_Log->setObjectName("edit_IMG_Log");
-    edit_IMG_Log->setUndoRedoEnabled(false);
-    edit_IMG_Log->setReadOnly(true);
-
-    gridLayout_3->addWidget(edit_IMG_Log, 7, 0, 1, 3);
-
-    horizontalLayout_3 = new QHBoxLayout();
-    horizontalLayout_3->setSpacing(2);
-    horizontalLayout_3->setObjectName("horizontalLayout_3");
-    horizontalLayout_3->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    horizontalLayout_3->addItem(horizontalSpacer_3);
-
-    btn_IMG_Go = new QPushButton(tab_IMG);
-    btn_IMG_Go->setObjectName("btn_IMG_Go");
-
-    horizontalLayout_3->addWidget(btn_IMG_Go);
-
-    horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    horizontalLayout_3->addItem(horizontalSpacer_4);
-
-
-    gridLayout_3->addLayout(horizontalLayout_3, 5, 0, 1, 3);
-
-    lbl_IMG_Status = new QLabel(tab_IMG);
-    lbl_IMG_Status->setObjectName("lbl_IMG_Status");
-
-    gridLayout_3->addWidget(lbl_IMG_Status, 3, 0, 1, 2);
-
     tabWidget_3 = new QTabWidget(tab_IMG);
     tabWidget_3->setObjectName("tabWidget_3");
     tab_IMG_Upload = new QWidget();
@@ -256,11 +224,15 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_4->setSpacing(2);
     gridLayout_4->setObjectName("gridLayout_4");
     gridLayout_4->setContentsMargins(6, 6, 6, 6);
-    progress_IMG_Complete = new QProgressBar(tab_IMG_Upload);
-    progress_IMG_Complete->setObjectName("progress_IMG_Complete");
-    progress_IMG_Complete->setValue(0);
+    label_4 = new QLabel(tab_IMG_Upload);
+    label_4->setObjectName("label_4");
 
-    gridLayout_4->addWidget(progress_IMG_Complete, 3, 1, 1, 1);
+    gridLayout_4->addWidget(label_4, 0, 0, 1, 1);
+
+    check_IMG_Reset = new QCheckBox(tab_IMG_Upload);
+    check_IMG_Reset->setObjectName("check_IMG_Reset");
+
+    gridLayout_4->addWidget(check_IMG_Reset, 2, 1, 1, 1);
 
     label_6 = new QLabel(tab_IMG_Upload);
     label_6->setObjectName("label_6");
@@ -283,10 +255,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_4->addLayout(horizontalLayout_5, 0, 1, 1, 1);
 
-    label_4 = new QLabel(tab_IMG_Upload);
-    label_4->setObjectName("label_4");
+    label_41 = new QLabel(tab_IMG_Upload);
+    label_41->setObjectName("label_41");
 
-    gridLayout_4->addWidget(label_4, 0, 0, 1, 1);
+    gridLayout_4->addWidget(label_41, 1, 0, 1, 1);
 
     horizontalLayout_4 = new QHBoxLayout();
     horizontalLayout_4->setSpacing(2);
@@ -316,20 +288,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_4->addLayout(horizontalLayout_4, 1, 1, 1, 1);
 
-    label_41 = new QLabel(tab_IMG_Upload);
-    label_41->setObjectName("label_41");
+    progress_IMG_Complete = new QProgressBar(tab_IMG_Upload);
+    progress_IMG_Complete->setObjectName("progress_IMG_Complete");
+    progress_IMG_Complete->setValue(0);
 
-    gridLayout_4->addWidget(label_41, 1, 0, 1, 1);
+    gridLayout_4->addWidget(progress_IMG_Complete, 3, 1, 1, 1);
 
     label_9 = new QLabel(tab_IMG_Upload);
     label_9->setObjectName("label_9");
 
     gridLayout_4->addWidget(label_9, 2, 0, 1, 1);
 
-    check_IMG_Reset = new QCheckBox(tab_IMG_Upload);
-    check_IMG_Reset->setObjectName("check_IMG_Reset");
+    verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-    gridLayout_4->addWidget(check_IMG_Reset, 2, 1, 1, 1);
+    gridLayout_4->addItem(verticalSpacer_4, 4, 0, 1, 1);
 
     tabWidget_3->addTab(tab_IMG_Upload, QString());
     tab_IMG_Images = new QWidget();
@@ -410,6 +382,31 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_3->addTab(tab_IMG_Erase, QString());
 
     gridLayout_3->addWidget(tabWidget_3, 0, 0, 1, 1);
+
+    horizontalLayout_3 = new QHBoxLayout();
+    horizontalLayout_3->setSpacing(2);
+    horizontalLayout_3->setObjectName("horizontalLayout_3");
+    horizontalLayout_3->setContentsMargins(-1, -1, -1, 0);
+    horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_3->addItem(horizontalSpacer_3);
+
+    btn_IMG_Go = new QPushButton(tab_IMG);
+    btn_IMG_Go->setObjectName("btn_IMG_Go");
+
+    horizontalLayout_3->addWidget(btn_IMG_Go);
+
+    horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_3->addItem(horizontalSpacer_4);
+
+
+    gridLayout_3->addLayout(horizontalLayout_3, 5, 0, 1, 3);
+
+    lbl_IMG_Status = new QLabel(tab_IMG);
+    lbl_IMG_Status->setObjectName("lbl_IMG_Status");
+
+    gridLayout_3->addWidget(lbl_IMG_Status, 3, 0, 1, 2);
 
     tabWidget_2->addTab(tab_IMG, QString());
     tab_OS = new QWidget();
@@ -894,17 +891,15 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
     label_19->setText(QCoreApplication::translate("Form", "Hash/checksum:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
-    btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    label_4->setText(QCoreApplication::translate("Form", "File:", nullptr));
+    check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
     btn_IMG_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
-    label_4->setText(QCoreApplication::translate("Form", "File:", nullptr));
+    label_41->setText(QCoreApplication::translate("Form", "Image:", nullptr));
     radio_IMG_No_Action->setText(QCoreApplication::translate("Form", "No action", nullptr));
     radio_IMG_Test->setText(QCoreApplication::translate("Form", "Test", nullptr));
     radio_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
-    label_41->setText(QCoreApplication::translate("Form", "Image:", nullptr));
     label_9->setText(QCoreApplication::translate("Form", "Reset:", nullptr));
-    check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Upload), QCoreApplication::translate("Form", "Upload", nullptr));
     label_5->setText(QCoreApplication::translate("Form", "State:", nullptr));
     radio_IMG_Get->setText(QCoreApplication::translate("Form", "Get", nullptr));
@@ -913,6 +908,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
+    btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_IMG), QCoreApplication::translate("Form", "Img", nullptr));
     label_10->setText(QCoreApplication::translate("Form", "Input:", nullptr));
     label_11->setText(QCoreApplication::translate("Form", "Output:", nullptr));
@@ -1622,10 +1619,6 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     smp_groups.img_mgmt->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false), nullptr);
                     qDebug() << "do upload of " << upload_hash;
                 }
-                else
-                {
-                    edit_IMG_Log->appendPlainText("Finished");
-                }
             }
             else if (user_data == ACTION_IMG_UPLOAD_SET)
             {
@@ -1639,10 +1632,6 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
                     smp_groups.os_mgmt->start_reset(false);
                     qDebug() << "do reset";
-                }
-                else
-                {
-                    edit_IMG_Log->appendPlainText("Finished and marked as test/confirm");
                 }
             }
             else if (user_data == ACTION_IMG_IMAGE_LIST)
@@ -1704,7 +1693,6 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
             else if (user_data == ACTION_OS_UPLOAD_RESET)
             {
-                edit_IMG_Log->appendPlainText("Finished and reset");
             }
             else if (user_data == ACTION_OS_MEMORY_POOL)
             {

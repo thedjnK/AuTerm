@@ -233,66 +233,6 @@
          <property name="spacing">
           <number>2</number>
          </property>
-         <item row="7" column="0" colspan="3">
-          <widget class="QPlainTextEdit" name="edit_IMG_Log">
-           <property name="undoRedoEnabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0" colspan="3">
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btn_IMG_Go">
-             <property name="text">
-              <string>Go</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QLabel" name="lbl_IMG_Status">
-           <property name="text">
-            <string>[Status]</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0">
           <widget class="QTabWidget" name="tabWidget_3">
            <property name="currentIndex">
@@ -318,10 +258,17 @@
              <property name="spacing">
               <number>2</number>
              </property>
-             <item row="3" column="1">
-              <widget class="QProgressBar" name="progress_IMG_Complete">
-               <property name="value">
-                <number>0</number>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>File:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QCheckBox" name="check_IMG_Reset">
+               <property name="text">
+                <string>After upload</string>
                </property>
               </widget>
              </item>
@@ -349,10 +296,10 @@
                </item>
               </layout>
              </item>
-             <item row="0" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="label_4">
                <property name="text">
-                <string>File:</string>
+                <string>Image:</string>
                </property>
               </widget>
              </item>
@@ -397,10 +344,10 @@
                </item>
               </layout>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Image:</string>
+             <item row="3" column="1">
+              <widget class="QProgressBar" name="progress_IMG_Complete">
+               <property name="value">
+                <number>0</number>
                </property>
               </widget>
              </item>
@@ -411,12 +358,18 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QCheckBox" name="check_IMG_Reset">
-               <property name="text">
-                <string>After upload</string>
+             <item row="4" column="0">
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
                </property>
-              </widget>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
@@ -562,6 +515,56 @@
              </item>
             </layout>
            </widget>
+          </widget>
+         </item>
+         <item row="5" column="0" colspan="3">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_IMG_Go">
+             <property name="text">
+              <string>Go</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QLabel" name="lbl_IMG_Status">
+           <property name="text">
+            <string>[Status]</string>
+           </property>
           </widget>
          </item>
         </layout>
