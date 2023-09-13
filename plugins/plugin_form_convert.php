@@ -13,8 +13,10 @@ $Replacement1 = array(
 
 $Replacement2 = array(
 	array('gridLayout = new QGridLayout(', '//', 1),
+	array('gridLayout->setObjectName("gridLayout");', '//', 1),
 	array('gridLayout->setObjectName(QString::fromUtf8("gridLayout"));', '//', 1),
 	array('tabWidget = new QTabWidget(', '//', 1),
+	array('tabWidget->setObjectName("tabWidget");', '//', 1),
 	array('tabWidget->setObjectName(QString::fromUtf8("tabWidget"));', '//', 1),
 	array('tab = new QWidget();', 'tab = new QWidget(tabWidget_orig);', 0),
 	array('verticalLayoutWidget = new QWidget(tab);', 'verticalLayoutWidget = new QWidget();', 0),
@@ -24,11 +26,14 @@ $Replacement2 = array(
 	array('retranslateUi(Form);', '//', 1),
 	array('tabWidget->setCurrentIndex(0);', '//', 1),
 	array('QMetaObject::connectSlotsByName(Form);', '//', 1),
+	array('tabWidget->addTab(tab_2, QString());', '//', 1),
+	array('tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("Form", "Page", nullptr));', '//', 1),
 );
 
 $Replacement3 = array(
 	array('Form->setWindowTitle(QCoreApplication::translate("Form", "Form", nullptr));', '//', 1),
 	array('tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));', '//', 1),
+	array('tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("Form", "Page", nullptr));', '//', 1),
 );
 
 //Start text, end text, number of lines to remove from start, number of lines to remove from end, replace array, file, block comment start/end

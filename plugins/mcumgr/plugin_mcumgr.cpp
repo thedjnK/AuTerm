@@ -312,6 +312,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_5->setContentsMargins(6, 6, 6, 6);
     colview_IMG_Images = new QColumnView(tab_IMG_Images);
     colview_IMG_Images->setObjectName("colview_IMG_Images");
+    colview_IMG_Images->setResizeGripsVisible(false);
 
     gridLayout_5->addWidget(colview_IMG_Images, 0, 0, 1, 1);
 
@@ -1035,6 +1036,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_IMG_Set, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_Set_toggled(bool)));
 
     colview_IMG_Images->setModel(&model_image_state);
+    colview_IMG_Images->setColumnWidths(QList<int>() << 50 << 50);
 
     check_IMG_Preview_Confirmed->setChecked(true);
     check_IMG_Preview_Confirmed->installEventFilter(this);
