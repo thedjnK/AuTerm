@@ -159,6 +159,8 @@ private slots:
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     void on_radio_transport_bluetooth_toggled(bool checked);
 #endif
+    void on_radio_OS_Buffer_Info_toggled(bool checked);
+    void on_radio_OS_uname_toggled(bool checked);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);

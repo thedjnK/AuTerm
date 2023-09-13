@@ -28,7 +28,7 @@
         <rect>
          <x>10</x>
          <y>40</y>
-         <width>401</width>
+         <width>411</width>
          <height>291</height>
         </rect>
        </property>
@@ -36,7 +36,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_FS">
         <attribute name="title">
@@ -574,7 +574,7 @@
          <item row="0" column="0">
           <widget class="QTabWidget" name="selector_OS">
            <property name="currentIndex">
-            <number>2</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="tab_OS_Echo">
             <attribute name="title">
@@ -782,6 +782,9 @@
              </item>
              <item row="0" column="1">
               <widget class="QLineEdit" name="edit_OS_UName">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="readOnly">
                 <bool>false</bool>
                </property>

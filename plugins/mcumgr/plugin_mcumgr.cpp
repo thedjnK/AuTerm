@@ -95,7 +95,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab->setObjectName("tab");
     tabWidget_2 = new QTabWidget(tab);
     tabWidget_2->setObjectName("tabWidget_2");
-    tabWidget_2->setGeometry(QRect(10, 40, 401, 291));
+    tabWidget_2->setGeometry(QRect(10, 40, 411, 291));
     tabWidget_2->setTabPosition(QTabWidget::West);
     tab_FS = new QWidget();
     tab_FS->setObjectName("tab_FS");
@@ -529,6 +529,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     edit_OS_UName = new QLineEdit(tab_OS_Info);
     edit_OS_UName->setObjectName("edit_OS_UName");
+    edit_OS_UName->setEnabled(false);
     edit_OS_UName->setReadOnly(false);
 
     gridLayout_13->addWidget(edit_OS_UName, 0, 1, 1, 1);
@@ -872,9 +873,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(0);
+    tabWidget_2->setCurrentIndex(1);
     tabWidget_3->setCurrentIndex(0);
-    selector_OS->setCurrentIndex(2);
+    selector_OS->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
 
     //retranslate code
@@ -1030,6 +1031,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     connect(radio_transport_bluetooth, SIGNAL(toggled(bool)), this, SLOT(on_radio_transport_bluetooth_toggled(bool)));
 #endif
+    connect(radio_OS_Buffer_Info, SIGNAL(toggled(bool)), this, SLOT(on_radio_OS_Buffer_Info_toggled(bool)));
+    connect(radio_OS_uname, SIGNAL(toggled(bool)), this, SLOT(on_radio_OS_uname_toggled(bool)));
 
     colview_IMG_Images->setModel(&model_image_state);
 
@@ -1419,7 +1422,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.os_mgmt->start_echo(edit_OS_Echo_Input->toPlainText());
 
-        lbl_OS_Status->setText("Echoing...");
+        lbl_OS_Status->setText("Echo command sent...");
     }
     else if (selector_OS->currentWidget() == tab_OS_Tasks)
     {
@@ -1430,7 +1433,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.os_mgmt->start_task_stats(&task_list);
 
-        edit_OS_Echo_Output->appendPlainText("Tasking...");
+        lbl_OS_Status->setText("Task list command sent...");
     }
     else if (selector_OS->currentWidget() == tab_OS_Memory)
     {
@@ -1441,7 +1444,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.os_mgmt->start_memory_pool(&memory_list);
 
-        edit_OS_Echo_Output->appendPlainText("Memorying...");
+        lbl_OS_Status->setText("Memory pool list command sent...");
     }
     else if (selector_OS->currentWidget() == tab_OS_Reset)
     {
@@ -1452,7 +1455,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.os_mgmt->start_reset(check_OS_Force_Reboot->isChecked());
 
-        edit_OS_Echo_Output->appendPlainText("Resetting...");
+        lbl_OS_Status->setText("Reset command...");
     }
     else if (selector_OS->currentWidget() == tab_OS_Info)
     {
@@ -1466,7 +1469,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
             smp_groups.os_mgmt->start_os_application_info(edit_OS_UName->text());
 
-            edit_OS_Echo_Output->appendPlainText("Infoing...");
+            lbl_OS_Status->setText("uname command sent...");
         }
         else
         {
@@ -1478,7 +1481,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
             smp_groups.os_mgmt->start_mcumgr_parameters();
 
-            edit_OS_Echo_Output->appendPlainText("Buffering...");
+            lbl_OS_Status->setText("MCUmgr buffer command sent...");
         }
     }
 }
@@ -1496,7 +1499,7 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
     smp_groups.shell_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
     smp_groups.shell_mgmt->start_execute(&list_arguments, &shell_rc);
 
-    lbl_SHELL_Status->setText("Executing...");
+    lbl_SHELL_Status->setText("Shell execute command sent...");
 }
 
 void plugin_mcumgr::on_btn_STAT_Go_clicked()
@@ -1511,7 +1514,7 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.stat_mgmt->start_list_groups(&group_list);
 
-        lbl_STAT_Status->setText("Listing...");
+        lbl_STAT_Status->setText("Stat list command sent...");
     }
     else if (radio_STAT_Fetch->isChecked() && !combo_STAT_Group->currentText().isEmpty())
     {
@@ -1523,7 +1526,7 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         smp_groups.stat_mgmt->start_group_data(combo_STAT_Group->currentText(), &stat_list);
 
-        lbl_STAT_Status->setText("Fetching...");
+        lbl_STAT_Status->setText("Stat get command sent...");
     }
 }
 
@@ -1798,12 +1801,15 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
             else if (user_data == ACTION_OS_MCUMGR_BUFFER)
             {
-                //TODO
+                edit_OS_Info_Output->clear();
+                edit_OS_Info_Output->appendPlainText(error_string);
+                error_string = nullptr;
             }
             else if (user_data == ACTION_OS_OS_APPLICATION_INFO)
             {
                 edit_OS_Info_Output->clear();
                 edit_OS_Info_Output->appendPlainText(error_string);
+                error_string = nullptr;
             }
         }
     }
@@ -2031,3 +2037,19 @@ void plugin_mcumgr::on_radio_transport_bluetooth_toggled(bool checked)
 #endif
 }
 #endif
+
+void plugin_mcumgr::on_radio_OS_Buffer_Info_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        edit_OS_UName->setEnabled(false);
+    }
+}
+
+void plugin_mcumgr::on_radio_OS_uname_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        edit_OS_UName->setEnabled(true);
+    }
+}

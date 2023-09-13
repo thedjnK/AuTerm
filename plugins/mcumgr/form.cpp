@@ -108,3 +108,13 @@ void Form::on_radio_transport_bluetooth_toggled(bool checked)
 
 }
 
+void Form::on_radio_OS_Buffer_Info_toggled(bool checked)
+{
+
+}
+
+void Form::on_radio_OS_uname_toggled(bool checked)
+{
+
+}
+
