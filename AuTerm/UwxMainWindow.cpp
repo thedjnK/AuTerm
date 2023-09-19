@@ -5803,10 +5803,11 @@ MainWindow::plugin_set_status(
     bool *accepted
     )
 {
+    *accepted = false;
+
     if (gbPluginRunning == true)
     {
         qDebug() << "A plugin tried to run whilst another was busy";
-        *accepted = false;
         return;
     }
 
@@ -5815,7 +5816,6 @@ MainWindow::plugin_set_status(
         if (this->sender() != plugin_status_owner)
         {
             qDebug() << "A plugin tried to declare it was no longer busy when another plugin had locked this";
-            *accepted = false;
             return;
         }
 
@@ -5825,6 +5825,12 @@ MainWindow::plugin_set_status(
     }
     else
     {
+        if (gspSerialPort.isOpen() == false)
+        {
+            qDebug() << "A plugin tried to run whilst the UART was closed";
+            return;
+        }
+
         gbPluginRunning = busy;
         gbPluginHideTerminalOutput = hide_terminal_output;
         plugin_status_owner = this->sender();
