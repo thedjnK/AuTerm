@@ -123,7 +123,7 @@ public:
 
 signals:
     void show_message_box(QString str_message);
-    void plugin_set_status(bool busy, bool hide_terminal_output);
+    void plugin_set_status(bool busy, bool hide_terminal_output, bool *accepted);
     void plugin_add_open_close_button(QPushButton *button);
     void plugin_to_hex(QByteArray *data);
 
@@ -167,6 +167,8 @@ private slots:
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
     smp_transport *active_transport();
+    bool claim_transport(QLabel *status);
+    void relase_transport(void);
 
     //Form items
 ///AUTOGEN_START_OBJECTS

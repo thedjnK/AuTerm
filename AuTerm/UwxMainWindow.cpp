@@ -98,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             if (plugin.plugin)
             {
 //                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
-                connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
+                connect(plugin.object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
                 connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
                 connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
 
@@ -139,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             if (plugin.plugin)
             {
 //                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
-                connect(plugin.object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
+                connect(plugin.object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
                 connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
                 connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
 
@@ -289,6 +289,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 #endif
 #ifndef SKIPPLUGINS
     gbPluginRunning = false;
+    gbPluginHideTerminalOutput = false;
+    plugin_status_owner = nullptr;
 #endif
     gbAppStarted = false;
 
@@ -1120,7 +1122,7 @@ MainWindow::~MainWindow()
     while (i < plugin_list.length())
     {
         disconnect(plugin_list.at(i).object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
-        disconnect(plugin_list.at(i).object, SIGNAL(plugin_set_status(bool,bool)), this, SLOT(plugin_set_status(bool,bool)));
+        disconnect(plugin_list.at(i).object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
         delete plugin_list.at(i).object;
 #ifndef QT_STATIC
         plugin_list.at(i).plugin_loader->unload();
@@ -5797,19 +5799,38 @@ MainWindow::on_btn_Plugin_Config_clicked(
 void
 MainWindow::plugin_set_status(
     bool busy,
-    bool hide_terminal_output
+    bool hide_terminal_output,
+    bool *accepted
     )
 {
+    if (gbPluginRunning == true)
+    {
+        qDebug() << "A plugin tried to run whilst another was busy";
+        *accepted = false;
+        return;
+    }
+
     if (busy == false)
     {
+        if (this->sender() != plugin_status_owner)
+        {
+            qDebug() << "A plugin tried to declare it was no longer busy when another plugin had locked this";
+            *accepted = false;
+            return;
+        }
+
         gbPluginRunning = false;
         gbPluginHideTerminalOutput = false;
+        plugin_status_owner = nullptr;
     }
     else
     {
         gbPluginRunning = busy;
         gbPluginHideTerminalOutput = hide_terminal_output;
+        plugin_status_owner = this->sender();
     }
+
+    *accepted = true;
 }
 
 //=============================================================================

@@ -1226,11 +1226,15 @@ void plugin_mcumgr::on_btn_FS_Local_clicked()
 void plugin_mcumgr::on_btn_FS_Go_clicked()
 {
     bool started = false;
+    bool reset_status = false;
+
+    if (claim_transport(lbl_FS_Status) == false)
+    {
+        return;
+    }
 
     if (radio_FS_Upload->isChecked())
     {
-        emit plugin_set_status(true, false);
-
         mode = ACTION_FS_UPLOAD;
         processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1243,8 +1247,6 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     }
     else if (radio_FS_Download->isChecked())
     {
-        emit plugin_set_status(true, false);
-
         mode = ACTION_FS_DOWNLOAD;
         processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1257,8 +1259,6 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     }
     else if (radio_FS_Size->isChecked())
     {
-        emit plugin_set_status(true, false);
-
         mode = ACTION_FS_STATUS;
         processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1271,8 +1271,6 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     }
     else if (radio_FS_HashChecksum->isChecked())
     {
-        emit plugin_set_status(true, false);
-
         mode = ACTION_FS_HASH_CHECKSUM;
         processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1285,8 +1283,6 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     }
     else if (radio_FS_Hash_Checksum_Types->isChecked())
     {
-        emit plugin_set_status(true, false);
-
         mode = ACTION_FS_SUPPORTED_HASHES_CHECKSUMS;
         processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1301,6 +1297,10 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     if (started == true)
     {
         progress_FS_Complete->setValue(0);
+    }
+    else if (reset_status == true)
+    {
+        relase_transport();
     }
 }
 
@@ -1333,12 +1333,16 @@ void plugin_mcumgr::on_btn_IMG_Local_clicked()
 void plugin_mcumgr::on_btn_IMG_Go_clicked()
 {
     bool started = false;
+    bool reset_status = false;
+
+    if (claim_transport(lbl_IMG_Status) == false)
+    {
+        return;
+    }
 
     if (tabWidget_3->currentWidget() == tab_IMG_Upload)
     {
         //Upload
-        emit plugin_set_status(true, false);
-
         mode = ACTION_IMG_UPLOAD;
         processor->set_transport(active_transport());
         smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1352,8 +1356,6 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
     else if (tabWidget_3->currentWidget() == tab_IMG_Images)
     {
         //Image list
-        emit plugin_set_status(true, false);
-
         if (radio_IMG_Get->isChecked())
         {
             colview_IMG_Images->previewWidget()->hide();
@@ -1418,20 +1420,21 @@ finished:
                 else
                 {
                     lbl_IMG_Status->setText("Could not find item bounds");
-//todo: release status
+                    started = false;
+                    reset_status = true;
                 }
             }
             else
             {
                 lbl_IMG_Status->setText("Invalid selection");
-//todo: release status
+                started = false;
+                reset_status = true;
             }
         }
     }
     else if (tabWidget_3->currentWidget() == tab_IMG_Erase)
     {
         //Erase
-        emit plugin_set_status(true, false);
         mode = ACTION_IMG_IMAGE_ERASE;
         processor->set_transport(active_transport());
         smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
@@ -1447,6 +1450,10 @@ finished:
     {
         progress_IMG_Complete->setValue(0);
     }
+    else if (reset_status == true)
+    {
+        relase_transport();
+    }
 }
 
 void plugin_mcumgr::on_radio_IMG_No_Action_toggled(bool checked)
@@ -1460,11 +1467,15 @@ void plugin_mcumgr::on_btn_IMG_Preview_Copy_clicked()
 void plugin_mcumgr::on_btn_OS_Go_clicked()
 {
     bool started = false;
+    bool reset_status = false;
+
+    if (claim_transport(lbl_OS_Status) == false)
+    {
+        return;
+    }
 
     if (selector_OS->currentWidget() == tab_OS_Echo)
     {
-        emit plugin_set_status(true, false);
-
         edit_OS_Echo_Output->clear();
         mode = ACTION_OS_ECHO;
         processor->set_transport(active_transport());
@@ -1475,11 +1486,13 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         {
             lbl_OS_Status->setText("Echo command sent...");
         }
+        else
+        {
+            reset_status = true;
+        }
     }
     else if (selector_OS->currentWidget() == tab_OS_Tasks)
     {
-        emit plugin_set_status(true, false);
-
         mode = ACTION_OS_TASK_STATS;
         processor->set_transport(active_transport());
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1489,11 +1502,13 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         {
             lbl_OS_Status->setText("Task list command sent...");
         }
+        else
+        {
+            reset_status = true;
+        }
     }
     else if (selector_OS->currentWidget() == tab_OS_Memory)
     {
-        emit plugin_set_status(true, false);
-
         mode = ACTION_OS_MEMORY_POOL;
         processor->set_transport(active_transport());
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1503,11 +1518,13 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         {
             lbl_OS_Status->setText("Memory pool list command sent...");
         }
+        else
+        {
+            reset_status = true;
+        }
     }
     else if (selector_OS->currentWidget() == tab_OS_Reset)
     {
-        emit plugin_set_status(true, false);
-
         mode = ACTION_OS_RESET;
         processor->set_transport(active_transport());
         smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1517,14 +1534,16 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         {
             lbl_OS_Status->setText("Reset command...");
         }
+        else
+        {
+            reset_status = true;
+        }
     }
     else if (selector_OS->currentWidget() == tab_OS_Info)
     {
         if (radio_OS_uname->isChecked())
         {
             //uname
-            emit plugin_set_status(true, false);
-
             mode = ACTION_OS_OS_APPLICATION_INFO;
             processor->set_transport(active_transport());
             smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1534,12 +1553,14 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             {
                 lbl_OS_Status->setText("uname command sent...");
             }
+            else
+            {
+                reset_status = true;
+            }
         }
         else
         {
             //Buffer details
-            emit plugin_set_status(true, false);
-
             mode = ACTION_OS_MCUMGR_BUFFER;
             processor->set_transport(active_transport());
             smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1549,7 +1570,16 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             {
                 lbl_OS_Status->setText("MCUmgr buffer command sent...");
             }
+            else
+            {
+                reset_status = true;
+            }
         }
+    }
+
+    if (reset_status == true)
+    {
+        relase_transport();
     }
 }
 
@@ -1557,7 +1587,12 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
 {
     //Execute shell command
     bool started = false;
-    emit plugin_set_status(true, false);
+    bool reset_status = false;
+
+    if (claim_transport(lbl_SHELL_Status) == false)
+    {
+        return;
+    }
 
     QRegularExpression reTempRE("\\s+");
     QStringList list_arguments = edit_SHELL_Input->text().split(reTempRE);
@@ -1571,17 +1606,25 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
     {
         lbl_SHELL_Status->setText("Shell execute command sent...");
     }
+    else
+    {
+        relase_transport();
+    }
 }
 
 void plugin_mcumgr::on_btn_STAT_Go_clicked()
 {
     bool started = false;
+    bool reset_status = false;
+
+    if (claim_transport(lbl_STAT_Status) == false)
+    {
+        return;
+    }
 
     if (radio_STAT_List->isChecked())
     {
         //Execute stat list command
-        emit plugin_set_status(true, false);
-
         mode = ACTION_STAT_LIST_GROUPS;
         processor->set_transport(active_transport());
         smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1595,8 +1638,6 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
     else if (radio_STAT_Fetch->isChecked() && !combo_STAT_Group->currentText().isEmpty())
     {
         //Execute stat get command
-        emit plugin_set_status(true, false);
-
         mode = ACTION_STAT_GROUP_DATA;
         processor->set_transport(active_transport());
         smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -1606,6 +1647,11 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         {
             lbl_STAT_Status->setText("Stat get command sent...");
         }
+    }
+
+    if (reset_status == true)
+    {
+        relase_transport();
     }
 }
 
@@ -1987,7 +2033,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     if (finished == true)
     {
         mode = ACTION_IDLE;
-        emit plugin_set_status(false, false);
+        relase_transport();
 
         if (error_string == nullptr)
         {
@@ -2140,4 +2186,41 @@ void plugin_mcumgr::on_radio_IMG_Set_toggled(bool checked)
     {
         check_IMG_Confirm->setEnabled(true);
     }
+}
+
+bool plugin_mcumgr::claim_transport(QLabel *status)
+{
+    bool successful = false;
+
+    if (active_transport() == uart)
+    {
+        emit plugin_set_status(true, false, &successful);
+
+        if (successful == false)
+        {
+            status->setText("Error: Could not claim transport");
+        }
+    }
+    else
+    {
+        successful = true;
+    }
+
+    return successful;
+}
+
+void plugin_mcumgr::relase_transport(void)
+{
+    if (active_transport() == uart)
+    {
+        bool successful = false;
+
+        emit plugin_set_status(false, false, &successful);
+
+        if (successful == false)
+        {
+            qDebug() << "Failed to release UART transport";
+        }
+    }
+
 }

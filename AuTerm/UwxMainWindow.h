@@ -343,7 +343,8 @@ private slots:
     void
     plugin_set_status(
         bool busy,
-        bool hide_terminal_output
+        bool hide_terminal_output,
+        bool *accepted
         );
 #endif
     void
@@ -569,6 +570,7 @@ private:
 #ifndef SKIPPLUGINS
     bool gbPluginRunning; //True if a plugin is running
     bool gbPluginHideTerminalOutput; //True if terminal output should not be updated whilst plugin is running
+    QObject *plugin_status_owner; //Owner of the last plugin set operation
     QList<QPushButton *> list_plugin_open_close_buttons;
     QList<plugins> plugin_list;
 #endif
