@@ -66,7 +66,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
             //Start
             //Check this header
             SMPBuffer.clear();
-//            qDebug() << SerialData.mid((pos + 2), (posA - pos - 2));
+//            qDebug() << "AA" << SerialData.mid((pos + 2), (posA - pos - 2));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
             SMPBuffer = QByteArray::fromBase64(SerialData.mid((pos + 2), (posA - pos - 2)), QByteArray::AbortOnBase64DecodingErrors);
 #else
@@ -90,6 +90,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
                     uint16_t crc = crc16(&SMPBuffer, 0, SMPBuffer.length() - 2, 0x1021, 0, true);
                     uint16_t message_crc = ((uint16_t)SMPBuffer[(SMPBuffer.length() - 2)]) << 8;
                     message_crc |= SMPBuffer[(SMPBuffer.length() - 1)] & 0xff;
+
                     if (crc == message_crc)
                     {
                         //Good to parse message after removing CRC
@@ -123,7 +124,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
             //Continuation
             //Check this header
             SMPBuffer.clear();
-//            qDebug() << SerialData.mid((pos_other + 2), (posA_other - pos_other - 2));
+//            qDebug() << "BB" << SerialData.mid((pos_other + 2), (posA_other - pos_other - 2));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
             SMPBuffer = QByteArray::fromBase64(SerialData.mid((pos_other + 2), (posA_other - pos_other - 2)), QByteArray::AbortOnBase64DecodingErrors);
 #else
@@ -134,7 +135,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
             {
                 qDebug() << "Failed decoding base64";
             }
-            else if (SMPBuffer.length() > 2)
+            else if (SMPBuffer.length() > 0)
             {
                 //Check length
                 SMPBufferActualData.append(SMPBuffer);
@@ -144,6 +145,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
                     uint16_t crc = crc16(&SMPBufferActualData, 0, SMPBufferActualData.length() - 2, 0x1021, 0, true);
                     uint16_t message_crc = ((uint16_t)SMPBufferActualData[(SMPBufferActualData.length() - 2)]) << 8;
                     message_crc |= SMPBufferActualData[(SMPBufferActualData.length() - 1)] & 0xff;
+
                     if (crc == message_crc)
                     {
                         //Good to parse message after removing CRC
