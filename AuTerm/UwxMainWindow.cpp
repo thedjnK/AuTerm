@@ -5805,7 +5805,7 @@ MainWindow::plugin_set_status(
 {
     *accepted = false;
 
-    if (gbPluginRunning == true)
+    if (gbPluginRunning == true && busy == true)
     {
         qDebug() << "A plugin tried to run whilst another was busy";
         return;
