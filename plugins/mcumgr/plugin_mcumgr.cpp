@@ -21,58 +21,31 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#include "plugin_mcumgr.h"
 #include <QDebug>
 #include <QFileDialog>
-#include "smp_group_array.h"
-#include "error_lookup.h"
-
-#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-#include "smp_udp.h"
-#endif
-
-#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-#include "smp_bluetooth.h"
-#endif
-
 #include <QStandardItemModel>
 #include <QRegularExpression>
 #include <QClipboard>
+#include "plugin_mcumgr.h"
 
 const uint8_t retries = 3;
 const uint16_t timeout_ms = 3000;
 const uint16_t timeout_erase_ms = 14000;
 
-QMainWindow *parent_window;
-smp_uart *uart;
-smp_processor *processor;
-QStandardItemModel model_image_state;
-
-smp_group_array smp_groups;
-error_lookup *error_lookup_form;
-QList<image_state_t> blaharray;
-QList<hash_checksum_t> what;
-
-#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-smp_udp *my_udp;
-#endif
-
-#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-smp_bluetooth *my_bluetooth;
-#endif
+static QMainWindow *parent_window;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
     parent_window = main_window;
 
-    uart = new smp_uart(this);
+    uart_transport = new smp_uart(this);
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-    my_udp = new smp_udp(this);
+    udp_transport = new smp_udp(this);
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-    my_bluetooth = new smp_bluetooth(this);
+    bluetooth_transport = new smp_bluetooth(this);
 #endif
 
     processor = new smp_processor(this);
@@ -1001,18 +974,18 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_orig->addTab(tab, QString("MCUmgr"));
 
 //Signals
-    connect(uart, SIGNAL(serial_write(QByteArray*)), parent_window, SLOT(plugin_serial_transmit(QByteArray*)));
+    connect(uart_transport, SIGNAL(serial_write(QByteArray*)), parent_window, SLOT(plugin_serial_transmit(QByteArray*)));
     //connect(uart, SIGNAL(receive_waiting(QByteArray)), this, SLOT(receive_waiting(QByteArray)));
-    connect(uart, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+    connect(uart_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
     //connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     //connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-    connect(my_udp, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+    connect(udp_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-    connect(my_bluetooth, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+    connect(bluetooth_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
 #endif
 
 //Form signals
@@ -1091,11 +1064,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 plugin_mcumgr::~plugin_mcumgr()
 {
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-    delete my_bluetooth;
+    delete bluetooth_transport;
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-    delete my_udp;
+    delete udp_transport;
 #endif
 
     delete error_lookup_form;
@@ -1105,7 +1078,7 @@ plugin_mcumgr::~plugin_mcumgr()
     delete smp_groups.os_mgmt;
     delete smp_groups.img_mgmt;
     delete processor;
-    delete uart;
+    delete uart_transport;
 }
 
 bool plugin_mcumgr::eventFilter(QObject *, QEvent *event)
@@ -1127,12 +1100,23 @@ bool plugin_mcumgr::eventFilter(QObject *, QEvent *event)
 
 const QString plugin_mcumgr::plugin_about()
 {
-    return "AuTerm MCUmgr plugin\r\nCopyright 2021-2023 Jamie M.\r\n\r\nCan be used to communicate with Zephyr devices with the serial MCUmgr transport enabled.\r\n\r\nUNFINISHED INITIAL TEST USE ONLY, NOT REPRESENTATIVE OF FINAL PRODUCT.\r\n\r\nBuilt using Qt " QT_VERSION_STR;
+    return "AuTerm MCUmgr plugin\r\nCopyright 2021-2023 Jamie M.\r\n\r\nCan be used to communicate with Zephyr devices with the serial"
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+           "/UDP"
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+           "/Bluetooth"
+#endif
+           " MCUmgr transport"
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP) || defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+           "s"
+#endif
+           " enabled.\r\n\r\nUNFINISHED INITIAL TEST USE ONLY, NOT REPRESENTATIVE OF FINAL PRODUCT.\r\n\r\nBuilt using Qt " QT_VERSION_STR;
 }
 
 bool plugin_mcumgr::plugin_configuration()
 {
-//    emit show_message_box("CONFIG BUTTON was clicked");
     return false;
 }
 
@@ -1148,27 +1132,31 @@ void plugin_mcumgr::serial_error(QSerialPort::SerialPortError serial_error)
 
 void plugin_mcumgr::serial_receive(QByteArray *data)
 {
-    uart->serial_read(data);
+    uart_transport->serial_read(data);
 }
 
 void plugin_mcumgr::serial_bytes_written(qint64 bytes)
 {
     Q_UNUSED(bytes);
-//    qDebug() << "written: " << bytes;
 }
 
 void plugin_mcumgr::serial_about_to_close()
 {
-//    qDebug() << "about to close";
 }
 
 void plugin_mcumgr::serial_opened()
 {
-
 }
 
 void plugin_mcumgr::serial_closed()
 {
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP) || defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    if (active_transport() != uart_transport)
+    {
+        return;
+    }
+#endif
+
     switch (mode)
     {
         case ACTION_IMG_UPLOAD:
@@ -1193,6 +1181,29 @@ void plugin_mcumgr::serial_closed()
             break;
         }
 
+        case ACTION_SHELL_EXECUTE:
+        {
+            smp_groups.shell_mgmt->cancel();
+            break;
+        }
+
+        case ACTION_STAT_GROUP_DATA:
+        case ACTION_STAT_LIST_GROUPS:
+        {
+            smp_groups.stat_mgmt->cancel();
+            break;
+        }
+
+        case ACTION_FS_UPLOAD:
+        case ACTION_FS_DOWNLOAD:
+        case ACTION_FS_STATUS:
+        case ACTION_FS_HASH_CHECKSUM:
+        case ACTION_FS_SUPPORTED_HASHES_CHECKSUMS:
+        {
+            smp_groups.fs_mgmt->cancel();
+            break;
+        }
+
         default:
         {
         }
@@ -1209,7 +1220,7 @@ void plugin_mcumgr::on_btn_FS_Local_clicked()
     if (radio_FS_Upload->isChecked())
     {
         //TODO: load path
-        filename = QFileDialog::getOpenFileName(parent_window, "Select source/target file for transfer", "", "All Files (*.*)");
+        filename = QFileDialog::getOpenFileName(parent_window, "Select source/target file for transfer", "", "All Files (*)");
     }
     else
     {
@@ -1286,7 +1297,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         mode = ACTION_FS_SUPPORTED_HASHES_CHECKSUMS;
         processor->set_transport(active_transport());
         smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.fs_mgmt->start_supported_hashes_checksums(&what);
+        started = smp_groups.fs_mgmt->start_supported_hashes_checksums(&supported_hash_checksum_list);
 
         if (started == true)
         {
@@ -1322,7 +1333,7 @@ void plugin_mcumgr::on_radio_FS_HashChecksum_clicked()
 
 void plugin_mcumgr::on_btn_IMG_Local_clicked()
 {
-    QString strFilename = QFileDialog::getOpenFileName(parent_window, tr("Open firmware file"), edit_IMG_Local->text(), tr("Binary Files (*.bin);;All Files (*.*)"));
+    QString strFilename = QFileDialog::getOpenFileName(parent_window, tr("Open firmware file"), edit_IMG_Local->text(), tr("Binary Files (*.bin);;All Files (*)"));
 
     if (!strFilename.isEmpty())
     {
@@ -1360,11 +1371,11 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         {
             colview_IMG_Images->previewWidget()->hide();
             model_image_state.clear();
-            blaharray.clear();
+            images_list.clear();
             mode = ACTION_IMG_IMAGE_LIST;
             processor->set_transport(active_transport());
             smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-            started = smp_groups.img_mgmt->start_image_get(&blaharray);
+            started = smp_groups.img_mgmt->start_image_get(&images_list);
 
             if (started == true)
             {
@@ -1379,14 +1390,14 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
                 uint8_t l = 0;
                 bool found = false;
 
-                while (i < blaharray.length())
+                while (i < images_list.length())
                 {
-                    if (blaharray[i].item == model_image_state.itemFromIndex(colview_IMG_Images->currentIndex())->parent())
+                    if (images_list[i].item == model_image_state.itemFromIndex(colview_IMG_Images->currentIndex())->parent())
                     {
                         l = 0;
-                        while (l < blaharray[i].slot_list.length())
+                        while (l < images_list[i].slot_list.length())
                         {
-                            if (model_image_state.itemFromIndex(colview_IMG_Images->currentIndex()) == blaharray[i].slot_list[l].item)
+                            if (model_image_state.itemFromIndex(colview_IMG_Images->currentIndex()) == images_list[i].slot_list[l].item)
                             {
                                 found = true;
                                 goto finished;
@@ -1410,7 +1421,7 @@ finished:
                     parent_column = colview_IMG_Images->currentIndex().parent().column();
                     child_row = colview_IMG_Images->currentIndex().row();
                     child_column = colview_IMG_Images->currentIndex().column();
-                    started = smp_groups.img_mgmt->start_image_set(&blaharray[i].slot_list[l].hash, check_IMG_Confirm->isChecked(), &blaharray);
+                    started = smp_groups.img_mgmt->start_image_set(&images_list[i].slot_list[l].hash, check_IMG_Confirm->isChecked(), &images_list);
 
                     if (started == true)
                     {
@@ -1668,24 +1679,24 @@ void plugin_mcumgr::on_btn_SHELL_Copy_clicked()
 void plugin_mcumgr::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index)
 {
     uint8_t i = 0;
-    while (i < blaharray.length())
+    while (i < images_list.length())
     {
-        if (blaharray[i].item == model_image_state.itemFromIndex(index)->parent())
+        if (images_list[i].item == model_image_state.itemFromIndex(index)->parent())
         {
             uint8_t l = 0;
-            while (l < blaharray[i].slot_list.length())
+            while (l < images_list[i].slot_list.length())
             {
-                if (model_image_state.itemFromIndex(index) == blaharray[i].slot_list[l].item)
+                if (model_image_state.itemFromIndex(index) == images_list[i].slot_list[l].item)
                 {
-                    QByteArray escaped_hash = blaharray[i].slot_list[l].hash;
+                    QByteArray escaped_hash = images_list[i].slot_list[l].hash;
                     emit plugin_to_hex(&escaped_hash);
                     edit_IMG_Preview_Hash->setText(escaped_hash);
-                    edit_IMG_Preview_Version->setText(blaharray[i].slot_list[l].version);
-                    check_IMG_Preview_Active->setChecked(blaharray[i].slot_list[l].active);
-                    check_IMG_Preview_Bootable->setChecked(blaharray[i].slot_list[l].bootable);
-                    check_IMG_Preview_Confirmed->setChecked(blaharray[i].slot_list[l].confirmed);
-                    check_IMG_Preview_Pending->setChecked(blaharray[i].slot_list[l].pending);
-                    check_IMG_Preview_Permanent->setChecked(blaharray[i].slot_list[l].permanent);
+                    edit_IMG_Preview_Version->setText(images_list[i].slot_list[l].version);
+                    check_IMG_Preview_Active->setChecked(images_list[i].slot_list[l].active);
+                    check_IMG_Preview_Bootable->setChecked(images_list[i].slot_list[l].bootable);
+                    check_IMG_Preview_Confirmed->setChecked(images_list[i].slot_list[l].confirmed);
+                    check_IMG_Preview_Pending->setChecked(images_list[i].slot_list[l].pending);
+                    check_IMG_Preview_Permanent->setChecked(images_list[i].slot_list[l].permanent);
 
                     i = 99;
                     break;
@@ -1764,9 +1775,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             else if (user_data == ACTION_IMG_IMAGE_LIST)
             {
                 uint8_t i = 0;
-                while (i < blaharray.length())
+                while (i < images_list.length())
                 {
-                    model_image_state.appendRow(blaharray[i].item);
+                    model_image_state.appendRow(images_list[i].item);
                     ++i;
                 }
             }
@@ -1778,9 +1789,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
                     model_image_state.clear();
 
-                    while (i < blaharray.length())
+                    while (i < images_list.length())
                     {
-                        model_image_state.appendRow(blaharray[i].item);
+                        model_image_state.appendRow(images_list[i].item);
                         ++i;
                     }
 
@@ -2014,11 +2025,11 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
                 combo_FS_Hash_Checksum->clear();
 
-                while (i < what.length())
+                while (i < supported_hash_checksum_list.length())
                 {
-                    combo_FS_Hash_Checksum->addItem(what.at(i).name);
-                    qDebug() << what.at(i).format << ", " << what.at(i).size;
-                    edit_FS_Log->appendPlainText(QString("Has %1, %2, %3").arg(what[i].name, QString::number(what[i].format), QString::number(what[i].size)));
+                    combo_FS_Hash_Checksum->addItem(supported_hash_checksum_list.at(i).name);
+                    qDebug() << supported_hash_checksum_list.at(i).format << ", " << supported_hash_checksum_list.at(i).size;
+                    edit_FS_Log->appendPlainText(QString("Has %1, %2, %3").arg(supported_hash_checksum_list[i].name, QString::number(supported_hash_checksum_list[i].format), QString::number(supported_hash_checksum_list[i].size)));
                     ++i;
                 }
                 edit_FS_Log->appendPlainText("todo4");
@@ -2108,18 +2119,18 @@ smp_transport *plugin_mcumgr::active_transport()
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     else if (radio_transport_udp->isChecked() == true)
     {
-        return my_udp;
+        return udp_transport;
     }
 #endif
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     else if (radio_transport_bluetooth->isChecked() == true)
     {
-        return my_bluetooth;
+        return bluetooth_transport;
     }
 #endif
     else
     {
-        return uart;
+        return uart_transport;
     }
 }
 
@@ -2130,29 +2141,38 @@ QMainWindow *plugin_mcumgr::get_main_window()
 
 void plugin_mcumgr::on_radio_transport_uart_toggled(bool checked)
 {
+    if (checked == true)
+    {
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-    my_udp->close_connect_dialog();
+        udp_transport->close_connect_dialog();
 #endif
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-    my_bluetooth->close_connect_dialog();
+        bluetooth_transport->close_connect_dialog();
 #endif
+    }
 }
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
 void plugin_mcumgr::on_radio_transport_udp_toggled(bool checked)
 {
+    if (checked == true)
+    {
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-    my_bluetooth->close_connect_dialog();
+        bluetooth_transport->close_connect_dialog();
 #endif
+    }
 }
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
 void plugin_mcumgr::on_radio_transport_bluetooth_toggled(bool checked)
 {
+    if (checked == true)
+    {
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-    my_udp->close_connect_dialog();
+        udp_transport->close_connect_dialog();
 #endif
+    }
 }
 #endif
 
@@ -2192,7 +2212,7 @@ bool plugin_mcumgr::claim_transport(QLabel *status)
 {
     bool successful = false;
 
-    if (active_transport() == uart)
+    if (active_transport() == uart_transport)
     {
         emit plugin_set_status(true, false, &successful);
 
@@ -2211,7 +2231,7 @@ bool plugin_mcumgr::claim_transport(QLabel *status)
 
 void plugin_mcumgr::relase_transport(void)
 {
-    if (active_transport() == uart)
+    if (active_transport() == uart_transport)
     {
         bool successful = false;
 
@@ -2222,5 +2242,4 @@ void plugin_mcumgr::relase_transport(void)
             qDebug() << "Failed to release UART transport";
         }
     }
-
 }

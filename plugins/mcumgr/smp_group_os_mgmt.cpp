@@ -292,19 +292,19 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
 
                 if (key == "blksiz")
                 {
-                            current_memory->size = task_value;
+                    current_memory->size = task_value;
                 }
                 else if (key == "nblks")
                 {
-                            current_memory->blocks = task_value;
+                    current_memory->blocks = task_value;
                 }
                 else if (key == "nfree")
                 {
-                            current_memory->free = task_value;
+                    current_memory->free = task_value;
                 }
                 else if (key == "min")
                 {
-                            current_memory->minimum = task_value;
+                    current_memory->minimum = task_value;
                 }
 
                 reader.next();
@@ -317,22 +317,22 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
 
                 while (r.status == QCborStreamReader::Ok)
                 {
-                            data.append(r.data);
-                            r = reader.readString();
+                    data.append(r.data);
+                    r = reader.readString();
                 }
 
                 if (r.status == QCborStreamReader::Error)
                 {
-                            data.clear();
-                            qDebug("Error decoding string");
+                    data.clear();
+                    qDebug("Error decoding string");
                 }
                 else
                 {
-                            if (key.isEmpty())
-                            {
-                                key = data;
-                                keyset = true;
-                            }
+                    if (key.isEmpty())
+                    {
+                        key = data;
+                        keyset = true;
+                    }
                 }
 
                 break;
@@ -344,25 +344,24 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
                 reader.enterContainer();
                 while (reader.lastError() == QCborError::NoError && reader.hasNext())
                 {
-                            {
-                                current_memory->name = key;
-                                current_memory->blocks = 0;
-                                current_memory->free = 0;
-                                current_memory->minimum = 0;
-                                current_memory->size = 0;
-                            }
+                    current_memory->name = key;
+                    current_memory->blocks = 0;
+                    current_memory->free = 0;
+                    current_memory->minimum = 0;
+                    current_memory->size = 0;
 
-                            parse_memory_pool_response(reader, current_memory, memory_array);
+                    parse_memory_pool_response(reader, current_memory, memory_array);
                 }
+
                 if (reader.lastError() == QCborError::NoError)
                 {
-                            reader.leaveContainer();
+                    reader.leaveContainer();
 
-                            if (!current_memory->name.isEmpty())
-                            {
-                                memory_array->append(*current_memory);
-                                current_memory->name.clear();
-                            }
+                    if (!current_memory->name.isEmpty())
+                    {
+                        memory_array->append(*current_memory);
+                        current_memory->name.clear();
+                    }
                 }
                 break;
             }
@@ -858,7 +857,7 @@ QString smp_group_os_mgmt::command_to_string(uint8_t command)
 
 bool smp_group_os_mgmt::error_lookup(int32_t rc, QString *error)
 {
-    rc -= 2;
+    rc -= smp_version_2_error_code_start;
 
     if (rc < smp_error_values.length())
     {
@@ -871,7 +870,7 @@ bool smp_group_os_mgmt::error_lookup(int32_t rc, QString *error)
 
 bool smp_group_os_mgmt::error_define_lookup(int32_t rc, QString *error)
 {
-    rc -= 2;
+    rc -= smp_version_2_error_code_start;
 
     if (rc < smp_error_defines.length())
     {

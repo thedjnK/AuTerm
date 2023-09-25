@@ -31,6 +31,7 @@ smp_udp::smp_udp(QObject *parent)
 {
     Q_UNUSED(parent);
 
+    QMainWindow *main_window = plugin_mcumgr::get_main_window();
     udp_window = new udp_setup(nullptr);
 
     socket = new QUdpSocket(this);

@@ -36,7 +36,6 @@
 #include "AutPlugin.h"
 #include "smp_processor.h"
 #include "smp_group.h"
-
 #include "smp_uart.h"
 #include "smp_group_img_mgmt.h"
 #include "smp_group_os_mgmt.h"
@@ -44,6 +43,16 @@
 #include "smp_group_stat_mgmt.h"
 #include "smp_group_fs_mgmt.h"
 #include "smp_error.h"
+#include "smp_group_array.h"
+#include "error_lookup.h"
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+#include "smp_udp.h"
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+#include "smp_bluetooth.h"
+#endif
 
 //Form includes
 ///AUTOGEN_START_INCLUDES
@@ -341,6 +350,23 @@ private:
     int32_t shell_rc;
     QStringList group_list;
     QList<stat_value_t> stat_list;
+    QStandardItemModel model_image_state;
+    error_lookup *error_lookup_form;
+    smp_processor *processor;
+    smp_group_array smp_groups;
+    class smp_uart *uart_transport;
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    class smp_udp *udp_transport;
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    class smp_bluetooth *bluetooth_transport;
+#endif
+
+    QList<image_state_t> images_list;
+    QList<hash_checksum_t> supported_hash_checksum_list;
+
 };
 
 #endif // PLUGIN_MCUMGR_H

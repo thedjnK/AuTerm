@@ -47,6 +47,9 @@ struct smp_error_lookup_list_t {
     smp_group *lookup;
 };
 
+//All SMP group error codes (for SMP version 2) must start at offset 2
+const int32_t smp_version_2_error_code_start = 2;
+
 class smp_error
 {
 public:

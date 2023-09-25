@@ -396,7 +396,7 @@ QString smp_group_stat_mgmt::command_to_string(uint8_t command)
 
 bool smp_group_stat_mgmt::error_lookup(int32_t rc, QString *error)
 {
-    rc -= 2;
+    rc -= smp_version_2_error_code_start;
 
     if (rc < smp_error_values.length())
     {
@@ -409,7 +409,7 @@ bool smp_group_stat_mgmt::error_lookup(int32_t rc, QString *error)
 
 bool smp_group_stat_mgmt::error_define_lookup(int32_t rc, QString *error)
 {
-    rc -= 2;
+    rc -= smp_version_2_error_code_start;
 
     if (rc < smp_error_defines.length())
     {

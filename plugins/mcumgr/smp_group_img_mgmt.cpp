@@ -38,6 +38,7 @@ enum img_mgmt_commands : uint8_t {
     COMMAND_ERASE = 5
 };
 
+//MCUboot TLV (Tag-Length-Value) related constants
 static const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
 static const uint16_t image_tlv_tag_sha256 = 0x10;
 static const uint8_t sha256_size = 32;
@@ -1010,7 +1011,7 @@ QString smp_group_img_mgmt::command_to_string(uint8_t command)
 
 bool smp_group_img_mgmt::error_lookup(int32_t rc, QString *error)
 {
-    rc -= 2;
+    rc -= smp_version_2_error_code_start;
 
     if (rc < smp_error_values.length())
     {
@@ -1023,7 +1024,7 @@ bool smp_group_img_mgmt::error_lookup(int32_t rc, QString *error)
 
 bool smp_group_img_mgmt::error_define_lookup(int32_t rc, QString *error)
 {
-    rc -= 2;
+    rc -= smp_version_2_error_code_start;
 
     if (rc < smp_error_defines.length())
     {
