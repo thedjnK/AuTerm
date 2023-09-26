@@ -35,8 +35,10 @@
 class AutEscape
 {
 public:
+    static void do_setup(void);
     static void escape_characters(QByteArray *baData);
     static void strip_vt100_formatting(QByteArray *data, int32_t offset);
+    static void strip_vt100_non_formatting(QByteArray *data, int32_t offset);
     static void replace_unprintable(QByteArray *data, bool include_1b);
     static void to_hex(QByteArray *data);
 };

@@ -28,9 +28,35 @@
 #include "AutEscape.h"
 #include <QRegularExpression>
 
+static QRegularExpression vt100_colour_regex("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
+static QRegularExpression vt100_non_colour_regex[8] = {
+    QRegularExpression("\\x1b\\[(20|\\?[1,3-9])h"),
+    QRegularExpression("\\x1b\\[(20|\\?[1-9])l"),
+    QRegularExpression("\\x1b(=|>|N|O|H|#[3-6|8]|5n|0n|3n|6n|D|M|E|7|8|c)"),
+    QRegularExpression("\\x1b\\[(\\(|\\))(A|B|[0-2])"),
+    QRegularExpression("\\x1b\\[([0-9]+);([0-9]+)(r|H|f)"),
+    QRegularExpression("\\x1b\\[([0-9]+)(A|B|C|D)"),
+    QRegularExpression("\\x1b\\[(g|0g|3g|K|[0-2]K|J|[0-2]J|H|;H|f|;f|c|0c)"),
+    QRegularExpression("\\x1b([0-9]+);([0-9]+)R")
+};
+
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
+
+//=============================================================================
+//=============================================================================
+void AutEscape::do_setup(void)
+{
+    int8_t i = (sizeof(vt100_non_colour_regex) / sizeof(vt100_non_colour_regex[0])) - 1;
+    vt100_colour_regex.setPatternOptions(QRegularExpression::MultilineOption);
+
+    while (i >= 0)
+    {
+        vt100_non_colour_regex[i].setPatternOptions(QRegularExpression::MultilineOption);
+        --i;
+    }
+}
 
 //=============================================================================
 //=============================================================================
@@ -97,15 +123,33 @@ void AutEscape::escape_characters(QByteArray *data)
 //=============================================================================
 void AutEscape::strip_vt100_formatting(QByteArray *data, int32_t offset)
 {
-//TODO: improve this
-    QRegularExpression vt100_regex("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
-    vt100_regex.setPatternOptions(QRegularExpression::MultilineOption);
-    QRegularExpressionMatch regex_match = vt100_regex.match(*data, offset);
+    QRegularExpressionMatch regex_match = vt100_colour_regex.match(*data, offset);
 
     while (regex_match.hasMatch())
     {
         data->remove(regex_match.capturedStart(0), regex_match.capturedLength(0));
-        regex_match = vt100_regex.match(*data);
+        regex_match = vt100_colour_regex.match(*data);
+    }
+
+    strip_vt100_non_formatting(data, offset);
+}
+
+void AutEscape::strip_vt100_non_formatting(QByteArray *data, int32_t offset)
+{
+    uint8_t i = 0;
+    uint8_t l = (sizeof(vt100_non_colour_regex) / sizeof(vt100_non_colour_regex[0]));
+
+    while (i < l)
+    {
+        QRegularExpressionMatch regex_match = vt100_non_colour_regex[i].match(*data, offset);
+
+        while (regex_match.hasMatch())
+        {
+            data->remove(regex_match.capturedStart(0), regex_match.capturedLength(0));
+            regex_match = vt100_non_colour_regex[i].match(*data);
+        }
+
+        ++i;
     }
 }
 

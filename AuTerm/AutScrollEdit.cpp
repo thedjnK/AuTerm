@@ -64,6 +64,8 @@ AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
 
     pre = this->textCursor().charFormat();
     last_format = pre;
+
+    AutEscape::do_setup();
 }
 
 //=============================================================================
@@ -942,6 +944,10 @@ void AutScrollEdit::update_display()
         if (vt100_control_mode == VT100_MODE_STRIP)
         {
             AutEscape::strip_vt100_formatting(&mstrDatIn, 0);
+        }
+        else if (vt100_control_mode == VT100_MODE_DECODE)
+        {
+            AutEscape::strip_vt100_non_formatting(&mstrDatIn, 0);
         }
 
 //TODO: deal with partial VT100 escape codes
