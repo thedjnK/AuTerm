@@ -29,15 +29,19 @@
 #include <QRegularExpression>
 
 static QRegularExpression vt100_colour_regex("\\x1b(\\[[0-9]{0,3}(;[0-9]{1,3})?[A-Za-z])");
-static QRegularExpression vt100_non_colour_regex[8] = {
+static QRegularExpression vt100_non_colour_regex[12] = {
     QRegularExpression("\\x1b\\[(20|\\?[1,3-9])h"),
     QRegularExpression("\\x1b\\[(20|\\?[1-9])l"),
-    QRegularExpression("\\x1b(=|>|N|O|H|#[3-6|8]|5n|0n|3n|6n|D|M|E|7|8|c)"),
+    QRegularExpression("\\x1b(<|=|>|N|O|H|#[3-6|8]|5n|0n|3n|6n|D|M|E|7|8|c|F|G|A|B|C|D|H|I|K|J|Z|/Z)"),
     QRegularExpression("\\x1b\\[(\\(|\\))(A|B|[0-2])"),
     QRegularExpression("\\x1b\\[([0-9]+);([0-9]+)(r|H|f)"),
-    QRegularExpression("\\x1b\\[([0-9]+)(A|B|C|D)"),
+    QRegularExpression("\\x1b\\[([0-9]+)(A|B|D)"),
     QRegularExpression("\\x1b\\[(g|0g|3g|K|[0-2]K|J|[0-2]J|H|;H|f|;f|c|0c)"),
-    QRegularExpression("\\x1b([0-9]+);([0-9]+)R")
+    QRegularExpression("\\x1b([0-9]+);([0-9]+)R"),
+    QRegularExpression("\\x1b\\[\\?1;([0-9]+)0c"),
+    QRegularExpression("\\x1b\\[2;(1|2|9|10)y"),
+    QRegularExpression("\\x1b\\[([0-4])q"),
+    QRegularExpression("\\x1b([0-9]+?)([0-9]+)")
 };
 
 /******************************************************************************/
