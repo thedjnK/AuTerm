@@ -43,6 +43,7 @@ static QRegularExpression vt100_non_colour_regex[12] = {
     QRegularExpression("\\x1b\\[([0-4])q"),
     QRegularExpression("\\x1b([0-9]+?)([0-9]+)")
 };
+static QRegularExpression vt100_shift_regex("\\x1b\\[([0-9]+)C");
 
 /******************************************************************************/
 // Local Functions or Private Members
@@ -54,6 +55,7 @@ void AutEscape::do_setup(void)
 {
     int8_t i = (sizeof(vt100_non_colour_regex) / sizeof(vt100_non_colour_regex[0])) - 1;
     vt100_colour_regex.setPatternOptions(QRegularExpression::MultilineOption);
+    vt100_shift_regex.setPatternOptions(QRegularExpression::MultilineOption);
 
     while (i >= 0)
     {
@@ -133,6 +135,14 @@ void AutEscape::strip_vt100_formatting(QByteArray *data, int32_t offset)
     {
         data->remove(regex_match.capturedStart(0), regex_match.capturedLength(0));
         regex_match = vt100_colour_regex.match(*data);
+    }
+
+    regex_match = vt100_shift_regex.match(*data, offset);
+
+    while (regex_match.hasMatch())
+    {
+        data->remove(regex_match.capturedStart(0), regex_match.capturedLength(0));
+        regex_match = vt100_shift_regex.match(*data);
     }
 
     strip_vt100_non_formatting(data, offset);
