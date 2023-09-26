@@ -1019,7 +1019,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_IMG_Set, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_Set_toggled(bool)));
 
     colview_IMG_Images->setModel(&model_image_state);
-    colview_IMG_Images->setColumnWidths(QList<int>() << 50 << 50);
+    colview_IMG_Images->setColumnWidths(QList<int>() << 50 << 50 << 460);
 
     check_IMG_Preview_Confirmed->setChecked(true);
     check_IMG_Preview_Confirmed->installEventFilter(this);
