@@ -773,7 +773,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
     verticalLayout->setObjectName("verticalLayout");
-    verticalLayout->setContentsMargins(0, 0, 0, 0);
+    verticalLayout->setContentsMargins(6, 6, 6, 6);
     formLayout = new QFormLayout();
     formLayout->setObjectName("formLayout");
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -856,7 +856,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    tabWidget->setCurrentIndex(0);
     tabWidget_2->setCurrentIndex(1);
     tabWidget_3->setCurrentIndex(0);
-    selector_OS->setCurrentIndex(2);
+    selector_OS->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
 
     //retranslate code
