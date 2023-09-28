@@ -20,6 +20,7 @@ SOURCES += \
     smp_error.cpp \
     smp_group_fs_mgmt.cpp \
     smp_group_os_mgmt.cpp \
+    smp_group_settings_mgmt.cpp \
     smp_group_shell_mgmt.cpp \
     smp_group_stat_mgmt.cpp \
     smp_message.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     smp_group_array.h \
     smp_group_fs_mgmt.h \
     smp_group_os_mgmt.h \
+    smp_group_settings_mgmt.h \
     smp_group_shell_mgmt.h \
     smp_group_stat_mgmt.h \
     smp_message.h \

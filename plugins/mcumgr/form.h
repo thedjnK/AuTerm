@@ -39,6 +39,13 @@ private slots:
     void on_radio_OS_uname_toggled(bool checked);
     void on_radio_IMG_Get_toggled(bool checked);
     void on_radio_IMG_Set_toggled(bool checked);
+    void on_radio_img_settings_read_toggled(bool checked);
+    void on_radio_img_settings_write_toggled(bool checked);
+    void on_radio_img_settings_delete_toggled(bool checked);
+    void on_radio_img_settings_commit_toggled(bool checked);
+    void on_radio_img_settings_load_toggled(bool checked);
+    void on_radio_img_settings_save_toggled(bool checked);
+    void on_btn_os_settings_go_clicked();
 
 private:
     Ui::Form *ui;

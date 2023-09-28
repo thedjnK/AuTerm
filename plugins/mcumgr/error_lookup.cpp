@@ -13,7 +13,7 @@ error_lookup::error_lookup(QWidget *parent, smp_group_array *groups) :
     ui->combo_group->addItem(QString("%1 (OS)").arg(SMP_GROUP_ID_OS));
     ui->combo_group->addItem(QString("%1 (Img)").arg(SMP_GROUP_ID_IMG));
     ui->combo_group->addItem(QString("%1 (Stats)").arg(SMP_GROUP_ID_STATS));
-    ui->combo_group->addItem(QString("%1 (Config)").arg(SMP_GROUP_ID_CONFIG));
+    ui->combo_group->addItem(QString("%1 (Settings)").arg(SMP_GROUP_ID_SETTINGS));
     ui->combo_group->addItem(QString("%1 (FS)").arg(SMP_GROUP_ID_FS));
     ui->combo_group->addItem(QString("%1 (Shell)").arg(SMP_GROUP_ID_SHELL));
     ui->combo_group->addItem(QString("%1 (Zephyr Basic)").arg(SMP_GROUP_ID_ZBASIC));

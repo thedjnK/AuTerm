@@ -41,7 +41,7 @@ enum smp_group_ids : uint16_t {
     SMP_GROUP_ID_OS = 0,
     SMP_GROUP_ID_IMG,
     SMP_GROUP_ID_STATS,
-    SMP_GROUP_ID_CONFIG,
+    SMP_GROUP_ID_SETTINGS,
     SMP_GROUP_ID_FS = 8,
     SMP_GROUP_ID_SHELL,
     SMP_GROUP_ID_ZBASIC = 63,

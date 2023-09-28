@@ -128,3 +128,45 @@ void Form::on_radio_IMG_Set_toggled(bool checked)
 
 }
 
+
+void Form::on_radio_img_settings_read_toggled(bool checked)
+{
+
+}
+
+
+void Form::on_radio_img_settings_write_toggled(bool checked)
+{
+
+}
+
+
+void Form::on_radio_img_settings_delete_toggled(bool checked)
+{
+
+}
+
+
+void Form::on_radio_img_settings_commit_toggled(bool checked)
+{
+
+}
+
+
+void Form::on_radio_img_settings_load_toggled(bool checked)
+{
+
+}
+
+
+void Form::on_radio_img_settings_save_toggled(bool checked)
+{
+
+}
+
+
+void Form::on_btn_os_settings_go_clicked()
+{
+
+}
+

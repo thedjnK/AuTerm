@@ -790,6 +790,100 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_2->addTab(tab_Shell, QString());
     tab_Settings = new QWidget();
     tab_Settings->setObjectName("tab_Settings");
+    gridLayout_15 = new QGridLayout(tab_Settings);
+    gridLayout_15->setSpacing(2);
+    gridLayout_15->setObjectName("gridLayout_15");
+    gridLayout_15->setContentsMargins(6, 6, 6, 6);
+    label_23 = new QLabel(tab_Settings);
+    label_23->setObjectName("label_23");
+
+    gridLayout_15->addWidget(label_23, 0, 0, 1, 1);
+
+    lbl_settings_status = new QLabel(tab_Settings);
+    lbl_settings_status->setObjectName("lbl_settings_status");
+
+    gridLayout_15->addWidget(lbl_settings_status, 4, 0, 1, 2);
+
+    horizontalLayout_15 = new QHBoxLayout();
+    horizontalLayout_15->setSpacing(2);
+    horizontalLayout_15->setObjectName("horizontalLayout_15");
+    horizontalSpacer_10 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_15->addItem(horizontalSpacer_10);
+
+    btn_settings_go = new QPushButton(tab_Settings);
+    btn_settings_go->setObjectName("btn_settings_go");
+
+    horizontalLayout_15->addWidget(btn_settings_go);
+
+    horizontalSpacer_11 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_15->addItem(horizontalSpacer_11);
+
+
+    gridLayout_15->addLayout(horizontalLayout_15, 5, 0, 1, 2);
+
+    edit_settings_value = new QLineEdit(tab_Settings);
+    edit_settings_value->setObjectName("edit_settings_value");
+    edit_settings_value->setReadOnly(true);
+
+    gridLayout_15->addWidget(edit_settings_value, 1, 1, 1, 1);
+
+    horizontalLayout_11 = new QHBoxLayout();
+    horizontalLayout_11->setObjectName("horizontalLayout_11");
+    radio_settings_read = new QRadioButton(tab_Settings);
+    radio_settings_read->setObjectName("radio_settings_read");
+    radio_settings_read->setChecked(true);
+
+    horizontalLayout_11->addWidget(radio_settings_read);
+
+    radio_settings_write = new QRadioButton(tab_Settings);
+    radio_settings_write->setObjectName("radio_settings_write");
+
+    horizontalLayout_11->addWidget(radio_settings_write);
+
+    radio_settings_delete = new QRadioButton(tab_Settings);
+    radio_settings_delete->setObjectName("radio_settings_delete");
+
+    horizontalLayout_11->addWidget(radio_settings_delete);
+
+    radio_settings_commit = new QRadioButton(tab_Settings);
+    radio_settings_commit->setObjectName("radio_settings_commit");
+
+    horizontalLayout_11->addWidget(radio_settings_commit);
+
+    radio_settings_load = new QRadioButton(tab_Settings);
+    radio_settings_load->setObjectName("radio_settings_load");
+
+    horizontalLayout_11->addWidget(radio_settings_load);
+
+    radio_settings_save = new QRadioButton(tab_Settings);
+    radio_settings_save->setObjectName("radio_settings_save");
+
+    horizontalLayout_11->addWidget(radio_settings_save);
+
+
+    gridLayout_15->addLayout(horizontalLayout_11, 2, 1, 1, 1);
+
+    label_22 = new QLabel(tab_Settings);
+    label_22->setObjectName("label_22");
+
+    gridLayout_15->addWidget(label_22, 2, 0, 1, 1);
+
+    edit_settings_key = new QLineEdit(tab_Settings);
+    edit_settings_key->setObjectName("edit_settings_key");
+
+    gridLayout_15->addWidget(edit_settings_key, 0, 1, 1, 1);
+
+    label_24 = new QLabel(tab_Settings);
+    label_24->setObjectName("label_24");
+
+    gridLayout_15->addWidget(label_24, 1, 0, 1, 1);
+
+    verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    gridLayout_15->addItem(verticalSpacer_5, 3, 0, 1, 1);
+
     tabWidget_2->addTab(tab_Settings, QString());
 
     verticalLayout_2->addWidget(tabWidget_2);
@@ -991,6 +1085,17 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_SHELL_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
+    label_23->setText(QCoreApplication::translate("Form", "Key:", nullptr));
+    lbl_settings_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    btn_settings_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    radio_settings_read->setText(QCoreApplication::translate("Form", "Read", nullptr));
+    radio_settings_write->setText(QCoreApplication::translate("Form", "Write", nullptr));
+    radio_settings_delete->setText(QCoreApplication::translate("Form", "Delete", nullptr));
+    radio_settings_commit->setText(QCoreApplication::translate("Form", "Commit", nullptr));
+    radio_settings_load->setText(QCoreApplication::translate("Form", "Load", nullptr));
+    radio_settings_save->setText(QCoreApplication::translate("Form", "Save", nullptr));
+    label_22->setText(QCoreApplication::translate("Form", "Action:", nullptr));
+    label_24->setText(QCoreApplication::translate("Form", "Value:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
@@ -1051,6 +1156,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_OS_uname, SIGNAL(toggled(bool)), this, SLOT(on_radio_OS_uname_toggled(bool)));
     connect(radio_IMG_Get, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_Get_toggled(bool)));
     connect(radio_IMG_Set, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_Set_toggled(bool)));
+    connect(radio_settings_read, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_read_toggled(bool)));
+    connect(radio_settings_write, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_write_toggled(bool)));
+    connect(radio_settings_delete, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_delete_toggled(bool)));
+    connect(radio_settings_commit, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_commit_toggled(bool)));
+    connect(radio_settings_load, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_load_toggled(bool)));
+    connect(radio_settings_save, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_save_toggled(bool)));
+    connect(btn_settings_go, SIGNAL(clicked()), this, SLOT(on_btn_settings_go_clicked()));
 
     colview_IMG_Images->setModel(&model_image_state);
     colview_IMG_Images->setColumnWidths(QList<int>() << 50 << 50 << 460);
@@ -1065,14 +1177,19 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     //test
 //    emit plugin_add_open_close_button(btn_FS_Go);
+    smp_groups.fs_mgmt = new smp_group_fs_mgmt(processor);
     smp_groups.img_mgmt = new smp_group_img_mgmt(processor);
     smp_groups.os_mgmt = new smp_group_os_mgmt(processor);
+    smp_groups.settings_mgmt = new smp_group_settings_mgmt(processor);
     smp_groups.shell_mgmt = new smp_group_shell_mgmt(processor);
     smp_groups.stat_mgmt = new smp_group_stat_mgmt(processor);
-    smp_groups.fs_mgmt = new smp_group_fs_mgmt(processor);
     error_lookup_form = new error_lookup(parent_window, &smp_groups);
 
     //error_lookup_form->show();
+
+    connect(smp_groups.fs_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.fs_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(smp_groups.fs_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 
     connect(smp_groups.img_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.img_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
@@ -1082,6 +1199,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(smp_groups.os_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 //    connect(smp_groups.os_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 
+    connect(smp_groups.settings_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.settings_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+//    connect(smp_groups.settings_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+
     connect(smp_groups.shell_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.shell_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 //    connect(smp_groups.shell_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
@@ -1089,11 +1210,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(smp_groups.stat_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.stat_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 //    connect(smp_groups.shell_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-
-    connect(smp_groups.fs_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(smp_groups.fs_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(smp_groups.fs_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-}
+    }
 
 plugin_mcumgr::~plugin_mcumgr()
 {
@@ -1106,11 +1223,12 @@ plugin_mcumgr::~plugin_mcumgr()
 #endif
 
     delete error_lookup_form;
-    delete smp_groups.fs_mgmt;
     delete smp_groups.stat_mgmt;
     delete smp_groups.shell_mgmt;
+    delete smp_groups.settings_mgmt;
     delete smp_groups.os_mgmt;
     delete smp_groups.img_mgmt;
+    delete smp_groups.fs_mgmt;
     delete processor;
     delete uart_transport;
 }
@@ -1236,6 +1354,17 @@ void plugin_mcumgr::serial_closed()
         case ACTION_FS_SUPPORTED_HASHES_CHECKSUMS:
         {
             smp_groups.fs_mgmt->cancel();
+            break;
+        }
+
+        case ACTION_SETTINGS_READ:
+        case ACTION_SETTINGS_WRITE:
+        case ACTION_SETTINGS_DELETE:
+        case ACTION_SETTINGS_COMMIT:
+        case ACTION_SETTINGS_LOAD:
+        case ACTION_SETTINGS_SAVE:
+        {
+            smp_groups.settings_mgmt->cancel();
             break;
         }
 
@@ -2105,7 +2234,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     }
     else if (sender() == smp_groups.fs_mgmt)
     {
-        qDebug() << "stat sender";
+        qDebug() << "fs sender";
         label_status = lbl_FS_Status;
 
         if (status == STATUS_COMPLETE)
@@ -2141,6 +2270,23 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             else if (user_data == ACTION_FS_STATUS)
             {
                 edit_FS_Log->appendPlainText("todo5");
+            }
+        }
+    }
+    else if (sender() == smp_groups.settings_mgmt)
+    {
+        qDebug() << "settings sender";
+        label_status = lbl_settings_status;
+
+        if (status == STATUS_COMPLETE)
+        {
+            qDebug() << "complete";
+            if (user_data == ACTION_SETTINGS_READ)
+            {
+                edit_settings_value->setText(settings_read_response);
+            }
+            else if (user_data == ACTION_SETTINGS_WRITE || user_data == ACTION_SETTINGS_DELETE || user_data == ACTION_SETTINGS_COMMIT || user_data == ACTION_SETTINGS_LOAD || user_data == ACTION_SETTINGS_SAVE)
+            {
             }
         }
     }
@@ -2345,5 +2491,150 @@ void plugin_mcumgr::relase_transport(void)
         {
             qDebug() << "Failed to release UART transport";
         }
+    }
+}
+
+void plugin_mcumgr::on_radio_settings_read_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        edit_settings_key->setEnabled(true);
+        edit_settings_value->setEnabled(true);
+        edit_settings_value->setReadOnly(true);
+    }
+}
+
+void plugin_mcumgr::on_radio_settings_write_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        edit_settings_key->setEnabled(true);
+        edit_settings_value->setEnabled(true);
+        edit_settings_value->setReadOnly(false);
+    }
+}
+
+void plugin_mcumgr::on_radio_settings_delete_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        edit_settings_key->setEnabled(true);
+        edit_settings_value->setEnabled(false);
+    }
+}
+
+void plugin_mcumgr::on_radio_settings_commit_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        edit_settings_key->setEnabled(false);
+        edit_settings_value->setEnabled(false);
+    }
+}
+
+void plugin_mcumgr::on_radio_settings_load_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        edit_settings_key->setEnabled(false);
+        edit_settings_value->setEnabled(false);
+    }
+}
+
+void plugin_mcumgr::on_radio_settings_save_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        edit_settings_key->setEnabled(false);
+        edit_settings_value->setEnabled(false);
+    }
+}
+
+void plugin_mcumgr::on_btn_settings_go_clicked()
+{
+    bool started = false;
+    bool reset_status = false;
+
+    if (claim_transport(lbl_settings_status) == false)
+    {
+        return;
+    }
+
+    if (radio_settings_read->isChecked())
+    {
+        mode = ACTION_SETTINGS_READ;
+        processor->set_transport(active_transport());
+        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.settings_mgmt->start_read(edit_settings_key->text(), 0, &settings_read_response);
+
+        if (started == true)
+        {
+            lbl_settings_status->setText("Reading...");
+        }
+    }
+    else if (radio_settings_write->isChecked())
+    {
+        mode = ACTION_SETTINGS_WRITE;
+        processor->set_transport(active_transport());
+        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.settings_mgmt->start_write(edit_settings_key->text(), edit_settings_value->text().toUtf8());
+
+        if (started == true)
+        {
+            lbl_settings_status->setText("Writing...");
+        }
+    }
+    else if (radio_settings_delete->isChecked())
+    {
+        mode = ACTION_SETTINGS_DELETE;
+        processor->set_transport(active_transport());
+        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.settings_mgmt->start_delete(edit_settings_key->text());
+
+        if (started == true)
+        {
+            lbl_settings_status->setText("Deleting...");
+        }
+    }
+    else if (radio_settings_commit->isChecked())
+    {
+        mode = ACTION_SETTINGS_COMMIT;
+        processor->set_transport(active_transport());
+        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.settings_mgmt->start_commit();
+
+        if (started == true)
+        {
+            lbl_settings_status->setText("Committing...");
+        }
+    }
+    else if (radio_settings_load->isChecked())
+    {
+        mode = ACTION_SETTINGS_LOAD;
+        processor->set_transport(active_transport());
+        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.settings_mgmt->start_load();
+
+        if (started == true)
+        {
+            lbl_settings_status->setText("Loading...");
+        }
+    }
+    else if (radio_settings_save->isChecked())
+    {
+        mode = ACTION_SETTINGS_SAVE;
+        processor->set_transport(active_transport());
+        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.settings_mgmt->start_save();
+
+        if (started == true)
+        {
+            lbl_settings_status->setText("Saving...");
+        }
+    }
+
+    if (reset_status == true)
+    {
+        relase_transport();
     }
 }

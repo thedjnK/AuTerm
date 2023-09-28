@@ -37,11 +37,12 @@
 #include "smp_processor.h"
 #include "smp_group.h"
 #include "smp_uart.h"
+#include "smp_group_fs_mgmt.h"
 #include "smp_group_img_mgmt.h"
 #include "smp_group_os_mgmt.h"
+#include "smp_group_settings_mgmt.h"
 #include "smp_group_shell_mgmt.h"
 #include "smp_group_stat_mgmt.h"
-#include "smp_group_fs_mgmt.h"
 #include "smp_error.h"
 #include "smp_group_array.h"
 #include "error_lookup.h"
@@ -109,6 +110,13 @@ enum mcumgr_action_t {
     ACTION_FS_STATUS,
     ACTION_FS_HASH_CHECKSUM,
     ACTION_FS_SUPPORTED_HASHES_CHECKSUMS,
+
+    ACTION_SETTINGS_READ,
+    ACTION_SETTINGS_WRITE,
+    ACTION_SETTINGS_DELETE,
+    ACTION_SETTINGS_COMMIT,
+    ACTION_SETTINGS_LOAD,
+    ACTION_SETTINGS_SAVE,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin
@@ -173,6 +181,13 @@ private slots:
     void on_radio_OS_uname_toggled(bool checked);
     void on_radio_IMG_Get_toggled(bool checked);
     void on_radio_IMG_Set_toggled(bool checked);
+    void on_radio_settings_read_toggled(bool checked);
+    void on_radio_settings_write_toggled(bool checked);
+    void on_radio_settings_delete_toggled(bool checked);
+    void on_radio_settings_commit_toggled(bool checked);
+    void on_radio_settings_load_toggled(bool checked);
+    void on_radio_settings_save_toggled(bool checked);
+    void on_btn_settings_go_clicked();
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -327,6 +342,25 @@ private:
     QSpacerItem *horizontalSpacer_8;
     QLabel *label_13;
     QWidget *tab_Settings;
+    QGridLayout *gridLayout_15;
+    QLabel *label_23;
+    QLabel *lbl_settings_status;
+    QHBoxLayout *horizontalLayout_15;
+    QSpacerItem *horizontalSpacer_10;
+    QPushButton *btn_settings_go;
+    QSpacerItem *horizontalSpacer_11;
+    QLineEdit *edit_settings_value;
+    QHBoxLayout *horizontalLayout_11;
+    QRadioButton *radio_settings_read;
+    QRadioButton *radio_settings_write;
+    QRadioButton *radio_settings_delete;
+    QRadioButton *radio_settings_commit;
+    QRadioButton *radio_settings_load;
+    QRadioButton *radio_settings_save;
+    QLabel *label_22;
+    QLineEdit *edit_settings_key;
+    QLabel *label_24;
+    QSpacerItem *verticalSpacer_5;
     QWidget *tab_2;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
@@ -374,6 +408,7 @@ private:
     QList<image_state_t> images_list;
     QList<hash_checksum_t> supported_hash_checksum_list;
     QVariant bootloader_info_response;
+    QByteArray settings_read_response;
 };
 
 #endif // PLUGIN_MCUMGR_H
