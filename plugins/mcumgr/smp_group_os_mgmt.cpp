@@ -592,14 +592,15 @@ bool smp_group_os_mgmt::parse_bootloader_info_response(QCborStreamReader &reader
 
             case QCborStreamReader::UnsignedInteger:
             {
-                *response = reader.toInteger();
+                *response = reader.toUnsignedInteger();
                 reader.next();
                 break;
             }
 
             case QCborStreamReader::NegativeInteger:
             {
-                *response = (int64_t)reader.toNegativeInteger();
+                //*response = reader.toNegativeInteger();
+                *response = reader.toInteger();
                 reader.next();
                 break;
             }
