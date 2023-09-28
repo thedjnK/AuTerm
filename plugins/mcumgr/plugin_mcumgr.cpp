@@ -437,6 +437,31 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_7 = new QGridLayout(tab_OS);
     gridLayout_7->setSpacing(2);
     gridLayout_7->setObjectName("gridLayout_7");
+    horizontalLayout_13 = new QHBoxLayout();
+    horizontalLayout_13->setSpacing(2);
+    horizontalLayout_13->setObjectName("horizontalLayout_13");
+    horizontalLayout_13->setContentsMargins(-1, -1, -1, 0);
+    horizontalSpacer_17 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_13->addItem(horizontalSpacer_17);
+
+    btn_OS_Go = new QPushButton(tab_OS);
+    btn_OS_Go->setObjectName("btn_OS_Go");
+
+    horizontalLayout_13->addWidget(btn_OS_Go);
+
+    horizontalSpacer_18 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_13->addItem(horizontalSpacer_18);
+
+
+    gridLayout_7->addLayout(horizontalLayout_13, 2, 0, 1, 1);
+
+    lbl_OS_Status = new QLabel(tab_OS);
+    lbl_OS_Status->setObjectName("lbl_OS_Status");
+
+    gridLayout_7->addWidget(lbl_OS_Status, 1, 0, 1, 1);
+
     selector_OS = new QTabWidget(tab_OS);
     selector_OS->setObjectName("selector_OS");
     tab_OS_Echo = new QWidget();
@@ -587,33 +612,38 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_13->addWidget(edit_OS_Info_Output, 2, 1, 1, 1);
 
     selector_OS->addTab(tab_OS_Info, QString());
+    tab_OS_Bootloader = new QWidget();
+    tab_OS_Bootloader->setObjectName("tab_OS_Bootloader");
+    formLayout_2 = new QFormLayout(tab_OS_Bootloader);
+    formLayout_2->setObjectName("formLayout_2");
+    formLayout_2->setFormAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+    formLayout_2->setHorizontalSpacing(2);
+    formLayout_2->setVerticalSpacing(2);
+    formLayout_2->setContentsMargins(6, 6, 6, 6);
+    label_20 = new QLabel(tab_OS_Bootloader);
+    label_20->setObjectName("label_20");
+
+    formLayout_2->setWidget(0, QFormLayout::LabelRole, label_20);
+
+    edit_os_bootloader_query = new QLineEdit(tab_OS_Bootloader);
+    edit_os_bootloader_query->setObjectName("edit_os_bootloader_query");
+
+    formLayout_2->setWidget(0, QFormLayout::FieldRole, edit_os_bootloader_query);
+
+    label_21 = new QLabel(tab_OS_Bootloader);
+    label_21->setObjectName("label_21");
+
+    formLayout_2->setWidget(1, QFormLayout::LabelRole, label_21);
+
+    edit_os_bootloader_response = new QLineEdit(tab_OS_Bootloader);
+    edit_os_bootloader_response->setObjectName("edit_os_bootloader_response");
+    edit_os_bootloader_response->setReadOnly(true);
+
+    formLayout_2->setWidget(1, QFormLayout::FieldRole, edit_os_bootloader_response);
+
+    selector_OS->addTab(tab_OS_Bootloader, QString());
 
     gridLayout_7->addWidget(selector_OS, 0, 0, 1, 1);
-
-    horizontalLayout_13 = new QHBoxLayout();
-    horizontalLayout_13->setSpacing(2);
-    horizontalLayout_13->setObjectName("horizontalLayout_13");
-    horizontalLayout_13->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer_17 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    horizontalLayout_13->addItem(horizontalSpacer_17);
-
-    btn_OS_Go = new QPushButton(tab_OS);
-    btn_OS_Go->setObjectName("btn_OS_Go");
-
-    horizontalLayout_13->addWidget(btn_OS_Go);
-
-    horizontalSpacer_18 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    horizontalLayout_13->addItem(horizontalSpacer_18);
-
-
-    gridLayout_7->addLayout(horizontalLayout_13, 2, 0, 1, 1);
-
-    lbl_OS_Status = new QLabel(tab_OS);
-    lbl_OS_Status->setObjectName("lbl_OS_Status");
-
-    gridLayout_7->addWidget(lbl_OS_Status, 1, 0, 1, 1);
 
     tabWidget_2->addTab(tab_OS, QString());
     tab_Stats = new QWidget();
@@ -773,7 +803,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
     verticalLayout->setObjectName("verticalLayout");
-    verticalLayout->setContentsMargins(6, 6, 6, 6);
+    verticalLayout->setContentsMargins(6, 6, 8, 6);
     formLayout = new QFormLayout();
     formLayout->setObjectName("formLayout");
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -900,6 +930,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_IMG), QCoreApplication::translate("Form", "Img", nullptr));
+    btn_OS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    lbl_OS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     label_10->setText(QCoreApplication::translate("Form", "Input:", nullptr));
     label_11->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Echo), QCoreApplication::translate("Form", "Echo", nullptr));
@@ -936,8 +968,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_OS_uname->setText(QCoreApplication::translate("Form", "uname", nullptr));
     label_18->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Info), QCoreApplication::translate("Form", "Info", nullptr));
-    btn_OS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    lbl_OS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    label_20->setText(QCoreApplication::translate("Form", "Query (blank for bootloader):", nullptr));
+    edit_os_bootloader_query->setPlaceholderText(QCoreApplication::translate("Form", "Bootloader", nullptr));
+    label_21->setText(QCoreApplication::translate("Form", "Response:", nullptr));
+    selector_OS->setTabText(selector_OS->indexOf(tab_OS_Bootloader), QCoreApplication::translate("Form", "Bootloader", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_OS), QCoreApplication::translate("Form", "OS", nullptr));
     label_15->setText(QCoreApplication::translate("Form", "Group:", nullptr));
     label_16->setText(QCoreApplication::translate("Form", "Values:", nullptr));
@@ -1176,6 +1210,7 @@ void plugin_mcumgr::serial_closed()
         case ACTION_OS_RESET:
         case ACTION_OS_MCUMGR_BUFFER:
         case ACTION_OS_OS_APPLICATION_INFO:
+        case ACTION_OS_BOOTLOADER_INFO:
         {
             smp_groups.os_mgmt->cancel();
             break;
@@ -1587,6 +1622,23 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             }
         }
     }
+    else if (selector_OS->currentWidget() == tab_OS_Bootloader)
+    {
+        //bootloader info
+        mode = ACTION_OS_BOOTLOADER_INFO;
+        processor->set_transport(active_transport());
+        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.os_mgmt->start_bootloader_info(edit_os_bootloader_query->text(), &bootloader_info_response);
+
+        if (started == true)
+        {
+            lbl_OS_Status->setText("bootloader info command sent...");
+        }
+        else
+        {
+            reset_status = true;
+        }
+    }
 
     if (reset_status == true)
     {
@@ -1939,6 +1991,58 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 edit_OS_Info_Output->clear();
                 edit_OS_Info_Output->appendPlainText(error_string);
                 error_string = nullptr;
+            }
+            else if (user_data == ACTION_OS_BOOTLOADER_INFO)
+            {
+                switch (bootloader_info_response.type())
+                {
+                    case QVariant::Bool:
+                    {
+                        edit_os_bootloader_response->setText(bootloader_info_response.toBool() == true ? "True" : "False");
+                        break;
+                    }
+
+                    case QVariant::Int:
+                    {
+                        edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toInt()));
+                        break;
+                    }
+
+                    case QVariant::LongLong:
+                    {
+                        edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toLongLong()));
+                        break;
+                    }
+
+                    case QVariant::UInt:
+                    {
+                        edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toUInt()));
+                        break;
+                    }
+
+                    case QVariant::ULongLong:
+                    {
+                        edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toULongLong()));
+                        break;
+                    }
+
+                    case QVariant::Double:
+                    {
+                        edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toDouble()));
+                        break;
+                    }
+
+                    case QVariant::String:
+                    {
+                        edit_os_bootloader_response->setText(bootloader_info_response.toString());
+                        break;
+                    }
+
+                    default:
+                    {
+                        error_string = "Invalid";
+                    }
+                }
             }
         }
     }

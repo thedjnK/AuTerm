@@ -70,6 +70,7 @@ public:
     bool start_date_time_get();
     bool start_date_time_set();
     */
+    bool start_bootloader_info(QString query, QVariant *response);
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
 
@@ -82,6 +83,7 @@ private:
     /*
     bool parse_date_time_response(QCborStreamReader &reader, );
     */
+    bool parse_bootloader_info_response(QCborStreamReader &reader, QVariant *response);
 
     QString mode_to_string(uint8_t mode);
     QString command_to_string(uint8_t command);
@@ -90,6 +92,8 @@ private:
     uint8_t mode;
     QList<task_list_t> *task_list;
     QList<memory_pool_t> *memory_list;
+    QString bootloader_query_value;
+    QVariant *bootloader_info_response;
 };
 
 #endif // SMP_GROUP_OS_MGMT_H

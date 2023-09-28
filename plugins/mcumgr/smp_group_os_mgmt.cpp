@@ -31,7 +31,8 @@ enum modes : uint8_t {
     MODE_DATE_TIME_SET,
     MODE_RESET,
     MODE_MCUMGR_PARAMETERS,
-    MODE_OS_APPLICATION_INFO
+    MODE_OS_APPLICATION_INFO,
+    MODE_BOOTLOADER_INFO
 };
 
 enum os_mgmt_commands : uint8_t {
@@ -42,6 +43,7 @@ enum os_mgmt_commands : uint8_t {
     COMMAND_RESET,
     COMMAND_MCUMGR_PARAMETERS,
     COMMAND_OS_APPLICATION_INFO,
+    COMMAND_BOOTLOADER_INFO,
 };
 
 static QStringList smp_error_defines = QStringList() <<
@@ -538,6 +540,156 @@ bool smp_group_os_mgmt::parse_os_application_info_response(QCborStreamReader &re
     return true;
 }
 
+bool smp_group_os_mgmt::parse_bootloader_info_response(QCborStreamReader &reader, QVariant *response)
+{
+    QString key = "";
+    bool keyset = true;
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
+        //	    qDebug() << "Key: " << key;
+        //	    qDebug() << "Type: " << reader.type();
+        switch (reader.type())
+        {
+            case QCborStreamReader::String:
+            {
+                QString data;
+                auto r = reader.readString();
+
+                while (r.status == QCborStreamReader::Ok)
+                {
+                    data.append(r.data);
+                    r = reader.readString();
+                }
+
+                if (r.status == QCborStreamReader::Error)
+                {
+                    data.clear();
+                    qDebug("Error decoding string");
+                }
+                else
+                {
+                    if (key.isEmpty())
+                    {
+                        key = data;
+                        keyset = true;
+                    }
+                    else if (bootloader_query_value.isEmpty() == false && key == bootloader_query_value)
+                    {
+                        *response = data;
+                    }
+                }
+
+                break;
+            }
+
+            case QCborStreamReader::UnsignedInteger:
+            {
+                *response = reader.toInteger();
+                reader.next();
+                break;
+            }
+
+            case QCborStreamReader::NegativeInteger:
+            {
+                *response = (int64_t)reader.toNegativeInteger();
+                reader.next();
+                break;
+            }
+
+            case QCborStreamReader::ByteArray:
+            {
+                QByteArray data;
+                auto r = reader.readByteArray();
+                while (r.status == QCborStreamReader::Ok)
+                {
+                    data.append(r.data);
+                    r = reader.readByteArray();
+                }
+
+                if (r.status == QCborStreamReader::Error)
+                {
+                    data.clear();
+                    qDebug("Error decoding byte array");
+                }
+                else
+                {
+                    if (bootloader_query_value.isEmpty() == false && key == bootloader_query_value)
+                    {
+                        *response = data;
+                    }
+                }
+
+                break;
+            }
+
+            case QCborStreamReader::SimpleType:
+            {
+                if (reader.toSimpleType() == QCborSimpleType::Null || reader.toSimpleType() == QCborSimpleType::Undefined)
+                {
+                    //TODO
+                }
+                else
+                {
+                    *response = (bool)(reader.toSimpleType() == QCborSimpleType::False ? false : true);
+                }
+
+                reader.next();
+                break;
+            }
+
+/*          case QCborStreamReader::HalfFloat:
+            {
+                *response = reader.toFloat16();
+                break;
+            }*/
+
+            case QCborStreamReader::Float:
+            {
+                *response = reader.toFloat();
+                reader.next();
+                break;
+            }
+
+            case QCborStreamReader::Double:
+            {
+                *response = reader.toDouble();
+                reader.next();
+                break;
+            }
+
+            case QCborStreamReader::Array:
+            case QCborStreamReader::Map:
+            {
+                reader.enterContainer();
+                while (reader.lastError() == QCborError::NoError && reader.hasNext())
+                {
+                    parse_bootloader_info_response(reader, response);
+                }
+                if (reader.lastError() == QCborError::NoError)
+                {
+                    reader.leaveContainer();
+                }
+                break;
+            }
+
+            default:
+            {
+                reader.next();
+            }
+        }
+    }
+
+    return true;
+}
+
 void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data)
 {
     Q_UNUSED(op);
@@ -620,6 +772,14 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
             emit status(smp_user_data, STATUS_COMPLETE, response);
         }
+        else if (finished_mode == MODE_BOOTLOADER_INFO && command == COMMAND_BOOTLOADER_INFO)
+        {
+            //Response to OS/application info
+            QCborStreamReader cbor_reader(data);
+            bool good = parse_bootloader_info_response(cbor_reader, bootloader_info_response);
+
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
         else
         {
             qDebug() << "Unsupported command received";
@@ -663,6 +823,11 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_OS_APPLICATION_INFO && mode == MODE_OS_APPLICATION_INFO)
+    {
+        //TODO
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+    }
+    else if (command == COMMAND_BOOTLOADER_INFO && mode == MODE_BOOTLOADER_INFO)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
@@ -789,14 +954,44 @@ bool smp_group_os_mgmt::start_os_application_info(QString format)
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_OS_APPLICATION_INFO);
+
     if (format.isEmpty() == false)
     {
         tmp_message->writer()->append("format");
         tmp_message->writer()->append(format);
     }
+
     tmp_message->end_message();
 
     mode = MODE_OS_APPLICATION_INFO;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_os_mgmt::start_bootloader_info(QString query, QVariant *response)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_BOOTLOADER_INFO);
+
+    if (query.isEmpty() == false)
+    {
+        tmp_message->writer()->append("query");
+        tmp_message->writer()->append(query);
+        bootloader_query_value = query;
+    }
+    else
+    {
+        bootloader_query_value = "bootloader";
+    }
+
+    tmp_message->end_message();
+
+    mode = MODE_BOOTLOADER_INFO;
+    bootloader_info_response = response;
 
     //	    qDebug() << "len: " << message.length();
 
@@ -827,6 +1022,8 @@ QString smp_group_os_mgmt::mode_to_string(uint8_t mode)
             return "MCUmgr parameters";
         case MODE_OS_APPLICATION_INFO:
             return "OS/Application info";
+        case MODE_BOOTLOADER_INFO:
+            return "Bootloader info";
         default:
             return "Invalid";
     }

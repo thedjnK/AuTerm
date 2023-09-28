@@ -97,6 +97,7 @@ enum mcumgr_action_t {
     ACTION_OS_RESET,
     ACTION_OS_MCUMGR_BUFFER,
     ACTION_OS_OS_APPLICATION_INFO,
+    ACTION_OS_BOOTLOADER_INFO,
 
     ACTION_SHELL_EXECUTE,
 
@@ -260,6 +261,11 @@ private:
     QLabel *lbl_IMG_Status;
     QWidget *tab_OS;
     QGridLayout *gridLayout_7;
+    QHBoxLayout *horizontalLayout_13;
+    QSpacerItem *horizontalSpacer_17;
+    QPushButton *btn_OS_Go;
+    QSpacerItem *horizontalSpacer_18;
+    QLabel *lbl_OS_Status;
     QTabWidget *selector_OS;
     QWidget *tab_OS_Echo;
     QGridLayout *gridLayout_8;
@@ -286,11 +292,12 @@ private:
     QRadioButton *radio_OS_uname;
     QLabel *label_18;
     QPlainTextEdit *edit_OS_Info_Output;
-    QHBoxLayout *horizontalLayout_13;
-    QSpacerItem *horizontalSpacer_17;
-    QPushButton *btn_OS_Go;
-    QSpacerItem *horizontalSpacer_18;
-    QLabel *lbl_OS_Status;
+    QWidget *tab_OS_Bootloader;
+    QFormLayout *formLayout_2;
+    QLabel *label_20;
+    QLineEdit *edit_os_bootloader_query;
+    QLabel *label_21;
+    QLineEdit *edit_os_bootloader_response;
     QWidget *tab_Stats;
     QGridLayout *gridLayout_11;
     QLabel *label_15;
@@ -366,7 +373,7 @@ private:
 
     QList<image_state_t> images_list;
     QList<hash_checksum_t> supported_hash_checksum_list;
-
+    QVariant bootloader_info_response;
 };
 
 #endif // PLUGIN_MCUMGR_H
