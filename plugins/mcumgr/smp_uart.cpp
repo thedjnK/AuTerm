@@ -249,7 +249,7 @@ int smp_uart::send(smp_message *message)
     while (pos < (message->size() + 1))
     {
         /* Chunking required */
-        int16_t chunk_size = 90 - output.length();
+        int16_t chunk_size = 93 - output.length();
 
         if ((chunk_size + pos) > message->size())
         {
@@ -264,7 +264,7 @@ int smp_uart::send(smp_message *message)
         output.append(message->data()->mid(pos, chunk_size));
         pos += chunk_size;
 
-        if (pos == message->size() && (90 - chunk_size) > 2)
+        if (pos == message->size() && (93 - chunk_size) > 2)
         {
 end:
             output.append((uint8_t)((crc & 0xff00) >> 8));
