@@ -79,7 +79,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_MTU->setObjectName("edit_MTU");
     edit_MTU->setMinimum(32);
     edit_MTU->setMaximum(8192);
-    edit_MTU->setValue(256);
+    edit_MTU->setValue(254);
 
     horizontalLayout_7->addWidget(edit_MTU);
 
