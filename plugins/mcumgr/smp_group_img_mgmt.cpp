@@ -569,6 +569,7 @@ qDebug() << "Going in circles...";
         //Upload next chunk
         if (this->file_upload_area >= (uint32_t)this->file_upload_data.length())
         {
+            uint max_size = smp_message::max_message_data_size(smp_mtu, false);
             float blah = this->file_upload_data.length();
             uint8_t prefix = 0;
             while (blah >= 1024)
@@ -664,7 +665,14 @@ qDebug() << "Going in circles...";
         tmp_message->writer()->append("off");
         tmp_message->writer()->append(this->file_upload_area);
         tmp_message->writer()->append("data");
-        tmp_message->writer()->append(this->file_upload_data.mid(this->file_upload_area, (smp_message::max_message_data_size(smp_mtu, false) - tmp_message->size() - 2)));
+
+        //Calculate maximum size for data, each frame has 2 start bytes and 1 end byte
+        max_size -= (max_size / 127) * 4;
+
+        //CBOR element header is 2 bytes with 1 byte end token
+        max_size = max_size - tmp_message->size() - 3;
+
+        tmp_message->writer()->append(this->file_upload_data.mid(this->file_upload_area, max_size));
 
         //	    qDebug() << "off: " << this->file_upload_area << ", left: " << this->file_upload_data.length();
 
