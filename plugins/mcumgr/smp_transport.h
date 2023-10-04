@@ -64,6 +64,11 @@ public:
     {
     }
 
+    virtual uint16_t max_message_data_size(uint16_t mtu)
+    {
+        return mtu;
+    }
+
 signals:
 //    void connected();
 //    void disconnected();

@@ -380,3 +380,8 @@ void smp_processor::set_transport(smp_transport *transport_object)
 {
     transport = transport_object;
 }
+
+uint16_t smp_processor::max_message_data_size(uint16_t mtu)
+{
+    return transport->max_message_data_size(mtu);
+}

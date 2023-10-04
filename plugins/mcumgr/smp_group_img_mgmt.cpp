@@ -23,6 +23,7 @@
 #include "smp_group_img_mgmt.h"
 #include <QFile>
 #include <QCryptographicHash>
+#include "smp_message.h"
 
 enum modes : uint8_t {
     MODE_IDLE = 0,
@@ -567,9 +568,10 @@ qDebug() << "Going in circles...";
     if (good == true)
     {
         //Upload next chunk
+        uint max_size = processor->max_message_data_size(smp_mtu);
+
         if (this->file_upload_area >= (uint32_t)this->file_upload_data.length())
         {
-            uint max_size = smp_message::max_message_data_size(smp_mtu, false);
             float blah = this->file_upload_data.length();
             uint8_t prefix = 0;
             while (blah >= 1024)
@@ -666,9 +668,6 @@ qDebug() << "Going in circles...";
         tmp_message->writer()->append(this->file_upload_area);
         tmp_message->writer()->append("data");
 
-        //Calculate maximum size for data, each frame has 2 start bytes and 1 end byte
-        max_size -= (max_size / 127) * 4;
-
         //CBOR element header is 2 bytes with 1 byte end token
         max_size = max_size - tmp_message->size() - 3;
 
@@ -678,7 +677,7 @@ qDebug() << "Going in circles...";
 
         tmp_message->end_message();
 
-        //      qDebug() << "len: " << smp_data.length();
+        //      qDebug() << "len: " << tmp_message->data()->length();
 
         processor->send(tmp_message, smp_timeout, smp_retries, (this->file_upload_area == 0 ? true : false));
     }

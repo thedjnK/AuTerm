@@ -284,3 +284,30 @@ end:
 
     return 0;
 }
+
+uint16_t smp_uart::max_message_data_size(uint16_t mtu)
+{
+    float available_mtu = mtu;
+    int packets = ceil(available_mtu / 124.0);
+
+    //Convert to number of base64 encoded bytes
+    available_mtu = available_mtu * 3.0 / 4.0;
+
+    //Remove packet length and CRC (2 bytes each)
+    available_mtu -= 4.0;
+
+    //Remove header and footer of each packet
+    available_mtu -= (float)packets * 3.0;
+
+    //Remove possible padding bytes for narrow final packets
+    if (((uint16_t)available_mtu % 93) >= 91)
+    {
+        available_mtu -= 3.0;
+    }
+    else if (((uint16_t)available_mtu % 93) >= 88)
+    {
+        available_mtu -= 1.0;
+    }
+
+    return (uint16_t)available_mtu;
+}

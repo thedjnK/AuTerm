@@ -51,6 +51,7 @@ public:
     void register_handler(uint16_t group, smp_group *handler);
     void unregister_handler(uint16_t group);
     void set_transport(smp_transport *transport_object);
+    uint16_t max_message_data_size(uint16_t mtu);
 
 private:
     void cleanup();

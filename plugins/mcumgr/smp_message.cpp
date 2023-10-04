@@ -211,32 +211,3 @@ QCborStreamWriter *smp_message::writer()
 {
     return &cbor_writer;
 }
-
-//TODO: this is for UART transport only, move/update
-uint smp_message::max_message_data_size(uint16_t mtu, bool include_header)
-{
-    //16-bit packet size, 16-bit CRC
-    uint16_t data_size = 2 + 2;
-
-    if (include_header == true)
-    {
-        //Include SMP header
-        data_size += sizeof(smp_hdr);
-    }
-
-    //Base64 encoded
-    data_size = data_size * 4 / 3;
-
-    //16-bit start/continuation mark and newline
-    data_size += 2 + 1;
-
-    if (mtu <= data_size)
-    {
-        return 0;
-    }
-
-    mtu -= data_size;
-
-    //Return un-base64'd length for available size
-    return (mtu * 3 / 4);
-}

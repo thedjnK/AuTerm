@@ -36,6 +36,7 @@ public:
     ~smp_uart();
     int send(smp_message *message);
     //int get_mtu();
+    uint16_t max_message_data_size(uint16_t mtu);
 
 private:
     void data_received(QByteArray *message);
