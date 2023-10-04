@@ -15,6 +15,7 @@ TARGET          = $$qtLibraryTarget(plugin_mcumgr)
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    crc16.cpp \
     error_lookup.cpp \
     plugin_mcumgr.cpp \
     smp_error.cpp \
@@ -30,6 +31,7 @@ SOURCES += \
 
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
+    crc16.h \
     error_lookup.h \
     plugin_mcumgr.h \
     smp_error.h \

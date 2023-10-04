@@ -5,7 +5,7 @@
 **
 ** Module:  smp_uart.h
 **
-** Notes:   With exception to the crc16() function which is apache 2.0 licensed
+** Notes:
 **
 ** License: This program is free software: you can redistribute it and/or
 **          modify it under the terms of the GNU General Public License as
@@ -48,9 +48,6 @@ public slots:
     void serial_read(QByteArray *rec_data);
 
 private:
-    static uint16_t crc16(const QByteArray *src, size_t i, size_t len, uint16_t polynomial,
-                          uint16_t initial_value, bool pad);
-
     QByteArray SerialData;
     QByteArray SMPBuffer;
     QByteArray SMPBufferActualData;

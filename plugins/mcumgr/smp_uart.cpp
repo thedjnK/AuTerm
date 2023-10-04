@@ -5,7 +5,7 @@
 **
 ** Module:  smp_uart.cpp
 **
-** Notes:   With exception to the crc16() function which is apache 2.0 licensed
+** Notes:
 **
 ** License: This program is free software: you can redistribute it and/or
 **          modify it under the terms of the GNU General Public License as
@@ -22,6 +22,7 @@
 *******************************************************************************/
 #include "smp_uart.h"
 #include <QDebug>
+#include "crc16.h"
 
 //TODO: all of this
 
@@ -198,37 +199,6 @@ void smp_uart::serial_read(QByteArray *rec_data)
 //        qDebug() << SerialData;
         SerialData.clear();
     }
-}
-
-//Taken from zephyr - Apache 2.0 licensed
-uint16_t smp_uart::crc16(const QByteArray *src, size_t i, size_t len, uint16_t polynomial,
-                         uint16_t initial_value, bool pad)
-{
-    uint16_t crc = initial_value;
-    size_t padding = pad ? sizeof(crc) : 0;
-    size_t b;
-
-    /* src length + padding (if required) */
-    while (i < (len + padding))
-    {
-        for (b = 0; b < 8; b++) {
-            uint16_t divide = crc & 0x8000UL;
-
-            crc = (crc << 1U);
-
-            /* choose input bytes or implicit trailing zeros */
-            if (i < len) {
-                crc |= !!(src->at(i) & (0x80U >> b));
-            }
-
-            if (divide != 0U) {
-                crc = crc ^ polynomial;
-            }
-        }
-        ++i;
-    }
-
-    return crc;
 }
 
 int smp_uart::send(smp_message *message)
