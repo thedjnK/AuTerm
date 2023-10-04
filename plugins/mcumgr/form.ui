@@ -35,6 +35,12 @@
          </item>
          <item>
           <widget class="QSpinBox" name="edit_MTU">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="minimum">
             <number>32</number>
            </property>
@@ -42,7 +48,7 @@
             <number>8192</number>
            </property>
            <property name="value">
-            <number>254</number>
+            <number>256</number>
            </property>
           </widget>
          </item>
@@ -498,6 +504,19 @@
                   </widget>
                  </item>
                  <item>
+                  <widget class="QRadioButton" name="radio_img_images_erase">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Erase</string>
+                   </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="Line" name="line">
                    <property name="orientation">
                     <enum>Qt::Vertical</enum>
@@ -646,6 +665,18 @@
            <string>OS</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_7">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
            <property name="spacing">
             <number>2</number>
            </property>
@@ -1015,6 +1046,21 @@
            <string>Stats</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_11">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <property name="spacing">
+            <number>2</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_15">
              <property name="text">
@@ -1131,6 +1177,18 @@
            <string>Shell</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_9">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
            <property name="spacing">
             <number>2</number>
            </property>

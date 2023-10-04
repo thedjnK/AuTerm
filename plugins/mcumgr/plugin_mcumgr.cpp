@@ -77,9 +77,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     edit_MTU = new QSpinBox(tab);
     edit_MTU->setObjectName("edit_MTU");
+    edit_MTU->setMinimumSize(QSize(50, 0));
     edit_MTU->setMinimum(32);
     edit_MTU->setMaximum(8192);
-    edit_MTU->setValue(254);
+    edit_MTU->setValue(256);
 
     horizontalLayout_7->addWidget(edit_MTU);
 
@@ -357,6 +358,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_6->addWidget(radio_IMG_Set);
 
+    radio_img_images_erase = new QRadioButton(tab_IMG_Images);
+    radio_img_images_erase->setObjectName("radio_img_images_erase");
+    radio_img_images_erase->setEnabled(false);
+    radio_img_images_erase->setCheckable(true);
+
+    horizontalLayout_6->addWidget(radio_img_images_erase);
+
     line = new QFrame(tab_IMG_Images);
     line->setObjectName("line");
     line->setFrameShape(QFrame::VLine);
@@ -437,6 +445,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_7 = new QGridLayout(tab_OS);
     gridLayout_7->setSpacing(2);
     gridLayout_7->setObjectName("gridLayout_7");
+    gridLayout_7->setContentsMargins(6, 6, 6, 6);
     horizontalLayout_13 = new QHBoxLayout();
     horizontalLayout_13->setSpacing(2);
     horizontalLayout_13->setObjectName("horizontalLayout_13");
@@ -649,7 +658,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_Stats = new QWidget();
     tab_Stats->setObjectName("tab_Stats");
     gridLayout_11 = new QGridLayout(tab_Stats);
+    gridLayout_11->setSpacing(2);
     gridLayout_11->setObjectName("gridLayout_11");
+    gridLayout_11->setContentsMargins(6, 6, 6, 6);
     label_15 = new QLabel(tab_Stats);
     label_15->setObjectName("label_15");
 
@@ -725,6 +736,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_9 = new QGridLayout(tab_Shell);
     gridLayout_9->setSpacing(2);
     gridLayout_9->setObjectName("gridLayout_9");
+    gridLayout_9->setContentsMargins(6, 6, 6, 6);
     verticalLayout_3 = new QVBoxLayout();
     verticalLayout_3->setObjectName("verticalLayout_3");
     btn_SHELL_Clear = new QToolButton(tab_Shell);
@@ -1017,6 +1029,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_5->setText(QCoreApplication::translate("Form", "State:", nullptr));
     radio_IMG_Get->setText(QCoreApplication::translate("Form", "Get", nullptr));
     radio_IMG_Set->setText(QCoreApplication::translate("Form", "Set", nullptr));
+    radio_img_images_erase->setText(QCoreApplication::translate("Form", "Erase", nullptr));
     check_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));

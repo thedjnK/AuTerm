@@ -260,6 +260,7 @@ private:
     QLabel *label_5;
     QRadioButton *radio_IMG_Get;
     QRadioButton *radio_IMG_Set;
+    QRadioButton *radio_img_images_erase;
     QFrame *line;
     QCheckBox *check_IMG_Confirm;
     QSpacerItem *horizontalSpacer_5;
