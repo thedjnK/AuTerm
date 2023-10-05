@@ -23,6 +23,7 @@
 #include "smp_uart.h"
 #include <QDebug>
 #include "crc16.h"
+#include <math.h>
 
 //TODO: all of this
 
