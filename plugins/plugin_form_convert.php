@@ -13,7 +13,9 @@ $Replacement1 = array(
 
 $Replacement2 = array(
 	array('gridLayout = new QGridLayout(', '//', 1),
+	array('gridLayout->setSpacing(', '//', 1),
 	array('gridLayout->setObjectName("gridLayout");', '//', 1),
+	array('gridLayout->setContentsMargins(', '//', 1),
 	array('gridLayout->setObjectName(QString::fromUtf8("gridLayout"));', '//', 1),
 	array('tabWidget = new QTabWidget(', '//', 1),
 	array('tabWidget->setObjectName("tabWidget");', '//', 1),
@@ -22,6 +24,7 @@ $Replacement2 = array(
 	array('verticalLayoutWidget = new QWidget(tab);', 'verticalLayoutWidget = new QWidget();', 0),
 	array('verticalLayoutWidget->setGeometry(QRect(410, 20, 229, 182));', 'verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));', 0),
 	array('verticalLayoutWidget->setGeometry(QRect(210, 128, 229, 182));', 'verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));', 0),
+	array('verticalLayoutWidget->setGeometry(QRect(210, 120, 229, 182));', 'verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));', 0),
 	array('tabWidget->addTab(tab, QString());', '//', 1),
 	array('gridLayout->addWidget(tabWidget, 0, 0, 1, 1);', '//', 1),
 	array('retranslateUi(Form);', '//', 1),
