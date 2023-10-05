@@ -18,10 +18,6 @@ public:
 private slots:
     void on_btn_FS_Local_clicked();
     void on_btn_FS_Go_clicked();
-    void on_radio_FS_Upload_clicked();
-    void on_radio_FS_Download_clicked();
-    void on_radio_FS_Size_clicked();
-    void on_radio_FS_HashChecksum_clicked();
     void on_btn_IMG_Local_clicked();
     void on_btn_IMG_Go_clicked();
     void on_radio_IMG_No_Action_toggled(bool checked);
@@ -46,6 +42,11 @@ private slots:
     void on_radio_img_settings_load_toggled(bool checked);
     void on_radio_img_settings_save_toggled(bool checked);
     void on_btn_os_settings_go_clicked();
+    void on_radio_FS_Upload_toggled(bool checked);
+    void on_radio_FS_Download_toggled(bool checked);
+    void on_radio_FS_Size_toggled(bool checked);
+    void on_radio_FS_HashChecksum_toggled(bool checked);
+    void on_radio_FS_Hash_Checksum_Types_toggled(bool checked);
 
 private:
     Ui::Form *ui;

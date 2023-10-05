@@ -61,7 +61,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 ///AUTOGEN_START_INIT
 //    gridLayout = new QGridLayout(Form);
+//    gridLayout->setSpacing(2);
 //    gridLayout->setObjectName("gridLayout");
+//    gridLayout->setContentsMargins(6, 6, 6, 6);
 //    tabWidget = new QTabWidget(Form);
 //    tabWidget->setObjectName("tabWidget");
     tab = new QWidget(tabWidget_orig);
@@ -661,32 +663,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_11->setSpacing(2);
     gridLayout_11->setObjectName("gridLayout_11");
     gridLayout_11->setContentsMargins(6, 6, 6, 6);
-    label_15 = new QLabel(tab_Stats);
-    label_15->setObjectName("label_15");
+    lbl_STAT_Status = new QLabel(tab_Stats);
+    lbl_STAT_Status->setObjectName("lbl_STAT_Status");
 
-    gridLayout_11->addWidget(label_15, 0, 0, 1, 1);
-
-    combo_STAT_Group = new QComboBox(tab_Stats);
-    combo_STAT_Group->setObjectName("combo_STAT_Group");
-    combo_STAT_Group->setEditable(true);
-
-    gridLayout_11->addWidget(combo_STAT_Group, 0, 1, 1, 1);
-
-    label_16 = new QLabel(tab_Stats);
-    label_16->setObjectName("label_16");
-
-    gridLayout_11->addWidget(label_16, 1, 0, 1, 1);
-
-    table_STAT_Values = new QTableWidget(tab_Stats);
-    if (table_STAT_Values->columnCount() < 2)
-        table_STAT_Values->setColumnCount(2);
-    QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
-    table_STAT_Values->setHorizontalHeaderItem(0, __qtablewidgetitem12);
-    QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
-    table_STAT_Values->setHorizontalHeaderItem(1, __qtablewidgetitem13);
-    table_STAT_Values->setObjectName("table_STAT_Values");
-
-    gridLayout_11->addWidget(table_STAT_Values, 1, 1, 1, 1);
+    gridLayout_11->addWidget(lbl_STAT_Status, 3, 0, 1, 2);
 
     horizontalLayout_9 = new QHBoxLayout();
     horizontalLayout_9->setSpacing(2);
@@ -705,10 +685,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_11->addLayout(horizontalLayout_9, 2, 0, 1, 2);
 
-    lbl_STAT_Status = new QLabel(tab_Stats);
-    lbl_STAT_Status->setObjectName("lbl_STAT_Status");
+    combo_STAT_Group = new QComboBox(tab_Stats);
+    combo_STAT_Group->setObjectName("combo_STAT_Group");
+    combo_STAT_Group->setEditable(true);
 
-    gridLayout_11->addWidget(lbl_STAT_Status, 3, 0, 1, 2);
+    gridLayout_11->addWidget(combo_STAT_Group, 0, 1, 1, 1);
 
     horizontalLayout_14 = new QHBoxLayout();
     horizontalLayout_14->setSpacing(2);
@@ -729,6 +710,35 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 
     gridLayout_11->addLayout(horizontalLayout_14, 4, 0, 1, 2);
+
+    label_16 = new QLabel(tab_Stats);
+    label_16->setObjectName("label_16");
+
+    gridLayout_11->addWidget(label_16, 1, 0, 1, 1);
+
+    label_15 = new QLabel(tab_Stats);
+    label_15->setObjectName("label_15");
+
+    gridLayout_11->addWidget(label_15, 0, 0, 1, 1);
+
+    table_STAT_Values = new QTableWidget(tab_Stats);
+    if (table_STAT_Values->columnCount() < 2)
+        table_STAT_Values->setColumnCount(2);
+    QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
+    table_STAT_Values->setHorizontalHeaderItem(0, __qtablewidgetitem12);
+    QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
+    table_STAT_Values->setHorizontalHeaderItem(1, __qtablewidgetitem13);
+    table_STAT_Values->setObjectName("table_STAT_Values");
+    table_STAT_Values->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_STAT_Values->setProperty("showDropIndicator", QVariant(false));
+    table_STAT_Values->setDragDropOverwriteMode(false);
+    table_STAT_Values->setAlternatingRowColors(true);
+    table_STAT_Values->setSortingEnabled(true);
+    table_STAT_Values->setCornerButtonEnabled(false);
+    table_STAT_Values->horizontalHeader()->setCascadingSectionResizes(true);
+    table_STAT_Values->horizontalHeader()->setDefaultSectionSize(180);
+
+    gridLayout_11->addWidget(table_STAT_Values, 1, 1, 1, 1);
 
     tabWidget_2->addTab(tab_Stats, QString());
     tab_Shell = new QWidget();
@@ -1080,16 +1090,16 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_21->setText(QCoreApplication::translate("Form", "Response:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Bootloader), QCoreApplication::translate("Form", "Bootloader", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_OS), QCoreApplication::translate("Form", "OS", nullptr));
-    label_15->setText(QCoreApplication::translate("Form", "Group:", nullptr));
+    lbl_STAT_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    radio_STAT_List->setText(QCoreApplication::translate("Form", "List Groups", nullptr));
+    radio_STAT_Fetch->setText(QCoreApplication::translate("Form", "Fetch Stats", nullptr));
+    btn_STAT_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     label_16->setText(QCoreApplication::translate("Form", "Values:", nullptr));
+    label_15->setText(QCoreApplication::translate("Form", "Group:", nullptr));
     QTableWidgetItem *___qtablewidgetitem12 = table_STAT_Values->horizontalHeaderItem(0);
     ___qtablewidgetitem12->setText(QCoreApplication::translate("Form", "Name", nullptr));
     QTableWidgetItem *___qtablewidgetitem13 = table_STAT_Values->horizontalHeaderItem(1);
     ___qtablewidgetitem13->setText(QCoreApplication::translate("Form", "Value", nullptr));
-    radio_STAT_List->setText(QCoreApplication::translate("Form", "List Groups", nullptr));
-    radio_STAT_Fetch->setText(QCoreApplication::translate("Form", "Fetch Stats", nullptr));
-    lbl_STAT_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    btn_STAT_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Stats), QCoreApplication::translate("Form", "Stats", nullptr));
     btn_SHELL_Clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
     btn_SHELL_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
@@ -1143,10 +1153,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
     connect(btn_FS_Go, SIGNAL(clicked()), this, SLOT(on_btn_FS_Go_clicked()));
-    connect(radio_FS_Upload, SIGNAL(clicked()), this, SLOT(on_radio_FS_Upload_clicked()));
-    connect(radio_FS_Download, SIGNAL(clicked()), this, SLOT(on_radio_FS_Download_clicked()));
-    connect(radio_FS_Size, SIGNAL(clicked()), this, SLOT(on_radio_FS_Size_clicked()));
-    connect(radio_FS_HashChecksum, SIGNAL(clicked()), this, SLOT(on_radio_FS_HashChecksum_clicked()));
+    connect(radio_FS_Upload, SIGNAL(toggled(bool)), this, SLOT(on_radio_FS_Upload_toggled(bool)));
+    connect(radio_FS_Download, SIGNAL(toggled(bool)), this, SLOT(on_radio_FS_Download_toggled(bool)));
+    connect(radio_FS_Size, SIGNAL(toggled(bool)), this, SLOT(on_radio_FS_Size_toggled(bool)));
+    connect(radio_FS_HashChecksum, SIGNAL(toggled(bool)), this, SLOT(on_radio_FS_HashChecksum_toggled(bool)));
+    connect(radio_FS_Hash_Checksum_Types, SIGNAL(toggled(bool)), this, SLOT(on_radio_FS_Hash_Checksum_Types_toggled(bool)));
     connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
     connect(radio_IMG_No_Action, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_No_Action_toggled(bool)));
@@ -1397,12 +1408,12 @@ void plugin_mcumgr::on_btn_FS_Local_clicked()
     if (radio_FS_Upload->isChecked())
     {
         //TODO: load path
-        filename = QFileDialog::getOpenFileName(parent_window, "Select source/target file for transfer", "", "All Files (*)");
+        filename = QFileDialog::getOpenFileName(parent_window, "Select source file for transfer", "", "All Files (*)");
     }
     else
     {
         //TODO: load path
-        filename = QFileDialog::getSaveFileName(parent_window, "Select source/target file for transfer", "", "All Files (*)");
+        filename = QFileDialog::getSaveFileName(parent_window, "Select target file for transfer", "", "All Files (*)");
     }
 
     if (!filename.isEmpty())
@@ -1414,7 +1425,6 @@ void plugin_mcumgr::on_btn_FS_Local_clicked()
 void plugin_mcumgr::on_btn_FS_Go_clicked()
 {
     bool started = false;
-    bool reset_status = false;
 
     if (claim_transport(lbl_FS_Status) == false)
     {
@@ -1423,50 +1433,98 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
 
     if (radio_FS_Upload->isChecked())
     {
-        mode = ACTION_FS_UPLOAD;
-        processor->set_transport(active_transport());
-        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.fs_mgmt->start_upload(edit_FS_Local->text(), edit_FS_Remote->text());
-
-        if (started == true)
+        if (edit_FS_Local->text().isEmpty())
         {
-            lbl_FS_Status->setText("Uploading...");
+            lbl_FS_Status->setText("Error: Local file name is required");
+        }
+        else if (edit_FS_Remote->text().isEmpty())
+        {
+            lbl_FS_Status->setText("Error: Remote file name is required");
+        }
+        else if (!QFile(edit_FS_Local->text()).exists())
+        {
+            lbl_FS_Status->setText("Error: Local file must exist");
+        }
+        else
+        {
+            mode = ACTION_FS_UPLOAD;
+            processor->set_transport(active_transport());
+            smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.fs_mgmt->start_upload(edit_FS_Local->text(), edit_FS_Remote->text());
+
+            if (started == true)
+            {
+                lbl_FS_Status->setText("Uploading...");
+            }
         }
     }
     else if (radio_FS_Download->isChecked())
     {
-        mode = ACTION_FS_DOWNLOAD;
-        processor->set_transport(active_transport());
-        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.fs_mgmt->start_download(edit_FS_Remote->text(), edit_FS_Local->text());
-
-        if (started == true)
+        if (edit_FS_Local->text().isEmpty())
         {
-            lbl_FS_Status->setText("Downloading...");
+            lbl_FS_Status->setText("Error: Local file name is required");
+        }
+        else if (edit_FS_Remote->text().isEmpty())
+        {
+            lbl_FS_Status->setText("Error: Remote file name is required");
+        }
+        else if (!QFile(edit_FS_Local->text()).exists())
+        {
+            lbl_FS_Status->setText("Error: Local file must exist");
+        }
+        else
+        {
+            mode = ACTION_FS_DOWNLOAD;
+            processor->set_transport(active_transport());
+            smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.fs_mgmt->start_download(edit_FS_Remote->text(), edit_FS_Local->text());
+
+            if (started == true)
+            {
+                lbl_FS_Status->setText("Downloading...");
+            }
         }
     }
     else if (radio_FS_Size->isChecked())
     {
-        mode = ACTION_FS_STATUS;
-        processor->set_transport(active_transport());
-        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.fs_mgmt->start_status(edit_FS_Remote->text());
-
-        if (started == true)
+        if (edit_FS_Remote->text().isEmpty())
         {
-            lbl_FS_Status->setText("Statusing...");
+            lbl_FS_Status->setText("Error: Remote file name is required");
+        }
+        else
+        {
+            mode = ACTION_FS_STATUS;
+            processor->set_transport(active_transport());
+            smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.fs_mgmt->start_status(edit_FS_Remote->text());
+
+            if (started == true)
+            {
+                lbl_FS_Status->setText("Statusing...");
+            }
         }
     }
     else if (radio_FS_HashChecksum->isChecked())
     {
-        mode = ACTION_FS_HASH_CHECKSUM;
-        processor->set_transport(active_transport());
-        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.fs_mgmt->start_hash_checksum(edit_FS_Remote->text(), combo_FS_Hash_Checksum->currentText());
-
-        if (started == true)
+        if (edit_FS_Remote->text().isEmpty())
         {
-            lbl_FS_Status->setText("Hashing...");
+            lbl_FS_Status->setText("Error: Remote file name is required");
+        }
+        else if (edit_FS_Remote->text().isEmpty())
+        {
+            lbl_FS_Status->setText("Error: Hash/checksum type is required");
+        }
+        else
+        {
+            mode = ACTION_FS_HASH_CHECKSUM;
+            processor->set_transport(active_transport());
+            smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.fs_mgmt->start_hash_checksum(edit_FS_Remote->text(), combo_FS_Hash_Checksum->currentText());
+
+            if (started == true)
+            {
+                lbl_FS_Status->setText("Hashing...");
+            }
         }
     }
     else if (radio_FS_Hash_Checksum_Types->isChecked())
@@ -1486,26 +1544,50 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     {
         progress_FS_Complete->setValue(0);
     }
-    else if (reset_status == true)
+    else
     {
         relase_transport();
     }
 }
 
-void plugin_mcumgr::on_radio_FS_Upload_clicked()
+void plugin_mcumgr::on_radio_FS_Upload_toggled(bool checked)
 {
+    edit_FS_Local->setEnabled(true);
+    btn_FS_Local->setEnabled(true);
+    edit_FS_Remote->setEnabled(true);
+    combo_FS_Hash_Checksum->setEnabled(false);
 }
 
-void plugin_mcumgr::on_radio_FS_Download_clicked()
+void plugin_mcumgr::on_radio_FS_Download_toggled(bool checked)
 {
+    edit_FS_Local->setEnabled(true);
+    btn_FS_Local->setEnabled(true);
+    edit_FS_Remote->setEnabled(true);
+    combo_FS_Hash_Checksum->setEnabled(false);
 }
 
-void plugin_mcumgr::on_radio_FS_Size_clicked()
+void plugin_mcumgr::on_radio_FS_Size_toggled(bool checked)
 {
+    edit_FS_Local->setEnabled(false);
+    btn_FS_Local->setEnabled(false);
+    edit_FS_Remote->setEnabled(true);
+    combo_FS_Hash_Checksum->setEnabled(false);
 }
 
-void plugin_mcumgr::on_radio_FS_HashChecksum_clicked()
+void plugin_mcumgr::on_radio_FS_HashChecksum_toggled(bool checked)
 {
+    edit_FS_Local->setEnabled(false);
+    btn_FS_Local->setEnabled(false);
+    edit_FS_Remote->setEnabled(true);
+    combo_FS_Hash_Checksum->setEnabled(true);
+}
+
+void plugin_mcumgr::on_radio_FS_Hash_Checksum_Types_toggled(bool checked)
+{
+    edit_FS_Local->setEnabled(false);
+    btn_FS_Local->setEnabled(false);
+    edit_FS_Remote->setEnabled(false);
+    combo_FS_Hash_Checksum->setEnabled(true);
 }
 
 void plugin_mcumgr::on_btn_IMG_Local_clicked()
@@ -1521,7 +1603,6 @@ void plugin_mcumgr::on_btn_IMG_Local_clicked()
 void plugin_mcumgr::on_btn_IMG_Go_clicked()
 {
     bool started = false;
-    bool reset_status = false;
 
     if (claim_transport(lbl_IMG_Status) == false)
     {
@@ -1531,14 +1612,25 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
     if (tabWidget_3->currentWidget() == tab_IMG_Upload)
     {
         //Upload
-        mode = ACTION_IMG_UPLOAD;
-        processor->set_transport(active_transport());
-        smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.img_mgmt->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
-
-        if (started == true)
+        if (edit_IMG_Local->text().isEmpty())
         {
-            lbl_IMG_Status->setText("Uploading...");
+            lbl_IMG_Status->setText("Error: No file provided");
+        }
+        else if (!QFile(edit_IMG_Local->text()).exists())
+        {
+            lbl_IMG_Status->setText("Error: File does not exist");
+        }
+        else
+        {
+            mode = ACTION_IMG_UPLOAD;
+            processor->set_transport(active_transport());
+            smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.img_mgmt->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
+
+            if (started == true)
+            {
+                lbl_IMG_Status->setText("Uploading...");
+            }
         }
     }
     else if (tabWidget_3->currentWidget() == tab_IMG_Images)
@@ -1608,15 +1700,11 @@ finished:
                 else
                 {
                     lbl_IMG_Status->setText("Could not find item bounds");
-                    started = false;
-                    reset_status = true;
                 }
             }
             else
             {
                 lbl_IMG_Status->setText("Invalid selection");
-                started = false;
-                reset_status = true;
             }
         }
     }
@@ -1638,7 +1726,7 @@ finished:
     {
         progress_IMG_Complete->setValue(0);
     }
-    else if (reset_status == true)
+    else
     {
         relase_transport();
     }
@@ -1655,7 +1743,6 @@ void plugin_mcumgr::on_btn_IMG_Preview_Copy_clicked()
 void plugin_mcumgr::on_btn_OS_Go_clicked()
 {
     bool started = false;
-    bool reset_status = false;
 
     if (claim_transport(lbl_OS_Status) == false)
     {
@@ -1664,19 +1751,22 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
 
     if (selector_OS->currentWidget() == tab_OS_Echo)
     {
-        edit_OS_Echo_Output->clear();
-        mode = ACTION_OS_ECHO;
-        processor->set_transport(active_transport());
-        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.os_mgmt->start_echo(edit_OS_Echo_Input->toPlainText());
-
-        if (started == true)
+        if (edit_OS_Echo_Input->toPlainText().isEmpty())
         {
-            lbl_OS_Status->setText("Echo command sent...");
+            lbl_OS_Status->setText("Error: No text to echo");
         }
         else
         {
-            reset_status = true;
+            edit_OS_Echo_Output->clear();
+            mode = ACTION_OS_ECHO;
+            processor->set_transport(active_transport());
+            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.os_mgmt->start_echo(edit_OS_Echo_Input->toPlainText());
+
+            if (started == true)
+            {
+                lbl_OS_Status->setText("Echo command sent...");
+            }
         }
     }
     else if (selector_OS->currentWidget() == tab_OS_Tasks)
@@ -1690,10 +1780,6 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         {
             lbl_OS_Status->setText("Task list command sent...");
         }
-        else
-        {
-            reset_status = true;
-        }
     }
     else if (selector_OS->currentWidget() == tab_OS_Memory)
     {
@@ -1706,10 +1792,6 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         {
             lbl_OS_Status->setText("Memory pool list command sent...");
         }
-        else
-        {
-            reset_status = true;
-        }
     }
     else if (selector_OS->currentWidget() == tab_OS_Reset)
     {
@@ -1721,10 +1803,6 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         if (started == true)
         {
             lbl_OS_Status->setText("Reset command...");
-        }
-        else
-        {
-            reset_status = true;
         }
     }
     else if (selector_OS->currentWidget() == tab_OS_Info)
@@ -1741,10 +1819,6 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             {
                 lbl_OS_Status->setText("uname command sent...");
             }
-            else
-            {
-                reset_status = true;
-            }
         }
         else
         {
@@ -1757,10 +1831,6 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             if (started == true)
             {
                 lbl_OS_Status->setText("MCUmgr buffer command sent...");
-            }
-            else
-            {
-                reset_status = true;
             }
         }
     }
@@ -1776,13 +1846,9 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         {
             lbl_OS_Status->setText("bootloader info command sent...");
         }
-        else
-        {
-            reset_status = true;
-        }
     }
 
-    if (reset_status == true)
+    if (started == false)
     {
         relase_transport();
     }
@@ -1792,7 +1858,6 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
 {
     //Execute shell command
     bool started = false;
-    bool reset_status = false;
 
     if (claim_transport(lbl_SHELL_Status) == false)
     {
@@ -1820,7 +1885,6 @@ void plugin_mcumgr::on_btn_SHELL_Go_clicked()
 void plugin_mcumgr::on_btn_STAT_Go_clicked()
 {
     bool started = false;
-    bool reset_status = false;
 
     if (claim_transport(lbl_STAT_Status) == false)
     {
@@ -1840,21 +1904,28 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
             lbl_STAT_Status->setText("Stat list command sent...");
         }
     }
-    else if (radio_STAT_Fetch->isChecked() && !combo_STAT_Group->currentText().isEmpty())
+    else if (radio_STAT_Fetch->isChecked())
     {
         //Execute stat get command
-        mode = ACTION_STAT_GROUP_DATA;
-        processor->set_transport(active_transport());
-        smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.stat_mgmt->start_group_data(combo_STAT_Group->currentText(), &stat_list);
-
-        if (started == true)
+        if (combo_STAT_Group->currentText().isEmpty())
         {
-            lbl_STAT_Status->setText("Stat get command sent...");
+            lbl_STAT_Status->setText("Error: No group name provided");
+        }
+        else
+        {
+            mode = ACTION_STAT_GROUP_DATA;
+            processor->set_transport(active_transport());
+            smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.stat_mgmt->start_group_data(combo_STAT_Group->currentText(), &stat_list);
+
+            if (started == true)
+            {
+                lbl_STAT_Status->setText("Stat get command sent...");
+            }
         }
     }
 
-    if (reset_status == true)
+    if (started == false)
     {
         relase_transport();
     }
@@ -2221,22 +2292,40 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             qDebug() << "complete";
             if (user_data == ACTION_STAT_GROUP_DATA)
             {
-                uint8_t i = 0;
+                uint16_t i = 0;
+                uint16_t l = table_STAT_Values->rowCount();
 
-//TODO: optimise
-                table_STAT_Values->clearContents();
+                table_STAT_Values->setSortingEnabled(false);
 
                 while (i < stat_list.length())
                 {
-                    QTableWidgetItem *row_name = new QTableWidgetItem(stat_list[i].name);
-                    QTableWidgetItem *row_value = new QTableWidgetItem(QString::number(stat_list[i].value));
+                    if (i >= l)
+                    {
+                        table_STAT_Values->insertRow(i);
 
-                    table_STAT_Values->insertRow(table_STAT_Values->rowCount());
-                    table_STAT_Values->setItem((table_STAT_Values->rowCount() - 1), 0, row_name);
-                    table_STAT_Values->setItem((table_STAT_Values->rowCount() - 1), 1, row_value);
+                        QTableWidgetItem *row_name = new QTableWidgetItem(stat_list[i].name);
+                        QTableWidgetItem *row_value = new QTableWidgetItem(QString::number(stat_list[i].value));
+
+
+                        table_STAT_Values->setItem(i, 0, row_name);
+                        table_STAT_Values->setItem(i, 1, row_value);
+                    }
+                    else
+                    {
+                        table_STAT_Values->item(i, 0)->setText(stat_list[i].name);
+                        table_STAT_Values->item(i, 1)->setText(QString::number(stat_list[i].value));
+                    }
 
                     ++i;
                 }
+
+                while (i < l)
+                {
+                    table_STAT_Values->removeRow((table_STAT_Values->rowCount() - 1));
+                    ++i;
+                }
+
+                table_STAT_Values->setSortingEnabled(true);
             }
             else if (user_data == ACTION_STAT_LIST_GROUPS)
             {
@@ -2566,7 +2655,6 @@ void plugin_mcumgr::on_radio_settings_save_toggled(bool checked)
 void plugin_mcumgr::on_btn_settings_go_clicked()
 {
     bool started = false;
-    bool reset_status = false;
 
     if (claim_transport(lbl_settings_status) == false)
     {
@@ -2575,38 +2663,59 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
 
     if (radio_settings_read->isChecked())
     {
-        mode = ACTION_SETTINGS_READ;
-        processor->set_transport(active_transport());
-        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.settings_mgmt->start_read(edit_settings_key->text(), 0, &settings_read_response);
-
-        if (started == true)
+        if (edit_settings_key->text().isEmpty())
         {
-            lbl_settings_status->setText("Reading...");
+            lbl_settings_status->setText("Error: Key is required");
+        }
+        else
+        {
+            mode = ACTION_SETTINGS_READ;
+            processor->set_transport(active_transport());
+            smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.settings_mgmt->start_read(edit_settings_key->text(), 0, &settings_read_response);
+
+            if (started == true)
+            {
+                lbl_settings_status->setText("Reading...");
+            }
         }
     }
     else if (radio_settings_write->isChecked())
     {
-        mode = ACTION_SETTINGS_WRITE;
-        processor->set_transport(active_transport());
-        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.settings_mgmt->start_write(edit_settings_key->text(), edit_settings_value->text().toUtf8());
-
-        if (started == true)
+        if (edit_settings_key->text().isEmpty())
         {
-            lbl_settings_status->setText("Writing...");
+            lbl_settings_status->setText("Error: Key is required");
+        }
+        else
+        {
+            mode = ACTION_SETTINGS_WRITE;
+            processor->set_transport(active_transport());
+            smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.settings_mgmt->start_write(edit_settings_key->text(), edit_settings_value->text().toUtf8());
+
+            if (started == true)
+            {
+                lbl_settings_status->setText("Writing...");
+            }
         }
     }
     else if (radio_settings_delete->isChecked())
     {
-        mode = ACTION_SETTINGS_DELETE;
-        processor->set_transport(active_transport());
-        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-        started = smp_groups.settings_mgmt->start_delete(edit_settings_key->text());
-
-        if (started == true)
+        if (edit_settings_key->text().isEmpty())
         {
-            lbl_settings_status->setText("Deleting...");
+            lbl_settings_status->setText("Error: Key is required");
+        }
+        else
+        {
+            mode = ACTION_SETTINGS_DELETE;
+            processor->set_transport(active_transport());
+            smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.settings_mgmt->start_delete(edit_settings_key->text());
+
+            if (started == true)
+            {
+                lbl_settings_status->setText("Deleting...");
+            }
         }
     }
     else if (radio_settings_commit->isChecked())
@@ -2646,7 +2755,7 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
         }
     }
 
-    if (reset_status == true)
+    if (started == false)
     {
         relase_transport();
     }
