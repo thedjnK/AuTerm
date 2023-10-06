@@ -22,6 +22,7 @@
 *******************************************************************************/
 #include <QApplication>
 #include <QClipboard>
+#include <QMessageBox>
 #include "plugin_logger.h"
 #include "ui_plugin_logger.h"
 
@@ -30,6 +31,7 @@ plugin_logger::plugin_logger(QWidget *parent) :
     ui(new Ui::plugin_logger)
 {
     ui->setupUi(this);
+    this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
 }
 
 plugin_logger::~plugin_logger()
@@ -39,7 +41,6 @@ plugin_logger::~plugin_logger()
 
 void plugin_logger::setup(QMainWindow *main_window)
 {
-    this->show();
 }
 
 const QString plugin_logger::plugin_about()
@@ -49,7 +50,16 @@ const QString plugin_logger::plugin_about()
 
 bool plugin_logger::plugin_configuration()
 {
-    return false;
+    if (QMessageBox::question(this, "Show logger?", "Enable log window?", QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    {
+        this->show();
+    }
+    else
+    {
+        this->hide();
+    }
+
+    return true;
 }
 
 QWidget *plugin_logger::GetWidget()

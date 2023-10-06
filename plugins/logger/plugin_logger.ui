@@ -2,13 +2,19 @@
 <ui version="4.0">
  <class>plugin_logger</class>
  <widget class="QWidget" name="plugin_logger">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>280</height>
+    <width>280</width>
+    <height>261</height>
    </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
   </property>
   <property name="windowTitle">
    <string>Logger</string>
