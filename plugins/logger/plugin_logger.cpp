@@ -32,6 +32,17 @@ plugin_logger::plugin_logger(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
+
+    //Set checkbox text colour to match that of the conditions
+    QPalette palette = ui->check_error->palette();
+    palette.setColor(QPalette::WindowText, error_text_colour);
+    ui->check_error->setPalette(palette);
+    palette.setColor(QPalette::WindowText, warning_text_colour);
+    ui->check_warning->setPalette(palette);
+    palette.setColor(QPalette::WindowText, information_text_colour);
+    ui->check_information->setPalette(palette);
+    palette.setColor(QPalette::WindowText, debug_text_colour);
+    ui->check_debug->setPalette(palette);
 }
 
 plugin_logger::~plugin_logger()
