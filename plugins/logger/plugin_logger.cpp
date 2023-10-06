@@ -106,6 +106,9 @@ void plugin_logger::log_level_enabled(enum log_level_types type, bool *enabled)
 void plugin_logger::log_message(enum log_level_types type, QString sender, QString message)
 {
     bool log;
+    QBrush new_colour;
+    QTextCursor text_cursor;
+    QTextCharFormat text_format;
 
     log_level_enabled(type, &log);
 
@@ -114,6 +117,40 @@ void plugin_logger::log_message(enum log_level_types type, QString sender, QStri
         return;
     }
 
+    switch (type)
+    {
+        case log_level_error:
+        {
+            new_colour = QBrush(error_text_colour);
+            break;
+        }
+        case log_level_warning:
+        {
+            new_colour = QBrush(warning_text_colour);
+            break;
+        }
+        case log_level_information:
+        {
+            new_colour = QBrush(information_text_colour);
+            break;
+        }
+        case log_level_debug:
+        {
+            new_colour = QBrush(debug_text_colour);
+            break;
+        }
+        default:
+        {
+            return;
+        }
+    }
+
+    text_cursor = ui->edit_log->textCursor();
+    text_format = text_cursor.charFormat();
+    text_format.setForeground(new_colour);
+    text_cursor.setCharFormat(text_format);
+
+    ui->edit_log->setTextCursor(text_cursor);
     ui->edit_log->appendPlainText(message);
 }
 

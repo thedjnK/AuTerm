@@ -24,6 +24,7 @@
 #define PLUGIN_LOGGER_H
 
 #include <QWidget>
+#include <QColor>
 #include "AutPlugin.h"
 
 namespace Ui {
@@ -61,6 +62,10 @@ private slots:
 
 private:
     Ui::plugin_logger *ui;
+    const QColor error_text_colour = QColor::fromRgb(255, 10, 10);
+    const QColor warning_text_colour = QColor::fromRgb(255, 220, 0);
+    const QColor information_text_colour = QColor::fromRgb(10, 200, 10);
+    const QColor debug_text_colour = QColor::fromRgb(120, 120, 120);
 };
 
 #endif // PLUGIN_LOGGER_H
