@@ -9,22 +9,22 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     AutEscape.cpp \
+    AutMainWindow.cpp \
     AutPlugin.cpp \
     AutScrollEdit.cpp \
-    UwxMainWindow.cpp \
     UwxPopup.cpp \
     LrdLogger.cpp
 
 HEADERS  += \
     AutEscape.h \
+    AutMainWindow.h \
     AutScrollEdit.h \
-    UwxMainWindow.h \
     UwxPopup.h \
     LrdLogger.h \
 
 FORMS    += \
-    UwxPopup.ui \
-    UwxMainWindow.ui
+    AutMainWindow.ui \
+    UwxPopup.ui
 
 RESOURCES += \
     AuTermImages.qrc
@@ -94,5 +94,21 @@ CONFIG(release, debug|release) {
 		else:unix: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
             }
         }
+
+	!contains(DEFINES, SKIPPLUGIN_LOGGER) {
+	    exists(../plugins/logger) {
+		DEFINES += "STATICPLUGIN_LOGGER"
+
+		win32: LIBS += -L$$DESTDIR -lplugin_logger
+		else:unix: LIBS += -L$$DESTDIR -lplugin_logger
+
+#INCLUDEPATH += $$PWD/../plugins
+#DEPENDPATH += $$PWD/../plugins
+
+		win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
+		else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_logger.lib
+		else:unix: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
+	    }
+	}
     }
 }

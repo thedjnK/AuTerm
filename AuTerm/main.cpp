@@ -24,7 +24,7 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "UwxMainWindow.h"
+#include "AutMainWindow.h"
 #include <QApplication>
 #include <QCommandLineParser>
 #if TARGET_OS_MAC
@@ -44,7 +44,7 @@ main(
     //Fix for Mac to stop bad styling
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 #endif
-    MainWindow w;
+    AutMainWindow w;
     w.show();
 
     return a.exec();

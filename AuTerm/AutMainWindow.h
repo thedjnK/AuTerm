@@ -1,9 +1,10 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: UwxMainWindow.h
+** Module: AutMainWindow.h
 **
 ** Notes:
 **
@@ -20,8 +21,10 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef UWXMAINWINDOW_H
-#define UWXMAINWINDOW_H
+#ifndef AUTMAINWINDOW_H
+#define AUTMAINWINDOW_H
+
+#define AUTERM_APPLICATION
 
 /******************************************************************************/
 // Include Files
@@ -179,7 +182,7 @@ const QChar NEWLINE                             = '\n';
 /******************************************************************************/
 namespace Ui
 {
-    class MainWindow;
+    class AutMainWindow;
 }
 
 //Enum used for specifying type of data
@@ -213,15 +216,15 @@ struct plugins {
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class MainWindow : public QMainWindow
+class AutMainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(
+    explicit AutMainWindow(
         QWidget *parent = 0
         );
-    ~MainWindow(
+    ~AutMainWindow(
         );
 
 public slots:
@@ -346,6 +349,10 @@ private slots:
         bool hide_terminal_output,
         bool *accepted
         );
+    void
+    find_plugin(
+        QString name
+        );
 #endif
     void
     on_radio_vt100_ignore_toggled(
@@ -362,6 +369,14 @@ private slots:
 
 #ifndef SKIPPLUGINS
     void on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *);
+
+signals:
+    void plugin_serial_receive(QByteArray *data);
+    void plugin_serial_error(QSerialPort::SerialPortError speErrorCode);
+    void plugin_serial_bytes_written(qint64 intByteCount);
+    void plugin_serial_about_to_close();
+    void plugin_serial_opened();
+    void plugin_serial_closed();
 
 public slots:
     void
@@ -381,7 +396,7 @@ public slots:
 #endif
 
 private:
-    Ui::MainWindow *ui;
+    Ui::AutMainWindow *ui;
     void
     RefreshSerialDevices(
         );
@@ -580,7 +595,7 @@ protected:
     void dropEvent(QDropEvent *dropEvent);
 };
 
-#endif // UWXMAINWINDOW_H
+#endif // AUTMAINWINDOW_H
 
 /******************************************************************************/
 // END OF FILE

@@ -1136,6 +1136,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_orig->addTab(tab, QString("MCUmgr"));
 
 //Signals
+    connect(parent_window, SIGNAL(plugin_serial_receive(QByteArray*)), this, SLOT(serial_receive(QByteArray*)));
+    connect(parent_window, SIGNAL(plugin_serial_error(QSerialPort::SerialPortError)), this, SLOT(serial_error(QSerialPort::SerialPortError)));
+    connect(parent_window, SIGNAL(plugin_serial_bytes_written(qint64)), this, SLOT(serial_bytes_written(qint64)));
+    connect(parent_window, SIGNAL(plugin_serial_about_to_close()), this, SLOT(serial_about_to_close()));
+    connect(parent_window, SIGNAL(plugin_serial_opened()), this, SLOT(serial_opened()));
+    connect(parent_window, SIGNAL(plugin_serial_closed()), this, SLOT(serial_closed()));
+
     connect(uart_transport, SIGNAL(serial_write(QByteArray*)), parent_window, SLOT(plugin_serial_transmit(QByteArray*)));
     //connect(uart, SIGNAL(receive_waiting(QByteArray)), this, SLOT(receive_waiting(QByteArray)));
     connect(uart_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));

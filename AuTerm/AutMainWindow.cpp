@@ -4,7 +4,7 @@
 **
 ** Project: AuTerm
 **
-** Module: UwxMainWindow.cpp
+** Module: AutMainWindow.cpp
 **
 ** Notes:
 **
@@ -25,8 +25,8 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "UwxMainWindow.h"
-#include "ui_UwxMainWindow.h"
+#include "AutMainWindow.h"
+#include "ui_AutMainWindow.h"
 #include <QDebug>
 
 /******************************************************************************/
@@ -75,7 +75,7 @@
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::AutMainWindow)
 {
     int32_t i = 0;
 
@@ -101,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
                 connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
                 connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
+                connect(plugin.object, SIGNAL(find_plugin(QString)), this, SLOT(find_plugin(QString)));
 
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
@@ -142,7 +143,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
                 connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
                 connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
-
+                connect(plugin.object, SIGNAL(find_plugin(QString)), this, SLOT(find_plugin(QString)));
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
 
@@ -971,7 +972,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 //=============================================================================
 //=============================================================================
-MainWindow::~MainWindow()
+AutMainWindow::~AutMainWindow()
 {
     //Disconnect all signals
     disconnect(this, SLOT(close()));
@@ -1015,10 +1016,11 @@ MainWindow::~MainWindow()
         gspSerialPort.close();
         gpSignalTimer->stop();
 #ifndef SKIPPLUGINS
-        for (int i = 0; i < plugin_list.length(); ++i)
+        /*for (int i = 0; i < plugin_list.length(); ++i)
         {
             plugin_list.at(i).plugin->serial_closed();
-        }
+        }*/
+        emit plugin_serial_closed();
         gbPluginHideTerminalOutput = false;
         gbPluginRunning = false;
 #endif
@@ -1158,7 +1160,7 @@ MainWindow::~MainWindow()
 //=============================================================================
 //=============================================================================
 void
-MainWindow::closeEvent(
+AutMainWindow::closeEvent(
     QCloseEvent *
     )
 {
@@ -1197,7 +1199,7 @@ MainWindow::closeEvent(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Connect_clicked(
+AutMainWindow::on_btn_Connect_clicked(
     )
 {
     //Connect to COM port button clicked.
@@ -1207,7 +1209,7 @@ MainWindow::on_btn_Connect_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_TermClose_clicked(
+AutMainWindow::on_btn_TermClose_clicked(
     )
 {
     if (gspSerialPort.isOpen() == false)
@@ -1301,10 +1303,11 @@ MainWindow::on_btn_TermClose_clicked(
             gspSerialPort.close();
 
 #ifndef SKIPPLUGINS
-            for (int i = 0; i < plugin_list.length(); ++i)
+            /*for (int i = 0; i < plugin_list.length(); ++i)
             {
                 plugin_list.at(i).plugin->serial_closed();
-            }
+            }*/
+            emit plugin_serial_closed();
             gbPluginHideTerminalOutput = false;
             gbPluginRunning = false;
 #endif
@@ -1376,7 +1379,7 @@ MainWindow::on_btn_TermClose_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Refresh_clicked(
+AutMainWindow::on_btn_Refresh_clicked(
     )
 {
     //Refresh the list of serial ports
@@ -1386,7 +1389,7 @@ MainWindow::on_btn_Refresh_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::RefreshSerialDevices(
+AutMainWindow::RefreshSerialDevices(
     )
 {
     //Clears and refreshes the list of serial devices
@@ -1463,7 +1466,7 @@ MainWindow::RefreshSerialDevices(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_TermClear_clicked(
+AutMainWindow::on_btn_TermClear_clicked(
     )
 {
     //Clears the screen of the terminal tab
@@ -1473,7 +1476,7 @@ MainWindow::on_btn_TermClear_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SerialRead(
+AutMainWindow::SerialRead(
     )
 {
     //Update the last received field
@@ -1561,10 +1564,11 @@ MainWindow::SerialRead(
     {
         //A plugin is running, siphon data to it
 //TODO: limit to the running plugin only
-        for (int i = 0; i < plugin_list.length(); ++i)
+        /*for (int i = 0; i < plugin_list.length(); ++i)
         {
             plugin_list.at(i).plugin->serial_receive(&baOrigData);
-        }
+        }*/
+        emit plugin_serial_receive(&baOrigData);
     }
 #endif
 }
@@ -1572,7 +1576,7 @@ MainWindow::SerialRead(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::StreamBatchContinue(
+AutMainWindow::StreamBatchContinue(
     QByteArray *baOrigData
     )
 {
@@ -1656,7 +1660,7 @@ MainWindow::StreamBatchContinue(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_text_TermEditData_customContextMenuRequested(
+AutMainWindow::on_text_TermEditData_customContextMenuRequested(
     const QPoint &pos
     )
 {
@@ -1668,7 +1672,7 @@ MainWindow::on_text_TermEditData_customContextMenuRequested(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::MenuSelected(
+AutMainWindow::MenuSelected(
     QAction* qaAction
     )
 {
@@ -2019,7 +2023,7 @@ MainWindow::MenuSelected(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::balloontriggered(
+AutMainWindow::balloontriggered(
     QAction* qaAction
     )
 {
@@ -2045,7 +2049,7 @@ MainWindow::balloontriggered(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::enter_pressed(
+AutMainWindow::enter_pressed(
     )
 {
     //Enter pressed in line mode
@@ -2097,7 +2101,7 @@ MainWindow::enter_pressed(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::UpdateImages(
+AutMainWindow::UpdateImages(
     )
 {
     //Updates images to reflect status
@@ -2124,7 +2128,7 @@ MainWindow::UpdateImages(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::key_pressed(
+AutMainWindow::key_pressed(
     int nKey,
     QChar chrKeyValue
     )
@@ -2205,7 +2209,7 @@ MainWindow::key_pressed(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::DoLineEnd(
+AutMainWindow::DoLineEnd(
     )
 {
     //Outputs a line ending
@@ -2233,7 +2237,7 @@ MainWindow::DoLineEnd(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SerialStatus(
+AutMainWindow::SerialStatus(
     bool bType
     )
 {
@@ -2291,7 +2295,7 @@ MainWindow::SerialStatus(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SerialStatusSlot(
+AutMainWindow::SerialStatusSlot(
     )
 {
     //Slot function to update serial pinout status
@@ -2301,7 +2305,7 @@ MainWindow::SerialStatusSlot(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::OpenDevice(
+AutMainWindow::OpenDevice(
     )
 {
     //Function to open serial port
@@ -2321,10 +2325,11 @@ MainWindow::OpenDevice(
             gspSerialPort.close();
 
 #ifndef SKIPPLUGINS
-            for (int i = 0; i < plugin_list.length(); ++i)
+            /*for (int i = 0; i < plugin_list.length(); ++i)
             {
                 plugin_list.at(i).plugin->serial_closed();
-            }
+            }*/
+            emit plugin_serial_closed();
             gbPluginHideTerminalOutput = false;
             gbPluginRunning = false;
 #endif
@@ -2549,7 +2554,7 @@ MainWindow::OpenDevice(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_Break_stateChanged(
+AutMainWindow::on_check_Break_stateChanged(
     )
 {
     //Break status changed
@@ -2559,7 +2564,7 @@ MainWindow::on_check_Break_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_RTS_stateChanged(
+AutMainWindow::on_check_RTS_stateChanged(
     )
 {
     //RTS status changed
@@ -2576,7 +2581,7 @@ MainWindow::on_check_RTS_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_DTR_stateChanged(
+AutMainWindow::on_check_DTR_stateChanged(
     )
 {
     //DTR status changed
@@ -2593,7 +2598,7 @@ MainWindow::on_check_DTR_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_Line_stateChanged(
+AutMainWindow::on_check_Line_stateChanged(
     )
 {
     //Line mode status changed
@@ -2603,7 +2608,7 @@ MainWindow::on_check_Line_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SerialError(
+AutMainWindow::SerialError(
     QSerialPort::SerialPortError speErrorCode
     )
 {
@@ -2620,10 +2625,11 @@ MainWindow::SerialError(
     {
         //No error. Why this is ever emitted is a mystery to me.
 #ifndef SKIPPLUGINS
-        for (int i = 0; i < plugin_list.length(); ++i)
+        /*for (int i = 0; i < plugin_list.length(); ++i)
         {
             plugin_list.at(i).plugin->serial_opened();
-        }
+        }*/
+        emit plugin_serial_opened();
 #endif
         return;
     }
@@ -2783,17 +2789,19 @@ MainWindow::SerialError(
     }
 
 #ifndef SKIPPLUGINS
-    for (int i = 0; i < plugin_list.length(); ++i)
+    /*for (int i = 0; i < plugin_list.length(); ++i)
     {
         plugin_list.at(i).plugin->serial_error(speErrorCode);
-    }
+    }*/
+    emit plugin_serial_error(speErrorCode);
 
     if (port_closed == true)
     {
-        for (int i = 0; i < plugin_list.length(); ++i)
+        /*for (int i = 0; i < plugin_list.length(); ++i)
         {
             plugin_list.at(i).plugin->serial_closed();
-        }
+        }*/
+        emit plugin_serial_closed();
 
         gbPluginHideTerminalOutput = false;
         gbPluginRunning = false;
@@ -2804,7 +2812,7 @@ MainWindow::SerialError(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Duplicate_clicked(
+AutMainWindow::on_btn_Duplicate_clicked(
     )
 {
     //Duplicates instance of AuTerm
@@ -2815,7 +2823,7 @@ MainWindow::on_btn_Duplicate_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::MessagePass(
+AutMainWindow::MessagePass(
     QByteArray baDataString,
     bool bEscapeString,
     bool bFromScripting
@@ -2875,7 +2883,7 @@ MainWindow::MessagePass(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::LookupErrorCode(
+AutMainWindow::LookupErrorCode(
     unsigned int intErrorCode
     )
 {
@@ -2901,7 +2909,7 @@ MainWindow::LookupErrorCode(
 //=============================================================================
 //=============================================================================
 QString
-MainWindow::LookupErrorCodeXCompile(
+AutMainWindow::LookupErrorCodeXCompile(
     unsigned int intErrorCode
     )
 {
@@ -2912,7 +2920,7 @@ MainWindow::LookupErrorCodeXCompile(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SerialBytesWritten(
+AutMainWindow::SerialBytesWritten(
     qint64 intByteCount
     )
 {
@@ -2980,17 +2988,18 @@ MainWindow::SerialBytesWritten(
     }
 
 #ifndef SKIPPLUGINS
-    for (int i = 0; i < plugin_list.length(); ++i)
+    /*for (int i = 0; i < plugin_list.length(); ++i)
     {
         plugin_list.at(i).plugin->serial_bytes_written(intByteCount);
-    }
+    }*/
+    emit plugin_serial_bytes_written(intByteCount);
 #endif
 }
 
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Cancel_clicked(
+AutMainWindow::on_btn_Cancel_clicked(
     )
 {
     //Cancel current stream or file download
@@ -3015,7 +3024,7 @@ MainWindow::on_btn_Cancel_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::FinishStream(
+AutMainWindow::FinishStream(
     bool bType
     )
 {
@@ -3052,7 +3061,7 @@ MainWindow::FinishStream(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::FinishBatch(
+AutMainWindow::FinishBatch(
     bool bType
     )
 {
@@ -3091,7 +3100,7 @@ MainWindow::FinishBatch(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::UpdateReceiveText(
+AutMainWindow::UpdateReceiveText(
     )
 {
     //Updates the receive text buffer
@@ -3110,7 +3119,7 @@ MainWindow::UpdateReceiveText(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::BatchTimeoutSlot(
+AutMainWindow::BatchTimeoutSlot(
     )
 {
     //A response to a batch command has timed out
@@ -3130,7 +3139,7 @@ MainWindow::BatchTimeoutSlot(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_combo_COM_currentIndexChanged(
+AutMainWindow::on_combo_COM_currentIndexChanged(
     int
     )
 {
@@ -3170,7 +3179,7 @@ MainWindow::on_combo_COM_currentIndexChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::dragEnterEvent(
+AutMainWindow::dragEnterEvent(
     QDragEnterEvent *dragEvent
     )
 {
@@ -3190,7 +3199,7 @@ MainWindow::dragEnterEvent(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::dropEvent(
+AutMainWindow::dropEvent(
     QDropEvent *dropEvent
     )
 {
@@ -3218,7 +3227,7 @@ MainWindow::dropEvent(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Github_clicked(
+AutMainWindow::on_btn_Github_clicked(
     )
 {
     //Open webpage at the AuTerm github page)
@@ -3368,7 +3377,7 @@ MainWindow::replyFinished(
 //=============================================================================
 #ifdef UseSSL
 void
-MainWindow::sslErrors(
+AutMainWindow::sslErrors(
     QNetworkReply* nrReply,
     QList<QSslError> lstSSLErrors
     )
@@ -3385,7 +3394,7 @@ MainWindow::sslErrors(
 //=============================================================================
 //=============================================================================
 QList<QString>
-MainWindow::SplitFilePath(
+AutMainWindow::SplitFilePath(
     QString strFilename
     )
 {
@@ -3409,7 +3418,7 @@ MainWindow::SplitFilePath(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_Echo_stateChanged(
+AutMainWindow::on_check_Echo_stateChanged(
     int
     )
 {
@@ -3420,7 +3429,7 @@ MainWindow::on_check_Echo_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_combo_PredefinedDevice_currentIndexChanged(
+AutMainWindow::on_combo_PredefinedDevice_currentIndexChanged(
     int intIndex
     )
 {
@@ -3463,7 +3472,7 @@ MainWindow::on_combo_PredefinedDevice_currentIndexChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_PredefinedAdd_clicked(
+AutMainWindow::on_btn_PredefinedAdd_clicked(
     )
 {
     //Adds a new predefined device entry
@@ -3480,7 +3489,7 @@ MainWindow::on_btn_PredefinedAdd_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_PredefinedDelete_clicked(
+AutMainWindow::on_btn_PredefinedDelete_clicked(
     )
 {
     //Remove current device configuration
@@ -3523,7 +3532,7 @@ MainWindow::on_btn_PredefinedDelete_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_SaveDevice_clicked(
+AutMainWindow::on_btn_SaveDevice_clicked(
     )
 {
     //Saves changes to a configuration
@@ -3539,7 +3548,7 @@ MainWindow::on_btn_SaveDevice_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::ContextMenuClosed(
+AutMainWindow::ContextMenuClosed(
     )
 {
     //Right click context menu closed, send message to text edit object
@@ -3550,7 +3559,7 @@ MainWindow::ContextMenuClosed(
 //=============================================================================
 //=============================================================================
 bool
-MainWindow::event(
+AutMainWindow::event(
     QEvent *evtEvent
     )
 {
@@ -3565,7 +3574,7 @@ MainWindow::event(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SerialPortClosing(
+AutMainWindow::SerialPortClosing(
     )
 {
     //Called when the serial port is closing
@@ -3594,17 +3603,18 @@ MainWindow::SerialPortClosing(
     }
 
 #ifndef SKIPPLUGINS
-    for (int i = 0; i < plugin_list.length(); ++i)
+    /*for (int i = 0; i < plugin_list.length(); ++i)
     {
         plugin_list.at(i).plugin->serial_about_to_close();
-    }
+    }*/
+    emit plugin_serial_about_to_close();
 #endif
 }
 
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_LogFileSelect_clicked(
+AutMainWindow::on_btn_LogFileSelect_clicked(
     )
 {
     //Updates the log file
@@ -3632,7 +3642,7 @@ MainWindow::on_btn_LogFileSelect_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_edit_LogFile_editingFinished(
+AutMainWindow::on_edit_LogFile_editingFinished(
     )
 {
     //Log filename has changed
@@ -3642,7 +3652,7 @@ MainWindow::on_edit_LogFile_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_LogEnable_stateChanged(
+AutMainWindow::on_check_LogEnable_stateChanged(
     int state
     )
 {
@@ -3656,7 +3666,7 @@ MainWindow::on_check_LogEnable_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_LogAppend_stateChanged(
+AutMainWindow::on_check_LogAppend_stateChanged(
     int
     )
 {
@@ -3667,7 +3677,7 @@ MainWindow::on_check_LogAppend_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Help_clicked(
+AutMainWindow::on_btn_Help_clicked(
     )
 {
     QString strMessage = "Command line options are:-\r\n\r\nCOM=n\r\n    Windows: COM[1..255] specifies a comport number\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\nr\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=\\r, 1=\\n, 2=\\r\\n]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \\t,\\r,\\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \\00 can be used to represent a null character and \\4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/"
@@ -3692,7 +3702,7 @@ MainWindow::on_btn_Help_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_combo_LogDirectory_currentIndexChanged(
+AutMainWindow::on_combo_LogDirectory_currentIndexChanged(
     int
     )
 {
@@ -3703,7 +3713,7 @@ MainWindow::on_combo_LogDirectory_currentIndexChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_LogRefresh_clicked(
+AutMainWindow::on_btn_LogRefresh_clicked(
     )
 {
     //Refreshes the log files available for viewing
@@ -3750,7 +3760,7 @@ MainWindow::on_btn_LogRefresh_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Licenses_clicked(
+AutMainWindow::on_btn_Licenses_clicked(
     )
 {
     //Show license text
@@ -3775,7 +3785,7 @@ MainWindow::on_btn_Licenses_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_EditViewFolder_clicked(
+AutMainWindow::on_btn_EditViewFolder_clicked(
     )
 {
     //Open application folder
@@ -3792,7 +3802,7 @@ MainWindow::on_btn_EditViewFolder_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_combo_EditFile_currentIndexChanged(
+AutMainWindow::on_combo_EditFile_currentIndexChanged(
     int
     )
 {
@@ -3886,7 +3896,7 @@ MainWindow::on_combo_EditFile_currentIndexChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_EditSave_clicked(
+AutMainWindow::on_btn_EditSave_clicked(
     )
 {
     if (ui->combo_EditFile->currentIndex() != 0)
@@ -3923,7 +3933,7 @@ MainWindow::on_btn_EditSave_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_EditLoad_clicked(
+AutMainWindow::on_btn_EditLoad_clicked(
     )
 {
     if (ui->combo_EditFile->currentIndex() != 0)
@@ -3937,7 +3947,7 @@ MainWindow::on_btn_EditLoad_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_EditExternal_clicked(
+AutMainWindow::on_btn_EditExternal_clicked(
     )
 {
     if (ui->combo_EditFile->currentIndex() == 1)
@@ -3956,7 +3966,7 @@ MainWindow::on_btn_EditExternal_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::LoadSettings(
+AutMainWindow::LoadSettings(
     )
 {
 #ifdef TARGET_OS_MAC
@@ -4078,7 +4088,7 @@ MainWindow::LoadSettings(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::UpdateSettings(
+AutMainWindow::UpdateSettings(
     int intMajor,
     int intMinor,
     QChar qcDelta
@@ -4092,7 +4102,7 @@ MainWindow::UpdateSettings(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_LogViewExternal_clicked(
+AutMainWindow::on_btn_LogViewExternal_clicked(
     )
 {
     //View log in external editor
@@ -4136,7 +4146,7 @@ MainWindow::on_btn_LogViewExternal_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_LogViewFolder_clicked(
+AutMainWindow::on_btn_LogViewFolder_clicked(
     )
 {
     //Open log folder
@@ -4169,7 +4179,7 @@ MainWindow::on_btn_LogViewFolder_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_text_EditData_textChanged(
+AutMainWindow::on_text_EditData_textChanged(
     )
 {
     //Mark file as edited
@@ -4179,7 +4189,7 @@ MainWindow::on_text_EditData_textChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_combo_LogFile_currentIndexChanged(
+AutMainWindow::on_combo_LogFile_currentIndexChanged(
     int
     )
 {
@@ -4271,7 +4281,7 @@ MainWindow::on_combo_LogFile_currentIndexChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_ReloadLog_clicked(
+AutMainWindow::on_btn_ReloadLog_clicked(
     )
 {
     //Reload log
@@ -4282,7 +4292,7 @@ MainWindow::on_btn_ReloadLog_clicked(
 //=============================================================================
 #ifdef UseSSL
 void
-MainWindow::on_check_EnableSSL_stateChanged(
+AutMainWindow::on_check_EnableSSL_stateChanged(
     int
     )
 {
@@ -4304,7 +4314,7 @@ MainWindow::on_check_EnableSSL_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_LineSeparator_stateChanged(
+AutMainWindow::on_check_LineSeparator_stateChanged(
     int
     )
 {
@@ -4319,7 +4329,7 @@ MainWindow::on_check_LineSeparator_stateChanged(
 //=============================================================================
 #ifndef SKIPERRORCODEFORM
 void
-MainWindow::on_btn_Error_clicked(
+AutMainWindow::on_btn_Error_clicked(
     )
 {
     //Open error form dialogue
@@ -4337,7 +4347,7 @@ MainWindow::on_btn_Error_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::ScriptStartRequest(
+AutMainWindow::ScriptStartRequest(
     )
 {
     //Request from scripting form to start running script
@@ -4371,7 +4381,7 @@ MainWindow::ScriptStartRequest(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::ScriptFinished(
+AutMainWindow::ScriptFinished(
     )
 {
     //Script execution has finished
@@ -4385,7 +4395,7 @@ MainWindow::ScriptFinished(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_SpeedRTS_stateChanged(
+AutMainWindow::on_check_SpeedRTS_stateChanged(
     int
     )
 {
@@ -4396,7 +4406,7 @@ MainWindow::on_check_SpeedRTS_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_SpeedDTR_stateChanged(
+AutMainWindow::on_check_SpeedDTR_stateChanged(
     int
     )
 {
@@ -4407,7 +4417,7 @@ MainWindow::on_check_SpeedDTR_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_SpeedClear_clicked(
+AutMainWindow::on_btn_SpeedClear_clicked(
     )
 {
     //Clear speed test display
@@ -4417,7 +4427,7 @@ MainWindow::on_btn_SpeedClear_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_SpeedStartStop_clicked(
+AutMainWindow::on_btn_SpeedStartStop_clicked(
     )
 {
     //Speed test start/stop button pressed
@@ -4520,7 +4530,7 @@ MainWindow::on_btn_SpeedStartStop_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_SpeedClose_clicked(
+AutMainWindow::on_btn_SpeedClose_clicked(
     )
 {
     //Close/open port on speed test page pressed
@@ -4530,7 +4540,7 @@ MainWindow::on_btn_SpeedClose_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SpeedMenuSelected(
+AutMainWindow::SpeedMenuSelected(
     QAction *qaAction
     )
 {
@@ -4690,7 +4700,7 @@ MainWindow::SpeedMenuSelected(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::OutputSpeedTestStats(
+AutMainWindow::OutputSpeedTestStats(
     )
 {
     //Output speed test (10s) stats
@@ -4748,7 +4758,7 @@ MainWindow::OutputSpeedTestStats(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_combo_SpeedDataType_currentIndexChanged(
+AutMainWindow::on_combo_SpeedDataType_currentIndexChanged(
     int
     )
 {
@@ -4801,7 +4811,7 @@ MainWindow::on_combo_SpeedDataType_currentIndexChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_SpeedCopy_clicked(
+AutMainWindow::on_btn_SpeedCopy_clicked(
     )
 {
     //Copies some data to the clipboard about the test
@@ -4987,7 +4997,7 @@ MainWindow::on_btn_SpeedCopy_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SendSpeedTestData(
+AutMainWindow::SendSpeedTestData(
     int intMaxLength
     )
 {
@@ -5030,7 +5040,7 @@ MainWindow::SendSpeedTestData(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SpeedTestBytesWritten(
+AutMainWindow::SpeedTestBytesWritten(
     qint64 intByteCount
     )
 {
@@ -5054,7 +5064,7 @@ MainWindow::SpeedTestBytesWritten(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SpeedTestReceive(
+AutMainWindow::SpeedTestReceive(
     )
 {
     //Receieved data from serial port in speed test mode
@@ -5260,7 +5270,7 @@ MainWindow::SpeedTestReceive(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::UpdateSpeedTestValues(
+AutMainWindow::UpdateSpeedTestValues(
     )
 {
     //Update speed test statistics
@@ -5326,7 +5336,7 @@ MainWindow::UpdateSpeedTestValues(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SpeedTestStartTimer(
+AutMainWindow::SpeedTestStartTimer(
     )
 {
     //Timer expired, begin sending speed test data
@@ -5339,7 +5349,7 @@ MainWindow::SpeedTestStartTimer(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SpeedTestStopTimer(
+AutMainWindow::SpeedTestStopTimer(
     )
 {
     //Timer expired, stop receiving speed test data
@@ -5390,7 +5400,7 @@ MainWindow::SpeedTestStopTimer(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::OutputSpeedTestAvgStats(
+AutMainWindow::OutputSpeedTestAvgStats(
     qint64 lngElapsed
     )
 {
@@ -5445,7 +5455,7 @@ MainWindow::OutputSpeedTestAvgStats(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::update_displayText(
+AutMainWindow::update_displayText(
     )
 {
     //Updates the speed display with data from the buffer
@@ -5492,7 +5502,7 @@ MainWindow::update_displayText(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_combo_SpeedDataDisplay_currentIndexChanged(
+AutMainWindow::on_combo_SpeedDataDisplay_currentIndexChanged(
     int
     )
 {
@@ -5533,7 +5543,7 @@ MainWindow::on_combo_SpeedDataDisplay_currentIndexChanged(
 //=============================================================================
 //=============================================================================
 quint64
-MainWindow::BitsBytesConvert(
+AutMainWindow::BitsBytesConvert(
     quint64 iCount,
     BitByteTypes bbtFrom,
     BitByteTypes bbtTo
@@ -5572,7 +5582,7 @@ MainWindow::BitsBytesConvert(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::SetLoopBackMode(
+AutMainWindow::SetLoopBackMode(
     bool bNewMode
     )
 {
@@ -5605,7 +5615,7 @@ MainWindow::SetLoopBackMode(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::AuTermUpdateCheck(
+AutMainWindow::AuTermUpdateCheck(
     bool bShowError
     )
 {
@@ -5663,7 +5673,7 @@ MainWindow::AuTermUpdateCheck(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::ScriptingFileSelected(
+AutMainWindow::ScriptingFileSelected(
     const QString *strFilepath
     )
 {
@@ -5678,7 +5688,7 @@ MainWindow::ScriptingFileSelected(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::UpdateCustomisation(
+AutMainWindow::UpdateCustomisation(
     bool bDefault
     )
 {
@@ -5697,7 +5707,7 @@ MainWindow::UpdateCustomisation(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_check_EnableTerminalSizeSaving_stateChanged(
+AutMainWindow::on_check_EnableTerminalSizeSaving_stateChanged(
     int
     )
 {
@@ -5721,7 +5731,7 @@ MainWindow::on_check_EnableTerminalSizeSaving_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::resizeEvent(
+AutMainWindow::resizeEvent(
     QResizeEvent *
     )
 {
@@ -5735,7 +5745,7 @@ MainWindow::resizeEvent(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_edit_Title_textEdited(
+AutMainWindow::on_edit_Title_textEdited(
     const QString &
     )
 {
@@ -5773,7 +5783,7 @@ MainWindow::on_edit_Title_textEdited(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Plugin_Abort_clicked(
+AutMainWindow::on_btn_Plugin_Abort_clicked(
     )
 {
     if (ui->list_Plugin_Plugins->currentRow() >= 0)
@@ -5785,7 +5795,7 @@ MainWindow::on_btn_Plugin_Abort_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::on_btn_Plugin_Config_clicked(
+AutMainWindow::on_btn_Plugin_Config_clicked(
     )
 {
     if (ui->list_Plugin_Plugins->currentRow() >= 0 && plugin_list.at(ui->list_Plugin_Plugins->currentRow()).plugin->plugin_configuration() == false)
@@ -5797,7 +5807,7 @@ MainWindow::on_btn_Plugin_Config_clicked(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::plugin_set_status(
+AutMainWindow::plugin_set_status(
     bool busy,
     bool hide_terminal_output,
     bool *accepted
@@ -5842,7 +5852,40 @@ MainWindow::plugin_set_status(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::plugin_serial_transmit(
+AutMainWindow::find_plugin(
+    QString name
+    )
+{
+    uint16_t i = 0;
+    uint16_t l = plugin_list.length();
+
+#ifdef QT_STATIC
+    QVector<QStaticPlugin> static_plugins = QPluginLoader::staticPlugins();
+#endif
+
+    while (i < l)
+    {
+        if (name ==
+#ifdef QT_STATIC
+            static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()
+#else
+            plugin_list[i].plugin_loader->metaData().value("MetaData").toObject().value("Name").toString()
+#endif
+        )
+        {
+            AutPlugin *sender = qobject_cast<AutPlugin *>(this->sender());
+            sender->found_plugin(plugin_list[i].object);
+            return;
+        }
+
+        ++i;
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void
+AutMainWindow::plugin_serial_transmit(
     QByteArray *data
     )
 {
@@ -5865,7 +5908,7 @@ MainWindow::plugin_serial_transmit(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::plugin_add_open_close_button(
+AutMainWindow::plugin_add_open_close_button(
     QPushButton *button
     )
 {
@@ -5877,7 +5920,7 @@ MainWindow::plugin_add_open_close_button(
 //=============================================================================
 //=============================================================================
 void
-MainWindow::plugin_to_hex(
+AutMainWindow::plugin_to_hex(
     QByteArray *data
     )
 {
@@ -5886,7 +5929,7 @@ MainWindow::plugin_to_hex(
 
 //=============================================================================
 //=============================================================================
-void MainWindow::plugin_save_setting(QString name, QVariant data)
+void AutMainWindow::plugin_save_setting(QString name, QVariant data)
 {
     name.prepend("plugin_");
 
@@ -5895,8 +5938,7 @@ void MainWindow::plugin_save_setting(QString name, QVariant data)
 
 //=============================================================================
 //=============================================================================
-
-void MainWindow::plugin_load_setting(QString name, QVariant *data, bool *found)
+void AutMainWindow::plugin_load_setting(QString name, QVariant *data, bool *found)
 {
     name.prepend("plugin_");
 
@@ -5911,7 +5953,7 @@ void MainWindow::plugin_load_setting(QString name, QVariant *data, bool *found)
 
 //=============================================================================
 //=============================================================================
-void MainWindow::on_radio_vt100_ignore_toggled(bool checked)
+void AutMainWindow::on_radio_vt100_ignore_toggled(bool checked)
 {
     if (checked == true)
     {
@@ -5921,7 +5963,7 @@ void MainWindow::on_radio_vt100_ignore_toggled(bool checked)
 
 //=============================================================================
 //=============================================================================
-void MainWindow::on_radio_vt100_strip_toggled(bool checked)
+void AutMainWindow::on_radio_vt100_strip_toggled(bool checked)
 {
     if (checked == true)
     {
@@ -5931,7 +5973,7 @@ void MainWindow::on_radio_vt100_strip_toggled(bool checked)
 
 //=============================================================================
 //=============================================================================
-void MainWindow::on_radio_vt100_decode_toggled(bool checked)
+void AutMainWindow::on_radio_vt100_decode_toggled(bool checked)
 {
     if (checked == true)
     {
@@ -5942,7 +5984,7 @@ void MainWindow::on_radio_vt100_decode_toggled(bool checked)
 #ifndef SKIPPLUGINS
 //=============================================================================
 //=============================================================================
-void MainWindow::on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *)
+void AutMainWindow::on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *)
 {
     on_btn_Plugin_Config_clicked();
 }

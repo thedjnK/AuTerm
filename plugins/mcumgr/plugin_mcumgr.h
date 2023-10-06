@@ -131,13 +131,9 @@ public:
     void setup(QMainWindow *main_window);
     const QString plugin_about();
     bool plugin_configuration();
-    void serial_receive(QByteArray *data);
-    void serial_error(QSerialPort::SerialPortError speErrorCode);
-    void serial_bytes_written(qint64 intByteCount);
-    void serial_about_to_close();
-    void serial_opened();
-    void serial_closed();
     static QMainWindow *get_main_window();
+    void setup_finished();
+    void found_plugin(QObject *plugin);
 
 signals:
     void show_message_box(QString str_message);
@@ -146,6 +142,12 @@ signals:
     void plugin_to_hex(QByteArray *data);
 
 private slots:
+    void serial_receive(QByteArray *data);
+    void serial_error(QSerialPort::SerialPortError speErrorCode);
+    void serial_bytes_written(qint64 intByteCount);
+    void serial_about_to_close();
+    void serial_opened();
+    void serial_closed();
     bool eventFilter(QObject *object, QEvent *event);
     void group_to_hex(QByteArray *data);
 
