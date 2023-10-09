@@ -55,6 +55,13 @@
 #include "smp_bluetooth.h"
 #endif
 
+#ifndef SKIPPLUGIN_LOGGER
+#include "../plugins/logger/plugin_logger.h"
+
+#define USE_LOGGER_PLUGIN
+#define LOGGER_NAME "mcumgr"
+#endif
+
 //Form includes
 ///AUTOGEN_START_INCLUDES
 #include <QtCore/QVariant>
@@ -132,14 +139,20 @@ public:
     const QString plugin_about();
     bool plugin_configuration();
     static QMainWindow *get_main_window();
+#ifdef USE_LOGGER_PLUGIN
     void setup_finished();
-    void found_plugin(QObject *plugin);
+#endif
 
 signals:
     void show_message_box(QString str_message);
     void plugin_set_status(bool busy, bool hide_terminal_output, bool *accepted);
     void plugin_add_open_close_button(QPushButton *button);
     void plugin_to_hex(QByteArray *data);
+#ifdef USE_LOGGER_PLUGIN
+    void find_plugin(QString name, plugin_data *plugin);
+    void logger_log(enum log_level_types type, QString sender, QString message);
+    void logger_set_visible(bool enabled);
+#endif
 
 private slots:
     void serial_receive(QByteArray *data);
@@ -413,6 +426,9 @@ private:
     QList<hash_checksum_t> supported_hash_checksum_list;
     QVariant bootloader_info_response;
     QByteArray settings_read_response;
+#ifdef USE_LOGGER_PLUGIN
+    plugin_data logger;
+#endif
 };
 
 #endif // PLUGIN_MCUMGR_H

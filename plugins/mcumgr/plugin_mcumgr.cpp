@@ -1310,7 +1310,9 @@ QWidget *plugin_mcumgr::GetWidget()
 
 void plugin_mcumgr::serial_error(QSerialPort::SerialPortError serial_error)
 {
-    qDebug() << "error: " << serial_error;
+#ifdef USE_LOGGER_PLUGIN
+    emit logger_log(log_level_error, LOGGER_NAME, QString("Serial error: %1").arg(serial_error));
+#endif
 }
 
 void plugin_mcumgr::serial_receive(QByteArray *data)
@@ -2003,19 +2005,28 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     QLabel *label_status = nullptr;
     bool finished = true;
 
-    qDebug() << "Status: " << status << "Sender: " << sender();
+#ifdef USE_LOGGER_PLUGIN
+    emit logger_log(log_level_debug, LOGGER_NAME, QString("Status: %1").arg(QString::number(status)));
+#endif
+
     if (sender() == smp_groups.img_mgmt)
     {
-        qDebug() << "img sender";
+#ifdef USE_LOGGER_PLUGIN
+        emit logger_log(log_level_debug, LOGGER_NAME, "img sender");
+#endif
         label_status = lbl_IMG_Status;
 
         if (status == STATUS_COMPLETE)
         {
-            qDebug() << "complete";
+#ifdef USE_LOGGER_PLUGIN
+            emit logger_log(log_level_debug, LOGGER_NAME, "complete");
+#endif
             //Advance to next stage of image upload
             if (user_data == ACTION_IMG_UPLOAD)
             {
-                qDebug() << "is upload";
+#ifdef USE_LOGGER_PLUGIN
+                emit logger_log(log_level_debug, LOGGER_NAME, "is upload");
+#endif
                 if (radio_IMG_Test->isChecked() || radio_IMG_Confirm->isChecked())
                 {
                     //Mark image for test or confirmation
@@ -2026,7 +2037,10 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
                     bool started = smp_groups.img_mgmt->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false), nullptr);
 //todo: check status
-                    qDebug() << "do upload of " << upload_hash;
+
+#ifdef USE_LOGGER_PLUGIN
+                    emit logger_log(log_level_debug, LOGGER_NAME, QString("do upload of %1").arg(QString(upload_hash.toHex())));
+#endif
                 }
             }
             else if (user_data == ACTION_IMG_UPLOAD_SET)
@@ -2041,7 +2055,10 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
                     bool started = smp_groups.os_mgmt->start_reset(false);
 //todo: check status
-                    qDebug() << "do reset";
+
+#ifdef USE_LOGGER_PLUGIN
+                    emit logger_log(log_level_debug, LOGGER_NAME, "do reset");
+#endif
                 }
             }
             else if (user_data == ACTION_IMG_IMAGE_LIST)
@@ -2090,12 +2107,16 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     }
     else if (sender() == smp_groups.os_mgmt)
     {
-        qDebug() << "os sender";
+#ifdef USE_LOGGER_PLUGIN
+        emit logger_log(log_level_debug, LOGGER_NAME, "os sender");
+#endif
         label_status = lbl_OS_Status;
 
         if (status == STATUS_COMPLETE)
         {
-            qDebug() << "complete";
+#ifdef USE_LOGGER_PLUGIN
+            emit logger_log(log_level_debug, LOGGER_NAME, "complete");
+#endif
             if (user_data == ACTION_OS_ECHO)
             {
                 edit_OS_Echo_Output->appendPlainText(error_string);
@@ -2268,12 +2289,16 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     }
     else if (sender() == smp_groups.shell_mgmt)
     {
-        qDebug() << "shell sender";
+#ifdef USE_LOGGER_PLUGIN
+        emit logger_log(log_level_debug, LOGGER_NAME, "shell sender");
+#endif
         label_status = lbl_SHELL_Status;
 
         if (status == STATUS_COMPLETE)
         {
-            qDebug() << "complete";
+#ifdef USE_LOGGER_PLUGIN
+            emit logger_log(log_level_debug, LOGGER_NAME, "complete");
+#endif
             if (user_data == ACTION_SHELL_EXECUTE)
             {
                 if (shell_rc == 0)
@@ -2291,12 +2316,16 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     }
     else if (sender() == smp_groups.stat_mgmt)
     {
-        qDebug() << "stat sender";
+#ifdef USE_LOGGER_PLUGIN
+        emit logger_log(log_level_debug, LOGGER_NAME, "stat sender");
+#endif
         label_status = lbl_STAT_Status;
 
         if (status == STATUS_COMPLETE)
         {
-            qDebug() << "complete";
+#ifdef USE_LOGGER_PLUGIN
+            emit logger_log(log_level_debug, LOGGER_NAME, "complete");
+#endif
             if (user_data == ACTION_STAT_GROUP_DATA)
             {
                 uint16_t i = 0;
@@ -2343,12 +2372,16 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     }
     else if (sender() == smp_groups.fs_mgmt)
     {
-        qDebug() << "fs sender";
+#ifdef USE_LOGGER_PLUGIN
+        emit logger_log(log_level_debug, LOGGER_NAME, "fs sender");
+#endif
         label_status = lbl_FS_Status;
 
         if (status == STATUS_COMPLETE)
         {
-            qDebug() << "complete";
+#ifdef USE_LOGGER_PLUGIN
+            emit logger_log(log_level_debug, LOGGER_NAME, "complete");
+#endif
             if (user_data == ACTION_FS_UPLOAD)
             {
                 edit_FS_Log->appendPlainText("todo");
@@ -2371,6 +2404,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 {
                     combo_FS_Hash_Checksum->addItem(supported_hash_checksum_list.at(i).name);
                     qDebug() << supported_hash_checksum_list.at(i).format << ", " << supported_hash_checksum_list.at(i).size;
+#ifdef USE_LOGGER_PLUGIN
+//                    emit logger_log(log_level_debug, LOGGER_NAME, QString("Serial error: %1").arg(serial_error));
+#endif
                     edit_FS_Log->appendPlainText(QString("Has %1, %2, %3").arg(supported_hash_checksum_list[i].name, QString::number(supported_hash_checksum_list[i].format), QString::number(supported_hash_checksum_list[i].size)));
                     ++i;
                 }
@@ -2384,12 +2420,16 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     }
     else if (sender() == smp_groups.settings_mgmt)
     {
-        qDebug() << "settings sender";
+#ifdef USE_LOGGER_PLUGIN
+        emit logger_log(log_level_debug, LOGGER_NAME, "settings sender");
+#endif
         label_status = lbl_settings_status;
 
         if (status == STATUS_COMPLETE)
         {
-            qDebug() << "complete";
+#ifdef USE_LOGGER_PLUGIN
+            emit logger_log(log_level_debug, LOGGER_NAME, "complete");
+#endif
             if (user_data == ACTION_SETTINGS_READ)
             {
                 edit_settings_value->setText(settings_read_response);
@@ -2434,7 +2474,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
         }
         else
         {
-            qDebug() << "Status message (no receiver): " << error_string;
+#ifdef USE_LOGGER_PLUGIN
+            emit logger_log(log_level_error, LOGGER_NAME, QString("Status message (no receiver): %1").arg(error_string));
+#endif
         }
     }
 }
@@ -2767,3 +2809,19 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
         relase_transport();
     }
 }
+
+#ifdef USE_LOGGER_PLUGIN
+void plugin_mcumgr::setup_finished()
+{
+    emit find_plugin("logger", &logger);
+
+    if (logger.found == false)
+    {
+        qDebug() << "Logger plugin was not found";
+        return;
+    }
+
+    connect(this, SIGNAL(logger_log(enum log_level_types,QString,QString)), logger.object, SLOT(log_message(enum log_level_types,QString,QString)));
+    connect(this, SIGNAL(logger_set_visible(bool)), logger.object, SLOT(set_enabled(bool)));
+}
+#endif
