@@ -12,4 +12,11 @@ SUBDIRS += \
 
         AuTerm.depends += plugins/mcumgr
     }
+
+    !contains(DEFINES, SKIPPLUGIN_LOGGER) {
+	SUBDIRS += \
+	    plugins/logger
+
+	AuTerm.depends += plugins/logger
+    }
 }

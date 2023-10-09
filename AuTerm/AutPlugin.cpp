@@ -29,4 +29,9 @@
 //MCUmgr plugin
 Q_IMPORT_PLUGIN(plugin_mcumgr)
 #endif
+
+#ifdef STATICPLUGIN_LOGGER
+//logger plugin
+Q_IMPORT_PLUGIN(plugin_logger)
+#endif
 #endif
