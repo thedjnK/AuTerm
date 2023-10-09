@@ -101,7 +101,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
                 connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
                 connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
-                connect(plugin.object, SIGNAL(find_plugin(QString)), this, SLOT(find_plugin(QString)));
+                connect(plugin.object, SIGNAL(find_plugin(QString,plugin_data*)), this, SLOT(find_plugin(QString,plugin_data*)));
 
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
@@ -143,7 +143,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 connect(plugin.object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
                 connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
                 connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
-                connect(plugin.object, SIGNAL(find_plugin(QString)), this, SLOT(find_plugin(QString)));
+                connect(plugin.object, SIGNAL(find_plugin(QString,plugin_data*)), this, SLOT(find_plugin(QString,plugin_data*)));
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
 
@@ -968,6 +968,16 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 #endif
 
     gbAppStarted = true;
+
+#ifndef SKIPPLUGINS
+    i = 0;
+
+    while (i < plugin_list.length())
+    {
+        plugin_list[i].plugin->setup_finished();
+        ++i;
+    }
+#endif
 }
 
 //=============================================================================
@@ -5853,7 +5863,8 @@ AutMainWindow::plugin_set_status(
 //=============================================================================
 void
 AutMainWindow::find_plugin(
-    QString name
+    QString name,
+    plugin_data *plugin
     )
 {
     uint16_t i = 0;
@@ -5873,13 +5884,16 @@ AutMainWindow::find_plugin(
 #endif
         )
         {
-            AutPlugin *sender = qobject_cast<AutPlugin *>(this->sender());
-            sender->found_plugin(plugin_list[i].object);
+            plugin->object = plugin_list[i].object;
+            plugin->found = true;
             return;
         }
 
         ++i;
     }
+
+    plugin->found = false;
+    return;
 }
 
 //=============================================================================

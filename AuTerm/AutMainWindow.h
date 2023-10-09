@@ -351,7 +351,8 @@ private slots:
         );
     void
     find_plugin(
-        QString name
+        QString name,
+        plugin_data *plugin
         );
 #endif
     void

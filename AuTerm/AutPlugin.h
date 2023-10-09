@@ -39,9 +39,6 @@ public:
     virtual void setup_finished()
     {
     }
-    virtual void found_plugin(QObject *plugin)
-    {
-    }
 
 signals:
     void show_message_box(QString str_message);
@@ -53,10 +50,17 @@ signals:
     void plugin_add_open_close_button(QPushButton *button);
 //#endif
     void plugin_to_hex(QByteArray *data);
-    void find_plugin(QString name);
+    void find_plugin(QString name, struct plugin_data *plugin);
 };
 
 Q_DECLARE_INTERFACE(AutPlugin, AuTermPluginInterface_iid)
+
+//Struct which holds plugin data when a plugin requests details on another plugin
+struct plugin_data {
+    const QObject *object;
+    const AutPlugin *plugin;
+    bool found;
+};
 
 #ifndef AUTERM_APPLICATION
 //Plugin-friendly version of main window class
