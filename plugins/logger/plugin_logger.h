@@ -55,6 +55,7 @@ public:
 public slots:
     void log_level_enabled(enum log_level_types type, bool *enabled);
     void log_message(enum log_level_types type, QString sender, QString message);
+    void set_enabled(bool enabled);
 
 private slots:
     void on_btn_clear_clicked();

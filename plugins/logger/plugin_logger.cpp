@@ -61,7 +61,7 @@ const QString plugin_logger::plugin_about()
 
 bool plugin_logger::plugin_configuration()
 {
-    if (QMessageBox::question(this, "Show logger?", "Enable log window?", QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    if (QMessageBox::question(this, "Enable logger?", "Enable logger and show log window?", QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
     {
         this->show();
     }
@@ -121,6 +121,12 @@ void plugin_logger::log_message(enum log_level_types type, QString sender, QStri
     QTextCursor text_cursor;
     QTextCharFormat text_format;
 
+    if (this->isHidden() == true)
+    {
+        //Only enable logging when window is shown
+        return;
+    }
+
     log_level_enabled(type, &log);
 
     if (log == false)
@@ -173,4 +179,16 @@ void plugin_logger::on_btn_clear_clicked()
 void plugin_logger::on_btn_copy_clicked()
 {
     QApplication::clipboard()->setText(ui->edit_log->toPlainText());
+}
+
+void plugin_logger::set_enabled(bool enabled)
+{
+    if (enabled == true)
+    {
+        this->show();
+    }
+    else
+    {
+        this->hide();
+    }
 }
