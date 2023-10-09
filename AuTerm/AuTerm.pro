@@ -86,9 +86,6 @@ CONFIG(release, debug|release) {
 		win32: LIBS += -L$$DESTDIR -lplugin_mcumgr
 		else:unix: LIBS += -L$$DESTDIR -lplugin_mcumgr
 
-#INCLUDEPATH += $$PWD/../plugins
-#DEPENDPATH += $$PWD/../plugins
-
 		win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
 		else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_mcumgr.lib
 		else:unix: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
@@ -101,9 +98,6 @@ CONFIG(release, debug|release) {
 
 		win32: LIBS += -L$$DESTDIR -lplugin_logger
 		else:unix: LIBS += -L$$DESTDIR -lplugin_logger
-
-#INCLUDEPATH += $$PWD/../plugins
-#DEPENDPATH += $$PWD/../plugins
 
 		win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
 		else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_logger.lib
