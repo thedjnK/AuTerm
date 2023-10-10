@@ -23,6 +23,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QMessageBox>
+#include <QTime>
 #include "plugin_logger.h"
 #include "ui_plugin_logger.h"
 
@@ -170,7 +171,7 @@ void plugin_logger::log_message(enum log_level_types type, QString sender, QStri
     text_cursor.setCharFormat(text_format);
 
     ui->edit_log->setTextCursor(text_cursor);
-    ui->edit_log->appendPlainText(message);
+    ui->edit_log->appendPlainText(QString("[%1] %2: %3").arg(QTime::currentTime().toString(), sender, message));
 }
 
 void plugin_logger::on_btn_clear_clicked()
