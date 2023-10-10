@@ -21,7 +21,6 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#include <QDebug>
 #include <QFileDialog>
 #include <QStandardItemModel>
 #include <QRegularExpression>
@@ -1136,6 +1135,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_orig->addTab(tab, QString("MCUmgr"));
 
 //Signals
+    connect(this, SIGNAL(plugin_set_status(bool,bool,bool*)), parent_window, SLOT(plugin_set_status(bool,bool,bool*)));
+    connect(this, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
+    connect(this, SIGNAL(plugin_to_hex(QByteArray*)), parent_window, SLOT(plugin_to_hex(QByteArray*)));
+
     connect(parent_window, SIGNAL(plugin_serial_receive(QByteArray*)), this, SLOT(serial_receive(QByteArray*)));
     connect(parent_window, SIGNAL(plugin_serial_error(QSerialPort::SerialPortError)), this, SLOT(serial_error(QSerialPort::SerialPortError)));
     connect(parent_window, SIGNAL(plugin_serial_bytes_written(qint64)), this, SLOT(serial_bytes_written(qint64)));
@@ -2003,7 +2006,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     QLabel *label_status = nullptr;
     bool finished = true;
 
-    log_debug() << "Status: %1" << status;
+    log_debug() << "Status: " << status;
 
     if (sender() == smp_groups.img_mgmt)
     {
@@ -2608,7 +2611,7 @@ void plugin_mcumgr::relase_transport(void)
 
         if (successful == false)
         {
-            qDebug() << "Failed to release UART transport";
+            log_error() << "Failed to release UART transport";
         }
     }
 }

@@ -97,12 +97,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 
             if (plugin.plugin)
             {
-//                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
-                connect(plugin.object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
-                connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
-                connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
-                connect(plugin.object, SIGNAL(find_plugin(QString,plugin_data*)), this, SLOT(find_plugin(QString,plugin_data*)));
-
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
 
@@ -139,11 +133,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 
             if (plugin.plugin)
             {
-//                connect(plugin.object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
-                connect(plugin.object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
-                connect(plugin.object, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
-                connect(plugin.object, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(plugin_to_hex(QByteArray*)));
-                connect(plugin.object, SIGNAL(find_plugin(QString,plugin_data*)), this, SLOT(find_plugin(QString,plugin_data*)));
                 plugin.plugin->setup(this);
                 plugin_list.append(plugin);
 
@@ -1133,8 +1122,6 @@ AutMainWindow::~AutMainWindow()
     int32_t i = 0;
     while (i < plugin_list.length())
     {
-        disconnect(plugin_list.at(i).object, SIGNAL(show_message_box(QString)), gpmErrorForm, SLOT(show_message(QString)));
-        disconnect(plugin_list.at(i).object, SIGNAL(plugin_set_status(bool,bool,bool*)), this, SLOT(plugin_set_status(bool,bool,bool*)));
         delete plugin_list.at(i).object;
 #ifndef QT_STATIC
         plugin_list.at(i).plugin_loader->unload();
