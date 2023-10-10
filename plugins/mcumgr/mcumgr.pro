@@ -16,6 +16,7 @@ TARGET          = $$qtLibraryTarget(plugin_mcumgr)
 
 SOURCES += \
     crc16.cpp \
+    debug_logger.cpp \
     error_lookup.cpp \
     plugin_mcumgr.cpp \
     smp_error.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
     crc16.h \
+    debug_logger.h \
     error_lookup.h \
     plugin_mcumgr.h \
     smp_error.h \
