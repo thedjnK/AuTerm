@@ -23,7 +23,6 @@
 #ifndef SKIPPLUGIN_LOGGER
 
 #include "debug_logger.h"
-#include <QDebug>
 
 debug_logger::debug_logger(QObject *parent)
     : QIODevice{parent}

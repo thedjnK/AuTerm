@@ -23,6 +23,8 @@
 #ifndef DEBUG_LOGGER_H
 #define DEBUG_LOGGER_H
 
+#include <QDebug>
+
 #ifndef SKIPPLUGIN_LOGGER
 #include <QIODevice>
 #include "../plugins/logger/plugin_logger.h"
