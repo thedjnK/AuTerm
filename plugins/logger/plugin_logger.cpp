@@ -31,7 +31,6 @@ plugin_logger::plugin_logger(QWidget *parent) :
     ui(new Ui::plugin_logger)
 {
     ui->setupUi(this);
-    this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
 
     //Set checkbox text colour to match that of the conditions
     QPalette palette = ui->check_error->palette();
@@ -52,6 +51,9 @@ plugin_logger::~plugin_logger()
 
 void plugin_logger::setup(QMainWindow *main_window)
 {
+    //Make window on top of terminal
+    this->setParent(main_window);
+    this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
 }
 
 const QString plugin_logger::plugin_about()
