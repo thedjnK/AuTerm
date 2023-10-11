@@ -1,5 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2018 Laird
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -73,10 +74,6 @@ public:
         );
     void
     ConnectionChange(
-        bool bEnabled
-        );
-    void
-    TempAlwaysOnTop(
         bool bEnabled
         );
     void

@@ -1,5 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2017 Laird
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -607,46 +608,12 @@ UwxAutomation::on_check_OnTop_stateChanged(
     //Always on-top state changed
     bool bReShow = this->isVisible();
 
-    if (ui->check_OnTop->isChecked())
-    {
-        //Always on top
-        this->setWindowFlags((Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint));
-    }
-    else
-    {
-        //Not always on top
-        this->setWindowFlags((Qt::Window | Qt::WindowCloseButtonHint));
-    }
+    this->setWindowFlags((ui->check_OnTop->isChecked() ? Qt::Dialog : Qt::Window) | Qt::WindowCloseButtonHint);
 
     if (bReShow == true)
     {
         //Repaint (show) window
         this->show();
-    }
-}
-
-//=============================================================================
-//=============================================================================
-void
-UwxAutomation::TempAlwaysOnTop(
-    bool bEnabled
-    )
-{
-    //This is used to temporally disable the always on top setting so that it doesn't overlap file open dialogues
-    if (this->isVisible() && ui->check_OnTop->isChecked())
-    {
-        //Window is visible and always on top is checked
-        if (bEnabled == true)
-        {
-            //Restore setting
-            on_check_OnTop_stateChanged(0);
-        }
-        else
-        {
-            //Disable
-            this->setWindowFlags((Qt::Window | Qt::WindowCloseButtonHint));
-            this->show();
-        }
     }
 }
 

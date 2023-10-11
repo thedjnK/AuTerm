@@ -1703,19 +1703,7 @@ AutMainWindow::MenuSelected(
         if (gspSerialPort.isOpen() == true && gbLoopbackMode == false && gbTermBusy == false)
         {
             //Not currently busy
-#ifndef SKIPAUTOMATIONFORM
-            if (guaAutomationForm != 0)
-            {
-                guaAutomationForm->TempAlwaysOnTop(0);
-            }
-#endif
             QString strFilename = QFileDialog::getOpenFileName(this, tr("Open File To Stream"), gstrLastFilename[FilenameIndexOthers], tr("Text Files (*.txt);;All Files (*.*)"));
-#ifndef SKIPAUTOMATIONFORM
-            if (guaAutomationForm != 0)
-            {
-                guaAutomationForm->TempAlwaysOnTop(1);
-            }
-#endif
 
             if (strFilename.length() > 1)
             {
@@ -1920,19 +1908,7 @@ AutMainWindow::MenuSelected(
         if (gspSerialPort.isOpen() == true && gbLoopbackMode == false && gbTermBusy == false)
         {
             //Not currently busy
-#ifndef SKIPAUTOMATIONFORM
-            if (guaAutomationForm != 0)
-            {
-                guaAutomationForm->TempAlwaysOnTop(0);
-            }
-#endif
             QString strFilename = QFileDialog::getOpenFileName(this, tr("Open Batch File"), gstrLastFilename[FilenameIndexOthers], tr("Text Files (*.txt);;All Files (*.*)"));
-#ifndef SKIPAUTOMATIONFORM
-            if (guaAutomationForm != 0)
-            {
-                guaAutomationForm->TempAlwaysOnTop(1);
-            }
-#endif
 
             if (strFilename.length() > 1)
             {
@@ -3615,19 +3591,8 @@ AutMainWindow::on_btn_LogFileSelect_clicked(
     )
 {
     //Updates the log file
-#ifndef SKIPAUTOMATIONFORM
-    if (guaAutomationForm != 0)
-    {
-        guaAutomationForm->TempAlwaysOnTop(0);
-    }
-#endif
     QString strLogFilename = QFileDialog::getSaveFileName(this, "Select Log File", ui->edit_LogFile->text(), "Log Files (*.log);;All Files (*.*)");
-#ifndef SKIPAUTOMATIONFORM
-    if (guaAutomationForm != 0)
-    {
-        guaAutomationForm->TempAlwaysOnTop(1);
-    }
-#endif
+
     if (!strLogFilename.isEmpty())
     {
         //Update log file
