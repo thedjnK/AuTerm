@@ -368,7 +368,7 @@ bool smp_group_fs_mgmt::parse_status_response(QCborStreamReader &reader, uint32_
     return true;
 }
 
-bool smp_group_fs_mgmt::parse_hash_checksum_response(QCborStreamReader &reader, QString *type, QByteArray *hash_checksum)
+bool smp_group_fs_mgmt::parse_hash_checksum_response(QCborStreamReader &reader, QString *type, QByteArray *hash_checksum, uint32_t *file_size)
 {
     //    qDebug() << reader.lastError() << reader.hasNext();
 
@@ -391,7 +391,17 @@ bool smp_group_fs_mgmt::parse_hash_checksum_response(QCborStreamReader &reader, 
                     if (key == "output")
                     {
                         uint32_t tmp_hash_checksum = (uint32_t)reader.toUnsignedInteger();
-                        hash_checksum->append(tmp_hash_checksum);
+
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+                        //Flip endian for little endian systems to allow for inserting bytes in correct order
+                        flip_endian((uint8_t *)&tmp_hash_checksum, sizeof(uint32_t));
+#endif
+
+                        hash_checksum->append((char *)&tmp_hash_checksum, sizeof(uint32_t));
+                    }
+                    else if (key == "len")
+                    {
+                        *file_size = (uint32_t)reader.toUnsignedInteger();
                     }
 
                     reader.next();
@@ -458,7 +468,7 @@ bool smp_group_fs_mgmt::parse_hash_checksum_response(QCborStreamReader &reader, 
 
                     while (reader.lastError() == QCborError::NoError && reader.hasNext())
                     {
-                        parse_hash_checksum_response(reader, type, hash_checksum);
+                        parse_hash_checksum_response(reader, type, hash_checksum, file_size);
                     }
 
                     if (reader.lastError() == QCborError::NoError)
@@ -622,6 +632,7 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
                 {
                     //Upload next chunk
                     upload_chunk();
+                    emit progress(smp_user_data, file_upload_area * 100 / local_file_size);
                 }
                 else
                 {
@@ -634,6 +645,7 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
                     upload_tmr.invalidate();
                     device_file_name.clear();
 
+                    emit progress(smp_user_data, 100);
                     emit status(smp_user_data, STATUS_COMPLETE, "Upload complete");
                 }
             }
@@ -679,6 +691,8 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             {
                 //Download next chunk
                 download_chunk();
+
+                emit progress(smp_user_data, file_upload_area * 100 / local_file_size);
             }
             else
             {
@@ -691,32 +705,30 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
                 upload_tmr.invalidate();
                 device_file_name.clear();
 
+                emit progress(smp_user_data, 100);
                 emit status(smp_user_data, STATUS_COMPLETE, "Download complete");
             }
         }
         else if (mode == MODE_STATUS && command == COMMAND_STATUS)
         {
-            uint32_t len = 0;
             QCborStreamReader cbor_reader(data);
-            bool good = parse_status_response(cbor_reader, &len);
+            bool good = parse_status_response(cbor_reader, file_size_object);
             mode = MODE_IDLE;
 
             qDebug() << "status done";
-            qDebug() << "Len: " << len;
+            qDebug() << "Len: " << *file_size_object;
 
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (mode == MODE_HASH_CHECKSUM && command == COMMAND_HASH_CHECKSUM)
         {
             QString type;
-            QByteArray hash_checksum;
 
             QCborStreamReader cbor_reader(data);
-            bool good = parse_hash_checksum_response(cbor_reader, &type, &hash_checksum);
+            bool good = parse_hash_checksum_response(cbor_reader, &type, hash_checksum_result_object, file_size_object);
             mode = MODE_IDLE;
 
-            qDebug() << "checksum done, got " << type << " und " << hash_checksum;
-            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+            emit status(smp_user_data, STATUS_COMPLETE, type);
         }
         else if (mode == MODE_SUPPORTED_HASHES_CHECKSUMS && command == COMMAND_SUPPORTED_HASHES_CHECKSUMS)
         {
@@ -918,7 +930,7 @@ bool smp_group_fs_mgmt::start_download(QString file_name, QString destination_na
 }
 
 //TODO
-bool smp_group_fs_mgmt::start_status(QString file_name)
+bool smp_group_fs_mgmt::start_status(QString file_name, uint32_t *file_size)
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_STATUS);
@@ -927,13 +939,15 @@ bool smp_group_fs_mgmt::start_status(QString file_name)
     tmp_message->end_message();
 
     mode = MODE_STATUS;
+    file_size_object = file_size;
+    *file_size = 0;
 
     processor->send(tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
 
-bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_checksum)
+bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_checksum, QByteArray *result, uint32_t *file_size)
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_HASH_CHECKSUM);
@@ -944,6 +958,10 @@ bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_chec
     tmp_message->end_message();
 
     mode = MODE_HASH_CHECKSUM;
+    hash_checksum_result_object = result;
+    result->clear();
+    file_size_object = file_size;
+    *file_size = 0;
 
     processor->send(tmp_message, smp_timeout, smp_retries, true);
 
@@ -1043,4 +1061,19 @@ bool smp_group_fs_mgmt::error_define_lookup(int32_t rc, QString *error)
     }
 
     return false;
+}
+
+void smp_group_fs_mgmt::flip_endian(uint8_t *data, uint8_t size)
+{
+    uint8_t i = 0;
+
+    while (i < (size / 2))
+    {
+        uint8_t temp = data[(size - 1) - i];
+
+        data[(size - 1) - i] = data[i];
+        data[i] = temp;
+
+        ++i;
+    }
 }

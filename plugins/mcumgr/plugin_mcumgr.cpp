@@ -128,35 +128,48 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_2->setSpacing(2);
     gridLayout_2->setObjectName("gridLayout_2");
     gridLayout_2->setContentsMargins(6, 6, 6, 6);
-    edit_FS_Local = new QLineEdit(tab_FS);
-    edit_FS_Local->setObjectName("edit_FS_Local");
+    label_28 = new QLabel(tab_FS);
+    label_28->setObjectName("label_28");
 
-    gridLayout_2->addWidget(edit_FS_Local, 0, 1, 1, 1);
+    gridLayout_2->addWidget(label_28, 3, 0, 1, 1);
+
+    lbl_FS_Status = new QLabel(tab_FS);
+    lbl_FS_Status->setObjectName("lbl_FS_Status");
+
+    gridLayout_2->addWidget(lbl_FS_Status, 8, 0, 1, 2);
+
+    label_29 = new QLabel(tab_FS);
+    label_29->setObjectName("label_29");
+
+    gridLayout_2->addWidget(label_29, 4, 0, 1, 1);
+
+    label_2 = new QLabel(tab_FS);
+    label_2->setObjectName("label_2");
+
+    gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
+
+    progress_FS_Complete = new QProgressBar(tab_FS);
+    progress_FS_Complete->setObjectName("progress_FS_Complete");
+    progress_FS_Complete->setValue(0);
+
+    gridLayout_2->addWidget(progress_FS_Complete, 6, 0, 1, 3);
 
     btn_FS_Local = new QToolButton(tab_FS);
     btn_FS_Local->setObjectName("btn_FS_Local");
 
     gridLayout_2->addWidget(btn_FS_Local, 0, 2, 1, 1);
 
-    horizontalLayout_2 = new QHBoxLayout();
-    horizontalLayout_2->setSpacing(2);
-    horizontalLayout_2->setObjectName("horizontalLayout_2");
-    horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    label_3 = new QLabel(tab_FS);
+    label_3->setObjectName("label_3");
 
-    horizontalLayout_2->addItem(horizontalSpacer);
+    gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
 
-    btn_FS_Go = new QPushButton(tab_FS);
-    btn_FS_Go->setObjectName("btn_FS_Go");
+    combo_FS_type = new QComboBox(tab_FS);
+    combo_FS_type->setObjectName("combo_FS_type");
+    combo_FS_type->setEnabled(false);
+    combo_FS_type->setEditable(true);
 
-    horizontalLayout_2->addWidget(btn_FS_Go);
-
-    horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    horizontalLayout_2->addItem(horizontalSpacer_2);
-
-
-    gridLayout_2->addLayout(horizontalLayout_2, 6, 0, 1, 3);
+    gridLayout_2->addWidget(combo_FS_type, 2, 1, 1, 2);
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setSpacing(2);
@@ -188,51 +201,61 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout->addWidget(radio_FS_Hash_Checksum_Types);
 
 
-    gridLayout_2->addLayout(horizontalLayout, 3, 0, 1, 3);
-
-    lbl_FS_Status = new QLabel(tab_FS);
-    lbl_FS_Status->setObjectName("lbl_FS_Status");
-
-    gridLayout_2->addWidget(lbl_FS_Status, 5, 0, 1, 2);
-
-    label_2 = new QLabel(tab_FS);
-    label_2->setObjectName("label_2");
-
-    gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
-
-    edit_FS_Log = new QPlainTextEdit(tab_FS);
-    edit_FS_Log->setObjectName("edit_FS_Log");
-    edit_FS_Log->setUndoRedoEnabled(false);
-    edit_FS_Log->setReadOnly(true);
-
-    gridLayout_2->addWidget(edit_FS_Log, 8, 0, 1, 3);
-
-    label_3 = new QLabel(tab_FS);
-    label_3->setObjectName("label_3");
-
-    gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
-
-    progress_FS_Complete = new QProgressBar(tab_FS);
-    progress_FS_Complete->setObjectName("progress_FS_Complete");
-    progress_FS_Complete->setValue(0);
-
-    gridLayout_2->addWidget(progress_FS_Complete, 4, 0, 1, 3);
-
-    edit_FS_Remote = new QLineEdit(tab_FS);
-    edit_FS_Remote->setObjectName("edit_FS_Remote");
-
-    gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
+    gridLayout_2->addLayout(horizontalLayout, 5, 0, 1, 3);
 
     label_19 = new QLabel(tab_FS);
     label_19->setObjectName("label_19");
 
     gridLayout_2->addWidget(label_19, 2, 0, 1, 1);
 
-    combo_FS_Hash_Checksum = new QComboBox(tab_FS);
-    combo_FS_Hash_Checksum->setObjectName("combo_FS_Hash_Checksum");
-    combo_FS_Hash_Checksum->setEditable(true);
+    edit_FS_Remote = new QLineEdit(tab_FS);
+    edit_FS_Remote->setObjectName("edit_FS_Remote");
 
-    gridLayout_2->addWidget(combo_FS_Hash_Checksum, 2, 1, 1, 2);
+    gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
+
+    horizontalLayout_2 = new QHBoxLayout();
+    horizontalLayout_2->setSpacing(2);
+    horizontalLayout_2->setObjectName("horizontalLayout_2");
+    horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
+    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_2->addItem(horizontalSpacer);
+
+    btn_FS_Go = new QPushButton(tab_FS);
+    btn_FS_Go->setObjectName("btn_FS_Go");
+
+    horizontalLayout_2->addWidget(btn_FS_Go);
+
+    horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_2->addItem(horizontalSpacer_2);
+
+
+    gridLayout_2->addLayout(horizontalLayout_2, 9, 0, 1, 3);
+
+    verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    gridLayout_2->addItem(verticalSpacer_6, 7, 0, 1, 1);
+
+    edit_FS_Local = new QLineEdit(tab_FS);
+    edit_FS_Local->setObjectName("edit_FS_Local");
+
+    gridLayout_2->addWidget(edit_FS_Local, 0, 1, 1, 1);
+
+    edit_FS_Result = new QLineEdit(tab_FS);
+    edit_FS_Result->setObjectName("edit_FS_Result");
+    edit_FS_Result->setEnabled(false);
+    edit_FS_Result->setReadOnly(true);
+
+    gridLayout_2->addWidget(edit_FS_Result, 3, 1, 1, 2);
+
+    edit_FS_Size = new QLineEdit(tab_FS);
+    edit_FS_Size->setObjectName("edit_FS_Size");
+    edit_FS_Size->setEnabled(false);
+    edit_FS_Size->setMaximumSize(QSize(80, 16777215));
+    edit_FS_Size->setReadOnly(true);
+
+    gridLayout_2->addWidget(edit_FS_Size, 4, 1, 1, 1);
 
     tabWidget_2->addTab(tab_FS, QString());
     tab_IMG = new QWidget();
@@ -618,6 +641,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     edit_OS_Info_Output = new QPlainTextEdit(tab_OS_Info);
     edit_OS_Info_Output->setObjectName("edit_OS_Info_Output");
+    edit_OS_Info_Output->setUndoRedoEnabled(false);
+    edit_OS_Info_Output->setReadOnly(true);
 
     gridLayout_13->addWidget(edit_OS_Info_Output, 2, 1, 1, 1);
 
@@ -746,42 +771,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_9->setSpacing(2);
     gridLayout_9->setObjectName("gridLayout_9");
     gridLayout_9->setContentsMargins(6, 6, 6, 6);
-    verticalLayout_3 = new QVBoxLayout();
-    verticalLayout_3->setObjectName("verticalLayout_3");
-    btn_SHELL_Clear = new QToolButton(tab_Shell);
-    btn_SHELL_Clear->setObjectName("btn_SHELL_Clear");
-
-    verticalLayout_3->addWidget(btn_SHELL_Clear);
-
-    btn_SHELL_Copy = new QToolButton(tab_Shell);
-    btn_SHELL_Copy->setObjectName("btn_SHELL_Copy");
-
-    verticalLayout_3->addWidget(btn_SHELL_Copy);
-
-
-    gridLayout_9->addLayout(verticalLayout_3, 1, 2, 1, 1);
-
-    lbl_SHELL_Status = new QLabel(tab_Shell);
-    lbl_SHELL_Status->setObjectName("lbl_SHELL_Status");
-
-    gridLayout_9->addWidget(lbl_SHELL_Status, 2, 0, 1, 3);
-
-    edit_SHELL_Output = new QPlainTextEdit(tab_Shell);
-    edit_SHELL_Output->setObjectName("edit_SHELL_Output");
-    edit_SHELL_Output->setUndoRedoEnabled(false);
-    edit_SHELL_Output->setReadOnly(true);
-
-    gridLayout_9->addWidget(edit_SHELL_Output, 1, 1, 1, 1);
-
-    edit_SHELL_Input = new QLineEdit(tab_Shell);
-    edit_SHELL_Input->setObjectName("edit_SHELL_Input");
-
-    gridLayout_9->addWidget(edit_SHELL_Input, 0, 1, 1, 2);
-
     label_12 = new QLabel(tab_Shell);
     label_12->setObjectName("label_12");
 
     gridLayout_9->addWidget(label_12, 0, 0, 1, 1);
+
+    label_13 = new QLabel(tab_Shell);
+    label_13->setObjectName("label_13");
+
+    gridLayout_9->addWidget(label_13, 1, 0, 1, 1);
+
+    edit_SHELL_Input = new QLineEdit(tab_Shell);
+    edit_SHELL_Input->setObjectName("edit_SHELL_Input");
+
+    gridLayout_9->addWidget(edit_SHELL_Input, 0, 1, 1, 1);
 
     horizontalLayout_8 = new QHBoxLayout();
     horizontalLayout_8->setSpacing(2);
@@ -791,22 +794,39 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_8->addItem(horizontalSpacer_7);
 
+    btn_SHELL_Clear = new QToolButton(tab_Shell);
+    btn_SHELL_Clear->setObjectName("btn_SHELL_Clear");
+
+    horizontalLayout_8->addWidget(btn_SHELL_Clear);
+
     btn_SHELL_Go = new QPushButton(tab_Shell);
     btn_SHELL_Go->setObjectName("btn_SHELL_Go");
 
     horizontalLayout_8->addWidget(btn_SHELL_Go);
+
+    btn_SHELL_Copy = new QToolButton(tab_Shell);
+    btn_SHELL_Copy->setObjectName("btn_SHELL_Copy");
+
+    horizontalLayout_8->addWidget(btn_SHELL_Copy);
 
     horizontalSpacer_8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     horizontalLayout_8->addItem(horizontalSpacer_8);
 
 
-    gridLayout_9->addLayout(horizontalLayout_8, 3, 0, 1, 3);
+    gridLayout_9->addLayout(horizontalLayout_8, 3, 0, 1, 2);
 
-    label_13 = new QLabel(tab_Shell);
-    label_13->setObjectName("label_13");
+    edit_SHELL_Output = new QPlainTextEdit(tab_Shell);
+    edit_SHELL_Output->setObjectName("edit_SHELL_Output");
+    edit_SHELL_Output->setUndoRedoEnabled(false);
+    edit_SHELL_Output->setReadOnly(true);
 
-    gridLayout_9->addWidget(label_13, 1, 0, 1, 1);
+    gridLayout_9->addWidget(edit_SHELL_Output, 1, 1, 1, 1);
+
+    lbl_SHELL_Status = new QLabel(tab_Shell);
+    lbl_SHELL_Status->setObjectName("lbl_SHELL_Status");
+
+    gridLayout_9->addWidget(lbl_SHELL_Status, 2, 0, 1, 2);
 
     tabWidget_2->addTab(tab_Shell, QString());
     tab_Settings = new QWidget();
@@ -815,15 +835,67 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_15->setSpacing(2);
     gridLayout_15->setObjectName("gridLayout_15");
     gridLayout_15->setContentsMargins(6, 6, 6, 6);
+    edit_settings_key = new QLineEdit(tab_Settings);
+    edit_settings_key->setObjectName("edit_settings_key");
+
+    gridLayout_15->addWidget(edit_settings_key, 0, 2, 1, 1);
+
+    label_22 = new QLabel(tab_Settings);
+    label_22->setObjectName("label_22");
+
+    gridLayout_15->addWidget(label_22, 3, 0, 1, 1);
+
+    lbl_settings_status = new QLabel(tab_Settings);
+    lbl_settings_status->setObjectName("lbl_settings_status");
+
+    gridLayout_15->addWidget(lbl_settings_status, 10, 0, 1, 3);
+
+    verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    gridLayout_15->addItem(verticalSpacer_5, 9, 0, 1, 1);
+
+    label_26 = new QLabel(tab_Settings);
+    label_26->setObjectName("label_26");
+
+    gridLayout_15->addWidget(label_26, 8, 0, 1, 1);
+
+    horizontalLayout_16 = new QHBoxLayout();
+    horizontalLayout_16->setSpacing(2);
+    horizontalLayout_16->setObjectName("horizontalLayout_16");
+    radio_settings_none = new QRadioButton(tab_Settings);
+    buttonGroup_2 = new QButtonGroup(tab_Settings);
+    buttonGroup_2->setObjectName("buttonGroup_2");
+    buttonGroup_2->addButton(radio_settings_none);
+    radio_settings_none->setObjectName("radio_settings_none");
+    radio_settings_none->setChecked(true);
+
+    horizontalLayout_16->addWidget(radio_settings_none);
+
+    radio_settings_text = new QRadioButton(tab_Settings);
+    buttonGroup_2->addButton(radio_settings_text);
+    radio_settings_text->setObjectName("radio_settings_text");
+    radio_settings_text->setChecked(false);
+
+    horizontalLayout_16->addWidget(radio_settings_text);
+
+    radio_settings_decimal = new QRadioButton(tab_Settings);
+    buttonGroup_2->addButton(radio_settings_decimal);
+    radio_settings_decimal->setObjectName("radio_settings_decimal");
+
+    horizontalLayout_16->addWidget(radio_settings_decimal);
+
+
+    gridLayout_15->addLayout(horizontalLayout_16, 6, 2, 1, 1);
+
     label_23 = new QLabel(tab_Settings);
     label_23->setObjectName("label_23");
 
     gridLayout_15->addWidget(label_23, 0, 0, 1, 1);
 
-    lbl_settings_status = new QLabel(tab_Settings);
-    lbl_settings_status->setObjectName("lbl_settings_status");
+    label_24 = new QLabel(tab_Settings);
+    label_24->setObjectName("label_24");
 
-    gridLayout_15->addWidget(lbl_settings_status, 4, 0, 1, 2);
+    gridLayout_15->addWidget(label_24, 1, 0, 1, 1);
 
     horizontalLayout_15 = new QHBoxLayout();
     horizontalLayout_15->setSpacing(2);
@@ -842,68 +914,101 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_15->addItem(horizontalSpacer_11);
 
 
-    gridLayout_15->addLayout(horizontalLayout_15, 5, 0, 1, 2);
+    gridLayout_15->addLayout(horizontalLayout_15, 11, 0, 1, 3);
 
-    edit_settings_value = new QLineEdit(tab_Settings);
-    edit_settings_value->setObjectName("edit_settings_value");
-    edit_settings_value->setReadOnly(true);
+    label_25 = new QLabel(tab_Settings);
+    label_25->setObjectName("label_25");
 
-    gridLayout_15->addWidget(edit_settings_value, 1, 1, 1, 1);
+    gridLayout_15->addWidget(label_25, 6, 0, 1, 1);
+
+    horizontalLayout_12 = new QHBoxLayout();
+    horizontalLayout_12->setSpacing(2);
+    horizontalLayout_12->setObjectName("horizontalLayout_12");
+    check_settings_big_endian = new QCheckBox(tab_Settings);
+    check_settings_big_endian->setObjectName("check_settings_big_endian");
+    check_settings_big_endian->setEnabled(false);
+
+    horizontalLayout_12->addWidget(check_settings_big_endian);
+
+    check_settings_signed_decimal_value = new QCheckBox(tab_Settings);
+    check_settings_signed_decimal_value->setObjectName("check_settings_signed_decimal_value");
+    check_settings_signed_decimal_value->setEnabled(false);
+
+    horizontalLayout_12->addWidget(check_settings_signed_decimal_value);
+
+
+    gridLayout_15->addLayout(horizontalLayout_12, 7, 2, 1, 1);
+
+    label_27 = new QLabel(tab_Settings);
+    label_27->setObjectName("label_27");
+
+    gridLayout_15->addWidget(label_27, 7, 0, 1, 1);
 
     horizontalLayout_11 = new QHBoxLayout();
+    horizontalLayout_11->setSpacing(2);
     horizontalLayout_11->setObjectName("horizontalLayout_11");
     radio_settings_read = new QRadioButton(tab_Settings);
+    buttonGroup = new QButtonGroup(tab_Settings);
+    buttonGroup->setObjectName("buttonGroup");
+    buttonGroup->addButton(radio_settings_read);
     radio_settings_read->setObjectName("radio_settings_read");
     radio_settings_read->setChecked(true);
 
     horizontalLayout_11->addWidget(radio_settings_read);
 
     radio_settings_write = new QRadioButton(tab_Settings);
+    buttonGroup->addButton(radio_settings_write);
     radio_settings_write->setObjectName("radio_settings_write");
 
     horizontalLayout_11->addWidget(radio_settings_write);
 
     radio_settings_delete = new QRadioButton(tab_Settings);
+    buttonGroup->addButton(radio_settings_delete);
     radio_settings_delete->setObjectName("radio_settings_delete");
 
     horizontalLayout_11->addWidget(radio_settings_delete);
 
     radio_settings_commit = new QRadioButton(tab_Settings);
+    buttonGroup->addButton(radio_settings_commit);
     radio_settings_commit->setObjectName("radio_settings_commit");
 
     horizontalLayout_11->addWidget(radio_settings_commit);
 
     radio_settings_load = new QRadioButton(tab_Settings);
+    buttonGroup->addButton(radio_settings_load);
     radio_settings_load->setObjectName("radio_settings_load");
 
     horizontalLayout_11->addWidget(radio_settings_load);
 
     radio_settings_save = new QRadioButton(tab_Settings);
+    buttonGroup->addButton(radio_settings_save);
     radio_settings_save->setObjectName("radio_settings_save");
 
     horizontalLayout_11->addWidget(radio_settings_save);
 
 
-    gridLayout_15->addLayout(horizontalLayout_11, 2, 1, 1, 1);
+    gridLayout_15->addLayout(horizontalLayout_11, 3, 2, 1, 1);
 
-    label_22 = new QLabel(tab_Settings);
-    label_22->setObjectName("label_22");
+    edit_settings_value = new QLineEdit(tab_Settings);
+    edit_settings_value->setObjectName("edit_settings_value");
+    edit_settings_value->setReadOnly(true);
 
-    gridLayout_15->addWidget(label_22, 2, 0, 1, 1);
+    gridLayout_15->addWidget(edit_settings_value, 1, 2, 1, 1);
 
-    edit_settings_key = new QLineEdit(tab_Settings);
-    edit_settings_key->setObjectName("edit_settings_key");
+    edit_settings_decoded = new QLineEdit(tab_Settings);
+    edit_settings_decoded->setObjectName("edit_settings_decoded");
+    edit_settings_decoded->setEnabled(false);
+    edit_settings_decoded->setReadOnly(true);
 
-    gridLayout_15->addWidget(edit_settings_key, 0, 1, 1, 1);
+    gridLayout_15->addWidget(edit_settings_decoded, 8, 2, 1, 1);
 
-    label_24 = new QLabel(tab_Settings);
-    label_24->setObjectName("label_24");
+    line_2 = new QFrame(tab_Settings);
+    line_2->setObjectName("line_2");
+    line_2->setLineWidth(1);
+    line_2->setFrameShape(QFrame::HLine);
+    line_2->setFrameShadow(QFrame::Sunken);
 
-    gridLayout_15->addWidget(label_24, 1, 0, 1, 1);
-
-    verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-    gridLayout_15->addItem(verticalSpacer_5, 3, 0, 1, 1);
+    gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
 
     tabWidget_2->addTab(tab_Settings, QString());
 
@@ -1013,17 +1118,19 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
     radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
+    label_28->setText(QCoreApplication::translate("Form", "Hash/Checksum:", nullptr));
+    lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    label_29->setText(QCoreApplication::translate("Form", "File size:", nullptr));
+    label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
     btn_FS_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
-    btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
     radio_FS_Upload->setText(QCoreApplication::translate("Form", "Upload", nullptr));
     radio_FS_Download->setText(QCoreApplication::translate("Form", "Download", nullptr));
     radio_FS_Size->setText(QCoreApplication::translate("Form", "Size", nullptr));
     radio_FS_HashChecksum->setText(QCoreApplication::translate("Form", "Hash/checksum", nullptr));
     radio_FS_Hash_Checksum_Types->setText(QCoreApplication::translate("Form", "Types", nullptr));
-    lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
-    label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
-    label_19->setText(QCoreApplication::translate("Form", "Hash/checksum:", nullptr));
+    label_19->setText(QCoreApplication::translate("Form", "Type:", nullptr));
+    btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
     label_4->setText(QCoreApplication::translate("Form", "File:", nullptr));
     check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
@@ -1100,24 +1207,32 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *___qtablewidgetitem13 = table_STAT_Values->horizontalHeaderItem(1);
     ___qtablewidgetitem13->setText(QCoreApplication::translate("Form", "Value", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Stats), QCoreApplication::translate("Form", "Stats", nullptr));
+    label_12->setText(QCoreApplication::translate("Form", "Input:", nullptr));
+    label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     btn_SHELL_Clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
+    btn_SHELL_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     btn_SHELL_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
     lbl_SHELL_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    label_12->setText(QCoreApplication::translate("Form", "Input:", nullptr));
-    btn_SHELL_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
-    label_23->setText(QCoreApplication::translate("Form", "Key:", nullptr));
+    label_22->setText(QCoreApplication::translate("Form", "Action:", nullptr));
     lbl_settings_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    label_26->setText(QCoreApplication::translate("Form", "Decoded:", nullptr));
+    radio_settings_none->setText(QCoreApplication::translate("Form", "None", nullptr));
+    radio_settings_text->setText(QCoreApplication::translate("Form", "Text", nullptr));
+    radio_settings_decimal->setText(QCoreApplication::translate("Form", "Decimal", nullptr));
+    label_23->setText(QCoreApplication::translate("Form", "Key:", nullptr));
+    label_24->setText(QCoreApplication::translate("Form", "Hex value:", nullptr));
     btn_settings_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    label_25->setText(QCoreApplication::translate("Form", "Decode:", nullptr));
+    check_settings_big_endian->setText(QCoreApplication::translate("Form", "Big endian", nullptr));
+    check_settings_signed_decimal_value->setText(QCoreApplication::translate("Form", "Signed decimal value", nullptr));
+    label_27->setText(QCoreApplication::translate("Form", "Decimals:", nullptr));
     radio_settings_read->setText(QCoreApplication::translate("Form", "Read", nullptr));
     radio_settings_write->setText(QCoreApplication::translate("Form", "Write", nullptr));
     radio_settings_delete->setText(QCoreApplication::translate("Form", "Delete", nullptr));
     radio_settings_commit->setText(QCoreApplication::translate("Form", "Commit", nullptr));
     radio_settings_load->setText(QCoreApplication::translate("Form", "Load", nullptr));
     radio_settings_save->setText(QCoreApplication::translate("Form", "Save", nullptr));
-    label_22->setText(QCoreApplication::translate("Form", "Action:", nullptr));
-    label_24->setText(QCoreApplication::translate("Form", "Value:", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
@@ -1197,6 +1312,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_settings_load, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_load_toggled(bool)));
     connect(radio_settings_save, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_save_toggled(bool)));
     connect(btn_settings_go, SIGNAL(clicked()), this, SLOT(on_btn_settings_go_clicked()));
+    connect(radio_settings_none, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_none_toggled(bool)));
+    connect(radio_settings_text, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_text_toggled(bool)));
+    connect(radio_settings_decimal, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_decimal_toggled(bool)));
+    connect(check_settings_big_endian, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_big_endian_toggled(bool)));
+    connect(check_settings_signed_decimal_value, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
 
     colview_IMG_Images->setModel(&model_image_state);
     colview_IMG_Images->setColumnWidths(QList<int>() << 50 << 50 << 460);
@@ -1244,7 +1364,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(smp_groups.stat_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.stat_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 //    connect(smp_groups.shell_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-    }
+
+    //Make shell response text edit have a monospace font
+    QFont monospace_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    monospace_font.setPointSize(8);
+    edit_SHELL_Output->setFont(monospace_font);
+}
 
 plugin_mcumgr::~plugin_mcumgr()
 {
@@ -1478,10 +1603,6 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         {
             lbl_FS_Status->setText("Error: Remote file name is required");
         }
-        else if (!QFile(edit_FS_Local->text()).exists())
-        {
-            lbl_FS_Status->setText("Error: Local file must exist");
-        }
         else
         {
             mode = ACTION_FS_DOWNLOAD;
@@ -1506,7 +1627,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
             mode = ACTION_FS_STATUS;
             processor->set_transport(active_transport());
             smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-            started = smp_groups.fs_mgmt->start_status(edit_FS_Remote->text());
+            started = smp_groups.fs_mgmt->start_status(edit_FS_Remote->text(), &fs_size_response);
 
             if (started == true)
             {
@@ -1529,7 +1650,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
             mode = ACTION_FS_HASH_CHECKSUM;
             processor->set_transport(active_transport());
             smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-            started = smp_groups.fs_mgmt->start_hash_checksum(edit_FS_Remote->text(), combo_FS_Hash_Checksum->currentText());
+            started = smp_groups.fs_mgmt->start_hash_checksum(edit_FS_Remote->text(), combo_FS_type->currentText(), &fs_hash_checksum_response, &fs_size_response);
 
             if (started == true)
             {
@@ -1562,42 +1683,67 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
 
 void plugin_mcumgr::on_radio_FS_Upload_toggled(bool checked)
 {
-    edit_FS_Local->setEnabled(true);
-    btn_FS_Local->setEnabled(true);
-    edit_FS_Remote->setEnabled(true);
-    combo_FS_Hash_Checksum->setEnabled(false);
+    if (checked == true)
+    {
+        edit_FS_Local->setEnabled(true);
+        btn_FS_Local->setEnabled(true);
+        edit_FS_Remote->setEnabled(true);
+        combo_FS_type->setEnabled(false);
+        edit_FS_Result->setEnabled(false);
+        edit_FS_Size->setEnabled(false);
+    }
 }
 
 void plugin_mcumgr::on_radio_FS_Download_toggled(bool checked)
 {
-    edit_FS_Local->setEnabled(true);
-    btn_FS_Local->setEnabled(true);
-    edit_FS_Remote->setEnabled(true);
-    combo_FS_Hash_Checksum->setEnabled(false);
+    if (checked == true)
+    {
+        edit_FS_Local->setEnabled(true);
+        btn_FS_Local->setEnabled(true);
+        edit_FS_Remote->setEnabled(true);
+        combo_FS_type->setEnabled(false);
+        edit_FS_Result->setEnabled(false);
+        edit_FS_Size->setEnabled(false);
+    }
 }
 
 void plugin_mcumgr::on_radio_FS_Size_toggled(bool checked)
 {
-    edit_FS_Local->setEnabled(false);
-    btn_FS_Local->setEnabled(false);
-    edit_FS_Remote->setEnabled(true);
-    combo_FS_Hash_Checksum->setEnabled(false);
+    if (checked == true)
+    {
+        edit_FS_Local->setEnabled(false);
+        btn_FS_Local->setEnabled(false);
+        edit_FS_Remote->setEnabled(true);
+        combo_FS_type->setEnabled(false);
+        edit_FS_Result->setEnabled(false);
+        edit_FS_Size->setEnabled(true);
+    }
 }
 
 void plugin_mcumgr::on_radio_FS_HashChecksum_toggled(bool checked)
 {
-    edit_FS_Local->setEnabled(false);
-    btn_FS_Local->setEnabled(false);
-    edit_FS_Remote->setEnabled(true);
-    combo_FS_Hash_Checksum->setEnabled(true);
+    if (checked == true)
+    {
+        edit_FS_Local->setEnabled(false);
+        btn_FS_Local->setEnabled(false);
+        edit_FS_Remote->setEnabled(true);
+        combo_FS_type->setEnabled(true);
+        edit_FS_Result->setEnabled(true);
+        edit_FS_Size->setEnabled(true);
+    }
 }
 
 void plugin_mcumgr::on_radio_FS_Hash_Checksum_Types_toggled(bool checked)
 {
-    edit_FS_Local->setEnabled(false);
-    btn_FS_Local->setEnabled(false);
-    edit_FS_Remote->setEnabled(false);
-    combo_FS_Hash_Checksum->setEnabled(true);
+    if (checked == true)
+    {
+        edit_FS_Local->setEnabled(false);
+        btn_FS_Local->setEnabled(false);
+        edit_FS_Remote->setEnabled(false);
+        combo_FS_type->setEnabled(true);
+        edit_FS_Result->setEnabled(false);
+        edit_FS_Size->setEnabled(false);
+    }
 }
 
 void plugin_mcumgr::on_btn_IMG_Local_clicked()
@@ -2286,16 +2432,16 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
             if (user_data == ACTION_SHELL_EXECUTE)
             {
+                edit_SHELL_Output->appendPlainText(error_string);
+
                 if (shell_rc == 0)
                 {
-                    lbl_SHELL_Status->setText("Finished");
+                    error_string = nullptr;
                 }
                 else
                 {
-                    lbl_SHELL_Status->setText(QString("Finished, error (ret): ").append(QString::number(shell_rc)));
+                    error_string = QString("Finished, error (ret): ").append(QString::number(shell_rc));
                 }
-
-                edit_SHELL_Output->appendPlainText(error_string);
             }
         }
     }
@@ -2363,34 +2509,34 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
             if (user_data == ACTION_FS_UPLOAD)
             {
-                edit_FS_Log->appendPlainText("todo");
+                //edit_FS_Log->appendPlainText("todo");
             }
             else if (user_data == ACTION_FS_DOWNLOAD)
             {
-                edit_FS_Log->appendPlainText("todo2");
+                //edit_FS_Log->appendPlainText("todo2");
             }
             else if (user_data == ACTION_FS_HASH_CHECKSUM)
             {
-                edit_FS_Log->appendPlainText("todo3");
+                error_string.prepend("Finished hash/checksum using ");
+                edit_FS_Result->setText(fs_hash_checksum_response.toHex());
+                edit_FS_Size->setText(QString::number(fs_size_response));
             }
             else if (user_data == ACTION_FS_SUPPORTED_HASHES_CHECKSUMS)
             {
                 uint8_t i = 0;
 
-                combo_FS_Hash_Checksum->clear();
+                combo_FS_type->clear();
 
                 while (i < supported_hash_checksum_list.length())
                 {
-                    combo_FS_Hash_Checksum->addItem(supported_hash_checksum_list.at(i).name);
+                    combo_FS_type->addItem(supported_hash_checksum_list.at(i).name);
                     log_debug() << supported_hash_checksum_list.at(i).format << ", " << supported_hash_checksum_list.at(i).size;
-                    edit_FS_Log->appendPlainText(QString("Has %1, %2, %3").arg(supported_hash_checksum_list[i].name, QString::number(supported_hash_checksum_list[i].format), QString::number(supported_hash_checksum_list[i].size)));
                     ++i;
                 }
-                edit_FS_Log->appendPlainText("todo4");
             }
             else if (user_data == ACTION_FS_STATUS)
             {
-                edit_FS_Log->appendPlainText("todo5");
+                edit_FS_Size->setText(QString::number(fs_size_response));
             }
         }
     }
@@ -2405,7 +2551,12 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
             if (user_data == ACTION_SETTINGS_READ)
             {
-                edit_settings_value->setText(settings_read_response);
+                edit_settings_value->setText(settings_read_response.toHex());
+
+                if (update_settings_display() == false)
+                {
+                    error_string = QString("Error: data is %1 bytes, cannot convert to decimal number").arg(QString::number(settings_read_response.length()));
+                }
             }
             else if (user_data == ACTION_SETTINGS_WRITE || user_data == ACTION_SETTINGS_DELETE || user_data == ACTION_SETTINGS_COMMIT || user_data == ACTION_SETTINGS_LOAD || user_data == ACTION_SETTINGS_SAVE)
             {
@@ -2456,12 +2607,16 @@ void plugin_mcumgr::progress(uint8_t user_data, uint8_t percent)
 {
     Q_UNUSED(user_data);
 
+    log_debug() << "Progress " << percent << " from " << this->sender();
+
     if (this->sender() == smp_groups.img_mgmt)
     {
+        log_debug() << "img sender";
         progress_IMG_Complete->setValue(percent);
     }
     else if (this->sender() == smp_groups.fs_mgmt)
     {
+        log_debug() << "fs sender";
         progress_FS_Complete->setValue(percent);
     }
 }
@@ -2711,7 +2866,8 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
             mode = ACTION_SETTINGS_WRITE;
             processor->set_transport(active_transport());
             smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-            started = smp_groups.settings_mgmt->start_write(edit_settings_key->text(), edit_settings_value->text().toUtf8());
+            //started = smp_groups.settings_mgmt->start_write(edit_settings_key->text(), edit_settings_value->text().toUtf8());
+            started = smp_groups.settings_mgmt->start_write(edit_settings_key->text(), QByteArray::fromHex(edit_settings_value->text().toLatin1()));
 
             if (started == true)
             {
@@ -2787,3 +2943,203 @@ void plugin_mcumgr::setup_finished()
     logger.find_logger_plugin(parent_window);
 }
 #endif
+
+void plugin_mcumgr::flip_endian(uint8_t *data, uint8_t size)
+{
+    uint8_t i = 0;
+
+    while (i < (size / 2))
+    {
+        uint8_t temp = data[(size - 1) - i];
+
+        data[(size - 1) - i] = data[i];
+        data[i] = temp;
+
+        ++i;
+    }
+}
+
+//settings_read_response
+void plugin_mcumgr::on_radio_settings_none_toggled(bool toggled)
+{
+    if (toggled == true)
+    {
+        edit_settings_decoded->setEnabled(false);
+        (void)update_settings_display();
+    }
+}
+
+void plugin_mcumgr::on_radio_settings_text_toggled(bool toggled)
+{
+    if (toggled == true)
+    {
+        edit_settings_decoded->setEnabled(true);
+        (void)update_settings_display();
+    }
+}
+
+void plugin_mcumgr::on_radio_settings_decimal_toggled(bool toggled)
+{
+    if (toggled == true)
+    {
+        check_settings_big_endian->setEnabled(true);
+        check_settings_signed_decimal_value->setEnabled(true);
+        edit_settings_decoded->setEnabled(true);
+        (void)update_settings_display();
+    }
+    else
+    {
+        check_settings_big_endian->setEnabled(false);
+        check_settings_signed_decimal_value->setEnabled(false);
+    }
+}
+
+void plugin_mcumgr::on_check_settings_big_endian_toggled(bool toggled)
+{
+    (void)update_settings_display();
+}
+
+void plugin_mcumgr::on_check_settings_signed_decimal_value_toggled(bool toggled)
+{
+    (void)update_settings_display();
+}
+
+bool plugin_mcumgr::update_settings_display()
+{
+    if (settings_read_response.length() == 0 || radio_settings_none->isChecked())
+    {
+        edit_settings_decoded->clear();
+    }
+    else if (radio_settings_text->isChecked())
+    {
+        edit_settings_decoded->setText(settings_read_response);
+    }
+    else if (radio_settings_decimal->isChecked())
+    {
+        if (settings_read_response.length() == sizeof(uint8_t) || settings_read_response.length() == sizeof(uint16_t) || settings_read_response.length() == sizeof(uint32_t) || settings_read_response.length() == sizeof(uint64_t))
+        {
+            bool endian_swap_required = false;
+
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+            if (check_settings_big_endian->isChecked())
+#else
+            if (!check_settings_big_endian->isChecked())
+#endif
+            {
+                endian_swap_required = true;
+            }
+
+            //Same endian as host, no conversion needed
+            if (check_settings_signed_decimal_value->isChecked())
+            {
+                //Signed integers
+                switch (settings_read_response.length())
+                {
+                    case sizeof(int8_t):
+                    {
+                        int8_t value = settings_read_response.constData()[0];
+                        edit_settings_decoded->setText(QString::number(value));
+                        break;
+                    }
+                    case sizeof(int16_t):
+                    {
+                        int16_t value;
+                        memcpy(&value, settings_read_response.constData(), sizeof(value));
+
+                        if (endian_swap_required == true)
+                        {
+                            flip_endian((uint8_t *)&value, sizeof(value));
+                        }
+
+                        edit_settings_decoded->setText(QString::number(value));
+                        break;
+                    }
+                    case sizeof(int32_t):
+                    {
+                        int32_t value;
+                        memcpy(&value, settings_read_response.constData(), sizeof(value));
+
+                        if (endian_swap_required == true)
+                        {
+                            flip_endian((uint8_t *)&value, sizeof(value));
+                        }
+
+                        edit_settings_decoded->setText(QString::number(value));
+                        break;
+                    }
+                    case sizeof(int64_t):
+                    {
+                        int64_t value;
+                        memcpy(&value, settings_read_response.constData(), sizeof(value));
+
+                        if (endian_swap_required == true)
+                        {
+                            flip_endian((uint8_t *)&value, sizeof(value));
+                        }
+
+                        edit_settings_decoded->setText(QString::number(value));
+                        break;
+                    }
+                };
+            }
+            else
+            {
+                //Unsigned integers
+                switch (settings_read_response.length())
+                {
+                    case sizeof(uint8_t):
+                    {
+                        uint8_t value = settings_read_response.constData()[0];
+                        edit_settings_decoded->setText(QString::number(value));
+                        break;
+                    }
+                    case sizeof(uint16_t):
+                    {
+                        uint16_t value;
+                        memcpy(&value, settings_read_response.constData(), sizeof(value));
+
+                        if (endian_swap_required == true)
+                        {
+                            flip_endian((uint8_t *)&value, sizeof(value));
+                        }
+
+                        edit_settings_decoded->setText(QString::number(value));
+                        break;
+                    }
+                    case sizeof(uint32_t):
+                    {
+                        uint32_t value;
+                        memcpy(&value, settings_read_response.constData(), sizeof(value));
+
+                        if (endian_swap_required == true)
+                        {
+                            flip_endian((uint8_t *)&value, sizeof(value));
+                        }
+
+                        edit_settings_decoded->setText(QString::number(value));
+                        break;
+                    }
+                    case sizeof(uint64_t):
+                    {
+                        uint64_t value;
+                        memcpy(&value, settings_read_response.constData(), sizeof(value));
+
+                        if (endian_swap_required == true)
+                        {
+                            flip_endian((uint8_t *)&value, sizeof(value));
+                        }
+
+                        edit_settings_decoded->setText(QString::number(value));
+                        break;
+                    }
+                };
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return true;
+}

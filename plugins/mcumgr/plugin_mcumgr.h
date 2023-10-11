@@ -63,6 +63,7 @@
 ///AUTOGEN_START_INCLUDES
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QColumnView>
 #include <QtWidgets/QComboBox>
@@ -196,12 +197,19 @@ private slots:
     void on_radio_settings_load_toggled(bool checked);
     void on_radio_settings_save_toggled(bool checked);
     void on_btn_settings_go_clicked();
+    void on_radio_settings_none_toggled(bool checked);
+    void on_radio_settings_text_toggled(bool checked);
+    void on_radio_settings_decimal_toggled(bool checked);
+    void on_check_settings_big_endian_toggled(bool checked);
+    void on_check_settings_signed_decimal_value_toggled(bool checked);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
     smp_transport *active_transport();
     bool claim_transport(QLabel *status);
     void relase_transport(void);
+    void flip_endian(uint8_t *data, uint8_t size);
+    bool update_settings_display();
 
     //Form items
 ///AUTOGEN_START_OBJECTS
@@ -221,26 +229,30 @@ private:
     QTabWidget *tabWidget_2;
     QWidget *tab_FS;
     QGridLayout *gridLayout_2;
-    QLineEdit *edit_FS_Local;
+    QLabel *label_28;
+    QLabel *lbl_FS_Status;
+    QLabel *label_29;
+    QLabel *label_2;
+    QProgressBar *progress_FS_Complete;
     QToolButton *btn_FS_Local;
-    QHBoxLayout *horizontalLayout_2;
-    QSpacerItem *horizontalSpacer;
-    QPushButton *btn_FS_Go;
-    QSpacerItem *horizontalSpacer_2;
+    QLabel *label_3;
+    QComboBox *combo_FS_type;
     QHBoxLayout *horizontalLayout;
     QRadioButton *radio_FS_Upload;
     QRadioButton *radio_FS_Download;
     QRadioButton *radio_FS_Size;
     QRadioButton *radio_FS_HashChecksum;
     QRadioButton *radio_FS_Hash_Checksum_Types;
-    QLabel *lbl_FS_Status;
-    QLabel *label_2;
-    QPlainTextEdit *edit_FS_Log;
-    QLabel *label_3;
-    QProgressBar *progress_FS_Complete;
-    QLineEdit *edit_FS_Remote;
     QLabel *label_19;
-    QComboBox *combo_FS_Hash_Checksum;
+    QLineEdit *edit_FS_Remote;
+    QHBoxLayout *horizontalLayout_2;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *btn_FS_Go;
+    QSpacerItem *horizontalSpacer_2;
+    QSpacerItem *verticalSpacer_6;
+    QLineEdit *edit_FS_Local;
+    QLineEdit *edit_FS_Result;
+    QLineEdit *edit_FS_Size;
     QWidget *tab_IMG;
     QGridLayout *gridLayout_3;
     QTabWidget *tabWidget_3;
@@ -338,27 +350,39 @@ private:
     QTableWidget *table_STAT_Values;
     QWidget *tab_Shell;
     QGridLayout *gridLayout_9;
-    QVBoxLayout *verticalLayout_3;
-    QToolButton *btn_SHELL_Clear;
-    QToolButton *btn_SHELL_Copy;
-    QLabel *lbl_SHELL_Status;
-    QPlainTextEdit *edit_SHELL_Output;
-    QLineEdit *edit_SHELL_Input;
     QLabel *label_12;
+    QLabel *label_13;
+    QLineEdit *edit_SHELL_Input;
     QHBoxLayout *horizontalLayout_8;
     QSpacerItem *horizontalSpacer_7;
+    QToolButton *btn_SHELL_Clear;
     QPushButton *btn_SHELL_Go;
+    QToolButton *btn_SHELL_Copy;
     QSpacerItem *horizontalSpacer_8;
-    QLabel *label_13;
+    QPlainTextEdit *edit_SHELL_Output;
+    QLabel *lbl_SHELL_Status;
     QWidget *tab_Settings;
     QGridLayout *gridLayout_15;
-    QLabel *label_23;
+    QLineEdit *edit_settings_key;
+    QLabel *label_22;
     QLabel *lbl_settings_status;
+    QSpacerItem *verticalSpacer_5;
+    QLabel *label_26;
+    QHBoxLayout *horizontalLayout_16;
+    QRadioButton *radio_settings_none;
+    QRadioButton *radio_settings_text;
+    QRadioButton *radio_settings_decimal;
+    QLabel *label_23;
+    QLabel *label_24;
     QHBoxLayout *horizontalLayout_15;
     QSpacerItem *horizontalSpacer_10;
     QPushButton *btn_settings_go;
     QSpacerItem *horizontalSpacer_11;
-    QLineEdit *edit_settings_value;
+    QLabel *label_25;
+    QHBoxLayout *horizontalLayout_12;
+    QCheckBox *check_settings_big_endian;
+    QCheckBox *check_settings_signed_decimal_value;
+    QLabel *label_27;
     QHBoxLayout *horizontalLayout_11;
     QRadioButton *radio_settings_read;
     QRadioButton *radio_settings_write;
@@ -366,10 +390,9 @@ private:
     QRadioButton *radio_settings_commit;
     QRadioButton *radio_settings_load;
     QRadioButton *radio_settings_save;
-    QLabel *label_22;
-    QLineEdit *edit_settings_key;
-    QLabel *label_24;
-    QSpacerItem *verticalSpacer_5;
+    QLineEdit *edit_settings_value;
+    QLineEdit *edit_settings_decoded;
+    QFrame *line_2;
     QWidget *tab_2;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
@@ -386,6 +409,8 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
+    QButtonGroup *buttonGroup;
+    QButtonGroup *buttonGroup_2;
 ///AUTOGEN_END_OBJECTS
 
     //
@@ -418,6 +443,8 @@ private:
     QList<hash_checksum_t> supported_hash_checksum_list;
     QVariant bootloader_info_response;
     QByteArray settings_read_response;
+    QByteArray fs_hash_checksum_response;
+    uint32_t fs_size_response;
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger logger;
 #endif

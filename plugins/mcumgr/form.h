@@ -47,6 +47,11 @@ private slots:
     void on_radio_FS_Size_toggled(bool checked);
     void on_radio_FS_HashChecksum_toggled(bool checked);
     void on_radio_FS_Hash_Checksum_Types_toggled(bool checked);
+    void on_radio_settings_none_toggled(bool checked);
+    void on_radio_settings_text_toggled(bool checked);
+    void on_radio_settings_decimal_toggled(bool checked);
+    void on_check_settings_big_endian_toggled(bool checked);
+    void on_check_settings_signed_decimal_value_toggled(bool checked);
 
 private:
     Ui::Form *ui;
