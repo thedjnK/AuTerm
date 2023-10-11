@@ -3937,15 +3937,18 @@ AutMainWindow::LoadSettings(
         //Create AuTerm directory in application support
         QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     }
-    gpTermSettings = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/AuTerm.ini"), QSettings::IniFormat); //Handle to settings
+    //gpTermSettings = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/AuTerm.ini"), QSettings::IniFormat); //Handle to settings
     gpErrorMessages = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/codes.csv"), QSettings::IniFormat); //Handle to error codes
-    gpPredefinedDevice = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/Devices.ini"), QSettings::IniFormat); //Handle to predefined devices
+    //gpPredefinedDevice = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/Devices.ini"), QSettings::IniFormat); //Handle to predefined devices
 #else
     //Open files in same directory
-    gpTermSettings = new QSettings(QString("AuTerm.ini"), QSettings::IniFormat); //Handle to settings
+    //gpTermSettings = new QSettings(QString("AuTerm.ini"), QSettings::IniFormat); //Handle to settings
     gpErrorMessages = new QSettings(QString("codes.csv"), QSettings::IniFormat); //Handle to error codes
-    gpPredefinedDevice = new QSettings(QString("Devices.ini"), QSettings::IniFormat); //Handle to predefined devices
+    //gpPredefinedDevice = new QSettings(QString("Devices.ini"), QSettings::IniFormat); //Handle to predefined devices
 #endif
+
+    gpTermSettings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "AuTerm", "settings"); //Handle to settings
+    gpPredefinedDevice = new QSettings(QSettings::IniFormat, QSettings::UserScope, "AuTerm", "devices"); //Handle to predefined devices
 
     //Check if error code file exists
 #ifdef TARGET_OS_MAC
@@ -3959,11 +3962,7 @@ AutMainWindow::LoadSettings(
     }
 
     //Check settings
-#ifdef TARGET_OS_MAC
-    if (!QFile::exists(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/AuTerm.ini")) || gpTermSettings->value("ConfigVersion").toString() != UwVersion)
-#else
-    if (!QFile::exists("AuTerm.ini") || gpTermSettings->value("ConfigVersion").toString() != UwVersion)
-#endif
+    if (gpTermSettings->allKeys().isEmpty() || gpTermSettings->value("ConfigVersion").toString() != UwVersion)
     {
         //Extract old configuration version
         if (!gpTermSettings->value("ConfigVersion").isNull())
