@@ -54,7 +54,10 @@ enum fs_mgmt_errs : uint16_t {
     FS_MGMT_ERR_FILE_WRITE_FAILED,
     FS_MGMT_ERR_FILE_OFFSET_NOT_VALID,
     FS_MGMT_ERR_FILE_OFFSET_LARGER_THAN_FILE,
-    FS_MGMT_ERR_CHECKSUM_HASH_NOT_FOUND
+    FS_MGMT_ERR_CHECKSUM_HASH_NOT_FOUND,
+    FS_MGMT_ERR_MOUNT_POINT_NOT_FOUND,
+    FS_MGMT_ERR_READ_ONLY_FILESYSTEM,
+    FS_MGMT_ERR_FILE_EMPTY
 };
 
 static QStringList smp_error_defines = QStringList() <<
@@ -70,7 +73,10 @@ static QStringList smp_error_defines = QStringList() <<
     "FILE_WRITE_FAILED" <<
     "FILE_OFFSET_NOT_VALID" <<
     "FILE_OFFSET_LARGER_THAN_FILE" <<
-    "CHECKSUM_HASH_NOT_FOUND";
+    "CHECKSUM_HASH_NOT_FOUND" <<
+    "MOUNT_POINT_NOT_FOUND" <<
+    "READ_ONLY_FILESYSTEM" <<
+    "FILE_EMPTY";
 
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
@@ -85,7 +91,10 @@ static QStringList smp_error_values = QStringList() <<
     "Error occurred whilst attempting to write data to a file" <<
     "Specified data offset is not valid" <<
     "The requested offset is larger than the size of the file on the device" <<
-    "The requested checksum or hash type was not found or is not supported by this build";
+    "The requested checksum or hash type was not found or is not supported by this build" <<
+    "The specified mount point was not found or is not mounted" <<
+    "The specified mount point is that of a read-only filesystem" <<
+    "The operation cannot be performed because the file is empty with no contents";
 
 smp_group_fs_mgmt::smp_group_fs_mgmt(smp_processor *parent) : smp_group(parent, "FS", SMP_GROUP_ID_FS, error_lookup, error_define_lookup)
 {

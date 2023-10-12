@@ -43,13 +43,19 @@ static QStringList smp_error_defines = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "KEY_TOO_LONG" <<
     "KEY_NOT_FOUND" <<
-    "READ_NOT_SUPPORTED";
+    "READ_NOT_SUPPORTED" <<
+    "ROOT_KEY_NOT_FOUND" <<
+    "WRITE_NOT_SUPPORTED" <<
+    "DELETE_NOT_SUPPORTED";
 
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "The provided key name is too long to be used" <<
     "The provided key name does not exist" <<
-    "The provided key name does not support being read";
+    "The provided key name does not support being read" <<
+    "The provided root key name does not exist" <<
+    "The provided key name does not support being written" <<
+    "The provided key name does not support being deleted";
 
 smp_group_settings_mgmt::smp_group_settings_mgmt(smp_processor *parent) : smp_group(parent, "SETTINGS", SMP_GROUP_ID_SETTINGS, error_lookup, error_define_lookup)
 {

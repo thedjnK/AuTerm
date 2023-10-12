@@ -48,11 +48,13 @@ enum os_mgmt_commands : uint8_t {
 
 static QStringList smp_error_defines = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
-    "INVALID_FORMAT";
+    "INVALID_FORMAT" <<
+    "QUERY_YIELDS_NO_ANSWER";
 
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
-    "The provided format value is not valid";
+    "The provided format value is not valid" <<
+    "Query was not recognized";
 
 smp_group_os_mgmt::smp_group_os_mgmt(smp_processor *parent) : smp_group(parent, "OS", SMP_GROUP_ID_OS, error_lookup, error_define_lookup)
 {

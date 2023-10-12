@@ -80,7 +80,9 @@ static QStringList smp_error_defines = QStringList() <<
     "IMAGE_ALREADY_PENDING" <<
     "INVALID_IMAGE_VECTOR_TABLE" <<
     "INVALID_IMAGE_TOO_LARGE" <<
-    "INVALID_IMAGE_DATA_OVERRUN";
+    "INVALID_IMAGE_DATA_OVERRUN" <<
+    "IMAGE_CONFIRMATION_DENIED" <<
+    "IMAGE_SETTING_TEST_TO_ACTIVE_DENIED";
 
 static QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
@@ -113,7 +115,9 @@ static QStringList smp_error_values = QStringList() <<
     "There is already an image operating pending" <<
     "The image vector table is invalid" <<
     "The image it too large to fit" <<
-    "The amount of data sent is larger than the provided image size";
+    "The amount of data sent is larger than the provided image size" <<
+    "Confirmation of image has been denied" <<
+    "Setting test to active slot is not allowed";
 
 image_state_t image_state_buffer;
 slot_state_t slot_state_buffer;
