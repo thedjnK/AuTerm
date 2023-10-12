@@ -3064,64 +3064,15 @@
              <number>2</number>
             </property>
             <item>
-             <widget class="QLabel" name="label_21">
-              <property name="maximumSize">
-               <size>
-                <width>150</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>View logs in:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="combo_LogDirectory">
-              <property name="maximumSize">
-               <size>
-                <width>150</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="currentIndex">
-               <number>1</number>
-              </property>
-              <item>
-               <property name="text">
-                <string>Current Directory</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Log-File Directory</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="btn_LogViewFolder">
               <property name="maximumSize">
                <size>
-                <width>150</width>
+                <width>200</width>
                 <height>16777215</height>
                </size>
               </property>
               <property name="text">
-               <string>View folder</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LogRefresh">
-              <property name="maximumSize">
-               <size>
-                <width>150</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Refresh</string>
+               <string>View log folder</string>
               </property>
              </widget>
             </item>
@@ -3160,6 +3111,19 @@
                 <string>- No file selected -</string>
                </property>
               </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_LogRefresh">
+              <property name="maximumSize">
+               <size>
+                <width>150</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Refresh</string>
+              </property>
              </widget>
             </item>
             <item>
@@ -3295,12 +3259,12 @@
               </item>
               <item>
                <property name="text">
-                <string>AuTerm.ini</string>
+                <string>settings.ini</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>Devices.ini</string>
+                <string>devices.ini</string>
                </property>
               </item>
              </widget>
@@ -3500,8 +3464,6 @@
   <tabstop>btn_TermClose</tabstop>
   <tabstop>btn_Cancel</tabstop>
   <tabstop>text_TermEditData</tabstop>
-  <tabstop>combo_LogDirectory</tabstop>
-  <tabstop>btn_LogRefresh</tabstop>
   <tabstop>text_LogData</tabstop>
  </tabstops>
  <resources>

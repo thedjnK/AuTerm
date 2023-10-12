@@ -114,7 +114,7 @@ const qint16 StreamProgress                     = 10000;   //Number of bytes bet
 const qint16 BatchTimeout                       = 4000;    //Time (in ms) to wait for getting a response from a batch command for
 const qint16 ModuleTimeout                      = 4000;    //Time (in ms) that a download stage command/process times out (module)
 //Constants for default config values
-const QString DefaultLogFile                    = "AuTerm.log";
+const QString DefaultLogFileName                = "AuTerm.log";
 const bool DefaultLogMode                       = 0;
 const bool DefaultLogEnable                     = 0;
 const bool DefaultSysTrayIcon                   = 1;

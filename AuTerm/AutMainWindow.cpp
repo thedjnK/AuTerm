@@ -484,7 +484,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     connect(&gtmrBatchTimeoutTimer, SIGNAL(timeout()), this, SLOT(BatchTimeoutSlot()));
 
     //Set logging options
-    ui->edit_LogFile->setText(gpTermSettings->value("LogFile", DefaultLogFile).toString());
+    ui->edit_LogFile->setText(gpTermSettings->value("LogFile", QString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(DefaultLogFileName)).toString());
     ui->check_LogEnable->setChecked(gpTermSettings->value("LogEnable", DefaultLogEnable).toBool());
     ui->check_LogAppend->setChecked(gpTermSettings->value("LogMode", DefaultLogMode).toBool());
 
@@ -1015,10 +1015,6 @@ AutMainWindow::~AutMainWindow()
         gspSerialPort.close();
         gpSignalTimer->stop();
 #ifndef SKIPPLUGINS
-        /*for (int i = 0; i < plugin_list.length(); ++i)
-        {
-            plugin_list.at(i).plugin->serial_closed();
-        }*/
         emit plugin_serial_closed();
         gbPluginHideTerminalOutput = false;
         gbPluginRunning = false;
@@ -1300,10 +1296,6 @@ AutMainWindow::on_btn_TermClose_clicked(
             gspSerialPort.close();
 
 #ifndef SKIPPLUGINS
-            /*for (int i = 0; i < plugin_list.length(); ++i)
-            {
-                plugin_list.at(i).plugin->serial_closed();
-            }*/
             emit plugin_serial_closed();
             gbPluginHideTerminalOutput = false;
             gbPluginRunning = false;
@@ -1561,10 +1553,6 @@ AutMainWindow::SerialRead(
     {
         //A plugin is running, siphon data to it
 //TODO: limit to the running plugin only
-        /*for (int i = 0; i < plugin_list.length(); ++i)
-        {
-            plugin_list.at(i).plugin->serial_receive(&baOrigData);
-        }*/
         emit plugin_serial_receive(&baOrigData);
     }
 #endif
@@ -2298,10 +2286,6 @@ AutMainWindow::OpenDevice(
             gspSerialPort.close();
 
 #ifndef SKIPPLUGINS
-            /*for (int i = 0; i < plugin_list.length(); ++i)
-            {
-                plugin_list.at(i).plugin->serial_closed();
-            }*/
             emit plugin_serial_closed();
             gbPluginHideTerminalOutput = false;
             gbPluginRunning = false;
@@ -2598,10 +2582,6 @@ AutMainWindow::SerialError(
     {
         //No error. Why this is ever emitted is a mystery to me.
 #ifndef SKIPPLUGINS
-        /*for (int i = 0; i < plugin_list.length(); ++i)
-        {
-            plugin_list.at(i).plugin->serial_opened();
-        }*/
         emit plugin_serial_opened();
 #endif
         return;
@@ -2762,20 +2742,11 @@ AutMainWindow::SerialError(
     }
 
 #ifndef SKIPPLUGINS
-    /*for (int i = 0; i < plugin_list.length(); ++i)
-    {
-        plugin_list.at(i).plugin->serial_error(speErrorCode);
-    }*/
     emit plugin_serial_error(speErrorCode);
 
     if (port_closed == true)
     {
-        /*for (int i = 0; i < plugin_list.length(); ++i)
-        {
-            plugin_list.at(i).plugin->serial_closed();
-        }*/
         emit plugin_serial_closed();
-
         gbPluginHideTerminalOutput = false;
         gbPluginRunning = false;
     }
@@ -2961,10 +2932,6 @@ AutMainWindow::SerialBytesWritten(
     }
 
 #ifndef SKIPPLUGINS
-    /*for (int i = 0; i < plugin_list.length(); ++i)
-    {
-        plugin_list.at(i).plugin->serial_bytes_written(intByteCount);
-    }*/
     emit plugin_serial_bytes_written(intByteCount);
 #endif
 }
@@ -3576,10 +3543,6 @@ AutMainWindow::SerialPortClosing(
     }
 
 #ifndef SKIPPLUGINS
-    /*for (int i = 0; i < plugin_list.length(); ++i)
-    {
-        plugin_list.at(i).plugin->serial_about_to_close();
-    }*/
     emit plugin_serial_about_to_close();
 #endif
 }
@@ -3681,29 +3644,9 @@ AutMainWindow::on_btn_LogRefresh_clicked(
     //Refreshes the log files available for viewing
     ui->combo_LogFile->clear();
     ui->combo_LogFile->addItem("- No file selected -");
-    QString strDirPath;
-    if (ui->combo_LogDirectory->currentIndex() == 1)
-    {
-        //Log file directory
-#ifdef TARGET_OS_MAC
-        QFileInfo a(QString((ui->edit_LogFile->text().left(1) == "/" || ui->edit_LogFile->text().left(1) == "\\") ? "" : QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/")).append(ui->edit_LogFile->text()));
-#else
-        QFileInfo a(ui->edit_LogFile->text());
-#endif
-        strDirPath = a.absolutePath();
-    }
-    else
-    {
-        //Application directory
-#ifdef TARGET_OS_MAC
-        strDirPath = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/");
-#else
-        strDirPath = "./";
-#endif
-    }
 
     //Apply file filters
-    QDir dirLogDir(strDirPath);
+    QDir dirLogDir(QString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/"));
     QFileInfoList filFiles;
     filFiles = dirLogDir.entryInfoList(QStringList() << "*.log");
     if (filFiles.count() > 0)
@@ -3750,15 +3693,8 @@ void
 AutMainWindow::on_btn_EditViewFolder_clicked(
     )
 {
-    //Open application folder
-#ifdef TARGET_OS_MAC
-    QString strFullDirname = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/");
-#else
-    QString strFullDirname = "./";
-#endif
-
-    //Open folder
-    QDesktopServices::openUrl(QUrl::fromLocalFile(strFullDirname));
+    //Open configuration folder
+    QDesktopServices::openUrl(QUrl::fromLocalFile(gpTermSettings->fileName().left(gpTermSettings->fileName().lastIndexOf("/"))));
 }
 
 //=============================================================================
@@ -3784,23 +3720,12 @@ AutMainWindow::on_combo_EditFile_currentIndexChanged(
 
     if (ui->combo_EditFile->currentIndex() != 0)
     {
-        //Load file data
-        QString strFullFilename;
-
         //Allow edits
         ui->text_EditData->setReadOnly(false);
 
-#ifdef TARGET_OS_MAC
-        strFullFilename = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/");
-#else
-        strFullFilename = "./";
-#endif
-
-        //Create the full filename
-        strFullFilename = strFullFilename.append("/").append(ui->combo_EditFile->currentIndex() == 1 ? "AuTerm.ini" : "Devices.ini");
-
         //Open the log file for reading
-        QFile fileLogFile(strFullFilename);
+        QFile fileLogFile(ui->combo_EditFile->currentIndex() == 1 ? gpTermSettings->fileName() : gpPredefinedDevice->fileName());
+
         if (fileLogFile.open(QFile::ReadOnly | QFile::Text))
         {
             //Get the contents of the log file
@@ -3810,7 +3735,7 @@ AutMainWindow::on_combo_EditFile_currentIndexChanged(
             giEditFileType = ui->combo_EditFile->currentIndex();
 
             //Information about the file
-            QFileInfo fiFileInfo(strFullFilename);
+            QFileInfo fiFileInfo(fileLogFile.fileName());
             char cPrefixes[4] = {'K', 'M', 'G', 'T'};
             float fltFilesize = fiFileInfo.size();
             unsigned char cPrefix = 0;
@@ -3863,20 +3788,9 @@ AutMainWindow::on_btn_EditSave_clicked(
 {
     if (ui->combo_EditFile->currentIndex() != 0)
     {
-        //Save file data
-        QString strFullFilename;
+        //Open the file for writing
+        QFile fileLogFile(ui->combo_EditFile->currentIndex() == 1 ? gpTermSettings->fileName() : gpPredefinedDevice->fileName());
 
-#ifdef TARGET_OS_MAC
-        strFullFilename = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/");
-#else
-        strFullFilename = "./";
-#endif
-
-        //Create the full filename
-        strFullFilename = strFullFilename.append("/").append(ui->combo_EditFile->currentIndex() == 1 ? "AuTerm.ini" : "Devices.ini");
-
-        //Open the log file for reading
-        QFile fileLogFile(strFullFilename);
         if (fileLogFile.open(QFile::WriteOnly | QFile::Text))
         {
             //Get the contents of the log file
@@ -3915,12 +3829,12 @@ AutMainWindow::on_btn_EditExternal_clicked(
     if (ui->combo_EditFile->currentIndex() == 1)
     {
         //Opens the AuTerm configuration file
-        QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("AuTerm.ini").absoluteFilePath()));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(gpTermSettings->fileName()));
     }
     else if (ui->combo_EditFile->currentIndex() == 2)
     {
         //Opens the predefined devices configuration file
-        QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("Devices.ini").absoluteFilePath()));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(gpPredefinedDevice->fileName()));
     }
 }
 #endif
@@ -3937,14 +3851,10 @@ AutMainWindow::LoadSettings(
         //Create AuTerm directory in application support
         QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     }
-    //gpTermSettings = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/AuTerm.ini"), QSettings::IniFormat); //Handle to settings
     gpErrorMessages = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/codes.csv"), QSettings::IniFormat); //Handle to error codes
-    //gpPredefinedDevice = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/Devices.ini"), QSettings::IniFormat); //Handle to predefined devices
 #else
     //Open files in same directory
-    //gpTermSettings = new QSettings(QString("AuTerm.ini"), QSettings::IniFormat); //Handle to settings
     gpErrorMessages = new QSettings(QString("codes.csv"), QSettings::IniFormat); //Handle to error codes
-    //gpPredefinedDevice = new QSettings(QString("Devices.ini"), QSettings::IniFormat); //Handle to predefined devices
 #endif
 
     gpTermSettings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "AuTerm", "settings"); //Handle to settings
@@ -3979,7 +3889,7 @@ AutMainWindow::LoadSettings(
         //No settings, or some config values not present defaults;
         if (gpTermSettings->value("LogFile").isNull())
         {
-            gpTermSettings->setValue("LogFile", DefaultLogFile); //Default log file
+            gpTermSettings->setValue("LogFile", QString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(DefaultLogFileName)); //Default log file
         }
         if (gpTermSettings->value("LogMode").isNull())
         {
@@ -4069,32 +3979,8 @@ AutMainWindow::on_btn_LogViewExternal_clicked(
     //View log in external editor
     if (ui->combo_LogFile->currentIndex() >= 1)
     {
-        //Create the full filename
-        QString strFullFilename;
-
-        if (ui->combo_LogDirectory->currentIndex() == 1)
-        {
-            //Log file directory
-#ifdef TARGET_OS_MAC
-            QFileInfo fiFileInfo(QString((ui->edit_LogFile->text().left(1) == "/" || ui->edit_LogFile->text().left(1) == "\\") ? "" : QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/")).append(ui->edit_LogFile->text()));
-#else
-            QFileInfo fiFileInfo(ui->edit_LogFile->text());
-#endif
-            strFullFilename = fiFileInfo.absolutePath();
-        }
-        else
-        {
-            //Application directory
-#ifdef TARGET_OS_MAC
-            strFullFilename = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/");
-#else
-            strFullFilename = "./";
-#endif
-        }
-        strFullFilename = strFullFilename.append("/").append(ui->combo_LogFile->currentText());
-
         //Open file
-        QDesktopServices::openUrl(QUrl::fromLocalFile(strFullFilename));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(ui->combo_LogFile->currentText())));
     }
     else
     {
@@ -4111,30 +3997,7 @@ AutMainWindow::on_btn_LogViewFolder_clicked(
     )
 {
     //Open log folder
-    QString strFullDirname;
-
-    if (ui->combo_LogDirectory->currentIndex() == 1)
-    {
-        //Log file directory
-#ifdef TARGET_OS_MAC
-        QFileInfo fiFileInfo(QString((ui->edit_LogFile->text().left(1) == "/" || ui->edit_LogFile->text().left(1) == "\\") ? "" : QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/")).append(ui->edit_LogFile->text()));
-#else
-        QFileInfo fiFileInfo(ui->edit_LogFile->text());
-#endif
-        strFullDirname = fiFileInfo.absolutePath();
-    }
-    else
-    {
-        //Application directory
-#ifdef TARGET_OS_MAC
-        strFullDirname = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/");
-#else
-        strFullDirname = "./";
-#endif
-    }
-
-    //Open folder
-    QDesktopServices::openUrl(QUrl::fromLocalFile(strFullDirname));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(QString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/")));
 }
 
 //=============================================================================
@@ -4155,37 +4018,13 @@ AutMainWindow::on_combo_LogFile_currentIndexChanged(
     )
 {
     //List item changed - load log file
-    QString strFullFilename;
-
-    if (ui->combo_LogDirectory->currentIndex() == 1)
-    {
-        //Log file directory
-#ifdef TARGET_OS_MAC
-        QFileInfo fiFileInfo(QString((ui->edit_LogFile->text().left(1) == "/" || ui->edit_LogFile->text().left(1) == "\\") ? "" : QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/")).append(ui->edit_LogFile->text()));
-#else
-        QFileInfo fiFileInfo(ui->edit_LogFile->text());
-#endif
-        strFullFilename = fiFileInfo.absolutePath();
-    }
-    else
-    {
-        //Application directory
-#ifdef TARGET_OS_MAC
-        strFullFilename = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/");
-#else
-        strFullFilename = "./";
-#endif
-    }
-
     ui->text_LogData->clear();
     ui->label_LogInfo->clear();
+
     if (ui->combo_LogFile->currentIndex() >= 1)
     {
-        //Create the full filename
-        strFullFilename = strFullFilename.append("/").append(ui->combo_LogFile->currentText());
-
         //Open the log file for reading
-        QFile fileLogFile(strFullFilename);
+        QFile fileLogFile(QString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(ui->combo_LogFile->currentText()));
         if (fileLogFile.open(QFile::ReadOnly | QFile::Text))
         {
             //Get the contents of the log file
@@ -4193,7 +4032,7 @@ AutMainWindow::on_combo_LogFile_currentIndexChanged(
             fileLogFile.close();
 
             //Information about the log file
-            QFileInfo fiFileInfo(strFullFilename);
+            QFileInfo fiFileInfo(fileLogFile.fileName());
             char cPrefixes[4] = {'K', 'M', 'G', 'T'};
             float fltFilesize = fiFileInfo.size();
             unsigned char cPrefix = 0;
