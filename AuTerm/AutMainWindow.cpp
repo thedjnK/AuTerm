@@ -3349,7 +3349,7 @@ AutMainWindow::on_check_Echo_stateChanged(
     )
 {
     //Local echo checkbox state changed
-//    ui->text_TermEditData->mbLocalEcho = ui->check_Echo->isChecked();
+    ui->text_TermEditData->mbLocalEcho = ui->check_Echo->isChecked();
 }
 
 //=============================================================================
