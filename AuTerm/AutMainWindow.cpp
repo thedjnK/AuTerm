@@ -667,13 +667,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         {
             //Set com port
             QString strPort = slArgs[chi].right(slArgs[chi].length()-4);
-#ifdef _WIN32
-            if (strPort.left(3) != "COM")
-            {
-                //Prepend COM for UwTerminal shortcut compatibility
-                strPort.prepend("COM");
-            }
-#endif
             ui->combo_COM->setCurrentText(strPort);
             bArgCom = true;
 
