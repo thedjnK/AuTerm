@@ -362,8 +362,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     connect(ui->text_TermEditData, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
     connect(ui->text_TermEditData, SIGNAL(key_pressed(int,QChar)), this, SLOT(key_pressed(int,QChar)));
 
-    //Connect file drag/drop signal
-
     //Initialise popup message
     gpmErrorForm = new PopupMessage(this);
 
@@ -442,11 +440,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     gpSpeedMenu->addAction("Send && receive test (delay 5 seconds)")->setData(SpeedMenuActionSendRecv5Delay);
     gpSpeedMenu->addAction("Send && receive test (delay 10 seconds)")->setData(SpeedMenuActionSendRecv10Delay);
     gpSpeedMenu->addAction("Send && receive test (delay 15 seconds)")->setData(SpeedMenuActionSendRecv15Delay);
-#endif
-
-#if defined(TARGET_OS_MAC) || (defined(SKIPUSBRECOVERY) && SKIPUSBRECOVERY == 1)
-    //Remove exit autorun button on mac
-    ui->btn_ExitAutorun->deleteLater();
 #endif
 
     //Connect the menu actions
