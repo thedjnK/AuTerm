@@ -5630,7 +5630,7 @@ bool AutMainWindow::is_newer(const QString *new_version, const QString *current_
         ++i;
     }
 
-    if (match == true && new_version->length() > current_version->length())
+    if (match == true && new_version->length() > current_version->length() && ((new_version->at(i) >= 'a' && new_version->at(i) <= 'z') || (new_version->at(i) >= '0' && new_version->at(i) <= '9')))
     {
         return true;
     }
