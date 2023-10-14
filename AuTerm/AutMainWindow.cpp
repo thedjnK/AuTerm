@@ -3218,7 +3218,6 @@ AutMainWindow::replyFinished(
             gchTermMode = 0;
             gbTermBusy = false;
             ui->btn_Cancel->setEnabled(false);
-            ui->statusBar->showMessage(QString(baTmpBA));
 
             if (baTmpBA.length() > 8)
             {
