@@ -259,7 +259,7 @@ private slots:
 #ifndef SKIPONLINE
     void replyFinished(QNetworkReply* nrReply);
 #ifndef QT_NO_SSL
-    void sslErrors(QNetworkReply*, QList<QSslError>);
+    void sslErrors(QNetworkReply *nrReply, const QList<QSslError> lstSSLErrors);
 #endif
 #endif
     void on_btn_Github_clicked();

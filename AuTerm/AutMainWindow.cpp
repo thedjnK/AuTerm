@@ -260,7 +260,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 #ifndef SKIPONLINE
     gnmManager = new QNetworkAccessManager(this);
     connect(gnmManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
-    connect(gnmManager, SIGNAL(sslErrors(QNetworkReply*,QList)), this, SLOT(sslErrors(QNetworkReply*,QList)));
+    connect(gnmManager, SIGNAL(sslErrors(QNetworkReply*,const QList<QSslError>)), this, SLOT(sslErrors(QNetworkReply*,const QList<QSslError>)));
 #endif
 #ifndef SKIPSPEEDTEST
     gtmrSpeedTestDelayTimer = 0;
@@ -969,6 +969,7 @@ AutMainWindow::~AutMainWindow()
     disconnect(this, SLOT(BatchTimeoutSlot()));
 #ifndef SKIPONLINE
     disconnect(this, SLOT(replyFinished(QNetworkReply*)));
+    disconnect(this, SLOT(sslErrors(QNetworkReply*,const QList<QSslError>)));
 #endif
     disconnect(this, SLOT(MessagePass(QByteArray,bool,bool)));
 #ifndef SKIPSPEEDTEST
@@ -3254,7 +3255,7 @@ AutMainWindow::replyFinished(
 void
 AutMainWindow::sslErrors(
     QNetworkReply* nrReply,
-    QList<QSslError> lstSSLErrors
+    const QList<QSslError> lstSSLErrors
     )
 {
     //Error detected with SSL
