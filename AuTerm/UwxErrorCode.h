@@ -76,12 +76,6 @@ private slots:
         int iListRow
         );
     void
-    on_edit_Search_returnPressed(
-        );
-    void
-    on_btn_Search_clicked(
-        );
-    void
     on_list_Search_currentRowChanged(
         int iSearchRow
         );
@@ -96,6 +90,8 @@ private slots:
     void
     on_btn_Copy_clicked(
         );
+    void on_edit_Search_textChanged(const QString &arg1);
+    void on_btn_order_clicked();
 
 private:
     Ui::UwxErrorCode *ui;

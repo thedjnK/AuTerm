@@ -114,49 +114,6 @@ UwxErrorCode::on_list_Codes_currentRowChanged(
 //=============================================================================
 //=============================================================================
 void
-UwxErrorCode::on_edit_Search_returnPressed(
-    )
-{
-    //Search for error
-    QString SearchStr = ui->edit_Search->text().toLower();
-    ui->list_Search->clear();
-    foreach (const QString &strKey, mpErrorMessages->childKeys())
-    {
-        if (mpErrorMessages->value(strKey).toString().toLower().indexOf(SearchStr) != -1)
-        {
-            //Potential match. One short at a time, convert the data to hex
-            quint16 ThisByte = strKey.toUInt();
-            QString strThisHex;
-            strThisHex.setNum(ThisByte, 16);
-            strThisHex = strThisHex.toUpper();
-            while (strThisHex.length() < 4)
-            {
-                //Expand to 4 characters
-                strThisHex.prepend('0');
-            }
-
-            //Add error to list
-            ui->list_Search->addItem(QString(strThisHex).append(": ").append(mpErrorMessages->value(strKey).toString()));
-        }
-    }
-
-    //Sort items in ascending order
-    ui->list_Search->sortItems(Qt::AscendingOrder);
-}
-
-//=============================================================================
-//=============================================================================
-void
-UwxErrorCode::on_btn_Search_clicked(
-    )
-{
-    //Search button pressed
-    on_edit_Search_returnPressed();
-}
-
-//=============================================================================
-//=============================================================================
-void
 UwxErrorCode::SetErrorObject(
     QSettings *pErrorMessages
     )
@@ -185,16 +142,12 @@ UwxErrorCode::SetErrorObject(
         foreach (const QString &strKey, mpErrorMessages->childKeys())
         {
             //Check if this key is the version string
-            if (strKey[0] != 'V')
+            if (strKey != "Version")
             {
-                //One short at a time, convert the data to hex
-                quint16 ThisByte = strKey.toUInt();
-                QString strThisHex;
-                strThisHex.setNum(ThisByte, 16);
-                strThisHex = strThisHex.toUpper();
-                while (strThisHex.length() < 4)
+                QString strThisHex = strKey;
+                while (strThisHex.length() < 3)
                 {
-                    //Expand to 4 characters
+                    //Expand to 3 characters
                     strThisHex.prepend('0');
                 }
 
@@ -257,7 +210,7 @@ UwxErrorCode::SetObjectStatus(
     )
 {
     //Enable or disable the form items
-    ui->btn_Search->setEnabled(bStatus);
+    ui->btn_order->setEnabled(bStatus);
     ui->combo_Code->setEnabled(bStatus);
     ui->edit_Search->setEnabled(bStatus);
     ui->list_Codes->setEnabled(bStatus);
@@ -302,6 +255,59 @@ UwxErrorCode::on_btn_Copy_clicked(
     {
         //Copy to clipboard
         QApplication::clipboard()->setText(ui->edit_Result->text());
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void UwxErrorCode::on_edit_Search_textChanged(const QString &arg1)
+{
+    //Search for error
+    QString SearchStr = ui->edit_Search->text().toLower();
+    ui->list_Search->clear();
+
+    if (SearchStr.isEmpty())
+    {
+        return;
+    }
+
+    foreach (const QString &strKey, mpErrorMessages->childKeys())
+    {
+        if (mpErrorMessages->value(strKey).toString().toLower().indexOf(SearchStr) != -1 && strKey != "Version")
+        {
+            //Potential match. One short at a time, convert the data to hex
+            QString strThisHex = strKey;
+            while (strThisHex.length() < 3)
+            {
+                //Expand to 3 characters
+                strThisHex.prepend('0');
+            }
+
+            //Add error to list
+            ui->list_Search->addItem(QString(strThisHex).append(": ").append(mpErrorMessages->value(strKey).toString()));
+        }
+    }
+
+    //Sort items in order as per option
+    ui->list_Search->sortItems(ui->btn_order->arrowType() == Qt::UpArrow ? Qt::AscendingOrder : Qt::DescendingOrder);
+}
+
+//=============================================================================
+//=============================================================================
+void UwxErrorCode::on_btn_order_clicked()
+{
+    if (ui->btn_order->arrowType() == Qt::UpArrow)
+    {
+        ui->btn_order->setArrowType(Qt::DownArrow);
+    }
+    else
+    {
+        ui->btn_order->setArrowType(Qt::UpArrow);
+    }
+
+    if (!ui->edit_Search->text().isEmpty())
+    {
+        ui->list_Search->sortItems(ui->btn_order->arrowType() == Qt::UpArrow ? Qt::AscendingOrder : Qt::DescendingOrder);
     }
 }
 

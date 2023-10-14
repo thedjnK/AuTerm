@@ -7,5 +7,6 @@
         <file>images/AuTerm16.png</file>
         <file>images/AuTerm32.ico</file>
         <file>images/AuTerm32.png</file>
+        <file>error_codes.ini</file>
     </qresource>
 </RCC>

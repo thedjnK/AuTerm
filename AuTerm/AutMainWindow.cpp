@@ -2844,17 +2844,6 @@ AutMainWindow::LookupErrorCode(
 
 //=============================================================================
 //=============================================================================
-QString
-AutMainWindow::LookupErrorCodeXCompile(
-    unsigned int intErrorCode
-    )
-{
-    //Looks up an error code and returns the error text as a string
-    return gpErrorMessages->value(QString::number(intErrorCode), "Undefined Error Code").toString();
-}
-
-//=============================================================================
-//=============================================================================
 void
 AutMainWindow::SerialBytesWritten(
     qint64 intByteCount
@@ -3761,27 +3750,12 @@ void
 AutMainWindow::LoadSettings(
     )
 {
-#ifdef TARGET_OS_MAC
-    if (!QDir().exists(QStandardPaths::writableLocation(QStandardPaths::DataLocation)))
-    {
-        //Create AuTerm directory in application support
-        QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-    }
-    gpErrorMessages = new QSettings(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/codes.csv"), QSettings::IniFormat); //Handle to error codes
-#else
-    //Open files in same directory
-    gpErrorMessages = new QSettings(QString("codes.csv"), QSettings::IniFormat); //Handle to error codes
-#endif
-
     gpTermSettings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "AuTerm", "settings"); //Handle to settings
     gpPredefinedDevice = new QSettings(QSettings::IniFormat, QSettings::UserScope, "AuTerm", "devices"); //Handle to predefined devices
+    gpErrorMessages = new QSettings(":/error_codes.ini", QSettings::IniFormat); //Handle to error codes
 
-    //Check if error code file exists
-#ifdef TARGET_OS_MAC
-    if (QFile::exists(QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/codes.csv")))
-#else
-    if (QFile::exists("codes.csv"))
-#endif
+    //Check if error code file is included
+    if (!gpErrorMessages->allKeys().isEmpty())
     {
         //Error code file has been loaded
         gbErrorsLoaded = true;

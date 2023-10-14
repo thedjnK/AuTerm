@@ -414,10 +414,6 @@ private:
     LookupErrorCode(
         unsigned int intErrorCode
         );
-    QString
-    LookupErrorCodeXCompile(
-        unsigned int intErrorCode
-        );
     void
     FinishStream(
         bool bType

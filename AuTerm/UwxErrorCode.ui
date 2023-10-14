@@ -134,6 +134,9 @@
          </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="spacing">
+            <number>2</number>
+           </property>
            <item>
             <widget class="QLineEdit" name="edit_Search">
              <property name="placeholderText">
@@ -142,9 +145,15 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="btn_Search">
+            <widget class="QToolButton" name="btn_order">
+             <property name="whatsThis">
+              <string>Ascending/descending order</string>
+             </property>
              <property name="text">
-              <string>&amp;Search</string>
+              <string>...</string>
+             </property>
+             <property name="arrowType">
+              <enum>Qt::UpArrow</enum>
              </property>
             </widget>
            </item>
@@ -202,7 +211,6 @@
   <tabstop>combo_Code</tabstop>
   <tabstop>list_Codes</tabstop>
   <tabstop>edit_Search</tabstop>
-  <tabstop>btn_Search</tabstop>
   <tabstop>list_Search</tabstop>
   <tabstop>edit_Result</tabstop>
   <tabstop>btn_Copy</tabstop>
