@@ -231,6 +231,7 @@ public slots:
     void SerialError(QSerialPort::SerialPortError speErrorCode);
     void enter_pressed();
     void key_pressed(int nKey, QChar chrKeyValue);
+    void vt100_send(QByteArray code);
     void SerialBytesWritten(qint64 intByteCount);
     void SerialPortClosing();
     void MessagePass(QByteArray baDataString, bool bEscapeString, bool bFromScripting);

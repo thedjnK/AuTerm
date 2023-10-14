@@ -356,6 +356,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     //Connect key-press signals
     connect(ui->text_TermEditData, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
     connect(ui->text_TermEditData, SIGNAL(key_pressed(int,QChar)), this, SLOT(key_pressed(int,QChar)));
+    connect(ui->text_TermEditData, SIGNAL(vt100_send(QByteArray)), this, SLOT(vt100_send(QByteArray)));
 
     //Initialise popup message
     gpmErrorForm = new PopupMessage(this);
@@ -955,6 +956,7 @@ AutMainWindow::~AutMainWindow()
     disconnect(this, SLOT(close()));
     disconnect(this, SLOT(enter_pressed()));
     disconnect(this, SLOT(key_pressed(int,QChar)));
+    disconnect(this, SLOT(vt100_send(QByteArray)));
     disconnect(this, SLOT(MenuSelected(QAction*)));
     disconnect(this, SLOT(balloontriggered(QAction*)));
     disconnect(this, SLOT(ContextMenuClosed()));
@@ -2117,6 +2119,31 @@ AutMainWindow::key_pressed(
                 //Output to log file
                 gpMainLog->WriteLogData(QString(chrKeyValue).toUtf8());
             }
+        }
+        else if (gbLoopbackMode == true)
+        {
+            //Loopback is enabled
+            gbaDisplayBuffer.append("[Cannot send: Loopback mode is enabled.]\n");
+
+            if (!gtmrTextUpdateTimer.isActive())
+            {
+                gtmrTextUpdateTimer.start();
+            }
+        }
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void AutMainWindow::vt100_send(QByteArray code)
+{
+    //Key pressed, send it out
+    if (gspSerialPort.isOpen())
+    {
+        if (gbTermBusy == false && gbLoopbackMode == false)
+        {
+            gspSerialPort.write(code);
+            gintQueuedTXBytes += code.size();
         }
         else if (gbLoopbackMode == true)
         {

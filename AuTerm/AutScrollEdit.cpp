@@ -690,7 +690,36 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
                 {
                     //Control key not held down
                     this->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
-                    if (keyEvent->key() != Qt::Key_Escape && keyEvent->key() != Qt::Key_Tab && keyEvent->key() != Qt::Key_Backtab && /*keyEvent->key() != Qt::Key_Backspace &&*/ keyEvent->key() != Qt::Key_Insert && keyEvent->key() != Qt::Key_Delete && keyEvent->key() != Qt::Key_Pause && keyEvent->key() != Qt::Key_Print && keyEvent->key() != Qt::Key_SysReq && keyEvent->key() != Qt::Key_Clear && keyEvent->key() != Qt::Key_Home && keyEvent->key() != Qt::Key_End && keyEvent->key() != Qt::Key_Shift && keyEvent->key() != Qt::Key_Control && keyEvent->key() != Qt::Key_Meta && keyEvent->key() != Qt::Key_Alt && keyEvent->key() != Qt::Key_AltGr && keyEvent->key() != Qt::Key_CapsLock && keyEvent->key() != Qt::Key_NumLock && keyEvent->key() != Qt::Key_ScrollLock)
+                    if (keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down || keyEvent->key() == Qt::Key_Left || keyEvent->key() == Qt::Key_Right)
+                    {
+                        //Send VT100 codes for arrow keys
+                        switch (keyEvent->key())
+                        {
+                            case Qt::Key_Up:
+                            {
+                                emit vt100_send(QByteArray("\x1b[A"));
+                                break;
+                            }
+                            case Qt::Key_Down:
+                            {
+                                emit vt100_send(QByteArray("\x1b[B"));
+                                break;
+                            }
+                            case Qt::Key_Left:
+                            {
+                                emit vt100_send(QByteArray("\x1b[D"));
+                                break;
+                            }
+                            case Qt::Key_Right:
+                            {
+                                emit vt100_send(QByteArray("\x1b[C"));
+                                break;
+                            }
+                        };
+
+                        this->update_display();
+                    }
+                    else if (keyEvent->key() != Qt::Key_Escape && keyEvent->key() != Qt::Key_Tab && keyEvent->key() != Qt::Key_Backtab && /*keyEvent->key() != Qt::Key_Backspace &&*/ keyEvent->key() != Qt::Key_Insert && keyEvent->key() != Qt::Key_Delete && keyEvent->key() != Qt::Key_Pause && keyEvent->key() != Qt::Key_Print && keyEvent->key() != Qt::Key_SysReq && keyEvent->key() != Qt::Key_Clear && keyEvent->key() != Qt::Key_Home && keyEvent->key() != Qt::Key_End && keyEvent->key() != Qt::Key_Shift && keyEvent->key() != Qt::Key_Control && keyEvent->key() != Qt::Key_Meta && keyEvent->key() != Qt::Key_Alt && keyEvent->key() != Qt::Key_AltGr && keyEvent->key() != Qt::Key_CapsLock && keyEvent->key() != Qt::Key_NumLock && keyEvent->key() != Qt::Key_ScrollLock)
                     {
                         //Not a special character
                         emit key_pressed(keyEvent->key(), *keyEvent->text().unicode());

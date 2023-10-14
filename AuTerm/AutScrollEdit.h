@@ -125,6 +125,7 @@ protected:
 signals:
     void enter_pressed();
     void key_pressed(int nKey, QChar chrKeyValue);
+    void vt100_send(QByteArray code);
     void file_dropped(QString strFilename);
 
 private:
