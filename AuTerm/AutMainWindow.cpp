@@ -965,7 +965,9 @@ AutMainWindow::~AutMainWindow()
     disconnect(this, SLOT(UpdateReceiveText()));
     disconnect(this, SLOT(SerialPortClosing()));
     disconnect(this, SLOT(BatchTimeoutSlot()));
-//    disconnect(this, SLOT(replyFinished(QNetworkReply*)));
+#ifndef SKIPONLINE
+    disconnect(this, SLOT(replyFinished(QNetworkReply*)));
+#endif
     disconnect(this, SLOT(MessagePass(QByteArray,bool,bool)));
 #ifndef SKIPSPEEDTEST
     disconnect(this, SLOT(update_displayText()));
@@ -1773,16 +1775,8 @@ AutMainWindow::MenuSelected(
     {
         //Restore customisations to default: colour
         QPalette palTmp = ui->text_TermEditData->palette();
-
-#ifdef _MSC_BUILD
-        //MSVC isn't a good compiler
-        palTmp.setColor(QPalette::Active, QPalette::Text, QColor("White"));
-        palTmp.setColor(QPalette::Active, QPalette::Base, QColor("Black"));
-#else
         palTmp.setColor(QPalette::Active, QPalette::Text, QColorConstants::White);
         palTmp.setColor(QPalette::Active, QPalette::Base, QColorConstants::Black);
-#endif
-
         ui->text_TermEditData->setPalette(palTmp);
         ui->text_LogData->setPalette(palTmp);
 
@@ -3113,7 +3107,7 @@ AutMainWindow::dropEvent(
     QDropEvent *dropEvent
     )
 {
-    //A file has been dragged onto the window - send this file if possible
+    //A file has been dragged onto the window
     QList<QUrl> lstURLs = dropEvent->mimeData()->urls();
     if (lstURLs.isEmpty())
     {
@@ -3525,21 +3519,7 @@ void
 AutMainWindow::on_btn_Help_clicked(
     )
 {
-    QString strMessage = "Command line options are:-\r\n\r\nPORT=n\r\n    Windows: COM[1..255] specifies a TTY device\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\n\r\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=\\r, 1=\\n, 2=\\r\\n]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \\t,\\r,\\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \\00 can be used to represent a null character and \\4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/"
-#ifdef SKIPAUTOMATIONFORM
-    "\r\n[Built without Automation support]"
-#endif
-#ifdef SKIPERRORCODEFORM
-    "\r\n[Built without Error code form]"
-#endif
-#ifdef SKIPSCRIPTINGFORM
-    "\r\n[Built without Scripting support]"
-#endif
-#ifdef SKIPSPEEDTEST
-    "\r\n[Built without Speed test support]"
-#endif
-    ;
-
+    QString strMessage = "Command line options are:-\r\n\r\nPORT=n\r\n    Windows: COM[1..255] specifies a TTY device\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\n\r\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=\\r, 1=\\n, 2=\\r\\n]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \\t,\\r,\\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \\00 can be used to represent a null character and \\4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/";
     gpmErrorForm->SetMessage(&strMessage);
     gpmErrorForm->show();
 }
@@ -5625,58 +5605,31 @@ void AutMainWindow::on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *)
 //=============================================================================
 bool AutMainWindow::is_newer(const QString *new_version, const QString *current_version)
 {
-    uint32_t version_a;
-    uint32_t version_b;
-    int32_t pos_start_a = 0;
-    int32_t pos_start_b = 0;
-    int32_t pos_end_a;
-    int32_t pos_end_b;
+    uint8_t i = 0;
+    uint8_t l = new_version->length();
+    bool match = true;
 
-    pos_end_a = new_version->indexOf(".");
-    pos_end_b = current_version->indexOf(".");
-
-    if (pos_end_a <= 0 || pos_end_b <= 0)
+    if (current_version->length() < l)
     {
-        return false;
+        l = current_version->length();
     }
 
-    version_a = new_version->mid(pos_start_a, (pos_end_a - pos_start_a)).toUInt();
-    version_b = current_version->mid(pos_start_b, (pos_end_b - pos_start_b)).toUInt();
-
-    if (version_a > version_b)
+    while (i < l)
     {
-        return true;
-    }
-
-    pos_start_a = pos_end_a + 1;
-    pos_start_b = pos_end_b + 1;
-    pos_end_a = pos_start_a;
-    pos_end_b = pos_start_b;
-
-    while (pos_end_a < new_version->length())
-    {
-        if (!(new_version->at(pos_end_a) >= '0' && new_version->at(pos_end_a) <= '9'))
+        if (new_version->at(i) > current_version->at(i))
         {
+            return true;
+        }
+        else if (new_version->at(i) != current_version->at(i))
+        {
+            match = false;
             break;
         }
 
-        ++pos_end_a;
+        ++i;
     }
 
-    while (pos_end_b < current_version->length())
-    {
-        if (!(current_version->at(pos_end_b) >= '0' && current_version->at(pos_end_b) <= '9'))
-        {
-            break;
-        }
-
-        ++pos_end_b;
-    }
-
-    version_a = new_version->mid(pos_start_a, (pos_end_a - pos_start_a)).toUInt();
-    version_b = current_version->mid(pos_start_b, (pos_end_b - pos_start_b)).toUInt();
-
-    if (version_a > version_b || new_version->length() > current_version->length() || (new_version->length() > (pos_end_a + 1) && current_version->length() > (pos_end_b + 1) && new_version->at(pos_end_a + 1) > current_version->at(pos_end_b + 1)))
+    if (match == true && new_version->length() > current_version->length())
     {
         return true;
     }

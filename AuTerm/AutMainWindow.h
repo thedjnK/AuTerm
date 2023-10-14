@@ -257,7 +257,6 @@ private slots:
     void on_combo_COM_currentIndexChanged(int intIndex);
 #ifndef SKIPONLINE
     void replyFinished(QNetworkReply* nrReply);
-    bool is_newer(const QString *new_version, const QString *current_version);
 #ifndef QT_NO_SSL
     void sslErrors(QNetworkReply*, QList<QSslError>);
 #endif
@@ -464,6 +463,7 @@ private:
     void
     AuTermUpdateCheck(
         );
+    bool is_newer(const QString *new_version, const QString *current_version);
 #endif
     void
     UpdateCustomisation(
