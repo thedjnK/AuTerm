@@ -59,9 +59,7 @@
 #include <QListWidgetItem>
 //Need cmath for std::ceil function
 #include <cmath>
-#if TARGET_OS_MAC
-#include "QStandardPaths"
-#endif
+#include <QStandardPaths>
 #include "AutScrollEdit.h"
 #include "UwxPopup.h"
 #include "LrdLogger.h"
@@ -79,17 +77,14 @@
 #include <QPluginLoader>
 #include "AutPlugin.h"
 #endif
+#include <QNetworkReply>
+#ifndef QT_NO_SSL
+#include <QSslSocket>
+#endif
 
 /******************************************************************************/
 // Defines
 /******************************************************************************/
-#ifndef QT_NO_SSL
-//    #define UseSSL //By default enable SSL if Qt supports it (requires OpenSSL runtime libraries). Comment this line out to build without SSL support or if you get errors when communicating with the server
-#endif
-#ifdef UseSSL
-//    #include <QSslSocket>
-#endif
-
 //Decides if generic data types will be 32 or 64-bit
 #if _WIN64 || __aarch64__ || TARGET_OS_MAC || __x86_64__
     //64-bit OS
@@ -127,13 +122,9 @@ const quint32 DefaultAutoTrimDBufferThreshold   = 0;     //(Unlisted option)
 const quint32 DefaultAutoTrimDBufferSize        = 0;     //(Unlisted option)
 const quint16 DefaultScrollbackBufferSize       = 32;    //(Unlisted option)
 const bool DefaultSaveSize                      = false;
+const bool DefaultOnlineUpdateCheck             = true;
 //Constants for URLs
 const QString URLLinuxNonRootSetup = "https://github.com/LairdCP/AuTerm/wiki/Granting-non-root-USB-device-access-(Linux)";
-//Constants for the protocol
-#ifndef UseSSL
-    //HTTP
-    const QString WebProtocol                   = "http";
-#endif
 const qint8 FilenameIndexScripting              = 0;
 const qint8 FilenameIndexOthers                 = 1;
 //Constants for right click menu options
@@ -191,6 +182,11 @@ enum class BitByteTypes
     TypeBytes,
     TypeDataBits,
     TypeAllBits
+};
+
+enum modes {
+    mode_idle = 0,
+    mode_check_for_update,
 };
 
 //Union used for checking received byte array contents whilst speed testing
@@ -259,11 +255,12 @@ private slots:
     void UpdateReceiveText();
     void BatchTimeoutSlot();
     void on_combo_COM_currentIndexChanged(int intIndex);
-#if 0
+#ifndef SKIPONLINE
     void replyFinished(QNetworkReply* nrReply);
-#endif
-#ifdef UseSSL
+    bool is_newer(const QString *new_version, const QString *current_version);
+#ifndef QT_NO_SSL
     void sslErrors(QNetworkReply*, QList<QSslError>);
+#endif
 #endif
     void on_btn_Github_clicked();
     QList<QString> SplitFilePath(QString strFilename);
@@ -279,7 +276,6 @@ private slots:
     void on_check_LogEnable_stateChanged(int state);
     void on_check_LogAppend_stateChanged(int intChecked);
     void on_btn_Help_clicked();
-    void on_combo_LogDirectory_currentIndexChanged(int);
     void on_btn_LogRefresh_clicked();
     void on_btn_Licenses_clicked();
     void on_btn_EditViewFolder_clicked();
@@ -294,9 +290,6 @@ private slots:
     void on_text_EditData_textChanged();
     void on_combo_LogFile_currentIndexChanged(int);
     void on_btn_ReloadLog_clicked();
-#ifdef UseSSL
-    void on_check_EnableSSL_stateChanged(int);
-#endif
     void on_check_LineSeparator_stateChanged(int);
 #ifndef SKIPERRORCODEFORM
     void on_btn_Error_clicked();
@@ -367,6 +360,9 @@ private slots:
     on_radio_vt100_decode_toggled(
         bool checked
         );
+#ifndef SKIPONLINE
+    void on_check_enable_online_version_check_toggled(bool checked);
+#endif
 
 #ifndef SKIPPLUGINS
     void on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *);
@@ -464,10 +460,9 @@ private:
     SetLoopBackMode(
         bool bNewMode
         );
-#if 0
+#ifndef SKIPONLINE
     void
     AuTermUpdateCheck(
-        bool bShowError
         );
 #endif
     void
@@ -522,21 +517,14 @@ private:
     QSettings *gpTermSettings; //Handle to settings
     QSettings *gpErrorMessages; //Handle to error codes
     QSettings *gpPredefinedDevice; //Handle to predefined devices
-#if 0
+#ifndef SKIPONLINE
     QNetworkAccessManager *gnmManager; //Network access manager
     QNetworkReply *gnmrReply; //Network reply
 #endif
     QString gstrLastFilename[(FilenameIndexOthers+1)]; //Holds the filenames of the last selected files
-#ifdef RESOLVEIPSEPARATELY
-    QString gstrResolvedServer; //Holds the resolved hostname of the XCompile server
-#endif
     bool gbEditFileModified; //True if the file in the editor pane has been modified, otherwise false
     int giEditFileType; //Type of file currently open in the editor
     bool gbErrorsLoaded; //True if error csv file has been loaded
-#ifdef UseSSL
-    QString WebProtocol; //Holds HTTP or HTTPS depending on options selected
-    QSslCertificate *sslcLairdSSLNew = NULL; //Holds the (newer) Laird SSL certificate
-#endif
     PopupMessage *gpmErrorForm; //Error message form
 #ifndef SKIPAUTOMATIONFORM
     UwxAutomation *guaAutomationForm; //Automation form

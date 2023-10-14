@@ -2,7 +2,11 @@
 
 include(../AuTerm-includes.pri)
 
-QT       += core gui widgets serialport
+QT += core gui widgets serialport
+
+!contains(DEFINES, SKIPONLINE) {
+    QT += network
+}
 
 TARGET = AuTerm
 TEMPLATE = app

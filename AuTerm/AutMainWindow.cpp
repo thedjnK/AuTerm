@@ -257,8 +257,10 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     gbEditFileModified = false;
     giEditFileType = -1;
     gbErrorsLoaded = false;
-#if 0
-    gnmManager = 0;
+#ifndef SKIPONLINE
+    gnmManager = new QNetworkAccessManager(this);
+    connect(gnmManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+    connect(gnmManager, SIGNAL(sslErrors(QNetworkReply*,QList)), this, SLOT(sslErrors(QNetworkReply*,QList)));
 #endif
 #ifndef SKIPSPEEDTEST
     gtmrSpeedTestDelayTimer = 0;
@@ -317,13 +319,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     gimUw32Image = QImage(":/images/AuTerm32.png");
 #endif
 
-#ifndef UseSSL
-    //Disable SSL checkbox for non-SSL builds
-    ui->check_EnableSSL->setCheckable(false);
-    ui->check_EnableSSL->setChecked(false);
-    ui->check_EnableSSL->setEnabled(false);
-#endif
-
     //Create pixmaps
     gpEmptyCirclePixmap = new QPixmap(QPixmap::fromImage(gimEmptyCircleImage));
     gpRedCirclePixmap = new QPixmap(QPixmap::fromImage(gimRedCircleImage));
@@ -378,12 +373,8 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     connect(&gtmrSpeedTestStats10s, SIGNAL(timeout()), this, SLOT(OutputSpeedTestStats()));
 #endif
     //Display version
-    ui->statusBar->showMessage(QString("AuTerm")
-#ifdef UseSSL
-    .append("-SSL")
-#endif
-    .append(" version ").append(UwVersion).append(" (").append(OS).append("), Built ").append(__DATE__).append(" Using QT ").append(QT_VERSION_STR)
-#ifdef UseSSL
+    ui->statusBar->showMessage(QString("AuTerm version ").append(UwVersion).append(" (").append(OS).append("), Built ").append(__DATE__).append(" Using QT ").append(QT_VERSION_STR)
+#ifndef QT_NO_SSL
 #ifdef TARGET_OS_MAC
     .append(", ").append(QString(QSslSocket::sslLibraryBuildVersionString()).replace(",", ":"))
 #else
@@ -480,21 +471,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     ui->edit_LogFile->setText(gpTermSettings->value("LogFile", QString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(DefaultLogFileName)).toString());
     ui->check_LogEnable->setChecked(gpTermSettings->value("LogEnable", DefaultLogEnable).toBool());
     ui->check_LogAppend->setChecked(gpTermSettings->value("LogMode", DefaultLogMode).toBool());
-
-#ifdef UseSSL
-    //Set SSL status
-    ui->check_EnableSSL->setChecked(gpTermSettings->value("SSLEnable", DefaultSSLEnable).toBool());
-    if (ui->check_EnableSSL->isChecked() == true)
-    {
-        //HTTPS
-        WebProtocol = "https";
-    }
-    else
-    {
-        //HTTP
-        WebProtocol = "http";
-    }
-#endif
 
     //Set window size saving
     ui->check_EnableTerminalSizeSaving->setChecked(gpTermSettings->value("SaveSize", DefaultSaveSize).toBool());
@@ -604,24 +580,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     ui->text_SpeedEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
     ui->text_TermEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
     ui->text_LogData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
-
-#ifdef RESOLVEIPSEPARATELY
-    //Set resolved hostname to be empty
-    gstrResolvedServer = "";
-#endif
-
-#ifdef UseSSL
-    //Load SSL certificate
-    QFile certFile(":/certificates/AuTerm_new.crt");
-    if (certFile.open(QIODevice::ReadOnly))
-    {
-        //Load certificate data
-        QSslConfiguration sslcConfig;
-        sslcLairdSSLNew = new QSslCertificate(certFile.readAll());
-        sslcConfig.addCaCertificate(*sslcLairdSSLNew);
-        certFile.close();
-    }
-#endif
 
     //Setup the terminal scrollback buffer size
     ui->text_TermEditData->setup_scrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
@@ -942,6 +900,14 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     }
 #endif
 
+#ifdef SKIPONLINE
+    ui->check_enable_online_version_check->deleteLater();
+    ui->label_version_update->deleteLater();
+#else
+    //Set status of online update checks
+    ui->check_enable_online_version_check->setChecked(gpTermSettings->value("UpdateCheck", DefaultOnlineUpdateCheck).toBool());
+#endif
+
     gbAppStarted = true;
 
 #ifndef SKIPPLUGINS
@@ -951,6 +917,32 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     {
         plugin_list[i].plugin->setup_finished();
         ++i;
+    }
+#endif
+
+#ifndef SKIPONLINE
+    if (ui->check_enable_online_version_check->isChecked())
+    {
+        bool run_check = true;
+
+        if (gpTermSettings->contains("LastUpdateCheck"))
+        {
+            if (gpTermSettings->value("LastUpdateCheck", QDate::currentDate().toString()).toString() == QDate::currentDate().toString())
+            {
+                run_check = false;
+            }
+        }
+
+        if (run_check == true)
+        {
+            gpTermSettings->setValue("LastUpdateCheck", QDate::currentDate().toString());
+            ui->label_version_update->setText("Checking for updates...");
+            AuTermUpdateCheck();
+        }
+        else
+        {
+            ui->label_version_update->setText("Update check already performed today.");
+        }
     }
 #endif
 }
@@ -1076,15 +1068,7 @@ AutMainWindow::~AutMainWindow()
         delete gpStreamFileHandle;
     }
 
-#ifdef UseSSL
-    if (sslcLairdSSLNew != NULL)
-    {
-        //Clear up (newer) SSL certificate
-        delete sslcLairdSSLNew;
-    }
-#endif
-
-#if 0
+#ifndef SKIPONLINE
     if (gnmManager != 0)
     {
         //Clear up network manager
@@ -3166,130 +3150,74 @@ AutMainWindow::on_btn_Github_clicked(
     }
 }
 
-#if 0
+#ifndef SKIPONLINE
 //=============================================================================
 //=============================================================================
 void
-MainWindow::replyFinished(
+AutMainWindow::replyFinished(
     QNetworkReply* nrReply
     )
 {
     //Response received from online server
-    if (nrReply->error() != QNetworkReply::NoError && nrReply->error() != QNetworkReply::ServiceUnavailableError)
+    if (nrReply->error() != QNetworkReply::NoError)
     {
         //An error occured
         ui->btn_Cancel->setEnabled(false);
-        ui->btn_ErrorCodeUpdate->setEnabled(true);
-        ui->btn_ErrorCodeDownload->setEnabled(true);
-        ui->btn_AuTermUpdate->setEnabled(true);
-        ui->btn_ModuleFirmware->setEnabled(true);
-        ui->btn_OnlineXComp_Supported->setEnabled(true);
-        gtmrDownloadTimeoutTimer.stop();
-        gstrHexData = "";
         if (!gtmrTextUpdateTimer.isActive())
         {
             gtmrTextUpdateTimer.start();
         }
-        gchTermMode = 0;
-        gchTermMode2 = 0;
-        gbTermBusy = false;
 
         //Display error message if operation wasn't cancelled
         if (nrReply->error() != QNetworkReply::OperationCanceledError)
         {
             //Output error message
-            QString strMessage = QString("An error occured during an online request related to XCompilation or updates: ").append(nrReply->errorString());
+            QString strMessage = QString("An error occured during an online request: ").append(nrReply->errorString());
             gpmErrorForm->SetMessage(&strMessage);
             gpmErrorForm->show();
+
+            if (gchTermMode == mode_check_for_update)
+            {
+                ui->label_version_update->setText("Error with network request.");
+            }
         }
+
+        gchTermMode = 0;
+        gbTermBusy = false;
     }
     else
     {
-        if (gchTermMode == MODE_CHECK_AuTerm_VERSIONS)
+        if (gchTermMode == mode_check_for_update)
         {
             //AuTerm update response
             QByteArray baTmpBA = nrReply->readAll();
-            QJsonParseError jpeJsonError;
-            QJsonDocument jdJsonData = QJsonDocument::fromJson(baTmpBA, &jpeJsonError);
-
-            if (jpeJsonError.error == QJsonParseError::NoError)
-            {
-                //Decoded JSON
-                QJsonObject joJsonObject = jdJsonData.object();
-
-                //Server responded with error
-                if (joJsonObject["Result"].toString() == "-1")
-                {
-                    //Outdated version
-                    ui->label_AuTermUpdate->setText(QString("Update available: ").append(joJsonObject["Version"].toString()));
-                    QPalette palBGColour = QPalette();
-                    palBGColour.setColor(QPalette::Active, QPalette::WindowText, Qt::darkGreen);
-                    palBGColour.setColor(QPalette::Inactive, QPalette::WindowText, Qt::darkGreen);
-                    palBGColour.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGreen);
-                    ui->label_AuTermUpdate->setPalette(palBGColour);
-                }
-                else if (joJsonObject["Result"].toString() == "-2")
-                {
-                    //Server error
-                    QString strMessage = QString("A server error was encountered whilst checking for an updated AuTerm version.");
-                    gpmErrorForm->SetMessage(&strMessage);
-                    gpmErrorForm->show();
-                }
-                else if (joJsonObject["Result"].toString() == "1")
-                {
-                    //Version is OK
-                    ui->label_AuTermUpdate->setText("No updates available.");
-                    QPalette palBGColour = QPalette();
-                    ui->label_AuTermUpdate->setPalette(palBGColour);
-                }
-                else
-                {
-                    //Server responded with error
-                    QString strMessage = QString("Server responded with error code ").append(joJsonObject["Result"].toString()).append("; ").append(joJsonObject["Error"].toString());
-                    gpmErrorForm->SetMessage(&strMessage);
-                    gpmErrorForm->show();
-                }
-
-                if (gupdUpdateCheck == UpdateCheckTypes::TypeWekely)
-                {
-                    //Performing weekly update check
-                    if (joJsonObject["Result"].toString() == "-1")
-                    {
-                        //AuTerm version is outdated
-                        gstrUpdateCheckString = new QString("Weekly update check:\r\n\r\n\tAuTerm: Outdated, ");
-                        gstrUpdateCheckString->append(joJsonObject["Version"].toString()).append(" available");
-                    }
-                }
-                else
-                {
-                    //No longer checking for updates
-                    gupdUpdateCheck = UpdateCheckTypes::TypeNone;
-                }
-            }
-            else
-            {
-                //Error whilst decoding JSON
-                QString strMessage = QString("Unable to decode JSON data from server, debug data: ").append(jdJsonData.toJson());
-                gpmErrorForm->SetMessage(&strMessage);
-                gpmErrorForm->show();
-            }
 
             //Back to non-busy mode
             gchTermMode = 0;
-            gchTermMode2 = 0;
             gbTermBusy = false;
             ui->btn_Cancel->setEnabled(false);
-            ui->btn_ErrorCodeUpdate->setEnabled(true);
-            ui->btn_ErrorCodeDownload->setEnabled(true);
-            ui->btn_AuTermUpdate->setEnabled(true);
-            ui->btn_ModuleFirmware->setEnabled(true);
-            ui->btn_OnlineXComp_Supported->setEnabled(true);
-            ui->statusBar->showMessage("");
+            ui->statusBar->showMessage(QString(baTmpBA));
 
-            if (gupdUpdateCheck == UpdateCheckTypes::TypeWekely)
+            if (baTmpBA.length() > 8)
             {
-                //Weekly check for error code file updates
-                ErrorCodeUpdateCheck(false);
+                //Something not quite right with this response...
+                ui->label_version_update->setText("Unknown server response.");
+                QString string_response = QString("Unknown response from server: %1").arg(QString(baTmpBA));
+                gpmErrorForm->SetMessage(&string_response);
+                gpmErrorForm->show();
+            }
+            else
+            {
+                QString newest_version = baTmpBA;
+
+                if (is_newer(&newest_version, &UwVersion) == true)
+                {
+                    ui->label_version_update->setText(QString("<a href=\"https://github.com/thedjnK/AuTerm/releases\">Update available: %1</a>").arg(newest_version));
+                }
+                else
+                {
+                    ui->label_version_update->setText("No update available.");
+                }
             }
         }
     }
@@ -3301,7 +3229,7 @@ MainWindow::replyFinished(
 
 //=============================================================================
 //=============================================================================
-#ifdef UseSSL
+#ifndef QT_NO_SSL
 void
 AutMainWindow::sslErrors(
     QNetworkReply* nrReply,
@@ -3309,11 +3237,17 @@ AutMainWindow::sslErrors(
     )
 {
     //Error detected with SSL
-    if (sslcLairdSSLNew != NULL && nrReply->sslConfiguration().peerCertificate() == *sslcLairdSSLNew)
+    QString string_response = "SSL error(s) during network request: ";
+    uint16_t i = 0;
+
+    while (i < lstSSLErrors.length())
     {
-        //Server certificate matches
-        nrReply->ignoreSslErrors(lstSSLErrors);
+        string_response.append(lstSSLErrors[i].errorString());
+        ++i;
     }
+
+    gpmErrorForm->SetMessage(&string_response);
+    gpmErrorForm->show();
 }
 #endif
 
@@ -3613,17 +3547,6 @@ AutMainWindow::on_btn_Help_clicked(
 //=============================================================================
 //=============================================================================
 void
-AutMainWindow::on_combo_LogDirectory_currentIndexChanged(
-    int
-    )
-{
-    //Refresh the list of log files
-    on_btn_LogRefresh_clicked();
-}
-
-//=============================================================================
-//=============================================================================
-void
 AutMainWindow::on_btn_LogRefresh_clicked(
     )
 {
@@ -3917,23 +3840,6 @@ AutMainWindow::LoadSettings(
         {
             gpTermSettings->setValue("ScrollbackBufferSize", DefaultScrollbackBufferSize); //The number of lines in the terminal scrollback buffer
         }
-#ifdef UseSSL
-        if (gpTermSettings->value("SSLEnable").isNull())
-        {
-            gpTermSettings->setValue("SSLEnable", DefaultSSLEnable); //If SSL should be used for online functionality or not (1 = use SSL, 0 = use HTTP)
-            if (DefaultSSLEnable == true)
-            {
-                //HTTPS
-                WebProtocol = "https";
-            }
-            else
-            {
-                //HTTP
-                WebProtocol = "http";
-            }
-        }
-#endif
-
         if (gpTermSettings->value("ConfigVersion").isNull() || gpTermSettings->value("ConfigVersion").toString() != UwVersion)
         {
             //Update configuration version
@@ -4073,29 +3979,6 @@ AutMainWindow::on_btn_ReloadLog_clicked(
     //Reload log
     on_combo_LogFile_currentIndexChanged(ui->combo_LogFile->currentIndex());
 }
-
-//=============================================================================
-//=============================================================================
-#ifdef UseSSL
-void
-AutMainWindow::on_check_EnableSSL_stateChanged(
-    int
-    )
-{
-    //Update SSL preference
-    gpTermSettings->setValue("SSLEnable", ui->check_EnableSSL->isChecked());
-    if (ui->check_EnableSSL->isChecked() == true)
-    {
-        //HTTPS
-        WebProtocol = "https";
-    }
-    else
-    {
-        //HTTP
-        WebProtocol = "http";
-    }
-}
-#endif
 
 //=============================================================================
 //=============================================================================
@@ -5397,62 +5280,19 @@ AutMainWindow::SetLoopBackMode(
     }
 }
 
-#if 0
+#ifndef SKIPONLINE
 //=============================================================================
 //=============================================================================
 void
 AutMainWindow::AuTermUpdateCheck(
-    bool bShowError
     )
 {
     //Send request to check for AuTerm updates
-    if (LookupDNSName(bShowError) == true)
-    {
-        gbTermBusy = true;
-        gchTermMode = MODE_CHECK_AuTerm_VERSIONS;
-        gchTermMode2 = MODE_CHECK_AuTerm_VERSIONS;
-        ui->btn_Cancel->setEnabled(true);
-        ui->btn_ErrorCodeUpdate->setEnabled(false);
-        ui->btn_ErrorCodeDownload->setEnabled(false);
-        ui->btn_AuTermUpdate->setEnabled(false);
-        ui->btn_ModuleFirmware->setEnabled(false);
-        ui->btn_OnlineXComp_Supported->setEnabled(false);
-        gnmrReply = gnmManager->get(QNetworkRequest(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/update_AuTerm.php?Ver=").append(UwVersion).append("&OS=").append(
-#ifdef _WIN32
-    //Windows
-    #ifdef _WIN64
-        //Windows 64-bit
-        "W64"
-        #define OS "Windows (x86_64)"
-    #else
-        //Windows 32-bit
-        "W32"
-    #endif
-#elif __APPLE__
-        //OSX
-        "OSX"
-#else
-    //Assume Linux
-    #ifdef __aarch64__
-        //ARM64
-        "LxARM64"
-    #elif __arm__
-        //ARM
-        "LxARM"
-    #elif __x86_64__
-        //x86_64
-        "Lx86_64"
-    #elif __i386
-        //x86
-        "Lx86"
-    #else
-        //Unknown
-        "LxOth"
-    #endif
-#endif
-        ))));
-        ui->statusBar->showMessage("Checking for AuTerm updates...");
-    }
+    gbTermBusy = true;
+    gchTermMode = mode_check_for_update;
+    ui->btn_Cancel->setEnabled(true);
+    gnmrReply = gnmManager->get(QNetworkRequest(QUrl("https://raw.githubusercontent.com/thedjnK/AuTerm/main/version.txt")));
+    ui->statusBar->showMessage("Checking for AuTerm updates...");
 }
 #endif
 
@@ -5777,6 +5617,81 @@ void AutMainWindow::on_radio_vt100_decode_toggled(bool checked)
 void AutMainWindow::on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *)
 {
     on_btn_Plugin_Config_clicked();
+}
+#endif
+
+#ifndef SKIPONLINE
+//=============================================================================
+//=============================================================================
+bool AutMainWindow::is_newer(const QString *new_version, const QString *current_version)
+{
+    uint32_t version_a;
+    uint32_t version_b;
+    int32_t pos_start_a = 0;
+    int32_t pos_start_b = 0;
+    int32_t pos_end_a;
+    int32_t pos_end_b;
+
+    pos_end_a = new_version->indexOf(".");
+    pos_end_b = current_version->indexOf(".");
+
+    if (pos_end_a <= 0 || pos_end_b <= 0)
+    {
+        return false;
+    }
+
+    version_a = new_version->mid(pos_start_a, (pos_end_a - pos_start_a)).toUInt();
+    version_b = current_version->mid(pos_start_b, (pos_end_b - pos_start_b)).toUInt();
+
+    if (version_a > version_b)
+    {
+        return true;
+    }
+
+    pos_start_a = pos_end_a + 1;
+    pos_start_b = pos_end_b + 1;
+    pos_end_a = pos_start_a;
+    pos_end_b = pos_start_b;
+
+    while (pos_end_a < new_version->length())
+    {
+        if (!(new_version->at(pos_end_a) >= '0' && new_version->at(pos_end_a) <= '9'))
+        {
+            break;
+        }
+
+        ++pos_end_a;
+    }
+
+    while (pos_end_b < current_version->length())
+    {
+        if (!(current_version->at(pos_end_b) >= '0' && current_version->at(pos_end_b) <= '9'))
+        {
+            break;
+        }
+
+        ++pos_end_b;
+    }
+
+    version_a = new_version->mid(pos_start_a, (pos_end_a - pos_start_a)).toUInt();
+    version_b = current_version->mid(pos_start_b, (pos_end_b - pos_start_b)).toUInt();
+
+    if (version_a > version_b || new_version->length() > current_version->length() || (new_version->length() > (pos_end_a + 1) && current_version->length() > (pos_end_b + 1) && new_version->at(pos_end_a + 1) > current_version->at(pos_end_b + 1)))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+//=============================================================================
+//=============================================================================
+void AutMainWindow::on_check_enable_online_version_check_toggled(bool checked)
+{
+    if (gbAppStarted == true)
+    {
+        gpTermSettings->setValue("UpdateCheck", checked);
+    }
 }
 #endif
 

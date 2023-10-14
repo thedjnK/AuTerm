@@ -13,8 +13,8 @@
 # Uncomment to exclude building speed test functionality
 #DEFINES += "SKIPSPEEDTEST"
 
-# Uncomment to resolve IP address from hostname prior to making web request
-#DEFINES += "RESOLVEIPSEPARATELY"
+# Uncomment to exclude online functionlaity (update checking)
+#DEFINES += "SKIPONLINE"
 
 #Uncomment to disable plugin support
 #DEFINES += "SKIPPLUGINS"
