@@ -2952,8 +2952,8 @@ AutMainWindow::UpdateReceiveText(
     if (ui->selector_Tab->currentWidget() == ui->tab_Term)
     {
         ui->text_TermEditData->add_display_data(&display_buffers);
-        display_buffers.clear();
         display_update_pending = false;
+        display_buffers.clear();
     }
     else
     {

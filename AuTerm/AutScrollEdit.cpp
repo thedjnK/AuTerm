@@ -760,8 +760,8 @@ void AutScrollEdit::set_line_mode(bool bNewLineMode)
 void AutScrollEdit::add_display_data(display_buffer_list *buffers)
 {
     //Adds data to the display buffer
-    uint16_t i = 0;
-    uint16_t l = buffers->length();
+    uint32_t i = 0;
+    uint32_t l = buffers->length();
 
     if (had_dat_in_data == false)
     {
@@ -1043,7 +1043,7 @@ void AutScrollEdit::update_display()
                 int32_t i = 0;
 
                 tcTmpCur = this->textCursor();
-                int8_t next_entry = -1;
+                int32_t next_entry = -1;
 
                 if (format.length() > 0 && format[0].start == 0)
                 {
@@ -1052,7 +1052,7 @@ void AutScrollEdit::update_display()
 
                 bool first = true;
 
-                int8_t aa = 0;
+                int32_t aa = 0;
 
                 while (i < dat_in_new_len)
                 {
