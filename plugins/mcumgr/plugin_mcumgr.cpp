@@ -1373,6 +1373,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 #ifndef SKIPPLUGIN_LOGGER
     logger = new debug_logger(this);
     processor->set_logger(logger);
+    smp_groups.fs_mgmt->set_logger(logger);
+    smp_groups.img_mgmt->set_logger(logger);
+    smp_groups.os_mgmt->set_logger(logger);
+    smp_groups.settings_mgmt->set_logger(logger);
+    smp_groups.shell_mgmt->set_logger(logger);
+    smp_groups.stat_mgmt->set_logger(logger);
 #endif
 }
 
@@ -1386,10 +1392,6 @@ plugin_mcumgr::~plugin_mcumgr()
     delete udp_transport;
 #endif
 
-#ifndef SKIPPLUGIN_LOGGER
-    delete logger;
-#endif
-
     delete error_lookup_form;
     delete smp_groups.stat_mgmt;
     delete smp_groups.shell_mgmt;
@@ -1399,6 +1401,10 @@ plugin_mcumgr::~plugin_mcumgr()
     delete smp_groups.fs_mgmt;
     delete processor;
     delete uart_transport;
+
+#ifndef SKIPPLUGIN_LOGGER
+    delete logger;
+#endif
 }
 
 bool plugin_mcumgr::eventFilter(QObject *, QEvent *event)

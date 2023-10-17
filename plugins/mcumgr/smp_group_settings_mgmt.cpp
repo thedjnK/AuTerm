@@ -106,7 +106,7 @@ bool smp_group_settings_mgmt::parse_read_response(QCborStreamReader &reader, QBy
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug() << "Error decoding byte array";
+                    log_error() << "Error decoding byte array";
                 }
                 else if (key == "val")
                 {
@@ -128,7 +128,7 @@ bool smp_group_settings_mgmt::parse_read_response(QCborStreamReader &reader, QBy
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -176,12 +176,12 @@ void smp_group_settings_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t g
 
     if (mode == MODE_IDLE)
     {
-        qDebug() << "Unexpected response, not busy";
+        log_error() << "Unexpected response, not busy";
         emit status(smp_user_data, STATUS_ERROR, "Unexpected response, settings mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_SETTINGS)
     {
-        qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_SETTINGS;
+        log_error() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_SETTINGS;
         emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not settings mgmt");
     }
     else
@@ -231,7 +231,7 @@ void smp_group_settings_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t g
         }
         else
         {
-            qDebug() << "Unsupported command received";
+            log_error() << "Unsupported command received";
         }
     }
 }
@@ -244,7 +244,7 @@ void smp_group_settings_mgmt::receive_error(uint8_t version, uint8_t op, uint16_
     Q_UNUSED(error);
 
     bool cleanup = true;
-    qDebug() << "error :(";
+    log_error() << "error :(";
 
     if (command == COMMAND_READ_WRITE && mode == MODE_READ)
     {
@@ -290,7 +290,7 @@ void smp_group_settings_mgmt::receive_error(uint8_t version, uint8_t op, uint16_
 
 void smp_group_settings_mgmt::timeout(smp_message *message)
 {
-    qDebug() << "timeout :(";
+    log_error() << "timeout :(";
 
     //TODO:
     emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));

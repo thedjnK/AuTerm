@@ -170,7 +170,7 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
                 if (hash_found == true)
                 {
                     //Duplicate hash has been found
-                    qDebug() << "Duplicate hash found";
+                    log_error() << "Duplicate hash found";
                     return false;
                 }
 
@@ -183,7 +183,7 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
                 else
                 {
                     //Invalid length hash found
-                    qDebug() << "Invalid length hash found";
+                    log_error() << "Invalid length hash found";
                 }
             }
 
@@ -270,7 +270,7 @@ bool smp_group_img_mgmt::parse_upload_response(QCborStreamReader &reader, int64_
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -429,7 +429,7 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -459,13 +459,13 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
 
                 while (reader.lastError() == QCborError::NoError && reader.hasNext())
                 {
-                    qDebug() << "container/map";
+                    log_debug() << "container/map";
                     parse_state_response(reader, array_name_dupe);
                 }
 
                 if (reader.lastError() == QCborError::NoError)
                 {
-                    qDebug() << "leave";
+                    log_debug() << "leave";
                     reader.leaveContainer();
 
                     if (array_name == "images")
@@ -546,7 +546,7 @@ void smp_group_img_mgmt::file_upload(QByteArray *message)
                 {
                     //Repeated lower offset 3 times, going in loop uploading the same thing over and over
 //TODO:
-qDebug() << "Going in circles...";
+log_error() << "Going in circles...";
                 }
             }
             else
@@ -699,12 +699,12 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
 
     if (mode == MODE_IDLE)
     {
-        qDebug() << "Unexpected response, not busy";
+        log_error() << "Unexpected response, not busy";
         emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_IMG)
     {
-        qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_IMG;
+        log_error() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_IMG;
         emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not img mgmt");
     }
     else
@@ -786,7 +786,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
         }
         else
         {
-            qDebug() << "Unsupported command received";
+            log_error() << "Unsupported command received";
             mode = MODE_IDLE;
         }
     }
@@ -800,7 +800,7 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
     Q_UNUSED(error);
 
     bool cleanup = true;
-    qDebug() << "error :(";
+    log_error() << "error :(";
 
     if (command == COMMAND_STATE && mode == MODE_LIST_IMAGES)
     {
@@ -846,7 +846,7 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
 
 void smp_group_img_mgmt::timeout(smp_message *message)
 {
-    qDebug() << "timeout :(";
+    log_error() << "timeout :(";
 
     if (mode == MODE_UPLOAD_FIRMWARE)
     {

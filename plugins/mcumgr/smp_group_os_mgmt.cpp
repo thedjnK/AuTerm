@@ -92,7 +92,7 @@ bool smp_group_os_mgmt::parse_echo_response(QCborStreamReader &reader, QString *
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -208,7 +208,7 @@ bool smp_group_os_mgmt::parse_task_stats_response(QCborStreamReader &reader, boo
                 if (r.status == QCborStreamReader::Error)
                 {
                         data.clear();
-                        qDebug("Error decoding string");
+                        log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -220,7 +220,7 @@ bool smp_group_os_mgmt::parse_task_stats_response(QCborStreamReader &reader, boo
 
                         if (key == "tasks")
                         {
-                            qDebug() << "in tasks";
+                            log_debug() << "in tasks";
                             *in_tasks = true;
                         }
                 }
@@ -328,7 +328,7 @@ bool smp_group_os_mgmt::parse_memory_pool_response(QCborStreamReader &reader, me
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -428,7 +428,7 @@ bool smp_group_os_mgmt::parse_mcumgr_parameters_response(QCborStreamReader &read
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -499,7 +499,7 @@ bool smp_group_os_mgmt::parse_os_application_info_response(QCborStreamReader &re
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -574,7 +574,7 @@ bool smp_group_os_mgmt::parse_bootloader_info_response(QCborStreamReader &reader
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -620,7 +620,7 @@ bool smp_group_os_mgmt::parse_bootloader_info_response(QCborStreamReader &reader
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding byte array");
+                    log_error() << "Error decoding byte array";
                 }
                 else
                 {
@@ -700,12 +700,12 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
     if (mode == MODE_IDLE)
     {
-        qDebug() << "Unexpected response, not busy";
+        log_error() << "Unexpected response, not busy";
         emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_OS)
     {
-        qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_OS;
+        log_error() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_OS;
         emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not os mgmt");
     }
     else
@@ -760,7 +760,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             uint32_t buffer_count;
             bool good = parse_mcumgr_parameters_response(cbor_reader, &buffer_size, &buffer_count);
 
-            qDebug() << "buffer size: " << buffer_size << ", buffer count: " << buffer_count;
+            log_debug() << "buffer size: " << buffer_size << ", buffer count: " << buffer_count;
 
             emit status(smp_user_data, STATUS_COMPLETE, QString("Buffer size: %1\nBuffer count: %2").arg(QString::number(buffer_size), QString::number(buffer_count)));
         }
@@ -771,7 +771,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             QString response;
             bool good = parse_os_application_info_response(cbor_reader, &response);
 
-            qDebug() << response;
+            log_debug() << response;
 
             emit status(smp_user_data, STATUS_COMPLETE, response);
         }
@@ -785,7 +785,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         }
         else
         {
-            qDebug() << "Unsupported command received";
+            log_error() << "Unsupported command received";
         }
     }
 }
@@ -798,7 +798,7 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
     Q_UNUSED(error);
 
     bool cleanup = true;
-    qDebug() << "error :(";
+    log_error() << "error :(";
 
     if (command == COMMAND_ECHO && mode == MODE_ECHO)
     {
@@ -849,7 +849,7 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
 
 void smp_group_os_mgmt::timeout(smp_message *message)
 {
-    qDebug() << "timeout :(";
+    log_error() << "timeout :(";
 
     //TODO:
     emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));

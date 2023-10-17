@@ -143,7 +143,7 @@ bool smp_group_fs_mgmt::parse_upload_response(QCborStreamReader &reader, uint32_
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -229,7 +229,7 @@ bool smp_group_fs_mgmt::parse_download_response(QCborStreamReader &reader, uint3
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -255,7 +255,7 @@ bool smp_group_fs_mgmt::parse_download_response(QCborStreamReader &reader, uint3
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding byte array");
+                    log_error() << "Error decoding byte array";
                 }
                 else
                 {
@@ -336,7 +336,7 @@ bool smp_group_fs_mgmt::parse_status_response(QCborStreamReader &reader, uint32_
                     if (r.status == QCborStreamReader::Error)
                     {
                         data.clear();
-                        qDebug("Error decoding string");
+                        log_error() << "Error decoding string";
                     }
                     else
                     {
@@ -428,7 +428,7 @@ bool smp_group_fs_mgmt::parse_hash_checksum_response(QCborStreamReader &reader, 
 
                     if (r.status == QCborStreamReader::Error)
                     {
-                        qDebug("Error decoding byte array");
+                        log_error() << "Error decoding byte array";
                     }
                     else
                     {
@@ -453,7 +453,7 @@ bool smp_group_fs_mgmt::parse_hash_checksum_response(QCborStreamReader &reader, 
                     if (r.status == QCborStreamReader::Error)
                     {
                         data.clear();
-                        qDebug("Error decoding string");
+                        log_error() << "Error decoding string";
                     }
                     else
                     {
@@ -543,7 +543,7 @@ bool smp_group_fs_mgmt::parse_supported_hashes_checksums_response(QCborStreamRea
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -607,12 +607,12 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
     if (mode == MODE_IDLE)
     {
-        qDebug() << "Unexpected response, not busy";
+        log_error() << "Unexpected response, not busy";
         emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_FS)
     {
-        qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_FS;
+        log_error() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_FS;
         emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not fs mgmt");
     }
     else
@@ -686,7 +686,7 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
             if (file_upload_area != off)
             {
-                qDebug() << "Error: mismatch!";
+                log_error() << "Error: mismatch!";
             }
 
             if (file_data.isEmpty() == false)
@@ -724,8 +724,8 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             bool good = parse_status_response(cbor_reader, file_size_object);
             mode = MODE_IDLE;
 
-            qDebug() << "status done";
-            qDebug() << "Len: " << *file_size_object;
+            log_debug() << "status done";
+            log_debug() << "Len: " << *file_size_object;
 
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
@@ -748,18 +748,18 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             bool good = parse_supported_hashes_checksums_response(cbor_reader, false, nullptr, &temp_item);
             mode = MODE_IDLE;
 
-            qDebug() << "supported hash/checksum done";
+            log_debug() << "supported hash/checksum done";
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (mode == MODE_FILE_CLOSE && command == COMMAND_FILE_CLOSE)
         {
             mode = MODE_IDLE;
-            qDebug() << "file close done";
+            log_debug() << "file close done";
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else
         {
-            qDebug() << "Unsupported command received";
+            log_error() << "Unsupported command received";
         }
     }
 }
@@ -772,7 +772,7 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
     Q_UNUSED(error);
 
     bool cleanup = true;
-    qDebug() << "error :(";
+    log_error() << "error :(";
 
     if (command == COMMAND_UPLOAD_DOWNLOAD && mode == MODE_UPLOAD)
     {
@@ -780,7 +780,7 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         if (error.type == SMP_ERROR_RET && error.group == SMP_GROUP_ID_FS && error.rc == FS_MGMT_ERR_FILE_OFFSET_NOT_VALID)
         {
             //TODO - Possible indication that another transport (or the device itself) has modified the underlying file
-            qDebug() << "Possible MCUmgr FS upload transport clash";
+            log_error() << "Possible MCUmgr FS upload transport clash";
         }
 
         emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
@@ -824,7 +824,7 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
 
 void smp_group_fs_mgmt::timeout(smp_message *message)
 {
-    qDebug() << "timeout :(";
+    log_error() << "timeout :(";
 
     //TODO:
     emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));

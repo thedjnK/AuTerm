@@ -27,6 +27,7 @@
 #include "smp_message.h"
 #include "smp_processor.h"
 #include "smp_error.h"
+#include "debug_logger.h"
 
 #include <QDebug>
 
@@ -99,6 +100,13 @@ public:
         return false;
     }
 
+#ifndef SKIPPLUGIN_LOGGER
+    void set_logger(debug_logger *object)
+    {
+        logger = object;
+    }
+#endif
+
     virtual void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) = 0;
     virtual void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) = 0;
     virtual void timeout(smp_message *message) = 0;
@@ -119,6 +127,9 @@ protected:
     uint8_t smp_user_data;
     smp_error_lookup error_lookup;
     smp_error_define_lookup error_define_lookup;
+#ifndef SKIPPLUGIN_LOGGER
+    debug_logger *logger;
+#endif
 };
 
 #endif // SMP_GROUP_H

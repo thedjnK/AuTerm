@@ -96,7 +96,7 @@ bool smp_group_stat_mgmt::parse_group_data_response(QCborStreamReader &reader, Q
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -182,7 +182,7 @@ bool smp_group_stat_mgmt::parse_list_groups_response(QCborStreamReader &reader, 
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -235,12 +235,12 @@ void smp_group_stat_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
 
     if (mode == MODE_IDLE)
     {
-        qDebug() << "Unexpected response, not busy";
+        log_error() << "Unexpected response, not busy";
         emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_STATS)
     {
-        qDebug() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_STATS;
+        log_error() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_STATS;
         emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not stat mgmt");
     }
     else
@@ -275,7 +275,7 @@ void smp_group_stat_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
         }
         else
         {
-            qDebug() << "Unsupported command received";
+            log_error() << "Unsupported command received";
         }
     }
 }
@@ -288,7 +288,7 @@ void smp_group_stat_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gr
     Q_UNUSED(error);
 
     bool cleanup = true;
-    qDebug() << "error :(";
+    log_error() << "error :(";
 
     if (command == COMMAND_GROUP_DATA && mode == MODE_GROUP_DATA)
     {
@@ -314,7 +314,7 @@ void smp_group_stat_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gr
 
 void smp_group_stat_mgmt::timeout(smp_message *message)
 {
-    qDebug() << "timeout :(";
+    log_error() << "timeout :(";
 
     //TODO:
     emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));
