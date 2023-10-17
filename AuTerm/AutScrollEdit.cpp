@@ -486,7 +486,7 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
 
                 return true;
             }
-            else if ((keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) && !(keyEvent->modifiers() & Qt::ControlModifier) && (!(keyEvent->modifiers() & Qt::ShiftModifier) || mbLineSeparator == false))
+            else if ((keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) && !(keyEvent->modifiers() & Qt::ControlModifier) && !(keyEvent->modifiers() & Qt::ShiftModifier))
             {
                 //Enter pressed
                 if (mbSerialOpen == true)

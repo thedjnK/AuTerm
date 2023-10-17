@@ -115,8 +115,6 @@ const bool DefaultLogEnable                     = 0;
 const bool DefaultSysTrayIcon                   = 1;
 const qint16 DefaultSerialSignalCheckInterval   = 50;
 const qint16 DefaultTextUpdateInterval          = 80;
-const bool DefaultSSLEnable                     = 1;
-const bool DefaultShiftEnterLineSeparator       = 1;
 const bool DefaultAutoDTrimBuffer               = false; //(Unlisted option)
 const quint32 DefaultAutoTrimDBufferThreshold   = 0;     //(Unlisted option)
 const quint32 DefaultAutoTrimDBufferSize        = 0;     //(Unlisted option)
@@ -290,7 +288,6 @@ private slots:
     void on_text_EditData_textChanged();
     void on_combo_LogFile_currentIndexChanged(int);
     void on_btn_ReloadLog_clicked();
-    void on_check_LineSeparator_stateChanged(int);
 #ifndef SKIPERRORCODEFORM
     void on_btn_Error_clicked();
 #endif

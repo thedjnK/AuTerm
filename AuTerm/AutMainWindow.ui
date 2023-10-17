@@ -1020,29 +1020,6 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="check_LineSeparator">
-                 <property name="toolTip">
-                  <string>When enabled, pressing shit+enter in the terminal will create a line separator allowing for multiple lines to be sent when enter is pressed. If disabled then shift+enter will behave the same as pressing enter and send the line.</string>
-                 </property>
-                 <property name="text">
-                  <string>Shift+enter line seperator</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_EnableSSL">
-                 <property name="toolTip">
-                  <string>Enable this to use HTTPS (SSL) when communicating with AuTerm server (when updating or compiling applications), otherwise uses plaintext HTTP.</string>
-                 </property>
-                 <property name="text">
-                  <string>Enable SSL</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QCheckBox" name="check_EnableTerminalSizeSaving">
                  <property name="enabled">
                   <bool>true</bool>

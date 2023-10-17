@@ -159,7 +159,6 @@ private:
 public:
     bool mbLocalEcho; //True if local echo is enabled
     bool mbContextMenuOpen; //True when context menu is open
-    bool mbLineSeparator; //True if line separator is enabled
 };
 
 #endif // AUTSCROLLEDIT_H

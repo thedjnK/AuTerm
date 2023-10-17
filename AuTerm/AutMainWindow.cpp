@@ -533,12 +533,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         gbSysTrayEnabled = true;
     }
 
-    //Load line separator setting
-    ui->check_LineSeparator->setChecked(gpTermSettings->value("ShiftEnterLineSeparator", DefaultShiftEnterLineSeparator).toBool());
-
-    //Notify scroll edit area of line separator value
-    ui->text_TermEditData->mbLineSeparator = ui->check_LineSeparator->isChecked();
-
     //Load last directory path
     gstrLastFilename[FilenameIndexScripting] = gpTermSettings->value("LastScriptFileDirectory", "").toString();
     gstrLastFilename[FilenameIndexOthers] = gpTermSettings->value("LastOtherFileDirectory", "").toString();
@@ -3732,10 +3726,6 @@ AutMainWindow::LoadSettings(
         {
             gpTermSettings->setValue("TextUpdateInterval", DefaultTextUpdateInterval); //Interval between screen updates in mS, lower = faster but can be problematic when receiving/sending large amounts of data (200 is good for this)
         }
-        if (gpTermSettings->value("ShiftEnterLineSeparator").isNull())
-        {
-            gpTermSettings->setValue("ShiftEnterLineSeparator", DefaultShiftEnterLineSeparator); //Shift+enter input (1 = line separater, 0 = newline character)
-        }
         if (gpTermSettings->value("AutoTrimDBuffer").isNull())
         {
             gpTermSettings->setValue("AutoTrimDBuffer", DefaultAutoDTrimBuffer); //(Unlisted option) Automatically trim display buffer if size exceeds threshold (1 = enable, 0 = disable)
@@ -3890,20 +3880,6 @@ AutMainWindow::on_btn_ReloadLog_clicked(
 {
     //Reload log
     on_combo_LogFile_currentIndexChanged(ui->combo_LogFile->currentIndex());
-}
-
-//=============================================================================
-//=============================================================================
-void
-AutMainWindow::on_check_LineSeparator_stateChanged(
-    int
-    )
-{
-    //Update line separator setting
-    gpTermSettings->setValue("ShiftEnterLineSeparator", (ui->check_LineSeparator->isChecked() == true ? 1 : 0));
-
-    //Notify scroll edit
-    ui->text_TermEditData->mbLineSeparator = ui->check_LineSeparator->isChecked();
 }
 
 //=============================================================================
