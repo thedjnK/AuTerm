@@ -1369,6 +1369,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QFont monospace_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monospace_font.setPointSize(8);
     edit_SHELL_Output->setFont(monospace_font);
+
+#ifndef SKIPPLUGIN_LOGGER
+    logger = new debug_logger(this);
+    processor->set_logger(logger);
+#endif
 }
 
 plugin_mcumgr::~plugin_mcumgr()
@@ -1379,6 +1384,10 @@ plugin_mcumgr::~plugin_mcumgr()
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     delete udp_transport;
+#endif
+
+#ifndef SKIPPLUGIN_LOGGER
+    delete logger;
 #endif
 
     delete error_lookup_form;
@@ -2940,7 +2949,7 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
 #ifndef SKIPPLUGIN_LOGGER
 void plugin_mcumgr::setup_finished()
 {
-    logger.find_logger_plugin(parent_window);
+    logger->find_logger_plugin(parent_window);
 }
 #endif
 

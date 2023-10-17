@@ -23,9 +23,6 @@
 #ifndef PLUGIN_MCUMGR_H
 #define PLUGIN_MCUMGR_H
 
-#define PLUGIN_NAME "mcumgr"
-#define LOG_OBJECT logger
-
 #include <QObject>
 #include <QtPlugin>
 #include <QMainWindow>
@@ -446,7 +443,7 @@ private:
     QByteArray fs_hash_checksum_response;
     uint32_t fs_size_response;
 #ifndef SKIPPLUGIN_LOGGER
-    debug_logger logger;
+    debug_logger *logger;
 #endif
 };
 

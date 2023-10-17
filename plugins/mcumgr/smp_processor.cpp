@@ -44,6 +44,13 @@ smp_processor::~smp_processor()
     group_handlers.clear();
 }
 
+#ifndef SKIPPLUGIN_LOGGER
+void smp_processor::set_logger(debug_logger *object)
+{
+    logger = object;
+}
+#endif
+
 bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check)
 {
     if (busy)
@@ -145,7 +152,7 @@ void smp_processor::message_timeout()
         if (i == group_handlers.length())
         {
             //There is no registered handler for this group
-            qDebug() << "No registered handler for group " << group << ", cannot send timeout message.";
+            log_error() << "No registered handler for group " << group << ", cannot send timeout message.";
             cleanup();
         }
         else
@@ -188,9 +195,12 @@ void smp_processor::message_received(smp_message *response)
 {
     const smp_hdr *response_header = nullptr;
 
+    log_error() << "got message";
+
     if (!busy)
     {
         //Not busy so this message probably isn't wanted anymore
+        log_error() << "Received message when not awaiting for a repsonse";
         return;
     }
 
@@ -200,23 +210,23 @@ void smp_processor::message_received(smp_message *response)
     if (response_header == nullptr)
     {
         //Cannot do anything without a header
-        qDebug() << "Invalid response header";
+        log_error() << "Invalid response header";
     }
     else if (response_header->nh_group != last_message_header->nh_group)
     {
-        qDebug() << "Invalid group, expected " << last_message_header->nh_group << " got " << response_header->nh_group;
+        log_error() << "Invalid group, expected " << last_message_header->nh_group << " got " << response_header->nh_group;
     }
     else if (response_header->nh_id != last_message_header->nh_id)
     {
-        qDebug() << "Invalid command, expected " << last_message_header->nh_id << " got " << response_header->nh_id;
+        log_error() << "Invalid command, expected " << last_message_header->nh_id << " got " << response_header->nh_id;
     }
     else if (response_header->nh_seq != last_message_header->nh_seq)
     {
-        qDebug() << "Invalid sequence, expected " << last_message_header->nh_seq << " got " << response_header->nh_seq;
+        log_error() << "Invalid sequence, expected " << last_message_header->nh_seq << " got " << response_header->nh_seq;
     }
     else if (response_header->nh_op != smp_message::response_op(last_message_header->nh_op))
     {
-        qDebug() << "Invalid op, expected " << smp_message::response_op(last_message_header->nh_op) << " got " << response_header->nh_op;
+        log_error() << "Invalid op, expected " << smp_message::response_op(last_message_header->nh_op) << " got " << response_header->nh_op;
     }
     else
     {
@@ -245,7 +255,7 @@ void smp_processor::message_received(smp_message *response)
         if (i == group_handlers.length())
         {
             //There is no registered handler for this group, clean up
-            qDebug() << "No registered handler for group " << group << ", dropping response.";
+            log_error() << "No registered handler for group " << group << ", dropping response.";
             this->cleanup();
             return;
         }
@@ -257,6 +267,7 @@ void smp_processor::message_received(smp_message *response)
 
         if (!parsed)
         {
+            log_error() << "parse failed";
             return;
         }
 
@@ -327,7 +338,7 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
                 if (r.status == QCborStreamReader::Error)
                 {
                     data.clear();
-                    qDebug("Error decoding string");
+                    log_error() << "Error decoding string";
                 }
                 else
                 {
@@ -363,7 +374,7 @@ bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, u
 
     if (reader.lastError())
     {
-        qDebug() << "Failed to parse CBOR message: " << reader.lastError().toString();
+        log_error() << "Failed to parse CBOR message: " << reader.lastError().toString();
         return false;
     }
 

@@ -29,10 +29,13 @@
 #include <QIODevice>
 #include "../plugins/logger/plugin_logger.h"
 
-#define log_error() LOG_OBJECT.set_options(PLUGIN_NAME, log_level_error); QDebug(&LOG_OBJECT)
-#define log_warning() LOG_OBJECT.set_options(PLUGIN_NAME, log_level_warning); QDebug(&LOG_OBJECT)
-#define log_information() LOG_OBJECT.set_options(PLUGIN_NAME, log_level_information); QDebug(&LOG_OBJECT)
-#define log_debug() LOG_OBJECT.set_options(PLUGIN_NAME, log_level_debug); QDebug(&LOG_OBJECT)
+#define PLUGIN_NAME "mcumgr"
+#define LOG_OBJECT logger
+
+#define log_error() LOG_OBJECT->set_options(PLUGIN_NAME, log_level_error); QDebug(LOG_OBJECT)
+#define log_warning() LOG_OBJECT->set_options(PLUGIN_NAME, log_level_warning); QDebug(LOG_OBJECT)
+#define log_information() LOG_OBJECT->set_options(PLUGIN_NAME, log_level_information); QDebug(LOG_OBJECT)
+#define log_debug() LOG_OBJECT->set_options(PLUGIN_NAME, log_level_debug); QDebug(LOG_OBJECT)
 #else
 #define log_error() qDebug()
 #define log_warning() qDebug()

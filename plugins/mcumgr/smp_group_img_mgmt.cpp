@@ -716,7 +716,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             emit version_error(version);
         }
 
-        else if (mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
+        if (mode == MODE_UPLOAD_FIRMWARE && command == COMMAND_UPLOAD)
         {
 #if 0
             if (command == 0x00)
@@ -739,7 +739,6 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
 #endif
             file_upload(&data);
         }
-#if 1
         else if (mode == MODE_SET_IMAGE && command == COMMAND_STATE)
         {
                 //Response to set image state
@@ -762,23 +761,28 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
             mode = MODE_IDLE;
         }
-#endif
         else if (mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
         {
 //TODO:
-                //Response to set image state
-                //            message.remove(0, 8);
-                QCborStreamReader cbor_reader(data);
-                bool good = parse_state_response(cbor_reader, "");
-                //		    qDebug() << "Got " << good << ", " << rc;
+            //Response to set image state
+            //            message.remove(0, 8);
+            QCborStreamReader cbor_reader(data);
+            bool good = parse_state_response(cbor_reader, "");
+            //		    qDebug() << "Got " << good << ", " << rc;
 
-                //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
-                //lbl_IMG_Status->setText("Finished.");
+            //		    edit_IMG_Log->appendPlainText(QString("Finished #2 in ").append(QString::number(this->upload_tmr.elapsed())).append("ms"));
+            //lbl_IMG_Status->setText("Finished.");
 
-                //file_list_in_progress = false;
-                //emit plugin_set_status(false, false);
-                emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-                mode = MODE_IDLE;
+            //file_list_in_progress = false;
+            //emit plugin_set_status(false, false);
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+            mode = MODE_IDLE;
+        }
+        else if (mode == MODE_ERASE_IMAGE && command == COMMAND_ERASE)
+        {
+            //Response to erase image
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+            mode = MODE_IDLE;
         }
         else
         {

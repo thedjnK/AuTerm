@@ -26,6 +26,7 @@
 #include <QObject>
 #include "smp_message.h"
 #include "smp_uart.h"
+#include "debug_logger.h"
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -46,6 +47,9 @@ class smp_processor : public QObject
 public:
     smp_processor(QObject *parent);
     ~smp_processor();
+#ifndef SKIPPLUGIN_LOGGER
+    void set_logger(debug_logger *object);
+#endif
     bool send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check);
     bool is_busy();
     void register_handler(uint16_t group, smp_group *handler);
@@ -72,6 +76,10 @@ private:
     uint8_t repeat_times;
     bool busy;
     QList<smp_group_match_t> group_handlers;
+
+#ifndef SKIPPLUGIN_LOGGER
+    debug_logger *logger;
+#endif
 };
 
 #endif // smp_processor_H
