@@ -757,48 +757,58 @@ void AutScrollEdit::set_line_mode(bool bNewLineMode)
 
 //=============================================================================
 //=============================================================================
-void AutScrollEdit::add_dat_in_text(QByteArray *baDat, bool apply_formatting)
+void AutScrollEdit::add_display_data(display_buffer_list *buffers)
 {
-    //Adds data to the DatIn buffer
-    bool added = false;
+    //Adds data to the display buffer
+    uint16_t i = 0;
+    uint16_t l = buffers->length();
 
     if (had_dat_in_data == false)
     {
         //Remove first newline
-        uint32_t i = 0;
-        uint32_t l = baDat->length();
-        while (i < l && (baDat->at(i) == '\r' || baDat->at(i) == '\n'))
+        uint32_t a = 0;
+        uint32_t b = buffers->at(i).data.length();
+        while (a < b && (buffers->at(i).data.at(a) == '\r' || buffers->at(i).data.at(a) == '\n'))
         {
-            ++i;
+            ++a;
         }
 
-        if (i > 0)
+        if (a > 0)
         {
-//TODO: a better way to deal with this "hack"
-            if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
+            //TODO: a better way to deal with this "hack"
+            if (buffers->at(i).apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
             {
                 mstrDatIn += "\x1b[9999m";
             }
-            mstrDatIn += baDat->mid(i).replace("\r\n", "\n").replace("\r", "\n");
-            if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
+
+            mstrDatIn += buffers->at(i).data.mid(a).replace("\r\n", "\n").replace("\r", "\n");
+
+            if (buffers->at(i).apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
             {
                 mstrDatIn += "\x1b[9998m";
             }
-            added = true;
+
+            ++i;
         }
     }
 
-    if (added == false)
+    while (i < l)
     {
-        if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
+        QByteArray temp_buffer = buffers->at(i).data;
+
+        if (buffers->at(i).apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
         {
             mstrDatIn += "\x1b[9999m";
         }
-        mstrDatIn += baDat->replace("\r\n", "\n").replace("\r", "\n");
-        if (apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
+
+        mstrDatIn += temp_buffer.replace("\r\n", "\n").replace("\r", "\n");
+
+        if (buffers->at(i).apply_formatting == false && vt100_control_mode == VT100_MODE_DECODE)
         {
             mstrDatIn += "\x1b[9998m";
         }
+
+        ++i;
     }
 
     had_dat_in_data = true;

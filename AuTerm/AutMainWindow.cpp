@@ -285,10 +285,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     plugin_status_owner = nullptr;
 #endif
     gbAppStarted = false;
-
-    //Clear display buffer byte array and reserve 128KB of RAM to reduce mallocs (should allow faster speed testing at 1M baud)
-    gbaDisplayBuffer.clear();
-    gbaDisplayBuffer.reserve(131072);
+    display_update_pending = false;
 
 #ifndef SKIPSPEEDTEST
     //Also reserve 64KB of RAM to reduce mallocs when speed testing
@@ -1088,8 +1085,7 @@ AutMainWindow::~AutMainWindow()
     }
 #endif
 
-    //Release reserved memory buffers
-    gbaDisplayBuffer.squeeze();
+    display_buffers.clear();
 
 #ifndef SKIPSPEEDTEST
     gbaSpeedReceivedData.squeeze();
@@ -1506,11 +1502,7 @@ AutMainWindow::SerialRead(
 //            baDispData.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f");
 
             //Update display buffer
-            gbaDisplayBuffer.append(baDispData);
-            if (!gtmrTextUpdateTimer.isActive())
-            {
-                gtmrTextUpdateTimer.start();
-            }
+            update_buffer(&baDispData, true);
 
             if (gbLoopbackMode == true)
             {
@@ -1518,7 +1510,7 @@ AutMainWindow::SerialRead(
                 gspSerialPort.write(baOrigData);
                 gintQueuedTXBytes += baOrigData.length();
                 gpMainLog->WriteRawLogData(baOrigData);
-                gbaDisplayBuffer.append(baDispData);
+                update_buffer(&baDispData, false);
             }
         }
 
@@ -1571,11 +1563,7 @@ AutMainWindow::StreamBatchContinue(
                 ++gintStreamBytesRead;
 
                 //Update the display buffer
-                gbaDisplayBuffer.append(baFileData);
-                if (!gtmrTextUpdateTimer.isActive())
-                {
-                    gtmrTextUpdateTimer.start();
-                }
+                update_buffer(&baFileData, false);
             }
             gbaBatchReceive.clear();
         }
@@ -1587,7 +1575,7 @@ AutMainWindow::StreamBatchContinue(
             if (remTempREM.hasMatch() == true)
             {
                 //Got the error code
-                gbaDisplayBuffer.append("\nError during batch command, error code: ").append(remTempREM.captured(1).toUtf8()).append("\n");
+                update_buffer(QByteArray("\nError during batch command, error code: ").append(remTempREM.captured(1).toUtf8()).append("\n"), false);
 
                 //Lookup error code
                 bool bTmpBool;
@@ -1601,7 +1589,7 @@ AutMainWindow::StreamBatchContinue(
             else
             {
                 //Unknown error code
-                gbaDisplayBuffer.append("\nError during batch command, unknown error code.\n");
+                update_buffer("\nError during batch command, unknown error code.\n", false);
             }
             if (!gtmrTextUpdateTimer.isActive())
             {
@@ -1909,11 +1897,7 @@ AutMainWindow::MenuSelected(
                 gintStreamBytesRead = 1;
 
                 //Update the display buffer
-                gbaDisplayBuffer.append(baFileData);
-                if (!gtmrTextUpdateTimer.isActive())
-                {
-                    gtmrTextUpdateTimer.start();
-                }
+                update_buffer(&baFileData, false);
 
                 //Start a timeout timer
                 gtmrBatchTimeoutTimer.start(BatchTimeout);
@@ -2014,19 +1998,13 @@ AutMainWindow::enter_pressed(
             else if (gbLoopbackMode == true)
             {
                 //Loopback is enabled
-                gbaDisplayBuffer.append("\n[Cannot send: Loopback mode is enabled.]\n");
-                if (!gtmrTextUpdateTimer.isActive())
-                {
-                    gtmrTextUpdateTimer.start();
-                }
+                update_buffer("\n[Cannot send: Loopback mode is enabled.]\n", false);
             }
 
             if (ui->check_Echo->isChecked() == true)
             {
                 //Local echo
-                QByteArray baTmpBA = ui->text_TermEditData->get_dat_out()->toUtf8();
-                baTmpBA.append("\n");
-                ui->text_TermEditData->add_dat_in_text(&baTmpBA, false);
+                update_buffer(ui->text_TermEditData->get_dat_out()->toUtf8().append("\n"), false);
             }
             ui->text_TermEditData->clear_dat_out();
         }
@@ -2078,12 +2056,7 @@ AutMainWindow::key_pressed(
                 //Echo mode on
                 if (nKey == Qt::Key_Enter || nKey == Qt::Key_Return)
                 {
-                    gbaDisplayBuffer.append("\n");
-                }
-
-                if (!gtmrTextUpdateTimer.isActive())
-                {
-                    gtmrTextUpdateTimer.start();
+                    update_buffer("\n", false);
                 }
             }
 
@@ -2110,18 +2083,12 @@ AutMainWindow::key_pressed(
                 if (ui->check_ShowCLRF->isChecked() == true)
                 {
                     //Escape \t, \r and \n in addition to normal escaping
-                    gbaDisplayBuffer.append(baTmpBA.replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n").replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f"));
+                    update_buffer(baTmpBA.replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n").replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f"), false);
                 }
                 else
                 {
                     //Normal escaping
-                    gbaDisplayBuffer.append(baTmpBA.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f"));
-                }
-
-                //Run display update timer
-                if (!gtmrTextUpdateTimer.isActive())
-                {
-                    gtmrTextUpdateTimer.start();
+                    update_buffer(baTmpBA.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f"), false);
                 }
 
                 //Output to log file
@@ -2131,12 +2098,7 @@ AutMainWindow::key_pressed(
         else if (gbLoopbackMode == true)
         {
             //Loopback is enabled
-            gbaDisplayBuffer.append("[Cannot send: Loopback mode is enabled.]\n");
-
-            if (!gtmrTextUpdateTimer.isActive())
-            {
-                gtmrTextUpdateTimer.start();
-            }
+            update_buffer("[Cannot send: Loopback mode is enabled.]\n", false);
         }
     }
 }
@@ -2156,12 +2118,7 @@ void AutMainWindow::vt100_send(QByteArray code)
         else if (gbLoopbackMode == true)
         {
             //Loopback is enabled
-            gbaDisplayBuffer.append("[Cannot send: Loopback mode is enabled.]\n");
-
-            if (!gtmrTextUpdateTimer.isActive())
-            {
-                gtmrTextUpdateTimer.start();
-            }
+            update_buffer("[Cannot send: Loopback mode is enabled.]\n", false);
         }
     }
 }
@@ -2798,11 +2755,7 @@ AutMainWindow::MessagePass(
 //            baDataString.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f");
 
             //Output to display buffer
-            gbaDisplayBuffer.append(baDataString);
-            if (!gtmrTextUpdateTimer.isActive())
-            {
-                gtmrTextUpdateTimer.start();
-            }
+            update_buffer(&baDataString, false);
         }
 
         if (bEscapeString == false && bFromScripting == false)
@@ -2815,11 +2768,7 @@ AutMainWindow::MessagePass(
     else if (gspSerialPort.isOpen() == true && gbLoopbackMode == true)
     {
         //Loopback is enabled
-        gbaDisplayBuffer.append("\n[Cannot send: Loopback mode is enabled.]\n");
-        if (!gtmrTextUpdateTimer.isActive())
-        {
-            gtmrTextUpdateTimer.start();
-        }
+        update_buffer("\n[Cannot send: Loopback mode is enabled.]\n", false);
     }
 }
 
@@ -2834,19 +2783,14 @@ AutMainWindow::LookupErrorCode(
     if (gbErrorsLoaded == true)
     {
         //Error file has been loaded
-        gbaDisplayBuffer.append(QString("\nError code 0x").append(QString::number(intErrorCode, 16)).append(": ").append(gpErrorMessages->value(QString::number(intErrorCode), "Undefined Error Code").toString()).append("\n").toUtf8());
+        update_buffer(QString("\nError code 0x").append(QString::number(intErrorCode, 16)).append(": ").append(gpErrorMessages->value(QString::number(intErrorCode), "Undefined Error Code").toString()).append("\n").toUtf8(), false);
     }
     else
     {
         //Error file has not been loaded
-        gbaDisplayBuffer.append(QString("\nUnable to lookup error code: error file (codes.csv) not loaded. Check the Update tab to download the latest version.\n").toUtf8());
+        update_buffer(QString("\nUnable to lookup error code: error file (codes.csv) not loaded. Check the Update tab to download the latest version.\n").toUtf8(), false);
     }
-
-    if (!gtmrTextUpdateTimer.isActive())
-    {
-        gtmrTextUpdateTimer.start();
-    }
-    ui->text_TermEditData->moveCursor(QTextCursor::End);
+//    ui->text_TermEditData->moveCursor(QTextCursor::End);
 }
 
 //=============================================================================
@@ -2892,11 +2836,7 @@ AutMainWindow::SerialBytesWritten(
             else if (gintStreamBytesRead > gintStreamBytesProgress)
             {
                 //Progress output
-                gbaDisplayBuffer.append(QString("Streamed ").append(QString::number(gintStreamBytesRead)).append(" bytes (").append(QString::number(gintStreamBytesRead*100/gintStreamBytesSize)).append("%).\n").toUtf8());
-                if (!gtmrTextUpdateTimer.isActive())
-                {
-                    gtmrTextUpdateTimer.start();
-                }
+                update_buffer(QString("Streamed ").append(QString::number(gintStreamBytesRead)).append(" bytes (").append(QString::number(gintStreamBytesRead*100/gintStreamBytesSize)).append("%).\n").toUtf8(), false);
                 gintStreamBytesProgress = gintStreamBytesProgress + StreamProgress;
             }
 
@@ -2960,20 +2900,14 @@ AutMainWindow::FinishStream(
     if (bType == true)
     {
         //Stream cancelled
-        gbaDisplayBuffer.append(QString("\nCancelled stream after ").append(QString::number(gintStreamBytesRead)).append(" bytes (").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds) [~").append(QString::number((gintStreamBytesRead/(1+gtmrStreamTimer.nsecsElapsed()/1000000000LL)))).append(" bytes/second].\n").toUtf8());
+        update_buffer(QString("\nCancelled stream after ").append(QString::number(gintStreamBytesRead)).append(" bytes (").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds) [~").append(QString::number((gintStreamBytesRead/(1+gtmrStreamTimer.nsecsElapsed()/1000000000LL)))).append(" bytes/second].\n").toUtf8(), false);
         ui->statusBar->showMessage("File streaming cancelled.");
     }
     else
     {
         //Stream finished
-        gbaDisplayBuffer.append(QString("\nFinished streaming file, ").append(QString::number(gintStreamBytesRead)).append(" bytes sent in ").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds [~").append(QString::number((gintStreamBytesRead/(1+gtmrStreamTimer.nsecsElapsed()/1000000000LL)))).append(" bytes/second].\n").toUtf8());
+        update_buffer(QString("\nFinished streaming file, ").append(QString::number(gintStreamBytesRead)).append(" bytes sent in ").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds [~").append(QString::number((gintStreamBytesRead/(1+gtmrStreamTimer.nsecsElapsed()/1000000000LL)))).append(" bytes/second].\n").toUtf8(), false);
         ui->statusBar->showMessage("File streaming complete!");
-    }
-
-    //Initiate timer for buffer update
-    if (!gtmrTextUpdateTimer.isActive())
-    {
-        gtmrTextUpdateTimer.start();
     }
 
     //Clear up
@@ -2997,20 +2931,14 @@ AutMainWindow::FinishBatch(
     if (bType == true)
     {
         //Stream cancelled
-        gbaDisplayBuffer.append(QString("\nCancelled batch (").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds)\n").toUtf8());
+        update_buffer(QString("\nCancelled batch (").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds)\n").toUtf8(), false);
         ui->statusBar->showMessage("Batch file sending cancelled.");
     }
     else
     {
         //Stream finished
-        gbaDisplayBuffer.append(QString("\nFinished sending batch file, ").append(QString::number(gintStreamBytesRead)).append(" lines sent in ").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds\n").toUtf8());
+        update_buffer(QString("\nFinished sending batch file, ").append(QString::number(gintStreamBytesRead)).append(" lines sent in ").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds\n").toUtf8(), false);
         ui->statusBar->showMessage("Batch file sending complete!");
-    }
-
-    //Initiate timer for buffer update
-    if (!gtmrTextUpdateTimer.isActive())
-    {
-        gtmrTextUpdateTimer.start();
     }
 
     //Clear up and cancel timer
@@ -3032,8 +2960,16 @@ AutMainWindow::UpdateReceiveText(
     )
 {
     //Updates the receive text buffer
-    ui->text_TermEditData->add_dat_in_text(&gbaDisplayBuffer, true);
-    gbaDisplayBuffer.clear();
+    if (ui->selector_Tab->currentWidget() == ui->tab_Term)
+    {
+        ui->text_TermEditData->add_display_data(&display_buffers);
+        display_buffers.clear();
+        display_update_pending = false;
+    }
+    else
+    {
+        display_update_pending = true;
+    }
 }
 
 //=============================================================================
@@ -3043,11 +2979,7 @@ AutMainWindow::BatchTimeoutSlot(
     )
 {
     //A response to a batch command has timed out
-    gbaDisplayBuffer.append("\nModule command timed out.\n");
-    if (!gtmrTextUpdateTimer.isActive())
-    {
-        gtmrTextUpdateTimer.start();
-    }
+    update_buffer("\nModule command timed out.\n", false);
     gbTermBusy = false;
     gbStreamingBatch = false;
     gchTermMode = 0;
@@ -5243,13 +5175,13 @@ AutMainWindow::SetLoopBackMode(
         if (gbLoopbackMode == true)
         {
             //Enabled
-            gbaDisplayBuffer.append("\n[Loopback Enabled]\n");
+            update_buffer("\n[Loopback Enabled]\n", false);
             gpMenu->actions().at(MenuActionLoopback)->setText("Disable Loopback (Rx->Tx)");
         }
         else
         {
             //Disabled
-            gbaDisplayBuffer.append("\n[Loopback Disabled]\n");
+            update_buffer("\n[Loopback Disabled]\n", false);
             gpMenu->actions().at(MenuActionLoopback)->setText("Enable Loopback (Rx->Tx)");
         }
 
@@ -5510,7 +5442,7 @@ AutMainWindow::plugin_serial_transmit(
 
         if (gbPluginHideTerminalOutput == false && ui->check_Echo->isChecked())
         {
-            ui->text_TermEditData->add_dat_in_text(data, false);
+            update_buffer(data, false);
         }
     }
 }
@@ -5647,6 +5579,53 @@ void AutMainWindow::on_check_enable_online_version_check_toggled(bool checked)
     }
 }
 #endif
+
+//=============================================================================
+//=============================================================================
+void AutMainWindow::on_selector_Tab_currentChanged(int index)
+{
+    if (index == ui->selector_Tab->indexOf(ui->tab_Term))
+    {
+        if (display_update_pending == true)
+        {
+            UpdateReceiveText();
+        }
+    }
+    else if (gtmrTextUpdateTimer.isActive())
+    {
+        gtmrTextUpdateTimer.stop();
+        display_update_pending = true;
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void AutMainWindow::update_buffer(QByteArray data, bool apply_formatting)
+{
+    update_buffer(&data, apply_formatting);
+}
+
+//=============================================================================
+//=============================================================================
+void AutMainWindow::update_buffer(QByteArray *data, bool apply_formatting)
+{
+    if (display_buffers.length() > 0 && display_buffers.last().apply_formatting == apply_formatting)
+    {
+        display_buffers.last().data.append(*data);
+    }
+    else
+    {
+        display_buffer_struct temp;
+        temp.data = *data;
+        temp.apply_formatting = apply_formatting;
+        display_buffers.append(temp);
+    }
+
+    if (!gtmrTextUpdateTimer.isActive())
+    {
+        gtmrTextUpdateTimer.start();
+    }
+}
 
 /******************************************************************************/
 // END OF FILE

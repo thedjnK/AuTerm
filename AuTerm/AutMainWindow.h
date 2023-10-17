@@ -366,6 +366,7 @@ private slots:
 
 #ifndef SKIPPLUGINS
     void on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *);
+    void on_selector_Tab_currentChanged(int index);
 
 signals:
     void plugin_serial_receive(QByteArray *data);
@@ -466,6 +467,8 @@ private:
     UpdateCustomisation(
         bool bDefault
     );
+    void update_buffer(QByteArray data, bool apply_formatting);
+    void update_buffer(QByteArray *data, bool apply_formatting);
 
     //Private variables
     bool gbTermBusy; //True when compiling or loading a program or streaming a file (busy)
@@ -505,7 +508,7 @@ private:
     OS32_64UINT gintStreamBytesSize; //The size of the file to stream in bytes
     OS32_64UINT gintStreamBytesRead; //The number of bytes read from the stream
     OS32_64UINT gintStreamBytesProgress; //The number of bytes when the next progress output should be made
-    QByteArray gbaDisplayBuffer; //Buffer of data to display
+    display_buffer_list display_buffers; //List of pending data awaiting terminal display
     QElapsedTimer gtmrStreamTimer; //Counts how long a stream takes to send
     QTimer gtmrTextUpdateTimer; //Timer for slower updating of display buffer (but less display freezing)
     bool gbStreamingBatch; //True if batch file is being streamed
@@ -575,6 +578,7 @@ private:
     QList<QPushButton *> list_plugin_open_close_buttons;
     QList<plugins> plugin_list;
 #endif
+    bool display_update_pending; //True if a display update is pending (for the tab to be switched to the terminal view)
 
 protected:
     void dragEnterEvent(QDragEnterEvent *dragEvent);

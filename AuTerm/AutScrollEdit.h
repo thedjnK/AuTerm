@@ -74,6 +74,13 @@ struct vt100_format_code {
     vt100_format_type temp;
 };
 
+struct display_buffer_struct {
+    QByteArray data;
+    bool apply_formatting;
+};
+
+typedef QList<display_buffer_struct> display_buffer_list;
+
 //QColor col_default = QColor();
 const QColor col_black = QColor(0, 0, 0);
 const QColor col_red = QColor(255, 0, 0);
@@ -105,7 +112,7 @@ public:
     void set_line_mode(bool bNewLineMode);
     void insertFromMimeData(const QMimeData *mdSrc);
     void update_display();
-    void add_dat_in_text(QByteArray *baDat, bool apply_formatting);
+    void add_display_data(display_buffer_list *buffers);
     void add_dat_out_text(const QString strDat);
     void clear_dat_in();
     void clear_dat_out();
