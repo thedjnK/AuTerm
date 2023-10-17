@@ -115,9 +115,9 @@ const bool DefaultLogEnable                     = 0;
 const bool DefaultSysTrayIcon                   = 1;
 const qint16 DefaultSerialSignalCheckInterval   = 50;
 const qint16 DefaultTextUpdateInterval          = 80;
-const bool DefaultAutoDTrimBuffer               = false; //(Unlisted option)
-const quint32 DefaultAutoTrimDBufferThreshold   = 0;     //(Unlisted option)
-const quint32 DefaultAutoTrimDBufferSize        = 0;     //(Unlisted option)
+const bool DefaultAutoDTrimBuffer               = false;
+const quint32 DefaultAutoTrimDBufferThreshold   = 256;
+const quint32 DefaultAutoTrimDBufferSize        = 64;
 const quint16 DefaultScrollbackBufferSize       = 32;    //(Unlisted option)
 const bool DefaultSaveSize                      = false;
 const bool DefaultOnlineUpdateCheck             = true;
@@ -360,10 +360,13 @@ private slots:
 #ifndef SKIPONLINE
     void on_check_enable_online_version_check_toggled(bool checked);
 #endif
+    void on_selector_Tab_currentChanged(int index);
+    void on_check_trim_toggled(bool checked);
+    void on_spin_trim_threshold_editingFinished();
+    void on_spin_trim_size_editingFinished();
 
 #ifndef SKIPPLUGINS
     void on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *);
-    void on_selector_Tab_currentChanged(int index);
 
 signals:
     void plugin_serial_receive(QByteArray *data);
@@ -466,6 +469,7 @@ private:
     );
     void update_buffer(QByteArray data, bool apply_formatting);
     void update_buffer(QByteArray *data, bool apply_formatting);
+    void update_display_trimming();
 
     //Private variables
     bool gbTermBusy; //True when compiling or loading a program or streaming a file (busy)
@@ -562,9 +566,6 @@ private:
     quint32 gintDelayedSpeedTestReceive; //Stores the delay before data started being received after a speed test begins (in seconds)
     bool gbSpeedTestReceived; //Set to true when data has been received in a speed test
 #endif
-    bool gbAutoTrimDBuffer; //(Unlisted option) Set to true to automatically trim the display buffer when it reaches a threashold
-    quint32 gintAutoTrimBufferDThreshold; //(Unlisted option) Number of bytes at which to trim the display buffer
-    quint32 gintAutoTrimBufferDSize; //(Unlisted option) Number of bytes to trim the recieve buffer
     bool gbAppStarted; //True if application startup is complete
     QElapsedTimer gtmrPortOpened; //Used for updating last received timestamp
     qint64 gintLastSerialTimeUpdate; //Used for recording when next last received timestamp should appear

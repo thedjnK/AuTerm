@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>648</width>
-    <height>448</height>
+    <width>629</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -883,59 +883,6 @@
                  <property name="spacing">
                   <number>2</number>
                  </property>
-                 <item row="0" column="0" colspan="3">
-                  <widget class="QLabel" name="label_46">
-                   <property name="text">
-                    <string>Line endings:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QRadioButton" name="radio_vt100_strip">
-                   <property name="text">
-                    <string>Strip</string>
-                   </property>
-                   <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup_2</string>
-                   </attribute>
-                  </widget>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QRadioButton" name="radio_vt100_ignore">
-                   <property name="text">
-                    <string>Ignore</string>
-                   </property>
-                   <property name="checked">
-                    <bool>false</bool>
-                   </property>
-                   <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup_2</string>
-                   </attribute>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <widget class="QRadioButton" name="radio_LCRLF">
-                   <property name="text">
-                    <string>\r\n</string>
-                   </property>
-                   <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup</string>
-                   </attribute>
-                  </widget>
-                 </item>
-                 <item row="3" column="2">
-                  <widget class="QRadioButton" name="radio_vt100_decode">
-                   <property name="text">
-                    <string>Decode</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                   <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup_2</string>
-                   </attribute>
-                  </widget>
-                 </item>
                  <item row="1" column="0">
                   <widget class="QRadioButton" name="radio_LCR">
                    <property name="text">
@@ -949,10 +896,17 @@
                    </attribute>
                   </widget>
                  </item>
-                 <item row="2" column="0" colspan="3">
-                  <widget class="QLabel" name="label_48">
+                 <item row="4" column="0">
+                  <widget class="QLabel" name="label_45">
                    <property name="text">
-                    <string>VT100 control codes:</string>
+                    <string>Window Title:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="0">
+                  <widget class="QLabel" name="label_49">
+                   <property name="text">
+                    <string>Threshold:</string>
                    </property>
                   </widget>
                  </item>
@@ -969,11 +923,17 @@
                    </attribute>
                   </widget>
                  </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="label_45">
+                 <item row="3" column="0">
+                  <widget class="QRadioButton" name="radio_vt100_ignore">
                    <property name="text">
-                    <string>Window Title:</string>
+                    <string>Ignore</string>
                    </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup_2</string>
+                   </attribute>
                   </widget>
                  </item>
                  <item row="4" column="1" colspan="2">
@@ -1004,6 +964,87 @@
                    </property>
                    <property name="maxLength">
                     <number>32</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0" colspan="3">
+                  <widget class="QLabel" name="label_46">
+                   <property name="text">
+                    <string>Line endings:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="2">
+                  <widget class="QRadioButton" name="radio_vt100_decode">
+                   <property name="text">
+                    <string>Decode</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup_2</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="5" column="0" colspan="3">
+                  <widget class="QCheckBox" name="check_trim">
+                   <property name="text">
+                    <string>Trim display buffer</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QRadioButton" name="radio_LCRLF">
+                   <property name="text">
+                    <string>\r\n</string>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QRadioButton" name="radio_vt100_strip">
+                   <property name="text">
+                    <string>Strip</string>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup_2</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="2" column="0" colspan="3">
+                  <widget class="QLabel" name="label_48">
+                   <property name="text">
+                    <string>VT100 control codes:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="7" column="0">
+                  <widget class="QLabel" name="label_50">
+                   <property name="text">
+                    <string>Size:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="1">
+                  <widget class="QSpinBox" name="spin_trim_threshold">
+                   <property name="minimum">
+                    <number>128</number>
+                   </property>
+                   <property name="maximum">
+                    <number>16384</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="7" column="1">
+                  <widget class="QSpinBox" name="spin_trim_size">
+                   <property name="minimum">
+                    <number>64</number>
+                   </property>
+                   <property name="maximum">
+                    <number>16384</number>
                    </property>
                   </widget>
                  </item>

@@ -876,9 +876,9 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     }
 
     //(Unlisted option) Setup display buffer automatic trimming
-    gbAutoTrimDBuffer = gpTermSettings->value("AutoTrimDBuffer", DefaultAutoDTrimBuffer).toBool();
-    gintAutoTrimBufferDThreshold = gpTermSettings->value("AutoTrimDBufferThreshold", DefaultAutoTrimDBufferThreshold).toULongLong();
-    gintAutoTrimBufferDSize = gpTermSettings->value("AutoTrimDBufferSize", DefaultAutoTrimDBufferSize).toULongLong();
+    ui->check_trim->setChecked(gpTermSettings->value("AutoTrimDBuffer", DefaultAutoDTrimBuffer).toBool());
+    ui->spin_trim_threshold->setValue(gpTermSettings->value("AutoTrimDBufferThreshold", DefaultAutoTrimDBufferThreshold).toULongLong());
+    ui->spin_trim_size->setValue(gpTermSettings->value("AutoTrimDBufferSize", DefaultAutoTrimDBufferSize).toULongLong());
 
 #ifdef __APPLE__
     //Show a warning to Mac users with the FTDI driver installed
@@ -938,12 +938,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     }
 #endif
 
-    if (gbAutoTrimDBuffer == true)
-    {
-        //(Unlisted option) Trim display buffer if required
-#pragma warning("TODO: Document trim options/add to GUI")
-        ui->text_TermEditData->set_trim_settings(gintAutoTrimBufferDThreshold, gintAutoTrimBufferDSize);
-    }
+    update_display_trimming();
 }
 
 //=============================================================================
@@ -5602,6 +5597,56 @@ void AutMainWindow::update_buffer(QByteArray *data, bool apply_formatting)
         gtmrTextUpdateTimer.start();
     }
 }
+
+//=============================================================================
+//=============================================================================
+void AutMainWindow::on_check_trim_toggled(bool checked)
+{
+    if (gbAppStarted == true)
+    {
+        gpTermSettings->setValue("AutoTrimDBuffer", checked);
+        update_display_trimming();
+    }
+
+    ui->spin_trim_threshold->setEnabled(checked);
+    ui->spin_trim_size->setEnabled(checked);
+}
+
+//=============================================================================
+//=============================================================================
+void AutMainWindow::on_spin_trim_threshold_editingFinished()
+{
+    if (gbAppStarted == true)
+    {
+        gpTermSettings->setValue("AutoTrimDBufferThreshold", ui->spin_trim_threshold->value());
+        update_display_trimming();
+    }
+}
+
+//=============================================================================
+//=============================================================================
+void AutMainWindow::on_spin_trim_size_editingFinished()
+{
+    if (gbAppStarted == true)
+    {
+        gpTermSettings->setValue("AutoTrimDBufferSize", ui->spin_trim_size->value());
+        update_display_trimming();
+    }
+}
+
+void AutMainWindow::update_display_trimming()
+{
+    //Setup display buffer trimming
+    if (ui->check_trim->isChecked() == true)
+    {
+        ui->text_TermEditData->set_trim_settings(ui->spin_trim_threshold->value(), ui->spin_trim_size->value());
+    }
+    else
+    {
+        ui->text_TermEditData->set_trim_settings(0, 0);
+    }
+}
+
 
 /******************************************************************************/
 // END OF FILE
