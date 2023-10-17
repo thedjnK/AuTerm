@@ -879,7 +879,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     ui->check_trim->setChecked(gpTermSettings->value("AutoTrimDBuffer", DefaultAutoDTrimBuffer).toBool());
     ui->spin_trim_threshold->setValue(gpTermSettings->value("AutoTrimDBufferThreshold", DefaultAutoTrimDBufferThreshold).toULongLong());
     ui->spin_trim_size->setValue(gpTermSettings->value("AutoTrimDBufferSize", DefaultAutoTrimDBufferSize).toULongLong());
-    on_check_trim_toggled(false);
+    on_check_trim_toggled(ui->check_trim->isChecked());
     update_display_trimming();
 
 #ifdef __APPLE__
