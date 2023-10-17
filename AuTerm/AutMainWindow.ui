@@ -989,6 +989,9 @@
                  </item>
                  <item row="5" column="0" colspan="3">
                   <widget class="QCheckBox" name="check_trim">
+                   <property name="toolTip">
+                    <string>Will limit the size of data shown in the terminal by trimming the oldest data</string>
+                   </property>
                    <property name="text">
                     <string>Trim display buffer</string>
                    </property>
@@ -1030,8 +1033,11 @@
                  </item>
                  <item row="6" column="1">
                   <widget class="QSpinBox" name="spin_trim_threshold">
+                   <property name="toolTip">
+                    <string>The amount of data needed in the display buffer (in bytes) before trimming it</string>
+                   </property>
                    <property name="minimum">
-                    <number>128</number>
+                    <number>512</number>
                    </property>
                    <property name="maximum">
                     <number>16384</number>
@@ -1040,8 +1046,11 @@
                  </item>
                  <item row="7" column="1">
                   <widget class="QSpinBox" name="spin_trim_size">
+                   <property name="toolTip">
+                    <string>The size (in bytes) to trim the display buffer to</string>
+                   </property>
                    <property name="minimum">
-                    <number>64</number>
+                    <number>256</number>
                    </property>
                    <property name="maximum">
                     <number>16384</number>

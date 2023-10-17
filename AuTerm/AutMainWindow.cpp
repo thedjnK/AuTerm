@@ -875,10 +875,12 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 #endif
     }
 
-    //(Unlisted option) Setup display buffer automatic trimming
+    //Setup display buffer automatic trimming
     ui->check_trim->setChecked(gpTermSettings->value("AutoTrimDBuffer", DefaultAutoDTrimBuffer).toBool());
     ui->spin_trim_threshold->setValue(gpTermSettings->value("AutoTrimDBufferThreshold", DefaultAutoTrimDBufferThreshold).toULongLong());
     ui->spin_trim_size->setValue(gpTermSettings->value("AutoTrimDBufferSize", DefaultAutoTrimDBufferSize).toULongLong());
+    on_check_trim_toggled(false);
+    update_display_trimming();
 
 #ifdef __APPLE__
     //Show a warning to Mac users with the FTDI driver installed
@@ -937,8 +939,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         }
     }
 #endif
-
-    update_display_trimming();
 }
 
 //=============================================================================
@@ -3106,11 +3106,16 @@ AutMainWindow::replyFinished(
             QString strMessage = QString("An error occured during an online request: ").append(nrReply->errorString());
             gpmErrorForm->SetMessage(&strMessage);
             gpmErrorForm->show();
+            ui->statusBar->showMessage("Network request error");
 
             if (gchTermMode == mode_check_for_update)
             {
                 ui->label_version_update->setText("Error with network request.");
             }
+        }
+        else
+        {
+            ui->statusBar->showMessage("Network request cancelled");
         }
 
         gchTermMode = 0;
@@ -3135,6 +3140,7 @@ AutMainWindow::replyFinished(
                 QString string_response = QString("Unknown response from server: %1").arg(QString(baTmpBA));
                 gpmErrorForm->SetMessage(&string_response);
                 gpmErrorForm->show();
+                ui->statusBar->showMessage("Unknown server response");
             }
             else
             {
@@ -3143,10 +3149,12 @@ AutMainWindow::replyFinished(
                 if (is_newer(&newest_version, &UwVersion) == true)
                 {
                     ui->label_version_update->setText(QString("<a href=\"https://github.com/thedjnK/AuTerm/releases\">Update available: %1</a>").arg(newest_version));
+                    ui->statusBar->showMessage(QString("AuTerm update to version %1 available").arg(newest_version));
                 }
                 else
                 {
                     ui->label_version_update->setText("No update available.");
+                    ui->statusBar->showMessage("No AuTerm update available");
                 }
             }
         }
@@ -5632,8 +5640,13 @@ void AutMainWindow::on_spin_trim_size_editingFinished()
         gpTermSettings->setValue("AutoTrimDBufferSize", ui->spin_trim_size->value());
         update_display_trimming();
     }
+
+    //Do not allow threshold value to be lower than size value
+    ui->spin_trim_threshold->setMinimum(ui->spin_trim_size->value() > DefaultAutoTrimDBufferThreshold ? ui->spin_trim_size->value() : DefaultAutoTrimDBufferThreshold);
 }
 
+//=============================================================================
+//=============================================================================
 void AutMainWindow::update_display_trimming()
 {
     //Setup display buffer trimming
@@ -5646,7 +5659,6 @@ void AutMainWindow::update_display_trimming()
         ui->text_TermEditData->set_trim_settings(0, 0);
     }
 }
-
 
 /******************************************************************************/
 // END OF FILE
