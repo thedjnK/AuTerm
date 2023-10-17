@@ -59,6 +59,8 @@ AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     dat_out_updated = false;
     dat_in_new_len = 0;
     had_dat_in_data = false;
+    trim_threshold = 0;
+    trim_size = 0;
 
     mstrDatIn.reserve(32768);
 
@@ -1099,6 +1101,20 @@ void AutScrollEdit::update_display()
             }
         }
 
+        if (trim_size > 0 && (uint32_t)dat_in_new_len >= trim_threshold)
+        {
+            //Trim buffer down to requested size
+//TODO: this can be improved by doing it before the append above, i.e. if old length + new lengh > threshold, remove from one or both buffers
+            uint32_t removal = (uint32_t)dat_in_new_len - trim_size;
+
+            tcTmpCur = this->textCursor();
+            tcTmpCur.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
+            tcTmpCur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, removal);
+            tcTmpCur.removeSelectedText();
+
+            dat_in_new_len -= removal;
+        }
+
         if (/*mbLocalEcho == true &&*/ mbLineMode == true && dat_out_updated == true)
         {
             /*QTextCursor*/ tcTmpCur = this->textCursor();
@@ -1183,13 +1199,15 @@ void AutScrollEdit::set_serial_open(bool SerialOpen)
 
 //=============================================================================
 //=============================================================================
-void AutScrollEdit::trim_dat_in(qint32 intThreshold, quint32 intSize)
+void AutScrollEdit::set_trim_settings(uint32_t threshold, uint32_t size)
 {
-    //Trim the display buffer
-    if (mstrDatIn.length() > intThreshold)
+    trim_threshold = threshold;
+    trim_size = size;
+
+    if (trim_size > 0 && mintPrevTextSize >= trim_threshold)
     {
-        //Threshold exceeded, trim to desired size
-        mstrDatIn.remove(0, mstrDatIn.length() - intSize);
+        //Buffer needs to be trimmed
+        this->update_display();
     }
 }
 

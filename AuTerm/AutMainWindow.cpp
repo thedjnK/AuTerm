@@ -946,6 +946,13 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         }
     }
 #endif
+
+    if (gbAutoTrimDBuffer == true)
+    {
+        //(Unlisted option) Trim display buffer if required
+#pragma warning("TODO: Document trim options/add to GUI")
+        ui->text_TermEditData->set_trim_settings(gintAutoTrimBufferDThreshold, gintAutoTrimBufferDSize);
+    }
 }
 
 //=============================================================================
@@ -3027,14 +3034,6 @@ AutMainWindow::UpdateReceiveText(
     //Updates the receive text buffer
     ui->text_TermEditData->add_dat_in_text(&gbaDisplayBuffer, true);
     gbaDisplayBuffer.clear();
-
-    //(Unlisted option) Trim display buffer if required
-    if (gbAutoTrimDBuffer == true)
-    {
-        //Trim display buffer (this may split UTF-8 characters up)
-        ui->text_TermEditData->trim_dat_in(gintAutoTrimBufferDThreshold, gintAutoTrimBufferDSize);
-#pragma warning("TODO: Document trim options/add to GUI")
-    }
 }
 
 //=============================================================================

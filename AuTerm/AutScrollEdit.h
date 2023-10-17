@@ -112,7 +112,7 @@ public:
     QString *get_dat_out();
     void update_cursor();
     void set_serial_open(bool SerialOpen);
-    void trim_dat_in(qint32 intThreshold, quint32 intSize);
+    void set_trim_settings(uint32_t threshold, uint32_t size);
     void set_vt100_mode(vt100_mode mode);
 
 protected:
@@ -146,6 +146,8 @@ private:
     vt100_mode vt100_control_mode; //VT100 control code mode
     bool had_dat_in_data; //True if there is current data displayed from the dat in buffer
     QTextCharFormat pre_dat_in_format_backup; //Backup of text format prior to dat in text being added
+    uint32_t trim_threshold;
+    uint32_t trim_size;
 
 public:
     bool mbLocalEcho; //True if local echo is enabled
