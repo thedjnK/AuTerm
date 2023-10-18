@@ -1147,7 +1147,6 @@ void AutScrollEdit::update_display()
         //Update the cursor position
         this->update_cursor();
 
-//BUG: if text selected is in out buffer, this messes up selection
         if (uiAnchor != 0 || uiPosition != 0)
         {
             //Reselect previous text
