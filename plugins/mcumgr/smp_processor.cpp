@@ -195,7 +195,7 @@ void smp_processor::message_received(smp_message *response)
 {
     const smp_hdr *response_header = nullptr;
 
-    log_error() << "got message";
+    log_debug() << "got message";
 
     if (!busy)
     {
