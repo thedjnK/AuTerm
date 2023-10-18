@@ -1270,7 +1270,7 @@ void AutScrollEdit::vt100_format_apply(QTextCursor *cursor, vt100_format_code *f
 
     if (format->weight != FORMAT_DUAL_UNSET)
     {
-        new_format.setFontWeight((format->weight == FORMAT_DUAL_DOUBLE ? 100 : (format->weight == FORMAT_DUAL_HALF ? 25 : 50)));
+        new_format.setFontWeight((format->weight == FORMAT_DUAL_DOUBLE ? QFont::Bold : (format->weight == FORMAT_DUAL_HALF ? QFont::ExtraLight : QFont::Normal)));
         changed = true;
     }
 
