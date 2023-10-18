@@ -21,11 +21,8 @@
 **
 *******************************************************************************/
 #include "smp_uart.h"
-#include <QDebug>
 #include "crc16.h"
 #include <math.h>
-
-//TODO: all of this
 
 smp_uart::smp_uart(QObject *parent)
 {
@@ -38,7 +35,6 @@ smp_uart::~smp_uart()
 
 void smp_uart::data_received(QByteArray *message)
 {
-//    qDebug() << "rec data: " << message;
     smp_message full_message;
     full_message.append(message);
 
@@ -52,7 +48,6 @@ void smp_uart::data_received(QByteArray *message)
 void smp_uart::serial_read(QByteArray *rec_data)
 {
     SerialData.append(*rec_data);
-//    qDebug() << QString("Now: ").append(SerialData);
 
     //Search for SMP packets
     int32_t pos = SerialData.indexOf(smp_first_header);
@@ -68,7 +63,6 @@ void smp_uart::serial_read(QByteArray *rec_data)
             //Start
             //Check this header
             SMPBuffer.clear();
-//            qDebug() << "AA" << SerialData.mid((pos + 2), (posA - pos - 2));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
             SMPBuffer = QByteArray::fromBase64(SerialData.mid((pos + 2), (posA - pos - 2)), QByteArray::AbortOnBase64DecodingErrors);
 #else
@@ -77,11 +71,10 @@ void smp_uart::serial_read(QByteArray *rec_data)
 
             if (SMPBuffer.length() == 0)
             {
-                qDebug() << "Failed decoding base64";
+                log_error() << "Failed decoding base64";
             }
             else if (SMPBuffer.length() > 2)
             {
-//                qDebug() << "length here is " << SMPBuffer.length();
                 //Check length
                 waiting_packet_length = ((uint16_t)SMPBuffer[0]) << 8;
                 waiting_packet_length |= ((uint16_t)SMPBuffer[1] & 0xff);
@@ -98,12 +91,11 @@ void smp_uart::serial_read(QByteArray *rec_data)
                         //Good to parse message after removing CRC
                         SMPBuffer.remove((SMPBuffer.length() - 2), 2);
                         data_received(&SMPBuffer);
-//                        emit receive_waiting(SMPBuffer);
                     }
                     else
                     {
                         //CRC failure
-                        qDebug() << "CRC failure, expected " << message_crc << " but got " << crc;
+                        log_error() << "CRC failure, expected " << message_crc << " but got " << crc;
                     }
                 }
                 else
@@ -126,7 +118,6 @@ void smp_uart::serial_read(QByteArray *rec_data)
             //Continuation
             //Check this header
             SMPBuffer.clear();
-//            qDebug() << "BB" << SerialData.mid((pos_other + 2), (posA_other - pos_other - 2));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
             SMPBuffer = QByteArray::fromBase64(SerialData.mid((pos_other + 2), (posA_other - pos_other - 2)), QByteArray::AbortOnBase64DecodingErrors);
 #else
@@ -135,7 +126,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
 
             if (SMPBuffer.length() == 0)
             {
-                qDebug() << "Failed decoding base64";
+                log_error() << "Failed decoding base64";
             }
             else if (SMPBuffer.length() > 0)
             {
@@ -153,12 +144,11 @@ void smp_uart::serial_read(QByteArray *rec_data)
                         //Good to parse message after removing CRC
                         SMPBufferActualData.remove((SMPBufferActualData.length() - 2), 2);
                         data_received(&SMPBufferActualData);
-                        //emit receive_waiting(SMPBufferActualData);
                     }
                     else
                     {
                         //CRC failure
-                        qDebug() << "CRC failure, expected " << message_crc << " but got " << crc;
+                        log_error() << "CRC failure, expected " << message_crc << " but got " << crc;
                     }
 
                     SMPBufferActualData.clear();
@@ -196,8 +186,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
 
     if (SerialData.length() > 10 && SerialData.indexOf(smp_first_header) == -1 && SerialData.indexOf(smp_continuation_header) == -1)
     {
-        qDebug() << "Clearing garbage data";
-//        qDebug() << SerialData;
+        log_error() << "Cleared garbage data in UART SMP transport buffer";
         SerialData.clear();
     }
 }
@@ -246,7 +235,6 @@ end:
         inbase.append(output.toBase64());
         inbase.append((uint8_t)0x0a);
         emit serial_write(&inbase);
-        //        qDebug() << "out: " << inbase  << " -> " << inbase.length() << "chunk_size = " << chunk_size << "output: " << output << " in b64: " << output.toBase64();
 
         inbase.clear();
         inbase.append(smp_continuation_header);

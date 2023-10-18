@@ -26,6 +26,7 @@
 #include <QObject>
 #include "smp_transport.h"
 #include "smp_message.h"
+#include "debug_logger.h"
 
 class smp_uart : public smp_transport
 {
@@ -35,7 +36,6 @@ public:
     smp_uart(QObject *parent = nullptr);
     ~smp_uart();
     int send(smp_message *message);
-    //int get_mtu();
     uint16_t max_message_data_size(uint16_t mtu);
 
 private:
