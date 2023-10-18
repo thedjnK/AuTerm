@@ -49,6 +49,10 @@ static const uint8_t image_tlv_legnth_offset_2 = 3;
 static const uint8_t image_tlv_header_size = 4;
 static const uint8_t image_tlv_data_header_size = 4;
 
+//MCUboot header constants
+static const uint8_t ih_hdr_size_offs = 8;
+static const uint8_t ih_img_size_offs = 12;
+
 static QStringList smp_error_defines = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "FLASH_CONFIG_QUERY_FAIL" <<
@@ -132,31 +136,39 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
     bool found = false;
     bool hash_found = false;
 
-    int32_t pos = file_data->length() - image_tlv_header_size;
-    uint16_t length;
+    uint16_t hdr_size;
+    uint32_t img_size;
 
-    while (pos >= 0)
+    hdr_size = (uint8_t)file_data->at(ih_hdr_size_offs);
+    hdr_size |= (uint16_t)((uint8_t)file_data->at(ih_hdr_size_offs + 1)) << 8;
+
+    img_size = (uint8_t)file_data->at(ih_img_size_offs);
+    img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 1)) << 8;
+    img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 2)) << 16;
+    img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 3)) << 24;
+
+    int32_t pos = hdr_size + img_size;
+    uint16_t tlv_area_length;
+
+    while (pos + image_tlv_magic_size < file_data->length())
     {
         if (file_data->mid(pos, image_tlv_magic_size) == image_tlv_magic)
         {
-            length = (uint8_t)file_data->at(pos + image_tlv_legnth_offset_1);
-            length |= (uint16_t)((uint8_t)file_data->at(pos + image_tlv_legnth_offset_2)) << 8;
-
-            if ((pos + length) == file_data->length())
-            {
-                found = true;
-                break;
-            }
+            tlv_area_length = (uint8_t)file_data->at(pos + image_tlv_legnth_offset_1);
+            tlv_area_length |= (uint16_t)((uint8_t)file_data->at(pos + image_tlv_legnth_offset_2)) << 8;
+            found = true;
+            // qDebug() << "Found magic tlv, size:" << tlv_area_length;
+            break;
         }
 
-        --pos;
+        ++pos;
     }
 
     if (found == true)
     {
-        uint32_t new_pos = pos + image_tlv_header_size;
+        int32_t new_pos = pos + image_tlv_header_size;
 
-        while (new_pos < (uint32_t)file_data->length())
+        while (new_pos < pos + tlv_area_length)
         {
             //TODO: TLVs are > 8-bit
             uint8_t type = file_data->at(new_pos);
