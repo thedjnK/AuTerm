@@ -100,7 +100,7 @@ int smp_udp::disconnect(bool force)
 
 int smp_udp::is_connected()
 {
-    if (socket_is_connected = true)
+    if (socket_is_connected == true)
     {
         return 1;
     }
