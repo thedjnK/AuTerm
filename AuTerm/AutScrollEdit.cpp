@@ -28,7 +28,7 @@
 #include "AutScrollEdit.h"
 #include "AutEscape.h"
 #include <QRegularExpression>
-#include <QDebug>
+#include <QTimer>
 
 /******************************************************************************/
 // Constants
@@ -418,8 +418,10 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
         //Vertical scroll bar event
         if (event->type() == QEvent::MouseButtonRelease)
         {
-            //Button was released, update display buffer
-            this->update_display();
+            //Button was released, update display buffer via a timer, as it needs to run after this function returns
+            QTimer::singleShot(1, this, [this] () {
+                this->update_display();
+            });
         }
         else if (event->type() == QEvent::UpdateLater && mbSliderShown == false)
         {

@@ -134,6 +134,7 @@ signals:
     void key_pressed(int nKey, QChar chrKeyValue);
     void vt100_send(QByteArray code);
     void file_dropped(QString strFilename);
+    void scrollbar_drag_released();
 
 private:
     QString *mstrItemArray; //Item text
