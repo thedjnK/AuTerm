@@ -943,7 +943,7 @@ void AutScrollEdit::update_display()
         bool bShiftStart = false;
         bool bShiftEnd = false;
         unsigned int uiCurrentSize = 0;
-
+        uint32_t removed_size = 0;
         int32_t cannot_parse_bytes = 0;
 
         if (this->textCursor().anchor() != this->textCursor().position())
@@ -952,17 +952,17 @@ void AutScrollEdit::update_display()
             uiAnchor = this->textCursor().anchor();
             uiPosition = this->textCursor().position();
             tcTmpCur = this->textCursor();
-            if (uiAnchor > mintPrevTextSize)
+            if (uiAnchor >= mintPrevTextSize)
             {
                 //Start of selected text is in the output buffer
                 bShiftStart = true;
-                uiCurrentSize = this->toPlainText().size();
+                uiCurrentSize = mintPrevTextSize;
             }
-            if (uiPosition > mintPrevTextSize)
+            if (uiPosition >= mintPrevTextSize)
             {
                 //End of selected text is in the output buffer
                 bShiftEnd = true;
-                uiCurrentSize = this->toPlainText().size();
+                uiCurrentSize = mintPrevTextSize;
             }
         }
 
@@ -1115,14 +1115,14 @@ void AutScrollEdit::update_display()
         {
             //Trim buffer down to requested size
 //TODO: this can be improved by doing it before the append above, i.e. if old length + new lengh > threshold, remove from one or both buffers
-            uint32_t removal = (uint32_t)dat_in_new_len - trim_size;
+            removed_size = (uint32_t)dat_in_new_len - trim_size;
 
             tcTmpCur = this->textCursor();
             tcTmpCur.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
-            tcTmpCur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, removal);
+            tcTmpCur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, removed_size);
             tcTmpCur.removeSelectedText();
 
-            dat_in_new_len -= removal;
+            dat_in_new_len -= removed_size;
         }
 
         if (/*mbLocalEcho == true &&*/ mbLineMode == true && dat_out_updated == true)
@@ -1154,13 +1154,45 @@ void AutScrollEdit::update_display()
             if (bShiftStart == true)
             {
                 //Adjust start position
-                uiAnchor = uiAnchor + (mintPrevTextSize - uiCurrentSize);
+                uiAnchor -= uiCurrentSize;
+                uiAnchor += mintPrevTextSize;
             }
+            else if (removed_size > 0)
+            {
+                //Data was trimmed from the buffer
+                if (uiAnchor < removed_size)
+                {
+                    //The text that was selected has been trimmed
+                    uiAnchor = 0;
+                }
+                else
+                {
+                    //The text that was selected has not been trimmed, offset to account for new position
+                    uiAnchor -= removed_size;
+                }
+            }
+
             if (bShiftEnd == true)
             {
                 //Adjust end position
-                uiPosition = uiPosition + (mintPrevTextSize - uiCurrentSize);
+                uiPosition -= uiCurrentSize;
+                uiPosition += mintPrevTextSize;
             }
+            else if (removed_size > 0)
+            {
+                //Data was trimmed from the buffer
+                if (uiPosition < removed_size)
+                {
+                    //The text that was selected has been trimmed
+                    uiPosition = 0;
+                }
+                else
+                {
+                    //The text that was selected has not been trimmed, offset to account for new position
+                    uiPosition -= removed_size;
+                }
+            }
+
             tcTmpCur.setPosition(uiAnchor);
             tcTmpCur.setPosition(uiPosition, QTextCursor::KeepAnchor);
             this->setTextCursor(tcTmpCur);
