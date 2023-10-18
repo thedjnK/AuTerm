@@ -143,6 +143,8 @@ signals:
     void plugin_set_status(bool busy, bool hide_terminal_output, bool *accepted);
     void plugin_add_open_close_button(QPushButton *button);
     void plugin_to_hex(QByteArray *data);
+    void plugin_serial_open_close(uint8_t mode);
+    void plugin_serial_is_open(bool *open);
 
 private slots:
     void serial_receive(QByteArray *data);
@@ -207,6 +209,7 @@ private:
     void relase_transport(void);
     void flip_endian(uint8_t *data, uint8_t size);
     bool update_settings_display();
+    void show_transport_open_status();
 
     //Form items
 ///AUTOGEN_START_OBJECTS

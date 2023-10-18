@@ -1253,6 +1253,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(this, SIGNAL(plugin_set_status(bool,bool,bool*)), parent_window, SLOT(plugin_set_status(bool,bool,bool*)));
     connect(this, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
     connect(this, SIGNAL(plugin_to_hex(QByteArray*)), parent_window, SLOT(plugin_to_hex(QByteArray*)));
+    connect(this, SIGNAL(plugin_serial_open_close(uint8_t)), parent_window, SLOT(plugin_serial_open_close(uint8_t)));
 
     connect(parent_window, SIGNAL(plugin_serial_receive(QByteArray*)), this, SLOT(serial_receive(QByteArray*)));
     connect(parent_window, SIGNAL(plugin_serial_error(QSerialPort::SerialPortError)), this, SLOT(serial_error(QSerialPort::SerialPortError)));
@@ -1482,6 +1483,7 @@ void plugin_mcumgr::serial_about_to_close()
 
 void plugin_mcumgr::serial_opened()
 {
+    btn_transport_connect->setText("Close");
 }
 
 void plugin_mcumgr::serial_closed()
@@ -1558,6 +1560,7 @@ void plugin_mcumgr::serial_closed()
     }
 
     mode = ACTION_IDLE;
+    btn_transport_connect->setText("Open");
 }
 
 //Form actions
@@ -2655,12 +2658,19 @@ void plugin_mcumgr::on_btn_transport_connect_clicked()
 {
     smp_transport *transport = active_transport();
 
-    if (transport->is_connected() == 1)
+    if (transport == uart_transport)
     {
-        transport->disconnect(true);
+        emit plugin_serial_open_close(2);
     }
+    else
+    {
+        if (transport->is_connected() == 1)
+        {
+            transport->disconnect(true);
+        }
 
-    transport->connect();
+        transport->connect();
+    }
 }
 
 smp_transport *plugin_mcumgr::active_transport()
@@ -2701,6 +2711,8 @@ void plugin_mcumgr::on_radio_transport_uart_toggled(bool checked)
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
         bluetooth_transport->close_connect_dialog();
 #endif
+
+        show_transport_open_status();
     }
 }
 
@@ -2712,6 +2724,8 @@ void plugin_mcumgr::on_radio_transport_udp_toggled(bool checked)
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
         bluetooth_transport->close_connect_dialog();
 #endif
+
+        show_transport_open_status();
     }
 }
 #endif
@@ -2724,6 +2738,8 @@ void plugin_mcumgr::on_radio_transport_bluetooth_toggled(bool checked)
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
         udp_transport->close_connect_dialog();
 #endif
+
+        show_transport_open_status();
     }
 }
 #endif
@@ -3167,4 +3183,24 @@ bool plugin_mcumgr::update_settings_display()
     }
 
     return true;
+}
+
+void plugin_mcumgr::show_transport_open_status()
+{
+    smp_transport *transport = active_transport();
+    bool open = false;
+
+    if (transport == uart_transport)
+    {
+        emit plugin_serial_is_open(&open);
+    }
+    else
+    {
+        if (transport->is_connected() == 1)
+        {
+            open = true;
+        }
+    }
+
+    btn_transport_connect->setText(open == true ? "Disconnect" : "Connect");
 }
