@@ -127,8 +127,7 @@ const qint8 FilenameIndexScripting              = 0;
 const qint8 FilenameIndexOthers                 = 1;
 //Constants for right click menu options
 enum menu_actions {
-    MenuActionErrorHex                          = 0,
-    MenuActionErrorInt,
+    MenuActionError                             = 0,
     MenuActionLoopback,
     MenuActionStreamFile,
     MenuActionFont,

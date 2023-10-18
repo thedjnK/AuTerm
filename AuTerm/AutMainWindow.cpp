@@ -387,8 +387,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 
     //Create menu items
     gpMenu = new QMenu(this);
-    gpMenu->addAction("Lookup Selected Error-Code (Hex)")->setData(MenuActionErrorHex);
-    gpMenu->addAction("Lookup Selected Error-Code (Int)")->setData(MenuActionErrorInt);
+    gpMenu->addAction("Lookup Selected Error-Code")->setData(MenuActionError);
     gpMenu->addAction("Enable Loopback (Rx->Tx)")->setData(MenuActionLoopback);
     gpMenu->addAction("Stream File Out")->setData(MenuActionStreamFile);
     gpSMenu4 = gpMenu->addMenu("Customisation");
@@ -1623,21 +1622,22 @@ AutMainWindow::MenuSelected(
     //Runs when a menu item is selected
     int intItem = qaAction->data().toInt();
 
-    if (intItem == MenuActionErrorHex)
+    if (intItem == MenuActionError)
     {
-        //Shows a meaning for the error code selected (number in hex)
+        //Shows a meaning for the error code selected
         bool bTmpBool;
-        unsigned int uiErrCode = QString("0x").append(ui->text_TermEditData->textCursor().selection().toPlainText()).toUInt(&bTmpBool, 16);
+
+        //QString
+        unsigned int uiErrCode = ui->text_TermEditData->textCursor().selection().toPlainText().toUInt(&bTmpBool, 0);
         if (bTmpBool == true)
         {
             //Converted
             LookupErrorCode(uiErrCode);
         }
-    }
-    else if (intItem == MenuActionErrorInt)
-    {
-        //Shows a meaning for the error code selected (number as int)
-        LookupErrorCode(ui->text_TermEditData->textCursor().selection().toPlainText().toInt());
+        else
+        {
+            update_buffer("\nSelected text does not have a numeric value, cannot look up error code.\n", false);
+        }
     }
     else if (intItem == MenuActionLoopback && gbTermBusy == false && gbSpeedTestRunning == false)
     {
@@ -2772,12 +2772,13 @@ AutMainWindow::LookupErrorCode(
     if (gbErrorsLoaded == true)
     {
         //Error file has been loaded
-        update_buffer(QString("\nError code 0x").append(QString::number(intErrorCode, 16)).append(": ").append(gpErrorMessages->value(QString::number(intErrorCode), "Undefined Error Code").toString()).append("\n").toUtf8(), false);
+        QString error = QString::number(intErrorCode);
+        update_buffer(QString("\nError code %1: %2\n").arg(error, gpErrorMessages->value(error, "Undefined Error Code").toString()).toUtf8(), false);
     }
     else
     {
         //Error file has not been loaded
-        update_buffer(QString("\nUnable to lookup error code: error file (codes.csv) not loaded. Check the Update tab to download the latest version.\n").toUtf8(), false);
+        update_buffer("\nUnable to lookup error code: error code file not loaded.\n", false);
     }
 //    ui->text_TermEditData->moveCursor(QTextCursor::End);
 }
