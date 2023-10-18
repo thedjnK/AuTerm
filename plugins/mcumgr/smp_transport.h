@@ -25,6 +25,7 @@
 
 #include <QObject>
 #include "smp_message.h"
+#include "debug_logger.h"
 //#include <QAbstractSocket>
 //#include <smp_settings.h>
 
@@ -53,6 +54,13 @@ public:
         return SMP_TRANSPORT_ERROR_UNSUPPORTED;
     }
 
+#ifndef SKIPPLUGIN_LOGGER
+    void set_logger(debug_logger *object)
+    {
+        logger = object;
+    }
+#endif
+
     virtual int is_connected(void)
     {
         return SMP_TRANSPORT_ERROR_UNSUPPORTED;
@@ -80,6 +88,11 @@ signals:
 //    void device_scan_error();
 //    void bytes_written(qint64 bytes);
     void receive_waiting(smp_message *message);
+
+protected:
+#ifndef SKIPPLUGIN_LOGGER
+    debug_logger *logger;
+#endif
 };
 
 #endif // SMP_TRANSPORT_H

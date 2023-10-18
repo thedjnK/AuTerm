@@ -1373,6 +1373,16 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 #ifndef SKIPPLUGIN_LOGGER
     logger = new debug_logger(this);
     processor->set_logger(logger);
+    uart_transport->set_logger(logger);
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    udp_transport->set_logger(logger);
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    bluetooth_transport->set_logger(logger);
+#endif
+
     smp_groups.fs_mgmt->set_logger(logger);
     smp_groups.img_mgmt->set_logger(logger);
     smp_groups.os_mgmt->set_logger(logger);
