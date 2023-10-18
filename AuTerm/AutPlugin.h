@@ -84,6 +84,14 @@ public slots:
         QPushButton *button
         );
     void
+    plugin_serial_open_close(
+        uint8_t mode
+        );
+    void
+    plugin_serial_is_open(
+        bool *open
+        );
+    void
     plugin_to_hex(
         QByteArray *data
         );

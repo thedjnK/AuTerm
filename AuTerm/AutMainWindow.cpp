@@ -1169,12 +1169,13 @@ AutMainWindow::on_btn_Connect_clicked(
 //=============================================================================
 void
 AutMainWindow::on_btn_TermClose_clicked(
+    bool from_plugin
     )
 {
     if (gspSerialPort.isOpen() == false)
     {
         //Open connection
-        OpenDevice();
+        OpenDevice(from_plugin);
     }
     else
     {
@@ -2212,6 +2213,7 @@ AutMainWindow::SerialStatusSlot(
 //=============================================================================
 void
 AutMainWindow::OpenDevice(
+    bool from_plugin
     )
 {
     //Function to open serial port
@@ -2291,7 +2293,7 @@ AutMainWindow::OpenDevice(
             }
 
             //Switch to Terminal tab if not on terminal or speed testing tab
-            if (ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_Term) && ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_SpeedTest))
+            if (from_plugin == false && ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_Term) && ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_SpeedTest))
             {
                 ui->selector_Tab->setCurrentIndex(ui->selector_Tab->indexOf(ui->tab_Term));
             }
@@ -5437,6 +5439,54 @@ AutMainWindow::plugin_add_open_close_button(
     list_plugin_open_close_buttons.append(button);
     connect(button, SIGNAL(clicked(bool)), this, SLOT(on_btn_TermClose_clicked()));
     button->setText(gspSerialPort.isOpen() == true ? "C&lose Port" : "&Open Port");
+}
+
+//=============================================================================
+//=============================================================================
+void
+AutMainWindow::plugin_serial_open_close(
+    uint8_t mode
+    )
+{
+    switch (mode) {
+        case 0:
+        {
+            //Open port
+            if (gspSerialPort.isOpen())
+            {
+                return;
+            }
+            break;
+        }
+
+        case 1:
+        {
+            //Close port
+            if (!gspSerialPort.isOpen())
+            {
+                return;
+            }
+            break;
+        }
+
+        default:
+        {
+            //Open port if closed, close port if open
+            break;
+        }
+    };
+
+    on_btn_TermClose_clicked(true);
+}
+
+//=============================================================================
+//=============================================================================
+void
+AutMainWindow::plugin_serial_is_open(
+    bool *open
+    )
+{
+    *open = gspSerialPort.isOpen();
 }
 
 //=============================================================================

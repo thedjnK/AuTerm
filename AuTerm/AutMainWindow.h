@@ -239,7 +239,7 @@ public slots:
 
 private slots:
     void on_btn_Connect_clicked();
-    void on_btn_TermClose_clicked();
+    void on_btn_TermClose_clicked(bool from_plugin = false);
     void on_btn_Refresh_clicked();
     void on_btn_TermClear_clicked();
     void on_btn_Duplicate_clicked();
@@ -385,6 +385,14 @@ public slots:
         QPushButton *button
         );
     void
+    plugin_serial_open_close(
+        uint8_t mode
+        );
+    void
+    plugin_serial_is_open(
+        bool *open
+        );
+    void
     plugin_to_hex(
         QByteArray *data
         );
@@ -409,6 +417,7 @@ private:
         );
     void
     OpenDevice(
+        bool from_plugin = false
         );
     void
     LookupErrorCode(
