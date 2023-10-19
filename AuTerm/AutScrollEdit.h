@@ -113,6 +113,7 @@ public:
     void insertFromMimeData(const QMimeData *mdSrc);
     void update_display();
     void add_display_data(display_buffer_list *buffers);
+    void add_dat_in_text(QByteArray data);
     void add_dat_out_text(const QString strDat);
     void clear_dat_in();
     void clear_dat_out();

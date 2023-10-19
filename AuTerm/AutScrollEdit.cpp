@@ -512,14 +512,14 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
                         mstrItemArray[mchItems] = mstrDatOut;
                         mchItems++;
                     }
-
+//todo: only store if successfully accepted
                     mchPosition = mchItems;
 
                     //Send message to main window
                     emit enter_pressed();
                 }
-                this->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
-                mintCurPos = 0;
+//                this->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
+//                mintCurPos = 0;
                 return true;
             }
             else if (keyEvent->key() == Qt::Key_Backspace)
@@ -813,6 +813,16 @@ void AutScrollEdit::add_display_data(display_buffer_list *buffers)
         ++i;
     }
 
+    had_dat_in_data = true;
+    this->update_display();
+}
+
+//=============================================================================
+//=============================================================================
+void AutScrollEdit::add_dat_in_text(QByteArray data)
+{
+    //Adds data to the DatOut buffer
+    mstrDatIn += data.replace("\r\n", "\n").replace("\r", "\n");
     had_dat_in_data = true;
     this->update_display();
 }
