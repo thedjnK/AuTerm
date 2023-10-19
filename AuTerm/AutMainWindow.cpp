@@ -568,9 +568,9 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 
     //Setup font spacing
     QFontMetrics tmTmpFM(fntTmpFnt2);
-    ui->text_SpeedEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
-    ui->text_TermEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
-    ui->text_LogData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
+    ui->text_SpeedEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
+    ui->text_TermEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
+    ui->text_LogData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
 
     //Setup the terminal scrollback buffer size
     ui->text_TermEditData->setup_scrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
