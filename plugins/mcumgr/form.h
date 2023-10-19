@@ -52,6 +52,7 @@ private slots:
     void on_radio_settings_decimal_toggled(bool checked);
     void on_check_settings_big_endian_toggled(bool checked);
     void on_check_settings_signed_decimal_value_toggled(bool checked);
+    void on_edit_SHELL_Input_returnPressed();
 
 private:
     Ui::Form *ui;

@@ -199,3 +199,8 @@ void Form::on_check_settings_signed_decimal_value_toggled(bool checked)
 {
 
 }
+
+void Form::on_edit_SHELL_Input_returnPressed()
+{
+
+}

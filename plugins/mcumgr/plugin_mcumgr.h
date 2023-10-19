@@ -82,6 +82,7 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "AutScrollEdit.h"
 ///AUTOGEN_END_INCLUDES
 
 enum mcumgr_action_t {
@@ -159,6 +160,8 @@ private slots:
     void status(uint8_t user_data, group_status status, QString error_string);
     void progress(uint8_t user_data, uint8_t percent);
 
+    void enter_pressed();
+
     //Form slots
     void on_btn_FS_Local_clicked();
     void on_btn_FS_Go_clicked();
@@ -172,7 +175,6 @@ private slots:
     void on_radio_IMG_No_Action_toggled(bool checked);
     void on_btn_IMG_Preview_Copy_clicked();
     void on_btn_OS_Go_clicked();
-    void on_btn_SHELL_Go_clicked();
     void on_btn_STAT_Go_clicked();
     void on_btn_SHELL_Clear_clicked();
     void on_btn_SHELL_Copy_clicked();
@@ -350,17 +352,17 @@ private:
     QTableWidget *table_STAT_Values;
     QWidget *tab_Shell;
     QGridLayout *gridLayout_9;
-    QLabel *label_12;
-    QLabel *label_13;
-    QLineEdit *edit_SHELL_Input;
+    QLabel *lbl_SHELL_Status;
+    AutScrollEdit *edit_SHELL_Output;
     QHBoxLayout *horizontalLayout_8;
     QSpacerItem *horizontalSpacer_7;
     QToolButton *btn_SHELL_Clear;
-    QPushButton *btn_SHELL_Go;
     QToolButton *btn_SHELL_Copy;
     QSpacerItem *horizontalSpacer_8;
-    QPlainTextEdit *edit_SHELL_Output;
-    QLabel *lbl_SHELL_Status;
+    QHBoxLayout *horizontalLayout_17;
+    QCheckBox *check_shell_vt100_decoding;
+    QCheckBox *check_shel_unescape_strings;
+    QSpacerItem *horizontalSpacer_12;
     QWidget *tab_Settings;
     QGridLayout *gridLayout_15;
     QLineEdit *edit_settings_key;
@@ -409,8 +411,8 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_2;
+    QButtonGroup *buttonGroup;
 ///AUTOGEN_END_OBJECTS
 
     //

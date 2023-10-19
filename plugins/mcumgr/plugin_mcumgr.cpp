@@ -771,20 +771,41 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_9->setSpacing(2);
     gridLayout_9->setObjectName("gridLayout_9");
     gridLayout_9->setContentsMargins(6, 6, 6, 6);
-    label_12 = new QLabel(tab_Shell);
-    label_12->setObjectName("label_12");
+    lbl_SHELL_Status = new QLabel(tab_Shell);
+    lbl_SHELL_Status->setObjectName("lbl_SHELL_Status");
 
-    gridLayout_9->addWidget(label_12, 0, 0, 1, 1);
+    gridLayout_9->addWidget(lbl_SHELL_Status, 3, 0, 1, 2);
 
-    label_13 = new QLabel(tab_Shell);
-    label_13->setObjectName("label_13");
+    edit_SHELL_Output = new AutScrollEdit(tab_Shell);
+    edit_SHELL_Output->setObjectName("edit_SHELL_Output");
+    QPalette palette;
+    QBrush brush(QColor(255, 255, 255, 255));
+    brush.setStyle(Qt::SolidPattern);
+    palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
+    palette.setBrush(QPalette::Active, QPalette::Text, brush);
+    QBrush brush1(QColor(0, 0, 0, 255));
+    brush1.setStyle(Qt::SolidPattern);
+    palette.setBrush(QPalette::Active, QPalette::Base, brush1);
+    QBrush brush2(QColor(255, 255, 255, 128));
+    brush2.setStyle(Qt::SolidPattern);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+    palette.setBrush(QPalette::Active, QPalette::PlaceholderText, brush2);
+#endif
+    palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+    palette.setBrush(QPalette::Inactive, QPalette::Text, brush);
+    palette.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+    palette.setBrush(QPalette::Inactive, QPalette::PlaceholderText, brush2);
+#endif
+    palette.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+    palette.setBrush(QPalette::Disabled, QPalette::PlaceholderText, brush2);
+#endif
+    edit_SHELL_Output->setPalette(palette);
+    edit_SHELL_Output->setUndoRedoEnabled(false);
+    edit_SHELL_Output->setReadOnly(false);
 
-    gridLayout_9->addWidget(label_13, 1, 0, 1, 1);
-
-    edit_SHELL_Input = new QLineEdit(tab_Shell);
-    edit_SHELL_Input->setObjectName("edit_SHELL_Input");
-
-    gridLayout_9->addWidget(edit_SHELL_Input, 0, 1, 1, 1);
+    gridLayout_9->addWidget(edit_SHELL_Output, 1, 1, 1, 1);
 
     horizontalLayout_8 = new QHBoxLayout();
     horizontalLayout_8->setSpacing(2);
@@ -799,11 +820,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_8->addWidget(btn_SHELL_Clear);
 
-    btn_SHELL_Go = new QPushButton(tab_Shell);
-    btn_SHELL_Go->setObjectName("btn_SHELL_Go");
-
-    horizontalLayout_8->addWidget(btn_SHELL_Go);
-
     btn_SHELL_Copy = new QToolButton(tab_Shell);
     btn_SHELL_Copy->setObjectName("btn_SHELL_Copy");
 
@@ -814,19 +830,31 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_8->addItem(horizontalSpacer_8);
 
 
-    gridLayout_9->addLayout(horizontalLayout_8, 3, 0, 1, 2);
+    gridLayout_9->addLayout(horizontalLayout_8, 4, 0, 1, 2);
 
-    edit_SHELL_Output = new QPlainTextEdit(tab_Shell);
-    edit_SHELL_Output->setObjectName("edit_SHELL_Output");
-    edit_SHELL_Output->setUndoRedoEnabled(false);
-    edit_SHELL_Output->setReadOnly(true);
+    horizontalLayout_17 = new QHBoxLayout();
+    horizontalLayout_17->setSpacing(2);
+    horizontalLayout_17->setObjectName("horizontalLayout_17");
+    horizontalLayout_17->setContentsMargins(-1, 0, -1, -1);
+    check_shell_vt100_decoding = new QCheckBox(tab_Shell);
+    check_shell_vt100_decoding->setObjectName("check_shell_vt100_decoding");
+    check_shell_vt100_decoding->setEnabled(false);
+    check_shell_vt100_decoding->setChecked(true);
 
-    gridLayout_9->addWidget(edit_SHELL_Output, 1, 1, 1, 1);
+    horizontalLayout_17->addWidget(check_shell_vt100_decoding);
 
-    lbl_SHELL_Status = new QLabel(tab_Shell);
-    lbl_SHELL_Status->setObjectName("lbl_SHELL_Status");
+    check_shel_unescape_strings = new QCheckBox(tab_Shell);
+    check_shel_unescape_strings->setObjectName("check_shel_unescape_strings");
+    check_shel_unescape_strings->setEnabled(false);
 
-    gridLayout_9->addWidget(lbl_SHELL_Status, 2, 0, 1, 2);
+    horizontalLayout_17->addWidget(check_shel_unescape_strings);
+
+    horizontalSpacer_12 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_17->addItem(horizontalSpacer_12);
+
+
+    gridLayout_9->addLayout(horizontalLayout_17, 2, 0, 1, 2);
 
     tabWidget_2->addTab(tab_Shell, QString());
     tab_Settings = new QWidget();
@@ -1207,12 +1235,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *___qtablewidgetitem13 = table_STAT_Values->horizontalHeaderItem(1);
     ___qtablewidgetitem13->setText(QCoreApplication::translate("Form", "Value", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Stats), QCoreApplication::translate("Form", "Stats", nullptr));
-    label_12->setText(QCoreApplication::translate("Form", "Input:", nullptr));
-    label_13->setText(QCoreApplication::translate("Form", "Output:", nullptr));
-    btn_SHELL_Clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
-    btn_SHELL_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    btn_SHELL_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
     lbl_SHELL_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    btn_SHELL_Clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
+    btn_SHELL_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
+    check_shell_vt100_decoding->setText(QCoreApplication::translate("Form", "VT100 decoding", nullptr));
+    check_shel_unescape_strings->setText(QCoreApplication::translate("Form", "Un-escape strings", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
     label_22->setText(QCoreApplication::translate("Form", "Action:", nullptr));
     lbl_settings_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
@@ -1289,7 +1316,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_IMG_No_Action, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_No_Action_toggled(bool)));
     connect(btn_IMG_Preview_Copy, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Preview_Copy_clicked()));
     connect(btn_OS_Go, SIGNAL(clicked()), this, SLOT(on_btn_OS_Go_clicked()));
-    connect(btn_SHELL_Go, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Go_clicked()));
     connect(btn_STAT_Go, SIGNAL(clicked()), this, SLOT(on_btn_STAT_Go_clicked()));
     connect(btn_SHELL_Clear, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Clear_clicked()));
     connect(btn_SHELL_Copy, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Copy_clicked()));
@@ -1318,6 +1344,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_settings_decimal, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_decimal_toggled(bool)));
     connect(check_settings_big_endian, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_big_endian_toggled(bool)));
     connect(check_settings_signed_decimal_value, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
+
+    connect(edit_SHELL_Output, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
+
+    edit_SHELL_Output->setup_scrollback(32);
+    edit_SHELL_Output->set_line_mode(true);
+    edit_SHELL_Output->set_vt100_mode(VT100_MODE_DECODE);
 
     colview_IMG_Images->setModel(&model_image_state);
     colview_IMG_Images->setColumnWidths(QList<int>() << 50 << 50 << 460);
@@ -1391,6 +1423,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.shell_mgmt->set_logger(logger);
     smp_groups.stat_mgmt->set_logger(logger);
 #endif
+
+    edit_SHELL_Output->set_serial_open(true);
 }
 
 plugin_mcumgr::~plugin_mcumgr()
@@ -2038,34 +2072,6 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     }
 }
 
-void plugin_mcumgr::on_btn_SHELL_Go_clicked()
-{
-    //Execute shell command
-    bool started = false;
-
-    if (claim_transport(lbl_SHELL_Status) == false)
-    {
-        return;
-    }
-
-    QRegularExpression reTempRE("\\s+");
-    QStringList list_arguments = edit_SHELL_Input->text().split(reTempRE);
-
-    mode = ACTION_SHELL_EXECUTE;
-    processor->set_transport(active_transport());
-    smp_groups.shell_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
-    started = smp_groups.shell_mgmt->start_execute(&list_arguments, &shell_rc);
-
-    if (started == true)
-    {
-        lbl_SHELL_Status->setText("Shell execute command sent...");
-    }
-    else
-    {
-        relase_transport();
-    }
-}
-
 void plugin_mcumgr::on_btn_STAT_Go_clicked()
 {
     bool started = false;
@@ -2117,7 +2123,7 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
 
 void plugin_mcumgr::on_btn_SHELL_Clear_clicked()
 {
-    edit_SHELL_Output->clear();
+    edit_SHELL_Output->clear_dat_in();
 }
 
 void plugin_mcumgr::on_btn_SHELL_Copy_clicked()
@@ -2460,7 +2466,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
             if (user_data == ACTION_SHELL_EXECUTE)
             {
-                edit_SHELL_Output->appendPlainText(error_string);
+                edit_SHELL_Output->add_dat_in_text(error_string.toUtf8());
 
                 if (shell_rc == 0)
                 {
@@ -3203,4 +3209,42 @@ void plugin_mcumgr::show_transport_open_status()
     }
 
     btn_transport_connect->setText(open == true ? "Disconnect" : "Connect");
+}
+
+void plugin_mcumgr::enter_pressed()
+{
+    //Execute shell command
+    bool started = false;
+    QString data = *edit_SHELL_Output->get_dat_out();
+
+    if (data.length() == 0)
+    {
+        lbl_SHELL_Status->setText("No data to send");
+        return;
+    }
+
+    if (claim_transport(lbl_SHELL_Status) == false)
+    {
+        return;
+    }
+
+    QRegularExpression reTempRE("\\s+");
+    QStringList list_arguments = data.split(reTempRE);
+
+    mode = ACTION_SHELL_EXECUTE;
+    processor->set_transport(active_transport());
+    smp_groups.shell_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+    started = smp_groups.shell_mgmt->start_execute(&list_arguments, &shell_rc);
+
+    if (started == true)
+    {
+        edit_SHELL_Output->clear_dat_out();
+        edit_SHELL_Output->add_dat_in_text(data.append("\n").toUtf8());
+        edit_SHELL_Output->update_display();
+        lbl_SHELL_Status->setText("Shell execute command sent...");
+    }
+    else
+    {
+        relase_transport();
+    }
 }
