@@ -1347,6 +1347,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     connect(edit_SHELL_Output, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
 
+    //Use monospace font for shell
+    QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    edit_SHELL_Output->setFont(shell_font);
+
+    //Setup font spacing
+    QFontMetrics shell_font_metrics(shell_font);
+    edit_SHELL_Output->setTabStopDistance(shell_font_metrics.horizontalAdvance(" ")*8);
+
     edit_SHELL_Output->setup_scrollback(32);
     edit_SHELL_Output->set_line_mode(true);
     edit_SHELL_Output->set_vt100_mode(VT100_MODE_DECODE);
