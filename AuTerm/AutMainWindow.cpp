@@ -374,11 +374,13 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 #endif
     //Display version
     ui->statusBar->showMessage(QString("AuTerm version ").append(UwVersion).append(" (").append(OS).append("), Built ").append(__DATE__).append(" Using QT ").append(QT_VERSION_STR)
+#ifndef SKIPONLINE
 #ifndef QT_NO_SSL
 #ifdef TARGET_OS_MAC
     .append(", ").append(QString(QSslSocket::sslLibraryBuildVersionString()).replace(",", ":"))
 #else
     .append(", ").append(QString(QSslSocket::sslLibraryBuildVersionString()).left(QSslSocket::sslLibraryBuildVersionString().indexOf(" ", 9)))
+#endif
 #endif
 #endif
 #ifdef QT_DEBUG
