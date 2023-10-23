@@ -77,9 +77,11 @@
 #include <QPluginLoader>
 #include "AutPlugin.h"
 #endif
+#ifndef SKIPONLINE
 #include <QNetworkReply>
 #ifndef QT_NO_SSL
 #include <QSslSocket>
+#endif
 #endif
 
 /******************************************************************************/
@@ -256,7 +258,7 @@ private slots:
 #ifndef SKIPONLINE
     void replyFinished(QNetworkReply* nrReply);
 #ifndef QT_NO_SSL
-    void sslErrors(QNetworkReply *nrReply, const QList<QSslError> lstSSLErrors);
+    void sslErrors(QNetworkReply *nrReply, QList<QSslError> lstSSLErrors);
 #endif
 #endif
     void on_btn_Github_clicked();

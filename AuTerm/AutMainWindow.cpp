@@ -260,7 +260,9 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 #ifndef SKIPONLINE
     gnmManager = new QNetworkAccessManager(this);
     connect(gnmManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
-    connect(gnmManager, SIGNAL(sslErrors(QNetworkReply*,const QList<QSslError>)), this, SLOT(sslErrors(QNetworkReply*,const QList<QSslError>)));
+#ifndef QT_NO_SSL
+    connect(gnmManager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
+#endif
 #endif
 #ifndef SKIPSPEEDTEST
     gtmrSpeedTestDelayTimer = 0;
@@ -961,7 +963,9 @@ AutMainWindow::~AutMainWindow()
     disconnect(this, SLOT(BatchTimeoutSlot()));
 #ifndef SKIPONLINE
     disconnect(this, SLOT(replyFinished(QNetworkReply*)));
+#ifndef QT_NO_SSL
     disconnect(this, SLOT(sslErrors(QNetworkReply*,const QList<QSslError>)));
+#endif
 #endif
     disconnect(this, SLOT(MessagePass(QByteArray,bool,bool)));
 #ifndef SKIPSPEEDTEST
@@ -3170,7 +3174,6 @@ AutMainWindow::replyFinished(
     //Queue the network reply object to be deleted
     nrReply->deleteLater();
 }
-#endif
 
 //=============================================================================
 //=============================================================================
@@ -3194,6 +3197,7 @@ AutMainWindow::sslErrors(
     gpmErrorForm->SetMessage(&string_response);
     gpmErrorForm->show();
 }
+#endif
 #endif
 
 //=============================================================================
