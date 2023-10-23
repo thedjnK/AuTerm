@@ -481,12 +481,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         //Restore window size
         this->resize(gpTermSettings->value("WindowWidth", this->width()).toUInt(), gpTermSettings->value("WindowHeight", this->height()).toUInt());
     }
-    else
-    {
-#ifdef _WIN32
-        this->resize(600, 300);
-#endif
-    }
 
     //Check if default devices were created
     if (gpPredefinedDevice->value("DoneSetup").isNull())
