@@ -35,9 +35,12 @@ RESOURCES += \
 
 # Automation form
 !contains(DEFINES, SKIPAUTOMATIONFORM) {
-    SOURCES += UwxAutomation.cpp
-    HEADERS += UwxAutomation.h
-    FORMS += UwxAutomation.ui
+    SOURCES += \
+    AutAutomation.cpp
+    HEADERS += \
+    AutAutomation.h
+    FORMS += \
+    AutAutomation.ui
 }
 
 # Scripting form
@@ -55,9 +58,12 @@ RESOURCES += \
 
 # Error code form
 !contains(DEFINES, SKIPERRORCODEFORM) {
-    SOURCES += UwxErrorCode.cpp
-    HEADERS += UwxErrorCode.h
-    FORMS += UwxErrorCode.ui
+    SOURCES += \
+    AutErrorCode.cpp
+    HEADERS += \
+    AutErrorCode.h
+    FORMS += \
+    AutErrorCode.ui
 }
 
 # Windows application version information

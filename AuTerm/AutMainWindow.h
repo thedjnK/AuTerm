@@ -64,10 +64,10 @@
 #include "UwxPopup.h"
 #include "LrdLogger.h"
 #ifndef SKIPAUTOMATIONFORM
-#include "UwxAutomation.h"
+#include "AutAutomation.h"
 #endif
 #ifndef SKIPERRORCODEFORM
-#include "UwxErrorCode.h"
+#include "AutErrorCode.h"
 #endif
 #ifndef SKIPSCRIPTINGFORM
 #include "UwxScripting.h"
@@ -536,10 +536,10 @@ private:
     bool gbErrorsLoaded; //True if error csv file has been loaded
     PopupMessage *gpmErrorForm; //Error message form
 #ifndef SKIPAUTOMATIONFORM
-    UwxAutomation *guaAutomationForm; //Automation form
+    AutAutomation *guaAutomationForm; //Automation form
 #endif
 #ifndef SKIPERRORCODEFORM
-    UwxErrorCode *gecErrorCodeForm; //Error code lookup form
+    AutErrorCode *gecErrorCodeForm; //Error code lookup form
 #endif
 #ifndef SKIPSCRIPTINGFORM
     UwxScripting *gusScriptingForm; //Scripting form

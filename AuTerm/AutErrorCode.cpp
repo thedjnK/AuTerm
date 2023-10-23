@@ -1,9 +1,10 @@
 /******************************************************************************
 ** Copyright (C) 2016-2017 Laird
+** Copyright (C) 2023 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: UwxErrorCode.cpp
+** Module: AutErrorCode.cpp
 **
 ** Notes:
 **
@@ -24,13 +25,13 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "UwxErrorCode.h"
-#include "ui_UwxErrorCode.h"
+#include "AutErrorCode.h"
+#include "ui_AutErrorCode.h"
 
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-UwxErrorCode::UwxErrorCode(QWidget *parent) : QDialog(parent), ui(new Ui::UwxErrorCode)
+AutErrorCode::AutErrorCode(QWidget *parent) : QDialog(parent), ui(new Ui::AutErrorCode)
 {
     //Setup UI
     ui->setupUi(this);
@@ -49,12 +50,12 @@ UwxErrorCode::UwxErrorCode(QWidget *parent) : QDialog(parent), ui(new Ui::UwxErr
     msbStatusBar->showMessage("");
 
     //Remove question mark button from window title
-    this->setWindowFlags((Qt::Window | Qt::WindowCloseButtonHint));
+    this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
 }
 
 //=============================================================================
 //=============================================================================
-UwxErrorCode::~UwxErrorCode()
+AutErrorCode::~AutErrorCode()
 {
     //Clear up
     if (mcmpErrors != 0)
@@ -70,30 +71,63 @@ UwxErrorCode::~UwxErrorCode()
 //=============================================================================
 //=============================================================================
 void
-UwxErrorCode::on_combo_Code_currentTextChanged(
-    const QString &strComboText
+AutErrorCode::on_combo_Code_currentTextChanged(
+    QString strComboText
     )
 {
     //Error code entered into combo box
-    unsigned int uiErrCode = QString("0x").append(strComboText).toUInt(NULL, 16);
-    QString strErrorCode = QString::number(uiErrCode);
-    if (mpErrorMessages->value(strErrorCode).isValid())
+    bool valid = true;
+    uint16_t i = 0;
+#ifdef ERROR_CODE_TREAT_NEGATIVE_AS_POSITIVE
+    bool negative = false;
+    bool number = false;
+#endif
+
+    while (i < strComboText.length())
+    {
+        if (!(strComboText.at(i) >= '0' && strComboText.at(i) <= '9'))
+        {
+#ifdef ERROR_CODE_TREAT_NEGATIVE_AS_POSITIVE
+            if (strComboText.at(i) == '-' && negative == false && number == false)
+            {
+                negative = true;
+                strComboText.remove(0, (i + 1));
+                i = 0;
+                continue;
+            }
+#endif
+
+            valid = false;
+            break;
+        }
+#ifdef ERROR_CODE_TREAT_NEGATIVE_AS_POSITIVE
+        else
+        {
+            number = true;
+        }
+#endif
+
+        ++i;
+    }
+
+    if (valid == true && strComboText.length() > 0 && mpErrorMessages->value(strComboText).isValid())
     {
         //Valid error
-        ui->edit_Result->setText(mpErrorMessages->value(strErrorCode).toString());
+        ui->edit_Result->setText(QString("%1: %2").arg(strComboText, mpErrorMessages->value(strComboText).toString()));
     }
     else
     {
         //Invalid error
         ui->edit_Result->setText("Invalid.");
     }
+
     ui->edit_Result->setCursorPosition(0);
 }
 
 //=============================================================================
 //=============================================================================
 void
-UwxErrorCode::on_list_Codes_currentRowChanged(
+AutErrorCode::on_list_Codes_currentRowChanged(
     int iListRow
     )
 {
@@ -101,20 +135,21 @@ UwxErrorCode::on_list_Codes_currentRowChanged(
     if (iListRow >= 0)
     {
         //Item selected
-        ui->edit_Result->setText(ui->list_Codes->item(iListRow)->text());
+        ui->edit_Result->setText(ui->list_Codes->item(iListRow)->text().trimmed());
     }
     else
     {
         //No item selected
         ui->edit_Result->setText("Invalid.");
     }
+
     ui->edit_Result->setCursorPosition(0);
 }
 
 //=============================================================================
 //=============================================================================
 void
-UwxErrorCode::SetErrorObject(
+AutErrorCode::SetErrorObject(
     QSettings *pErrorMessages
     )
 {
@@ -148,7 +183,7 @@ UwxErrorCode::SetErrorObject(
                 while (strThisHex.length() < 3)
                 {
                     //Expand to 3 characters
-                    strThisHex.prepend('0');
+                    strThisHex.prepend(' ');
                 }
 
                 //Append error code to list of error codes
@@ -173,7 +208,7 @@ UwxErrorCode::SetErrorObject(
     else
     {
         //Error code file not loaded
-        msbStatusBar->showMessage(QString("Error code file not present, download from the update tab."));
+        msbStatusBar->showMessage("Error code file not present.");
         ui->list_Codes->clear();
         ui->list_Search->clear();
         ui->edit_Result->clear();
@@ -184,7 +219,7 @@ UwxErrorCode::SetErrorObject(
 //=============================================================================
 //=============================================================================
 void
-UwxErrorCode::on_list_Search_currentRowChanged(
+AutErrorCode::on_list_Search_currentRowChanged(
     int iSearchRow
     )
 {
@@ -192,20 +227,21 @@ UwxErrorCode::on_list_Search_currentRowChanged(
     if (iSearchRow >= 0)
     {
         //Item selected
-        ui->edit_Result->setText(ui->list_Search->item(iSearchRow)->text());
+        ui->edit_Result->setText(ui->list_Search->item(iSearchRow)->text().trimmed());
     }
     else
     {
         //No item selected
         ui->edit_Result->setText("Invalid.");
     }
+
     ui->edit_Result->setCursorPosition(0);
 }
 
 //=============================================================================
 //=============================================================================
 void
-UwxErrorCode::SetObjectStatus(
+AutErrorCode::SetObjectStatus(
     bool bStatus
     )
 {
@@ -222,14 +258,14 @@ UwxErrorCode::SetObjectStatus(
 //=============================================================================
 //=============================================================================
 void
-UwxErrorCode::on_selector_Tab_currentChanged(
+AutErrorCode::on_selector_Tab_currentChanged(
     int iTabIndex
     )
 {
     //Tab has been changed
     if (iTabIndex == ErrorCodeLookupTab)
     {
-        //Get error code from 4-character value
+        //Get error code from value
         on_combo_Code_currentTextChanged(ui->combo_Code->currentText());
     }
     else if (iTabIndex == ErrorCodeListTab)
@@ -247,7 +283,7 @@ UwxErrorCode::on_selector_Tab_currentChanged(
 //=============================================================================
 //=============================================================================
 void
-UwxErrorCode::on_btn_Copy_clicked(
+AutErrorCode::on_btn_Copy_clicked(
     )
 {
     //Copy button clicked
@@ -260,7 +296,7 @@ UwxErrorCode::on_btn_Copy_clicked(
 
 //=============================================================================
 //=============================================================================
-void UwxErrorCode::on_edit_Search_textChanged(const QString &arg1)
+void AutErrorCode::on_edit_Search_textChanged(const QString &arg1)
 {
     //Search for error
     QString SearchStr = ui->edit_Search->text().toLower();
@@ -280,7 +316,7 @@ void UwxErrorCode::on_edit_Search_textChanged(const QString &arg1)
             while (strThisHex.length() < 3)
             {
                 //Expand to 3 characters
-                strThisHex.prepend('0');
+                strThisHex.prepend(' ');
             }
 
             //Add error to list
@@ -294,7 +330,7 @@ void UwxErrorCode::on_edit_Search_textChanged(const QString &arg1)
 
 //=============================================================================
 //=============================================================================
-void UwxErrorCode::on_btn_order_clicked()
+void AutErrorCode::on_btn_order_clicked()
 {
     if (ui->btn_order->arrowType() == Qt::UpArrow)
     {
@@ -309,6 +345,13 @@ void UwxErrorCode::on_btn_order_clicked()
     {
         ui->list_Search->sortItems(ui->btn_order->arrowType() == Qt::UpArrow ? Qt::AscendingOrder : Qt::DescendingOrder);
     }
+}
+
+//=============================================================================
+//=============================================================================
+void AutErrorCode::display_error(QString error)
+{
+    ui->combo_Code->setCurrentText(error);
 }
 
 /******************************************************************************/

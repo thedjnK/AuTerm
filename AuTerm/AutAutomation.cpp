@@ -4,7 +4,7 @@
 **
 ** Project: AuTerm
 **
-** Module: UwxAutomation.cpp
+** Module: AutAutomation.cpp
 **
 ** Notes:
 **
@@ -25,13 +25,13 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "UwxAutomation.h"
-#include "ui_UwxAutomation.h"
+#include "AutAutomation.h"
+#include "ui_AutAutomation.h"
 
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-UwxAutomation::UwxAutomation(QWidget *parent) : QDialog(parent), ui(new Ui::UwxAutomation)
+AutAutomation::AutAutomation(QWidget *parent) : QDialog(parent), ui(new Ui::AutAutomation)
 {
     //On dialogue creation
     ui->setupUi(this);
@@ -60,12 +60,13 @@ UwxAutomation::UwxAutomation(QWidget *parent) : QDialog(parent), ui(new Ui::UwxA
     msbStatusBar->showMessage("[Status]");
 
     //Set always on top state
+    parent_window = parent;
     on_check_OnTop_stateChanged(0);
 }
 
 //=============================================================================
 //=============================================================================
-UwxAutomation::~UwxAutomation(
+AutAutomation::~AutAutomation(
     )
 {
     //On dialogue deletion
@@ -85,7 +86,7 @@ UwxAutomation::~UwxAutomation(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::SetPopupHandle(
+AutAutomation::SetPopupHandle(
     PopupMessage *pmNewHandle
     )
 {
@@ -96,7 +97,7 @@ UwxAutomation::SetPopupHandle(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Load_clicked(
+AutAutomation::on_btn_Load_clicked(
     )
 {
     //Load button clicked
@@ -112,7 +113,7 @@ UwxAutomation::on_btn_Load_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Save_clicked(
+AutAutomation::on_btn_Save_clicked(
     )
 {
     //Save button clicked
@@ -161,7 +162,7 @@ UwxAutomation::on_btn_Save_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Top_clicked(
+AutAutomation::on_btn_Top_clicked(
     )
 {
     //Top button clicked
@@ -172,7 +173,7 @@ UwxAutomation::on_btn_Top_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Up_clicked(
+AutAutomation::on_btn_Up_clicked(
     )
 {
     //Up button clicked
@@ -204,7 +205,7 @@ UwxAutomation::on_btn_Up_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Down_clicked(
+AutAutomation::on_btn_Down_clicked(
     )
 {
     //Down button clicked
@@ -236,7 +237,7 @@ UwxAutomation::on_btn_Down_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Bottom_clicked(
+AutAutomation::on_btn_Bottom_clicked(
     )
 {
     //Bottom button clicked
@@ -247,7 +248,7 @@ UwxAutomation::on_btn_Bottom_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Close_clicked(
+AutAutomation::on_btn_Close_clicked(
     )
 {
     //Close button clicked
@@ -257,7 +258,7 @@ UwxAutomation::on_btn_Close_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send1_clicked(
+AutAutomation::on_btn_Send1_clicked(
     )
 {
     //Send button #1 pressed
@@ -267,7 +268,7 @@ UwxAutomation::on_btn_Send1_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send2_clicked(
+AutAutomation::on_btn_Send2_clicked(
     )
 {
     //Send button #2 pressed
@@ -277,7 +278,7 @@ UwxAutomation::on_btn_Send2_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send3_clicked(
+AutAutomation::on_btn_Send3_clicked(
     )
 {
     //Send button #3 pressed
@@ -287,7 +288,7 @@ UwxAutomation::on_btn_Send3_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send4_clicked(
+AutAutomation::on_btn_Send4_clicked(
     )
 {
     //Send button #4 pressed
@@ -297,7 +298,7 @@ UwxAutomation::on_btn_Send4_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send5_clicked(
+AutAutomation::on_btn_Send5_clicked(
     )
 {
     //Send button #5 pressed
@@ -307,7 +308,7 @@ UwxAutomation::on_btn_Send5_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send6_clicked(
+AutAutomation::on_btn_Send6_clicked(
     )
 {
     //Send button #6 pressed
@@ -317,7 +318,7 @@ UwxAutomation::on_btn_Send6_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send7_clicked(
+AutAutomation::on_btn_Send7_clicked(
     )
 {
     //Send button #7 pressed
@@ -327,7 +328,7 @@ UwxAutomation::on_btn_Send7_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send8_clicked(
+AutAutomation::on_btn_Send8_clicked(
     )
 {
     //Send button #8 pressed
@@ -337,7 +338,7 @@ UwxAutomation::on_btn_Send8_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send9_clicked(
+AutAutomation::on_btn_Send9_clicked(
     )
 {
     //Send button #9 pressed
@@ -347,7 +348,7 @@ UwxAutomation::on_btn_Send9_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Send10_clicked(
+AutAutomation::on_btn_Send10_clicked(
     )
 {
     //Send button #10 pressed
@@ -357,7 +358,7 @@ UwxAutomation::on_btn_Send10_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::LoadTextData(
+AutAutomation::LoadTextData(
     )
 {
     //Loads the text boxes with the data in the array
@@ -377,7 +378,7 @@ UwxAutomation::LoadTextData(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::ConnectionChange(
+AutAutomation::ConnectionChange(
     bool bEnabled
     )
 {
@@ -397,7 +398,7 @@ UwxAutomation::ConnectionChange(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line1_editingFinished(
+AutAutomation::on_edit_Line1_editingFinished(
     )
 {
     //Update array with new text
@@ -407,7 +408,7 @@ UwxAutomation::on_edit_Line1_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line2_editingFinished(
+AutAutomation::on_edit_Line2_editingFinished(
     )
 {
     //Update array with new text
@@ -417,7 +418,7 @@ UwxAutomation::on_edit_Line2_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line3_editingFinished(
+AutAutomation::on_edit_Line3_editingFinished(
     )
 {
     //Update array with new text
@@ -427,7 +428,7 @@ UwxAutomation::on_edit_Line3_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line4_editingFinished(
+AutAutomation::on_edit_Line4_editingFinished(
     )
 {
     //Update array with new text
@@ -437,7 +438,7 @@ UwxAutomation::on_edit_Line4_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line5_editingFinished(
+AutAutomation::on_edit_Line5_editingFinished(
     )
 {
     //Update array with new text
@@ -447,7 +448,7 @@ UwxAutomation::on_edit_Line5_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line6_editingFinished(
+AutAutomation::on_edit_Line6_editingFinished(
     )
 {
     //Update array with new text
@@ -457,7 +458,7 @@ UwxAutomation::on_edit_Line6_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line7_editingFinished(
+AutAutomation::on_edit_Line7_editingFinished(
     )
 {
     //Update array with new text
@@ -467,7 +468,7 @@ UwxAutomation::on_edit_Line7_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line8_editingFinished(
+AutAutomation::on_edit_Line8_editingFinished(
     )
 {
     //Update array with new text
@@ -477,7 +478,7 @@ UwxAutomation::on_edit_Line8_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line9_editingFinished(
+AutAutomation::on_edit_Line9_editingFinished(
     )
 {
     //Update array with new text
@@ -487,7 +488,7 @@ UwxAutomation::on_edit_Line9_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_edit_Line10_editingFinished(
+AutAutomation::on_edit_Line10_editingFinished(
     )
 {
     //Update array with new text
@@ -497,7 +498,7 @@ UwxAutomation::on_edit_Line10_editingFinished(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::ArrayHighest(
+AutAutomation::ArrayHighest(
     )
 {
     //Gets the highest position for a valid entry in the array
@@ -516,7 +517,7 @@ UwxAutomation::ArrayHighest(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::ArrayPositionUpdate(
+AutAutomation::ArrayPositionUpdate(
     )
 {
     //Updates the label to show the current array position
@@ -526,7 +527,7 @@ UwxAutomation::ArrayPositionUpdate(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::EnterPressed(
+AutAutomation::EnterPressed(
     )
 {
     //Enter has been pressed with a line edit selected
@@ -571,7 +572,7 @@ UwxAutomation::EnterPressed(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_btn_Clear_clicked(
+AutAutomation::on_btn_Clear_clicked(
     )
 {
     //Clears the array and all edit boxes and resets back to default
@@ -601,14 +602,15 @@ UwxAutomation::on_btn_Clear_clicked(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::on_check_OnTop_stateChanged(
+AutAutomation::on_check_OnTop_stateChanged(
     int
     )
 {
     //Always on-top state changed
     bool bReShow = this->isVisible();
 
-    this->setWindowFlags((ui->check_OnTop->isChecked() ? Qt::Dialog : Qt::Window) | Qt::WindowCloseButtonHint);
+    this->setParent((ui->check_OnTop->isChecked() ? parent_window : nullptr));
+    this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
 
     if (bReShow == true)
     {
@@ -620,7 +622,7 @@ UwxAutomation::on_check_OnTop_stateChanged(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::SetFirstLineFocus(
+AutAutomation::SetFirstLineFocus(
     )
 {
     //Sets the focus to the first line edit
@@ -630,7 +632,7 @@ UwxAutomation::SetFirstLineFocus(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::LoadFile(
+AutAutomation::LoadFile(
     QString strLoadFile
     )
 {
@@ -681,7 +683,7 @@ UwxAutomation::LoadFile(
 //=============================================================================
 //=============================================================================
 void
-UwxAutomation::wheelEvent(
+AutAutomation::wheelEvent(
     QWheelEvent *event
     )
 {

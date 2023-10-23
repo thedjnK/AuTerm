@@ -21,8 +21,8 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef UWXAUTOMATION_H
-#define UWXAUTOMATION_H
+#ifndef AUTAUTOMATION_H
+#define AUTAUTOMATION_H
 
 /******************************************************************************/
 // Include Files
@@ -51,22 +51,22 @@ const quint16 nAutoWheelScroll = 120;  //Number of lines to scroll per scrolls
 /******************************************************************************/
 namespace Ui
 {
-    class UwxAutomation;
+    class AutAutomation;
 }
 
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class UwxAutomation : public QDialog
+class AutAutomation : public QDialog
 {
     Q_OBJECT
 
 public:
     explicit
-    UwxAutomation(
+    AutAutomation(
         QWidget *parent = 0
         );
-    ~UwxAutomation(
+    ~AutAutomation(
         );
     void
     SetPopupHandle(
@@ -198,7 +198,8 @@ signals:
         );
 
 private:
-    Ui::UwxAutomation *ui;
+    Ui::AutAutomation *ui;
+    QWidget *parent_window;
     PopupMessage *mFormAuto; //Holds handle of error message dialogue
     QString mstrAutoItemArray[(nAutoItemAllow+1)]; //Holds the text items
     unsigned char mchItemPosition; //Current position of the array for the text boxes
@@ -206,7 +207,7 @@ private:
     QStatusBar *msbStatusBar; //Pointer to automation status bar
 };
 
-#endif // UWXAUTOMATION_H
+#endif // AUTAUTOMATION_H
 
 /******************************************************************************/
 // END OF FILE

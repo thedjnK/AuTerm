@@ -3,7 +3,12 @@
 **
 ** Project: AuTerm
 **
-** Module: UwxErrorCode.h
+** Copyright (C) 2016-2017 Laird
+** Copyright (C) 2023 Jamie M.
+**
+** Project: AuTerm
+**
+** Module: AutErrorCode.h
 **
 ** Notes:
 **
@@ -20,8 +25,8 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef UWXERRORCODE_H
-#define UWXERRORCODE_H
+#ifndef AUTERRORCODE_H
+#define AUTERRORCODE_H
 
 /******************************************************************************/
 // Include Files
@@ -32,6 +37,11 @@
 #include <QFontDatabase>
 #include <QStatusBar>
 #include <QClipboard>
+
+/******************************************************************************/
+// Defines
+/******************************************************************************/
+#define ERROR_CODE_TREAT_NEGATIVE_AS_POSITIVE
 
 /******************************************************************************/
 // Constants
@@ -45,31 +55,34 @@ const qint8 ErrorCodeSearchTab = 2;
 /******************************************************************************/
 namespace Ui
 {
-    class UwxErrorCode;
+    class AutErrorCode;
 }
 
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class UwxErrorCode : public QDialog
+class AutErrorCode : public QDialog
 {
     Q_OBJECT
 
 public:
     explicit
-    UwxErrorCode(
+    AutErrorCode(
         QWidget *parent = 0
         );
-    ~UwxErrorCode();
+    ~AutErrorCode();
     void
     SetErrorObject(
         QSettings *pErrorMessages
         );
 
+public slots:
+    void display_error(QString error);
+
 private slots:
     void
     on_combo_Code_currentTextChanged(
-        const QString &strComboText
+        QString strComboText
         );
     void
     on_list_Codes_currentRowChanged(
@@ -94,13 +107,13 @@ private slots:
     void on_btn_order_clicked();
 
 private:
-    Ui::UwxErrorCode *ui;
+    Ui::AutErrorCode *ui;
     QCompleter *mcmpErrors; //Handle for error completer object for combo box
     QSettings *mpErrorMessages; //Handle for error values object (owned by UwxMainWindow)
     QStatusBar *msbStatusBar; //Pointer to error code status bar
 };
 
-#endif // UWXERRORCODE_H
+#endif // AUTERRORCODE_H
 
 /******************************************************************************/
 // END OF FILE

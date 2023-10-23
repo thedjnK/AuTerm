@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UwxErrorCode</class>
- <widget class="QDialog" name="UwxErrorCode">
+ <class>AutErrorCode</class>
+ <widget class="QDialog" name="AutErrorCode">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>457</width>
-    <height>331</height>
+    <width>362</width>
+    <height>284</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,6 +66,9 @@
                <width>120</width>
                <height>0</height>
               </size>
+             </property>
+             <property name="inputMethodHints">
+              <set>Qt::ImhNone</set>
              </property>
              <property name="editable">
               <bool>true</bool>

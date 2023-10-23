@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UwxAutomation</class>
- <widget class="QDialog" name="UwxAutomation">
+ <class>AutAutomation</class>
+ <widget class="QDialog" name="AutAutomation">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>668</width>
+    <width>658</width>
     <height>300</height>
    </rect>
   </property>

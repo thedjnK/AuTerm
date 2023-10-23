@@ -748,7 +748,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
             if (guaAutomationForm == 0)
             {
                 //Initialise automation popup
-                guaAutomationForm = new UwxAutomation(this);
+                guaAutomationForm = new AutAutomation(this);
 
                 //Populate window handles for automation object
                 guaAutomationForm->SetPopupHandle(gpmErrorForm);
@@ -772,7 +772,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
             if (guaAutomationForm == 0)
             {
                 //Initialise automation popup
-                guaAutomationForm = new UwxAutomation(this);
+                guaAutomationForm = new AutAutomation(this);
 
                 //Populate window handles for automation object
                 guaAutomationForm->SetPopupHandle(gpmErrorForm);
@@ -1791,7 +1791,7 @@ AutMainWindow::MenuSelected(
         if (guaAutomationForm == 0)
         {
             //Initialise automation popup
-            guaAutomationForm = new UwxAutomation(this);
+            guaAutomationForm = new AutAutomation(this);
 
             //Populate window handles for automation object
             guaAutomationForm->SetPopupHandle(gpmErrorForm);
@@ -2771,17 +2771,21 @@ AutMainWindow::LookupErrorCode(
     )
 {
     //Looks up an error code and outputs it in the edit (does NOT store it to the log)
+#ifndef SKIPERRORCODEFORM
     if (gbErrorsLoaded == true)
     {
         //Error file has been loaded
-        QString error = QString::number(intErrorCode);
-        update_buffer(QString("\nError code %1: %2\n").arg(error, gpErrorMessages->value(error, "Undefined Error Code").toString()).toUtf8(), false);
+        on_btn_Error_clicked();
+        gecErrorCodeForm->display_error(QString::number(intErrorCode));
     }
     else
     {
         //Error file has not been loaded
         update_buffer("\nUnable to lookup error code: error code file not loaded.\n", false);
     }
+#else
+    update_buffer("\nError code form support not enabled.\n", false);
+#endif
 //    ui->text_TermEditData->moveCursor(QTextCursor::End);
 }
 
@@ -3899,7 +3903,7 @@ AutMainWindow::on_btn_Error_clicked(
     if (gecErrorCodeForm == 0)
     {
         //Initialise error code form
-        gecErrorCodeForm = new UwxErrorCode(this);
+        gecErrorCodeForm = new AutErrorCode(nullptr);
         gecErrorCodeForm->SetErrorObject(gpErrorMessages);
     }
     gecErrorCodeForm->show();
