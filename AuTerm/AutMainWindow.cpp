@@ -925,12 +925,12 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         if (run_check == true)
         {
             gpTermSettings->setValue("LastUpdateCheck", QDate::currentDate().toString());
-            ui->label_version_update->setText("Checking for updates...");
+            ui->label_version_update->setText("checking...");
             AuTermUpdateCheck();
         }
         else
         {
-            ui->label_version_update->setText("Update check already performed today.");
+            ui->label_version_update->setText("already checked today.");
         }
     }
 #endif
@@ -2894,12 +2894,17 @@ AutMainWindow::replyFinished(
 
             if (gchTermMode == mode_check_for_update)
             {
-                ui->label_version_update->setText("Error with network request.");
+                ui->label_version_update->setText("network error.");
             }
         }
         else
         {
-            ui->statusBar->showMessage("Network request cancelled");
+            if (gchTermMode == mode_check_for_update)
+            {
+                ui->label_version_update->setText("request cancelled.");
+            }
+
+            ui->statusBar->showMessage("Network request cancelled.");
         }
 
         gchTermMode = 0;
@@ -2920,7 +2925,7 @@ AutMainWindow::replyFinished(
             if (baTmpBA.length() > 8)
             {
                 //Something not quite right with this response...
-                ui->label_version_update->setText("Unknown server response.");
+                ui->label_version_update->setText("unknown response.");
                 QString string_response = QString("Unknown response from server: %1").arg(QString(baTmpBA));
                 gpmErrorForm->SetMessage(&string_response);
                 gpmErrorForm->show();
@@ -2932,12 +2937,12 @@ AutMainWindow::replyFinished(
 
                 if (is_newer(&newest_version, &UwVersion) == true)
                 {
-                    ui->label_version_update->setText(QString("<a href=\"https://github.com/thedjnK/AuTerm/releases\">Update available: %1</a>").arg(newest_version));
+                    ui->label_version_update->setText(QString("<a href=\"https://github.com/thedjnK/AuTerm/releases\">update available: %1</a>").arg(newest_version));
                     ui->statusBar->showMessage(QString("AuTerm update to version %1 available").arg(newest_version));
                 }
                 else
                 {
-                    ui->label_version_update->setText("No update available.");
+                    ui->label_version_update->setText("no updates.");
                     ui->statusBar->showMessage("No AuTerm update available");
                 }
             }
