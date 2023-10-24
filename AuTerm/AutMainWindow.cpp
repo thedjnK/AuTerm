@@ -257,8 +257,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     gbDCDStatus = 0;
     gbDSRStatus = 0;
     gbRIStatus = 0;
-    gbStreamingBatch = false;
-    gbaBatchReceive.clear();
     gbEditFileModified = false;
     giEditFileType = -1;
     gbErrorsLoaded = false;
@@ -414,7 +412,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     //Disable unimplemented scripting option
     gpMenu->actions().last()->setEnabled(false);
 #endif
-    gpMenu->addAction("Batch")->setData(MenuActionBatch);
     gpMenu->addAction("Clear Display")->setData(MenuActionClearDisplay);
     gpMenu->addAction("Clear RX/TX count")->setData(MenuActionClearRxTx);
     gpMenu->addSeparator();
@@ -468,10 +465,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     gtmrSpeedUpdateTimer.setInterval(gpTermSettings->value("TextUpdateInterval", DefaultTextUpdateInterval).toInt());
     connect(&gtmrSpeedUpdateTimer, SIGNAL(timeout()), this, SLOT(update_displayText()));
 #endif
-
-    //Setup timer for batch file timeout
-    gtmrBatchTimeoutTimer.setSingleShot(true);
-    connect(&gtmrBatchTimeoutTimer, SIGNAL(timeout()), this, SLOT(BatchTimeoutSlot()));
 
     //Set logging options
     ui->edit_LogFile->setText(gpTermSettings->value("LogFile", QString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(DefaultLogFileName)).toString());
@@ -961,7 +954,6 @@ AutMainWindow::~AutMainWindow()
     disconnect(this, SLOT(SerialBytesWritten(qint64)));
     disconnect(this, SLOT(UpdateReceiveText()));
     disconnect(this, SLOT(SerialPortClosing()));
-    disconnect(this, SLOT(BatchTimeoutSlot()));
 #ifndef SKIPONLINE
     disconnect(this, SLOT(replyFinished(QNetworkReply*)));
 #ifndef QT_NO_SSL
@@ -1060,12 +1052,6 @@ AutMainWindow::~AutMainWindow()
     //Clear up streaming data if opened
     if (gbTermBusy == true && gbStreamingFile == true)
     {
-        gpStreamFileHandle->close();
-        delete gpStreamFileHandle;
-    }
-    else if (gbTermBusy == true && gbStreamingBatch == true)
-    {
-        //Clear up batch
         gpStreamFileHandle->close();
         delete gpStreamFileHandle;
     }
@@ -1195,16 +1181,6 @@ AutMainWindow::on_btn_TermClose_clicked(
             gbStreamingFile = false;
             gpStreamFileHandle->close();
             delete gpStreamFileHandle;
-        }
-        else if (gbStreamingBatch == true)
-        {
-            //Clear up batch
-            gtmrStreamTimer.invalidate();
-            gtmrBatchTimeoutTimer.stop();
-            gbStreamingBatch = false;
-            gpStreamFileHandle->close();
-            delete gpStreamFileHandle;
-            gbaBatchReceive.clear();
         }
 #ifndef SKIPSPEEDTEST
         else if (gbSpeedTestRunning == true)
@@ -1511,9 +1487,6 @@ AutMainWindow::SerialRead(
         //Update number of recieved bytes
         gintRXBytes = gintRXBytes + baOrigData.length();
         ui->label_TermRx->setText(QString::number(gintRXBytes));
-
-        //Send next chunk of batch data if enabled
-        StreamBatchContinue(&baOrigData);
     }
 
 #ifndef SKIPPLUGINS
@@ -1524,86 +1497,6 @@ AutMainWindow::SerialRead(
         emit plugin_serial_receive(&baOrigData);
     }
 #endif
-}
-
-//=============================================================================
-//=============================================================================
-void
-AutMainWindow::StreamBatchContinue(
-    QByteArray *baOrigData
-    )
-{
-    if (gbStreamingBatch == true)
-    {
-        //Batch stream in progress
-        gbaBatchReceive += *baOrigData;
-        if (gbaBatchReceive.indexOf("\n00\r") != -1)
-        {
-            //Success code, next statement
-            if (gpStreamFileHandle->atEnd())
-            {
-                //Finished sending
-                FinishBatch(false);
-            }
-            else
-            {
-                //Send more data
-                QByteArray baFileData = gpStreamFileHandle->readLine().replace("\n", "").replace("\r", "");
-                gspSerialPort.write(baFileData);
-                gintQueuedTXBytes += baFileData.length();
-                DoLineEnd();
-                gpMainLog->WriteLogData(QString(baFileData).append("\n"));
-                gtmrBatchTimeoutTimer.start(BatchTimeout);
-                ++gintStreamBytesRead;
-
-                //Update the display buffer
-                update_buffer(&baFileData, false);
-            }
-            gbaBatchReceive.clear();
-        }
-        else if (gbaBatchReceive.indexOf("\n01\t") != -1 && gbaBatchReceive.indexOf("\r", gbaBatchReceive.indexOf("\n01\t")+4) != -1)
-        {
-            //Failure code
-            QRegularExpression reTempRE("\t([a-zA-Z0-9]{1,9})(\t|\r)");
-            QRegularExpressionMatch remTempREM = reTempRE.match(gbaBatchReceive);
-            if (remTempREM.hasMatch() == true)
-            {
-                //Got the error code
-                update_buffer(QByteArray("\nError during batch command, error code: ").append(remTempREM.captured(1).toUtf8()).append("\n"), false);
-
-                //Lookup error code
-                bool bTmpBool;
-                unsigned int ErrCode = QString("0x").append(remTempREM.captured(1)).toUInt(&bTmpBool, 16);
-                if (bTmpBool == true)
-                {
-                    //Converted
-                    LookupErrorCode(ErrCode);
-                }
-            }
-            else
-            {
-                //Unknown error code
-                update_buffer("\nError during batch command, unknown error code.\n", false);
-            }
-            if (!gtmrTextUpdateTimer.isActive())
-            {
-                gtmrTextUpdateTimer.start();
-            }
-
-            //Show status message
-            ui->statusBar->showMessage(QString("Failed sending batch file at line ").append(QString::number(gintStreamBytesRead)));
-
-            //Clear up and cancel timer
-            gtmrBatchTimeoutTimer.stop();
-            gbTermBusy = false;
-            gbStreamingBatch = false;
-            gchTermMode = 0;
-            gpStreamFileHandle->close();
-            delete gpStreamFileHandle;
-            gbaBatchReceive.clear();
-            ui->btn_Cancel->setEnabled(false);
-        }
-    }
 }
 
 //=============================================================================
@@ -1847,58 +1740,6 @@ AutMainWindow::MenuSelected(
         gusScriptingForm->SetEditorFocus();
     }
 #endif
-    else if (intItem == MenuActionBatch && gbTermBusy == false && gbSpeedTestRunning == false)
-    {
-        //Start a Batch file script
-        if (gspSerialPort.isOpen() == true && gbLoopbackMode == false && gbTermBusy == false)
-        {
-            //Not currently busy
-            QString strFilename = QFileDialog::getOpenFileName(this, tr("Open Batch File"), gstrLastFilename[FilenameIndexOthers], tr("Text Files (*.txt);;All Files (*.*)"));
-
-            if (strFilename.length() > 1)
-            {
-                //Set last directory config
-                gstrLastFilename[FilenameIndexOthers] = strFilename;
-                gpTermSettings->setValue("LastOtherFileDirectory", SplitFilePath(strFilename).at(0));
-
-                //File selected
-                gpStreamFileHandle = new QFile(strFilename);
-
-                if (!gpStreamFileHandle->open(QIODevice::ReadOnly))
-                {
-                    //Unable to open file
-                    QString strMessage = tr("Error during batch streaming: Access to selected file is denied: ").append(strFilename);
-                    gpmErrorForm->SetMessage(&strMessage);
-                    gpmErrorForm->show();
-                    return;
-                }
-
-                //We're now busy
-                gbTermBusy = true;
-                gbStreamingBatch = true;
-                gchTermMode = 50;
-                gbaBatchReceive.clear();
-                ui->btn_Cancel->setEnabled(true);
-
-                //Start a timer
-                gtmrStreamTimer.start();
-
-                //Reads out first block
-                QByteArray baFileData = gpStreamFileHandle->readLine().replace("\n", "").replace("\r", "");
-                gspSerialPort.write(baFileData);
-                gintQueuedTXBytes += baFileData.size();
-                DoLineEnd();
-                gpMainLog->WriteLogData(QString(baFileData).append("\n"));
-                gintStreamBytesRead = 1;
-
-                //Update the display buffer
-                update_buffer(&baFileData, false);
-
-                //Start a timeout timer
-                gtmrBatchTimeoutTimer.start(BatchTimeout);
-            }
-        }
-    }
     else if (intItem == MenuActionClearDisplay)
     {
         //Clear display
@@ -2561,16 +2402,6 @@ AutMainWindow::SerialError(
             gpStreamFileHandle->close();
             delete gpStreamFileHandle;
         }
-        else if (gbStreamingBatch == true)
-        {
-            //Clear up batch
-            gtmrStreamTimer.invalidate();
-            gtmrBatchTimeoutTimer.stop();
-            gbStreamingBatch = false;
-            gpStreamFileHandle->close();
-            delete gpStreamFileHandle;
-            gbaBatchReceive.clear();
-        }
 #ifndef SKIPSPEEDTEST
         else if (gbSpeedTestRunning == true)
         {
@@ -2853,11 +2684,6 @@ AutMainWindow::SerialBytesWritten(
                 ui->statusBar->showMessage(QString("Streamed ").append(QString::number(gintStreamBytesRead).append(" bytes of ").append(QString::number(gintStreamBytesSize))).append(" (").append(QString::number(gintStreamBytesRead*100/gintStreamBytesSize)).append("%)"));
             }
         }
-        else if (gbStreamingBatch == true)
-        {
-            //Batch file command
-            ui->statusBar->showMessage(QString("Sending Batch line number ").append(QString::number(gintStreamBytesRead)));
-        }
     }
 
 #ifndef SKIPPLUGINS
@@ -2878,11 +2704,6 @@ AutMainWindow::on_btn_Cancel_clicked(
         {
             //Cancel stream
             FinishStream(true);
-        }
-        else if (gbStreamingBatch == true)
-        {
-            //Cancel batch streaming
-            FinishBatch(true);
         }
     }
 
@@ -2924,39 +2745,6 @@ AutMainWindow::FinishStream(
 //=============================================================================
 //=============================================================================
 void
-AutMainWindow::FinishBatch(
-    bool bType
-    )
-{
-    //Sending a file stream has finished
-    if (bType == true)
-    {
-        //Stream cancelled
-        update_buffer(QString("\nCancelled batch (").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds)\n").toUtf8(), false);
-        ui->statusBar->showMessage("Batch file sending cancelled.");
-    }
-    else
-    {
-        //Stream finished
-        update_buffer(QString("\nFinished sending batch file, ").append(QString::number(gintStreamBytesRead)).append(" lines sent in ").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds\n").toUtf8(), false);
-        ui->statusBar->showMessage("Batch file sending complete!");
-    }
-
-    //Clear up and cancel timer
-    gtmrStreamTimer.invalidate();
-    gtmrBatchTimeoutTimer.stop();
-    gbTermBusy = false;
-    gbStreamingBatch = false;
-    gchTermMode = 0;
-    gpStreamFileHandle->close();
-    delete gpStreamFileHandle;
-    gbaBatchReceive.clear();
-    ui->btn_Cancel->setEnabled(false);
-}
-
-//=============================================================================
-//=============================================================================
-void
 AutMainWindow::UpdateReceiveText(
     )
 {
@@ -2971,22 +2759,6 @@ AutMainWindow::UpdateReceiveText(
     {
         display_update_pending = true;
     }
-}
-
-//=============================================================================
-//=============================================================================
-void
-AutMainWindow::BatchTimeoutSlot(
-    )
-{
-    //A response to a batch command has timed out
-    update_buffer("\nModule command timed out.\n", false);
-    gbTermBusy = false;
-    gbStreamingBatch = false;
-    gchTermMode = 0;
-    gpStreamFileHandle->close();
-    ui->btn_Cancel->setEnabled(false);
-    delete gpStreamFileHandle;
 }
 
 //=============================================================================

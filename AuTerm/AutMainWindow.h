@@ -108,8 +108,6 @@ const QString UwVersion                         = "0.26a"; //Version string
 //Constants for timeouts and streaming
 const qint16 FileReadBlock                      = 512;     //Number of bytes to read per block when streaming files
 const qint16 StreamProgress                     = 10000;   //Number of bytes between streaming progress updates
-const qint16 BatchTimeout                       = 4000;    //Time (in ms) to wait for getting a response from a batch command for
-const qint16 ModuleTimeout                      = 4000;    //Time (in ms) that a download stage command/process times out (module)
 //Constants for default config values
 const QString DefaultLogFileName                = "AuTerm.log";
 const bool DefaultLogMode                       = 0;
@@ -138,7 +136,6 @@ enum menu_actions {
     MenuActionRestoreDefaults,
     MenuActionAutomation,
     MenuActionScripting,
-    MenuActionBatch,
     MenuActionClearDisplay,
     MenuActionClearRxTx,
     MenuActionCopy,
@@ -150,12 +147,14 @@ enum menu_actions {
 const qint8 BalloonActionShow                   = 1;
 const qint8 BalloonActionExit                   = 2;
 //Constants for speed test menu
-const qint8 SpeedMenuActionRecv                 = 1;
-const qint8 SpeedMenuActionSend                 = 2;
-const qint8 SpeedMenuActionSendRecv             = 3;
-const qint8 SpeedMenuActionSendRecv5Delay       = 4;
-const qint8 SpeedMenuActionSendRecv10Delay      = 5;
-const qint8 SpeedMenuActionSendRecv15Delay      = 6;
+enum speed_menu_actions {
+    SpeedMenuActionRecv                         = 0,
+    SpeedMenuActionSend,
+    SpeedMenuActionSendRecv,
+    SpeedMenuActionSendRecv5Delay,
+    SpeedMenuActionSendRecv10Delay,
+    SpeedMenuActionSendRecv15Delay
+};
 const qint8 SpeedModeInactive                   = 0;
 const qint8 SpeedModeRecv                       = 1;
 const qint8 SpeedModeSend                       = 2;
@@ -253,7 +252,6 @@ private slots:
     void closeEvent(QCloseEvent *closeEvent);
     void on_btn_Cancel_clicked();
     void UpdateReceiveText();
-    void BatchTimeoutSlot();
     void on_combo_COM_currentIndexChanged(int intIndex);
 #ifndef SKIPONLINE
     void replyFinished(QNetworkReply* nrReply);
@@ -430,10 +428,6 @@ private:
         bool bType
         );
     void
-    FinishBatch(
-        bool bType
-        );
-    void
     LoadSettings(
         );
     void
@@ -459,10 +453,6 @@ private:
         qint64 lngElapsed
         );
 #endif
-    void
-    StreamBatchContinue(
-        QByteArray *baOrigData
-        );
     void
     SetLoopBackMode(
         bool bNewMode
@@ -522,9 +512,6 @@ private:
     display_buffer_list display_buffers; //List of pending data awaiting terminal display
     QElapsedTimer gtmrStreamTimer; //Counts how long a stream takes to send
     QTimer gtmrTextUpdateTimer; //Timer for slower updating of display buffer (but less display freezing)
-    bool gbStreamingBatch; //True if batch file is being streamed
-    QTimer gtmrBatchTimeoutTimer; //Timer for a batch command timeout
-    QByteArray gbaBatchReceive; //Storage for batch data coming in
     QSettings *gpTermSettings; //Handle to settings
     QSettings *gpErrorMessages; //Handle to error codes
     QSettings *gpPredefinedDevice; //Handle to predefined devices
