@@ -200,10 +200,10 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     BundleDir.cdUp();
     BundleDir.cdUp();
     gstrMacBundlePath = BundleDir.path().append("/");
-    if (!QDir().exists(QStandardPaths::writableLocation(QStandardPaths::DataLocation)))
+    if (!QDir().exists(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)))
     {
         //Create AuTerm directory in application support
-        QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+        QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
     }
 
     //Fix mac's resize
@@ -2389,7 +2389,7 @@ AutMainWindow::OpenDevice(
             {
                 //Logging is enabled
 #ifdef TARGET_OS_MAC
-                if (gpMainLog->OpenLogFile(QString((ui->edit_LogFile->text().left(1) == "/" || ui->edit_LogFile->text().left(1) == "\\") ? "" : QStandardPaths::writableLocation(QStandardPaths::DataLocation)).append("/").append(ui->edit_LogFile->text())) == LOG_OK)
+                if (gpMainLog->OpenLogFile(QString((ui->edit_LogFile->text().left(1) == "/" || ui->edit_LogFile->text().left(1) == "\\") ? "" : QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(ui->edit_LogFile->text())) == LOG_OK)
 #else
                 if (gpMainLog->OpenLogFile(ui->edit_LogFile->text()) == LOG_OK)
 #endif
