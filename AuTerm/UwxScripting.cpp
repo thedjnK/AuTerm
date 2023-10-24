@@ -60,21 +60,13 @@ UwxScripting::UwxScripting(QWidget *parent) : QDialog(parent), ui(new Ui::UwxScr
     mbWaitingForReceive = false;
 
     //Set the icons and tooltip of the buttons
-    ui->btn_Load->setText("");
     ui->btn_Load->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
-    ui->btn_Save->setText("");
     ui->btn_Save->setIcon(this->style()->standardIcon(QStyle::SP_DialogSaveButton));
-    ui->btn_Compile->setText("");
     ui->btn_Compile->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxWarning));
-    ui->btn_Run->setText("");
     ui->btn_Run->setIcon(this->style()->standardIcon(QStyle::SP_MediaPlay));
-    ui->btn_Pause->setText("");
     ui->btn_Pause->setIcon(this->style()->standardIcon(QStyle::SP_MediaPause));
-    ui->btn_Stop->setText("");
     ui->btn_Stop->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxCritical));
-    ui->btn_Clear->setText("");
     ui->btn_Clear->setIcon(this->style()->standardIcon(QStyle::SP_DialogDiscardButton));
-    ui->btn_Help->setText("");
     ui->btn_Help->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxQuestion));
     ui->btn_Options->setMinimumHeight(ui->btn_Compile->height()-2);
     ui->btn_Options->setMaximumHeight(ui->btn_Compile->height()-2);
@@ -93,7 +85,6 @@ UwxScripting::UwxScripting(QWidget *parent) : QDialog(parent), ui(new Ui::UwxScr
     //Create option menu items
     gpOptionsMenu = new QMenu(this);
     gpOptionsMenu->addAction("Change Font")->setData(MenuActionChangeFont);
-    //gpSOptionsMenu1 = gpOptionsMenu->addMenu("Export to");
 
     //Connect signals
     connect(gpOptionsMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuSelected(QAction*)));
@@ -135,7 +126,6 @@ UwxScripting::~UwxScripting(
     delete qaKeyShortcuts[0];
     delete mhlHighlighter;
     delete msbStatusBar;
-//    delete gpSOptionsMenu1;
     delete gpOptionsMenu;
     delete ui;
 }
@@ -750,7 +740,7 @@ UwxScripting::UpdateStatusBar(
     //Updates status bar with current action
     ui->progress_Complete->setValue((mintCLine-1)*100/mnScriptLines);
     QString strPercent = QString::number(ui->progress_Complete->value()).append("%");
-    setWindowTitle(QString("Scripting (Running... ").append(strPercent).append(")"));
+    setWindowTitle(QString("Scripting (Running... %1)").arg(strPercent));
     if (ucLastAct == ScriptingActionDataIn)
     {
         //Receiving data
@@ -759,14 +749,14 @@ UwxScripting::UpdateStatusBar(
         {
             //Time has expired
             on_btn_Stop_clicked();
-            msbStatusBar->showMessage(QString("Script failed (expected data not found after ").append(ui->spin_MaxRecTime->text()).append(" seconds).").append((mnRepeats > 0 ? QString(" on repeat #").append(QString::number(mnRepeats)) : "")));
+            msbStatusBar->showMessage(QString("Script failed (expected data not found after %1 seconds)%2").arg(ui->spin_MaxRecTime->text(), (mnRepeats > 0 ? QString(" on repeat #").append(QString::number(mnRepeats)) : "")));
             ui->edit_Script->SetExecutionLineStatus(true);
             setWindowTitle("Scripting");
         }
         else
         {
             //Time left
-            msbStatusBar->showMessage(QString("#").append(QString::number(mintCLine+1)).append(": Waiting to receive data (").append(QString::number(mbaRecvData.length())).append(" bytes received in ").append(QString::number(dblRecTimeSec, 'f', 1)).append(" seconds)").append((mnRepeats > 0 ? QString(" with ").append(QString::number(mnRepeats)).append(" repeat").append(mnRepeats == 1 ? "" : "s") : "").append("... (").append(strPercent).append(")")));
+            msbStatusBar->showMessage(QString("#%1: Waiting to receive data (%2 bytes received in %3 seconds)%4... (%5)").arg(QString::number(mintCLine+1), QString::number(mbaRecvData.length()), QString::number(dblRecTimeSec, 'f', 1), (mnRepeats > 0 ? QString(" with %1 repeat%s").arg(QString::number(mnRepeats), (mnRepeats == 1 ? "" : "s")) : ""), strPercent));
         }
     }
     else if (ucLastAct == ScriptingActionDataOut)
@@ -775,23 +765,23 @@ UwxScripting::UpdateStatusBar(
         if (ui->check_WaitForWrite->isChecked() == true)
         {
             //Sending data and waiting for it to be flushed
-            msbStatusBar->showMessage(QString("#").append(QString::number(mintCLine+1)).append(": Waiting to data to be flushed (").append(QString::number(mbBytesWriteRemain)).append(" bytes remaining)").append((mnRepeats > 0 ? QString(" with ").append(QString::number(mnRepeats)).append(" repeat").append(mnRepeats == 1 ? "" : "s") : "").append("... (").append(strPercent).append(")")));
+            msbStatusBar->showMessage(QString("#%1: Waiting to data to be flushed (%2 bytes remaining)%3... (%4)").arg(QString::number(mintCLine+1), QString::number(mbBytesWriteRemain), (mnRepeats > 0 ? QString(" with %1 repeat%2").arg(QString::number(mnRepeats), (mnRepeats == 1 ? "" : "s")) : ""), strPercent));
         }
         else
         {
             //Sending data
-            msbStatusBar->showMessage(QString("#").append(QString::number(mintCLine+1)).append(": Outputting data... (").append(strPercent).append(")"));
+            msbStatusBar->showMessage(QString("#%1: Outputting data... (%2)").arg(QString::number(mintCLine+1), strPercent));
         }
     }
     else if (ucLastAct == ScriptingActionWaitTime)
     {
         //Wait period
-        msbStatusBar->showMessage(QString("#").append(QString::number(mintCLine)).append(": Wait period ").append(QString::number(mtmrPauseTimer.interval())).append("ms (").append(QString::number(mtmrPauseTimer.remainingTime())).append("ms left)").append((mnRepeats > 0 ? QString(" with ").append(QString::number(mnRepeats)).append(" repeat").append(mnRepeats == 1 ? "" : "s") : "").append("... (").append(strPercent).append(")")));
+        msbStatusBar->showMessage(QString("#%1: Wait period %2ms (%3ms left)%4... (%5)").arg(QString::number(mintCLine), QString::number(mtmrPauseTimer.interval()), QString::number(mtmrPauseTimer.remainingTime()), (mnRepeats > 0 ? QString(" with %1 repeat%2").arg(QString::number(mnRepeats), (mnRepeats == 1 ? "" : "s")) : ""), strPercent));
     }
     else
     {
         //Comment or blank line
-        msbStatusBar->showMessage(QString("#").append(QString::number(mintCLine+1)).append(": Comment/Unknown line (").append(strPercent).append(")"));
+        msbStatusBar->showMessage(QString("#%1: Comment/Unknown line (%2)").arg(QString::number(mintCLine+1), strPercent));
     }
 }
 
@@ -939,7 +929,7 @@ UwxScripting::ScriptStartResult(
         gtmrScriptTimer.start();
 
         //Show start message
-        msbStatusBar->showMessage(QString("Beginning script execution... ").append(QString::number(ui->edit_Script->document()->blockCount())).append(" lines."));
+        msbStatusBar->showMessage(QString("Beginning script execution... %1 lines.").arg(QString::number(ui->edit_Script->document()->blockCount())));
 
         //Advance to the next (first) line
         AdvanceLine();
@@ -947,7 +937,7 @@ UwxScripting::ScriptStartResult(
     else
     {
         //Terminal is busy or script cannot run now
-        msbStatusBar->showMessage(QString("Failed to start script").append((ucReason == ScriptingReasonPortClosed ? ": Serial port is not open." : (ucReason == ScriptingReasonTermBusy ? ": Terminal currently busy." : QString(", error code: ").append(QString::number(ucReason))))));
+        msbStatusBar->showMessage(QString("Failed to start script%1").arg((ucReason == ScriptingReasonPortClosed ? ": Serial port is not open." : (ucReason == ScriptingReasonTermBusy ? ": Terminal currently busy." : QString(", error code: ").append(QString::number(ucReason))))));
     }
 }
 
@@ -970,7 +960,7 @@ UwxScripting::LoadScriptFile(
     else
     {
         //Failed to open file
-        QString strMessage = QString("Error during scripting file load: Access to selected file is denied: ").append(*strFilename);
+        QString strMessage = QString("Error during scripting file load: Access to selected file is denied: %1").arg(*strFilename);
         mFormAuto->SetMessage(&strMessage);
         mFormAuto->show();
     }
