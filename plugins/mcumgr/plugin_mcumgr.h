@@ -395,6 +395,14 @@ private:
     QLineEdit *edit_settings_value;
     QLineEdit *edit_settings_decoded;
     QFrame *line_2;
+    QWidget *tab_Custom;
+    QGridLayout *gridLayout_17;
+    QSpinBox *spinBox_Custom_Group;
+    QPushButton *btn_Custom_Go;
+    QPlainTextEdit *edit_Custom_Response;
+    QPlainTextEdit *edit_Custom_Request;
+    QSpinBox *spinBox_Custom_Command;
+    QLabel *lbl_Custom_Status;
     QWidget *tab_2;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;

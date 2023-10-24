@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>526</width>
-    <height>373</height>
+    <width>605</width>
+    <height>474</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -129,7 +129,7 @@
           <enum>QTabWidget::West</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>6</number>
          </property>
          <widget class="QWidget" name="tab_FS">
           <attribute name="title">
@@ -1788,6 +1788,43 @@
              </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_Custom">
+          <attribute name="title">
+           <string>Custom</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_17">
+           <item row="0" column="0">
+            <widget class="QSpinBox" name="spinBox_Custom_Group">
+             <property name="value">
+              <number>64</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QPushButton" name="btn_Custom_Go">
+             <property name="text">
+              <string>Go</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QPlainTextEdit" name="edit_Custom_Response"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QPlainTextEdit" name="edit_Custom_Request"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QSpinBox" name="spinBox_Custom_Command"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="lbl_Custom_Status">
+             <property name="text">
+              <string>[Status]</string>
              </property>
             </widget>
            </item>

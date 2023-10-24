@@ -1039,6 +1039,42 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
 
     tabWidget_2->addTab(tab_Settings, QString());
+    tab_Custom = new QWidget();
+    tab_Custom->setObjectName("tab_Custom");
+    gridLayout_17 = new QGridLayout(tab_Custom);
+    gridLayout_17->setObjectName("gridLayout_17");
+    spinBox_Custom_Group = new QSpinBox(tab_Custom);
+    spinBox_Custom_Group->setObjectName("spinBox_Custom_Group");
+    spinBox_Custom_Group->setValue(64);
+
+    gridLayout_17->addWidget(spinBox_Custom_Group, 0, 0, 1, 1);
+
+    btn_Custom_Go = new QPushButton(tab_Custom);
+    btn_Custom_Go->setObjectName("btn_Custom_Go");
+
+    gridLayout_17->addWidget(btn_Custom_Go, 5, 0, 1, 1);
+
+    edit_Custom_Response = new QPlainTextEdit(tab_Custom);
+    edit_Custom_Response->setObjectName("edit_Custom_Response");
+
+    gridLayout_17->addWidget(edit_Custom_Response, 3, 0, 1, 1);
+
+    edit_Custom_Request = new QPlainTextEdit(tab_Custom);
+    edit_Custom_Request->setObjectName("edit_Custom_Request");
+
+    gridLayout_17->addWidget(edit_Custom_Request, 2, 0, 1, 1);
+
+    spinBox_Custom_Command = new QSpinBox(tab_Custom);
+    spinBox_Custom_Command->setObjectName("spinBox_Custom_Command");
+
+    gridLayout_17->addWidget(spinBox_Custom_Command, 1, 0, 1, 1);
+
+    lbl_Custom_Status = new QLabel(tab_Custom);
+    lbl_Custom_Status->setObjectName("lbl_Custom_Status");
+
+    gridLayout_17->addWidget(lbl_Custom_Status, 4, 0, 1, 1);
+
+    tabWidget_2->addTab(tab_Custom, QString());
 
     verticalLayout_2->addWidget(tabWidget_2);
 
@@ -1132,7 +1168,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(1);
+    tabWidget_2->setCurrentIndex(6);
     tabWidget_3->setCurrentIndex(0);
     selector_OS->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
@@ -1261,6 +1297,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_settings_load->setText(QCoreApplication::translate("Form", "Load", nullptr));
     radio_settings_save->setText(QCoreApplication::translate("Form", "Save", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
+    btn_Custom_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    lbl_Custom_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Custom), QCoreApplication::translate("Form", "Custom", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
