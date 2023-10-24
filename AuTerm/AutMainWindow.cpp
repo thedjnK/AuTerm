@@ -108,22 +108,27 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     }
 #else
     //For dynamic builds, external library plugins can be loaded
-    QDir app_dir(QApplication::applicationDirPath());
-    app_dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
+    QDir lib_dir(QApplication::applicationDirPath());
+    lib_dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
 
 #ifdef _WIN32
-    app_dir.setNameFilters(QStringList() << "plugin_*.dll");
+    lib_dir.setNameFilters(QStringList() << "plugin_*.dll");
 #elif defined(__APPLE__)
-#error "Plugins are not supported on mac"
+    // On MacOs, lib_dir will be <location>/Term.app/Contents/MacOS
+    lib_dir.cdUp();
+    lib_dir.cdUp();
+    lib_dir.cd("Frameworks");
+    lib_dir.setNameFilters(QStringList() << "plugin_*.dylib");
+
 #else
-    app_dir.setNameFilters(QStringList() << "plugin_*.so");
+    lib_dir.setNameFilters(QStringList() << "plugin_*.so");
 #endif
 
-    QStringList plugin_names = app_dir.entryList();
+    QStringList plugin_names = lib_dir.entryList();
     struct plugins plugin;
     while (i < plugin_names.length())
     {
-        plugin.plugin_loader = new QPluginLoader(QString(QApplication::applicationDirPath()).append("/").append(plugin_names.at(i)));
+        plugin.plugin_loader = new QPluginLoader(lib_dir.path().append("/").append(plugin_names.at(i)));
         plugin.object = plugin.plugin_loader->instance();
 
         if (plugin.plugin_loader->isLoaded())
