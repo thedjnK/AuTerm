@@ -41,6 +41,7 @@ enum img_mgmt_commands : uint8_t {
 
 //MCUboot TLV (Tag-Length-Value) related constants
 static const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
+static const QByteArray image_tlv_magic_reverse_endian = QByteArrayLiteral("\x69\x07");
 static const uint16_t image_tlv_tag_sha256 = 0x10;
 static const uint8_t sha256_size = 32;
 static const uint8_t image_tlv_magic_size = 2;
@@ -50,6 +51,9 @@ static const uint8_t image_tlv_header_size = 4;
 static const uint8_t image_tlv_data_header_size = 4;
 
 //MCUboot header constants
+static const uint8_t ih_magic_none[] = { 0xff, 0xff, 0xff, 0xff };
+static const uint8_t ih_magic_v1[] = { 0x96, 0xf3, 0xb8, 0x3c };
+static const uint8_t ih_magic_v2[] = { 0x96, 0xf3, 0xb8, 0x3d };
 static const uint8_t ih_hdr_size_offs = 8;
 static const uint8_t ih_img_size_offs = 12;
 
@@ -131,6 +135,47 @@ smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent
     mode = MODE_IDLE;
 }
 
+bool smp_group_img_mgmt::extract_header(QByteArray *file_data, image_endian_t *endian)
+{
+    uint8_t mcuboot_magic[sizeof(ih_magic_none)];
+
+    if (file_data->length() < (int)sizeof(mcuboot_magic))
+    {
+        return false;
+    }
+
+    memcpy(mcuboot_magic, file_data->data(), sizeof(mcuboot_magic));
+
+    if (memcmp(mcuboot_magic, ih_magic_v2, sizeof(mcuboot_magic)) == 0 || memcmp(mcuboot_magic, ih_magic_v1, sizeof(mcuboot_magic)) == 0)
+    {
+        log_debug() << "Image is big endian";
+        *endian = ENDIAN_BIG;
+    }
+    else if (memcmp(mcuboot_magic, ih_magic_none, sizeof(mcuboot_magic)) == 0)
+    {
+        //As header is empty, it is not possible to know if this is big or little endian
+        log_debug() << "Image endianess is not known";
+        *endian = ENDIAN_UNKNOWN;
+    }
+    else
+    {
+        uint8_t reversed_mcuboot_magic[sizeof(ih_magic_none)] = { mcuboot_magic[3], mcuboot_magic[2], mcuboot_magic[1], mcuboot_magic[0] };
+
+        if (memcmp(reversed_mcuboot_magic, ih_magic_v2, sizeof(mcuboot_magic)) == 0 || memcmp(reversed_mcuboot_magic, ih_magic_v1, sizeof(mcuboot_magic)) == 0)
+        {
+            log_debug() << "Image is little endian";
+            *endian = ENDIAN_LITTLE;
+        }
+        else
+        {
+            log_debug() << "Image does not have MCUboot header";
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
 {
     bool found = false;
@@ -139,23 +184,59 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
     uint16_t hdr_size;
     uint32_t img_size;
 
-    hdr_size = (uint8_t)file_data->at(ih_hdr_size_offs);
-    hdr_size |= (uint16_t)((uint8_t)file_data->at(ih_hdr_size_offs + 1)) << 8;
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+    if (upload_endian != ENDIAN_BIG)
+#else
+    if (upload_endian != ENDIAN_LITTLE)
+#endif
+    {
+        hdr_size = (uint8_t)file_data->at(ih_hdr_size_offs);
+        hdr_size |= (uint16_t)((uint8_t)file_data->at(ih_hdr_size_offs + 1)) << 8;
 
-    img_size = (uint8_t)file_data->at(ih_img_size_offs);
-    img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 1)) << 8;
-    img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 2)) << 16;
-    img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 3)) << 24;
+        img_size = (uint8_t)file_data->at(ih_img_size_offs);
+        img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 1)) << 8;
+        img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 2)) << 16;
+        img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 3)) << 24;
+    }
+    else
+    {
+        hdr_size = (uint8_t)file_data->at(ih_hdr_size_offs + 1);
+        hdr_size |= (uint16_t)((uint8_t)file_data->at(ih_hdr_size_offs)) << 8;
+
+        img_size = (uint8_t)file_data->at(ih_img_size_offs + 3);
+        img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 2)) << 8;
+        img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 1)) << 16;
+        img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs)) << 24;
+    }
+
+    if (img_size >= INT32_MAX)
+    {
+        log_error() << "Decoded image size is not valid: " << img_size;
+        return false;
+    }
 
     int32_t pos = hdr_size + img_size;
     uint16_t tlv_area_length;
 
     while (pos + image_tlv_magic_size < file_data->length())
     {
-        if (file_data->mid(pos, image_tlv_magic_size) == image_tlv_magic)
+        if ((upload_endian != ENDIAN_BIG && file_data->mid(pos, image_tlv_magic_size) == image_tlv_magic) || (upload_endian == ENDIAN_BIG && file_data->mid(pos, image_tlv_magic_size) == image_tlv_magic_reverse_endian))
         {
-            tlv_area_length = (uint8_t)file_data->at(pos + image_tlv_legnth_offset_1);
-            tlv_area_length |= (uint16_t)((uint8_t)file_data->at(pos + image_tlv_legnth_offset_2)) << 8;
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+            if (upload_endian != ENDIAN_BIG)
+#else
+            if (upload_endian != ENDIAN_LITTLE)
+#endif
+            {
+                tlv_area_length = (uint8_t)file_data->at(pos + image_tlv_legnth_offset_1);
+                tlv_area_length |= (uint16_t)((uint8_t)file_data->at(pos + image_tlv_legnth_offset_2)) << 8;
+            }
+            else
+            {
+                tlv_area_length = (uint8_t)file_data->at(pos + image_tlv_legnth_offset_2);
+                tlv_area_length |= (uint16_t)((uint8_t)file_data->at(pos + image_tlv_legnth_offset_1)) << 8;
+            }
+
             found = true;
             // qDebug() << "Found magic tlv, size:" << tlv_area_length;
             break;
@@ -172,8 +253,22 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
         {
             //TODO: TLVs are > 8-bit
             uint8_t type = file_data->at(new_pos);
-            uint16_t local_length = (uint8_t)file_data->at(new_pos + image_tlv_legnth_offset_1);
-            local_length |= (uint16_t)((uint8_t)file_data->at(new_pos + image_tlv_legnth_offset_2)) << 8;
+            uint16_t local_length;
+
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+            if (upload_endian != ENDIAN_BIG)
+#else
+            if (upload_endian != ENDIAN_LITTLE)
+#endif
+            {
+                local_length = (uint8_t)file_data->at(new_pos + image_tlv_legnth_offset_1);
+                local_length |= (uint16_t)((uint8_t)file_data->at(new_pos + image_tlv_legnth_offset_2)) << 8;
+            }
+            else
+            {
+                local_length = (uint8_t)file_data->at(new_pos + image_tlv_legnth_offset_2);
+                local_length |= (uint16_t)((uint8_t)file_data->at(new_pos + image_tlv_legnth_offset_1)) << 8;
+            }
 
             //		    qDebug() << "Type " << type << ", length " << local_length;
 
@@ -960,7 +1055,13 @@ bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, 
 
     file.close();
 
-    if (extract_hash(&this->file_upload_data, &this->upload_hash) == false)
+    if (extract_header(&this->file_upload_data, &upload_endian) == false)
+    {
+        this->file_upload_data.clear();
+        emit status(smp_user_data, STATUS_ERROR, "MCUboot header was not found");
+        return false;
+    }
+    else if (extract_hash(&this->file_upload_data, &this->upload_hash) == false)
     {
         this->file_upload_data.clear();
         emit status(smp_user_data, STATUS_ERROR, "Hash was not found");

@@ -58,6 +58,13 @@ enum img_mgmt_upload_match : uint8_t {
     MATCH_PASSED
 };
 
+//Indicates the endianess of the image, if it matches the host PC or is opposite (or unknown)
+enum image_endian_t {
+    ENDIAN_BIG,
+    ENDIAN_LITTLE,
+    ENDIAN_UNKNOWN
+};
+
 class smp_group_img_mgmt : public smp_group
 {
     Q_OBJECT
@@ -79,6 +86,7 @@ signals:
     void plugin_to_hex(QByteArray *data);
 
 private:
+    bool extract_header(QByteArray *file_data, image_endian_t *endian);
     bool extract_hash(QByteArray *file_data, QByteArray *hash);
     bool parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match);
     bool parse_state_response(QCborStreamReader &reader, QString array_name);
@@ -93,6 +101,7 @@ private:
     uint32_t file_upload_area;
     QElapsedTimer upload_tmr;
     QByteArray upload_hash;
+    image_endian_t upload_endian;
     bool upgrade_only;
     uint8_t upload_repeated_parts;
     QList<image_state_t> *host_images;

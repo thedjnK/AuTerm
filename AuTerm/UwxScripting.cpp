@@ -155,7 +155,7 @@ UwxScripting::ChangeFont(
         //Set font and re-adjust tab spacing
         QFontMetrics tmTmpFM(fntTmpFnt);
         ui->edit_Script->setFont(fntTmpFnt);
-        ui->edit_Script->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
+        ui->edit_Script->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
     }
 }
 
@@ -409,18 +409,18 @@ UwxScripting::on_btn_Stop_clicked(
         if (mnRepeats > 0)
         {
             //Create text for repeat information
-            strRepeatText = QString(" with ").append(QString::number(mnRepeats)).append(" repeat").append(mnRepeats == 1 ? "" : "s").append(", ~");
             double fElapsed = (double)gtmrScriptTimer.elapsed()/1000.0;
             if (fElapsed == 0.0)
             {
                 //Avoid division by zero
                 fElapsed = 1.0;
             }
-            strRepeatText.append(QString::number(fElapsed/(double)mnRepeats, 'f', 1)).append(" seconds/loop");
+
+            strRepeatText = QString(" with %1 repeat%2, ~%3 seconds/loop").arg(QString::number(mnRepeats), (mnRepeats == 1 ? "" : "s"), QString::number(fElapsed/(double)mnRepeats, 'f', 1));
         }
 
         //Show script stopped message
-        msbStatusBar->showMessage(QString("Script stopped after ~").append(QString::number(((double)gtmrScriptTimer.elapsed()/1000.0), 'f', 1)).append(" seconds").append(strRepeatText));
+        msbStatusBar->showMessage(QString("Script stopped after ~%1 seconds%2").arg(QString::number(((double)gtmrScriptTimer.elapsed()/1000.0), 'f', 1), strRepeatText));
         gtmrScriptTimer.invalidate();
         ui->edit_Script->SetExecutionLineStatus(true);
 
@@ -585,16 +585,15 @@ UwxScripting::AdvanceLine(
     if (mnRepeats > 0)
     {
         //Create text for repeat information
-        strRepeatText = QString(" with ").append(QString::number(mnRepeats)).append(" repeat").append(mnRepeats == 1 ? "" : "s").append(", ~");
         double fElapsed = (double)gtmrScriptTimer.elapsed()/1000.0;
         if (fElapsed == 0.0)
         {
             //Avoid division by zero
             fElapsed = 1.0;
         }
-        strRepeatText.append(QString::number(fElapsed/(double)mnRepeats, 'f', 1)).append(" seconds/loop");
+        strRepeatText = QString(" with %1 repeat%2, ~%3 seconds/loop").arg(QString::number(mnRepeats), (mnRepeats == 1 ? "" : "s"), QString::number(fElapsed/(double)mnRepeats, 'f', 1));
     }
-    msbStatusBar->showMessage(QString("Script complete after ~").append(QString::number(((double)gtmrScriptTimer.elapsed()/1000.0), 'f', 1)).append(" seconds").append(strRepeatText));
+    msbStatusBar->showMessage(QString("Script complete after ~%1 seconds").arg(QString::number(((double)gtmrScriptTimer.elapsed()/1000.0), 'f', 1), strRepeatText));
     ui->progress_Complete->setValue(ui->progress_Complete->maximum());
     gtmrScriptTimer.invalidate();
 
