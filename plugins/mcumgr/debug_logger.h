@@ -49,6 +49,7 @@ class debug_logger : public QIODevice
     Q_OBJECT
 public:
     explicit debug_logger(QObject *parent = nullptr);
+    ~debug_logger();
     void find_logger_plugin(const QObject *main_window);
     void set_options(QString title, log_level_types type);
 

@@ -47,6 +47,10 @@ plugin_logger::plugin_logger(QWidget *parent) :
 
 plugin_logger::~plugin_logger()
 {
+    disconnect(this, SLOT(log_level_enabled(log_level_types, bool*)));
+    disconnect(this, SLOT(log_message(log_level_types,QString,QString)));
+    disconnect(this, SLOT(set_enabled(bool)));
+
     delete ui;
 }
 

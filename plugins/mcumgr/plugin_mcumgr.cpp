@@ -37,6 +37,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 {
     parent_window = main_window;
 
+    //Initialise transports
     uart_transport = new smp_uart(this);
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
@@ -47,10 +48,23 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     bluetooth_transport = new smp_bluetooth(this);
 #endif
 
+    //Initialise SMP-related objects
     processor = new smp_processor(this);
-    mode = ACTION_IDLE;
-    uart_transport_locked = false
+    smp_groups.fs_mgmt = new smp_group_fs_mgmt(processor);
+    smp_groups.img_mgmt = new smp_group_img_mgmt(processor);
+    smp_groups.os_mgmt = new smp_group_os_mgmt(processor);
+    smp_groups.settings_mgmt = new smp_group_settings_mgmt(processor);
+    smp_groups.shell_mgmt = new smp_group_shell_mgmt(processor);
+    smp_groups.stat_mgmt = new smp_group_stat_mgmt(processor);
+    error_lookup_form = new error_lookup(parent_window, &smp_groups);
 
+#ifndef SKIPPLUGIN_LOGGER
+    logger = new debug_logger(this);
+#endif
+
+    //Set defaults
+    mode = ACTION_IDLE;
+    uart_transport_locked = false;
     parent_row = -1;
     parent_column = -1;
     child_row = -1;
@@ -1277,7 +1291,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     //Add code
     tabWidget_orig->addTab(tab, QString("MCUmgr"));
 
-//Signals
+    //Signals
     connect(this, SIGNAL(plugin_set_status(bool,bool,bool*)), parent_window, SLOT(plugin_set_status(bool,bool,bool*)));
     connect(this, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
     connect(this, SIGNAL(plugin_to_hex(QByteArray*)), parent_window, SLOT(plugin_to_hex(QByteArray*)));
@@ -1291,10 +1305,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(parent_window, SIGNAL(plugin_serial_closed()), this, SLOT(serial_closed()));
 
     connect(uart_transport, SIGNAL(serial_write(QByteArray*)), parent_window, SLOT(plugin_serial_transmit(QByteArray*)));
-    //connect(uart, SIGNAL(receive_waiting(QByteArray)), this, SLOT(receive_waiting(QByteArray)));
     connect(uart_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
-    //connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
-    //connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     connect(udp_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
@@ -1304,7 +1315,21 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(bluetooth_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
 #endif
 
-//Form signals
+    connect(smp_groups.fs_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.fs_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.img_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.img_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.img_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
+    connect(smp_groups.os_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.os_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.settings_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.settings_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.shell_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.shell_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.stat_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.stat_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+
+    //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
     connect(btn_FS_Go, SIGNAL(clicked()), this, SLOT(on_btn_FS_Go_clicked()));
     connect(radio_FS_Upload, SIGNAL(toggled(bool)), this, SLOT(on_radio_FS_Upload_toggled(bool)));
@@ -1345,7 +1370,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_settings_decimal, SIGNAL(toggled(bool)), this, SLOT(on_radio_settings_decimal_toggled(bool)));
     connect(check_settings_big_endian, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_big_endian_toggled(bool)));
     connect(check_settings_signed_decimal_value, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
-
     connect(edit_SHELL_Output, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
 
     //Use monospace font for shell
@@ -1370,50 +1394,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     check_IMG_Preview_Bootable->installEventFilter(this);
     check_IMG_Preview_Permanent->installEventFilter(this);
 
-
-    //test
-//    emit plugin_add_open_close_button(btn_FS_Go);
-    smp_groups.fs_mgmt = new smp_group_fs_mgmt(processor);
-    smp_groups.img_mgmt = new smp_group_img_mgmt(processor);
-    smp_groups.os_mgmt = new smp_group_os_mgmt(processor);
-    smp_groups.settings_mgmt = new smp_group_settings_mgmt(processor);
-    smp_groups.shell_mgmt = new smp_group_shell_mgmt(processor);
-    smp_groups.stat_mgmt = new smp_group_stat_mgmt(processor);
-    error_lookup_form = new error_lookup(parent_window, &smp_groups);
-
-    //error_lookup_form->show();
-
-    connect(smp_groups.fs_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(smp_groups.fs_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(smp_groups.fs_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-
-    connect(smp_groups.img_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(smp_groups.img_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-    connect(smp_groups.img_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-
-    connect(smp_groups.os_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(smp_groups.os_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(smp_groups.os_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-
-    connect(smp_groups.settings_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(smp_groups.settings_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(smp_groups.settings_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-
-    connect(smp_groups.shell_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(smp_groups.shell_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(smp_groups.shell_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-
-    connect(smp_groups.stat_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
-    connect(smp_groups.stat_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
-//    connect(smp_groups.shell_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
-
     //Make shell response text edit have a monospace font
     QFont monospace_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monospace_font.setPointSize(8);
     edit_SHELL_Output->setFont(monospace_font);
 
 #ifndef SKIPPLUGIN_LOGGER
-    logger = new debug_logger(this);
     processor->set_logger(logger);
     uart_transport->set_logger(logger);
 
@@ -1438,6 +1424,82 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 plugin_mcumgr::~plugin_mcumgr()
 {
+    //Signals
+    disconnect(this, SIGNAL(plugin_set_status(bool,bool,bool*)), parent_window, SLOT(plugin_set_status(bool,bool,bool*)));
+    disconnect(this, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
+    disconnect(this, SIGNAL(plugin_to_hex(QByteArray*)), parent_window, SLOT(plugin_to_hex(QByteArray*)));
+    disconnect(this, SIGNAL(plugin_serial_open_close(uint8_t)), parent_window, SLOT(plugin_serial_open_close(uint8_t)));
+    disconnect(uart_transport, SIGNAL(serial_write(QByteArray*)), parent_window, SLOT(plugin_serial_transmit(QByteArray*)));
+
+    disconnect(parent_window, SIGNAL(plugin_serial_receive(QByteArray*)), this, SLOT(serial_receive(QByteArray*)));
+    disconnect(parent_window, SIGNAL(plugin_serial_error(QSerialPort::SerialPortError)), this, SLOT(serial_error(QSerialPort::SerialPortError)));
+    disconnect(parent_window, SIGNAL(plugin_serial_bytes_written(qint64)), this, SLOT(serial_bytes_written(qint64)));
+    disconnect(parent_window, SIGNAL(plugin_serial_about_to_close()), this, SLOT(serial_about_to_close()));
+    disconnect(parent_window, SIGNAL(plugin_serial_opened()), this, SLOT(serial_opened()));
+    disconnect(parent_window, SIGNAL(plugin_serial_closed()), this, SLOT(serial_closed()));
+
+    disconnect(processor, SLOT(message_received(smp_message*)));
+
+    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
+    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
+    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
+    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
+    disconnect(this, SLOT(group_to_hex(QByteArray*)));
+    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
+    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
+    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
+    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
+    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
+    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
+    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
+    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
+
+    //Form signals
+    disconnect(this, SLOT(on_btn_FS_Local_clicked()));
+    disconnect(this, SLOT(on_btn_FS_Go_clicked()));
+    disconnect(this, SLOT(on_radio_FS_Upload_toggled(bool)));
+    disconnect(this, SLOT(on_radio_FS_Download_toggled(bool)));
+    disconnect(this, SLOT(on_radio_FS_Size_toggled(bool)));
+    disconnect(this, SLOT(on_radio_FS_HashChecksum_toggled(bool)));
+    disconnect(this, SLOT(on_radio_FS_Hash_Checksum_Types_toggled(bool)));
+    disconnect(this, SLOT(on_btn_IMG_Local_clicked()));
+    disconnect(this, SLOT(on_btn_IMG_Go_clicked()));
+    disconnect(this, SLOT(on_radio_IMG_No_Action_toggled(bool)));
+    disconnect(this, SLOT(on_btn_IMG_Preview_Copy_clicked()));
+    disconnect(this, SLOT(on_btn_OS_Go_clicked()));
+    disconnect(this, SLOT(on_btn_STAT_Go_clicked()));
+    disconnect(this, SLOT(on_btn_SHELL_Clear_clicked()));
+    disconnect(this, SLOT(on_btn_SHELL_Copy_clicked()));
+    disconnect(this, SLOT(on_btn_transport_connect_clicked()));
+    disconnect(this, SLOT(on_colview_IMG_Images_updatePreviewWidget(QModelIndex)));
+    disconnect(this, SLOT(on_radio_transport_uart_toggled(bool)));
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    disconnect(this, SLOT(on_radio_transport_udp_toggled(bool)));
+#endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    disconnect(this, SLOT(on_radio_transport_bluetooth_toggled(bool)));
+#endif
+    disconnect(this, SLOT(on_radio_OS_Buffer_Info_toggled(bool)));
+    disconnect(this, SLOT(on_radio_OS_uname_toggled(bool)));
+    disconnect(this, SLOT(on_radio_IMG_Get_toggled(bool)));
+    disconnect(this, SLOT(on_radio_IMG_Set_toggled(bool)));
+    disconnect(this, SLOT(on_radio_settings_read_toggled(bool)));
+    disconnect(this, SLOT(on_radio_settings_write_toggled(bool)));
+    disconnect(this, SLOT(on_radio_settings_delete_toggled(bool)));
+    disconnect(this, SLOT(on_radio_settings_commit_toggled(bool)));
+    disconnect(this, SLOT(on_radio_settings_load_toggled(bool)));
+    disconnect(this, SLOT(on_radio_settings_save_toggled(bool)));
+    disconnect(this, SLOT(on_btn_settings_go_clicked()));
+    disconnect(this, SLOT(on_radio_settings_none_toggled(bool)));
+    disconnect(this, SLOT(on_radio_settings_text_toggled(bool)));
+    disconnect(this, SLOT(on_radio_settings_decimal_toggled(bool)));
+    disconnect(this, SLOT(on_check_settings_big_endian_toggled(bool)));
+    disconnect(this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
+    disconnect(this, SLOT(enter_pressed()));
+
+    //Clean up GUI
+    delete tab_2;
+
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     delete bluetooth_transport;
 #endif

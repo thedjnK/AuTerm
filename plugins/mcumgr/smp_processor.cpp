@@ -41,7 +41,16 @@ smp_processor::smp_processor(QObject *parent)
 smp_processor::~smp_processor()
 {
     cleanup();
+    disconnect(this, SLOT(message_timeout()));
     group_handlers.clear();
+
+    //Ensure object is deleted if it was part-way through creation
+    if (last_message != nullptr)
+    {
+        delete last_message;
+        last_message = nullptr;
+        last_message_header = nullptr;
+    }
 }
 
 #ifndef SKIPPLUGIN_LOGGER

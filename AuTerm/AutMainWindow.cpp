@@ -965,6 +965,14 @@ AutMainWindow::~AutMainWindow()
     disconnect(this, SLOT(update_displayText()));
     disconnect(this, SLOT(UpdateSpeedTestValues()));
     disconnect(this, SLOT(OutputSpeedTestStats()));
+#ifndef SKIPPLUGINS
+    //Plugins should disconnect these but just to be sure
+    disconnect(this, SLOT(plugin_set_status(bool,bool,bool*)));
+    disconnect(this, SLOT(plugin_add_open_close_button(QPushButton*)));
+    disconnect(this, SLOT(plugin_to_hex(QByteArray*)));
+    disconnect(this, SLOT(plugin_serial_open_close(uint8_t)));
+    disconnect(this, SLOT(plugin_serial_transmit(QByteArray*)));
+#endif
 
     if (gtmrSpeedTestDelayTimer != 0)
     {

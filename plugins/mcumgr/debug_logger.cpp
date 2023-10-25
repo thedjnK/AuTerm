@@ -31,6 +31,15 @@ debug_logger::debug_logger(QObject *parent)
     plugin_active = false;
 }
 
+debug_logger::~debug_logger()
+{
+    if (plugin_active == true)
+    {
+        logger_pointer = nullptr;
+        plugin_active = false;
+    }
+}
+
 qint64 debug_logger::readData(char *data, qint64 maxlen)
 {
     return 0;

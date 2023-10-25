@@ -37,9 +37,7 @@ smp_udp::smp_udp(QObject *parent)
     socket = new QUdpSocket(this);
     socket_is_connected = false;
 
-//    QObject::connect(socket, SIGNAL(aboutToClose()), this, SLOT(socket_abouttoclose()));
     QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(socket_readyread()));
-//    QObject::connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(socket_byteswritten(qint64)));
 //    QObject::connect(socket, SIGNAL(connected()), this, SLOT(socket_connected()));
 //    QObject::connect(socket, SIGNAL(disconnected()), this, SLOT(socket_disconnected()));
 //    QObject::connect(socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(socket_statechanged(QAbstractSocket::SocketState)));
@@ -53,14 +51,14 @@ smp_udp::~smp_udp()
 {
     delete udp_window;
 
-//    QObject::disconnect(this, SLOT(socket_abouttoclose()));
     QObject::disconnect(this, SLOT(socket_readyread()));
-//    QObject::disconnect(this, SLOT(socket_byteswritten(qint64)));
 //    QObject::disconnect(this, SLOT(socket_connected()));
 //    QObject::disconnect(this, SLOT(socket_disconnected()));
 //    QObject::disconnect(this, SLOT(socket_statechanged(QAbstractSocket::SocketState)));
 //    QObject::disconnect(this, SLOT(socket_error(QAbstractSocket::SocketError)));
 //    QObject::disconnect(this, SLOT(socket_readchannelfinished()));
+
+    QObject::disconnect(this, SLOT(connect_to_device(QString,uint16_t)));
 
     if (socket_is_connected == true)
     {
@@ -178,11 +176,6 @@ QString smp_udp::get_error_string(int error_code)
 
     return smp_transport::get_error_string(error_code);
 }
-
-void smp_udp::socket_abouttoclose()
-{
-
-}
 #endif
 
 void smp_udp::socket_readyread()
@@ -212,11 +205,6 @@ void smp_udp::socket_readyread()
 }
 
 #if 0
-void smp_udp::socket_byteswritten(qint64 bytes)
-{
-	emit bytes_written(bytes);
-}
-
 void smp_udp::socket_connected()
 {
 	emit connected();
