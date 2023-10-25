@@ -49,6 +49,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     processor = new smp_processor(this);
     mode = ACTION_IDLE;
+    uart_transport_locked = false
 
     parent_row = -1;
     parent_column = -1;
@@ -1603,6 +1604,7 @@ void plugin_mcumgr::serial_closed()
 
     mode = ACTION_IDLE;
     btn_transport_connect->setText("Open");
+    uart_transport_locked = false;
 }
 
 //Form actions
@@ -2798,7 +2800,11 @@ bool plugin_mcumgr::claim_transport(QLabel *status)
     {
         emit plugin_set_status(true, false, &successful);
 
-        if (successful == false)
+        if (successful == true)
+        {
+            uart_transport_locked = true;
+        }
+        else
         {
             status->setText("Error: Could not claim transport");
         }
@@ -2813,7 +2819,7 @@ bool plugin_mcumgr::claim_transport(QLabel *status)
 
 void plugin_mcumgr::relase_transport(void)
 {
-    if (active_transport() == uart_transport)
+    if (active_transport() == uart_transport && uart_transport_locked == true)
     {
         bool successful = false;
 

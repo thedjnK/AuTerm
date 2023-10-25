@@ -450,6 +450,7 @@ private:
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;
 #endif
+    bool uart_transport_locked;
 };
 
 #endif // PLUGIN_MCUMGR_H
