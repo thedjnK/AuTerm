@@ -18,8 +18,7 @@
 
 using namespace Qt::StringLiterals;
 
-static CborConverter cborConverter;
-static CborDiagnosticDumper cborDiagnosticDumper;
+
 
 static const char cborOptionHelp[] =
         "convert-float-to-int=yes|no    Write integers instead of floating point, if no\n"
@@ -146,15 +145,15 @@ bool CborDiagnosticDumper::probeFile(QIODevice *f) const
     return false;
 }
 
-QVariant CborDiagnosticDumper::loadFile(QIODevice *f, const Converter *&outputConverter) const
+QVariant CborDiagnosticDumper::load(QByteArray data, const Converter *&outputConverter) const
 {
     Q_UNREACHABLE();
-    Q_UNUSED(f);
+    Q_UNUSED(data);
     Q_UNUSED(outputConverter);
     return QVariant();
 }
 
-void CborDiagnosticDumper::saveFile(QIODevice *f, const QVariant &contents,
+QByteArray CborDiagnosticDumper::save(const QVariant &contents,
                                     const QStringList &options) const
 {
     QCborValue::DiagnosticNotationOptions opts = QCborValue::LineWrapped;
@@ -183,8 +182,8 @@ void CborDiagnosticDumper::saveFile(QIODevice *f, const QVariant &contents,
         exit(EXIT_FAILURE);
     }
 
-    QTextStream out(f);
-    out << convertFromVariant(contents, Double).toDiagnosticNotation(opts) << Qt::endl;
+    
+    return convertFromVariant(contents, Double).toDiagnosticNotation(opts).toUtf8();
 }
 
 CborConverter::CborConverter()
@@ -222,17 +221,11 @@ bool CborConverter::probeFile(QIODevice *f) const
 }
 
 //! [2]
-QVariant CborConverter::loadFile(QIODevice *f, const Converter *&outputConverter) const
+QVariant CborConverter::load(QByteArray data, const Converter *&outputConverter) const
 {
-    const char *ptr = nullptr;
-    if (auto file = qobject_cast<QFile *>(f))
-        ptr = reinterpret_cast<char *>(file->map(0, file->size()));
-
-    QByteArray mapped = QByteArray::fromRawData(ptr, ptr ? f->size() : 0);
-    QCborStreamReader reader(mapped);
-    if (!ptr)
-        reader.setDevice(f);
-
+    
+    QCborStreamReader reader(data);
+   
     if (reader.isTag() && reader.toTag() == QCborKnownTags::Signature)
         reader.next();
 
@@ -241,16 +234,9 @@ QVariant CborConverter::loadFile(QIODevice *f, const Converter *&outputConverter
     if (reader.lastError()) {
         fprintf(stderr, "Error loading CBOR contents (byte %lld): %s\n", offset,
                 qPrintable(reader.lastError().toString()));
-        fprintf(stderr, " bytes: %s\n",
-                (ptr ? mapped.mid(offset, 9) : f->read(9)).toHex(' ').constData());
-        exit(EXIT_FAILURE);
-    } else if (offset < mapped.size() || (!ptr && f->bytesAvailable())) {
-        fprintf(stderr, "Warning: bytes remaining at the end of the CBOR stream\n");
     }
 
     if (outputConverter == nullptr)
-        outputConverter = &cborDiagnosticDumper;
-    else if (outputConverter == null)
         return QVariant();
     else if (!outputConverter->outputOptions().testFlag(SupportsArbitraryMapKeys))
         return contents.toVariant();
@@ -258,10 +244,10 @@ QVariant CborConverter::loadFile(QIODevice *f, const Converter *&outputConverter
 }
 //! [2]
 //! [3]
-void CborConverter::saveFile(QIODevice *f, const QVariant &contents, const QStringList &options) const
+QByteArray CborConverter::save(const QVariant &contents, const QStringList &options) const
 {
     //! [3]
-    bool useSignature = true;
+    bool useSignature = false;
     bool useIntegers = true;
     enum { Yes, No, Always } useFloat16 = Yes, useFloat = Yes;
 
@@ -323,7 +309,9 @@ void CborConverter::saveFile(QIODevice *f, const QVariant &contents, const QStri
     QCborValue v =
         convertFromVariant(contents,
                            useFloat16 == Always ? Float16 : useFloat == Always ? Float : Double);
-    QCborStreamWriter writer(f);
+
+    QByteArray result;
+    QCborStreamWriter writer(&result);
     if (useSignature)
         writer.append(QCborKnownTags::Signature);
 
@@ -335,5 +323,6 @@ void CborConverter::saveFile(QIODevice *f, const QVariant &contents, const QStri
     if (useFloat16 != No)
         opts |= QCborValue::UseFloat16;
     v.toCbor(writer, opts);
+    return result;
 }
 //! [4]

@@ -58,7 +58,7 @@ class smp_message
 {
 public:
     smp_message();
-    void start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id);
+    void start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id, bool use_cbor_writer=true);
     //~smp_mesage();
     void append(const QByteArray data);
     void append(const QByteArray *data);
@@ -78,6 +78,7 @@ public:
 
 private:
     QByteArray buffer;
+    bool cbor_writer_in_use = true;
     bool header_added;
     QCborStreamWriter cbor_writer = QCborStreamWriter(&buffer);
 };

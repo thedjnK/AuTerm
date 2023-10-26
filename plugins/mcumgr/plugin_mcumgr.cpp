@@ -1298,6 +1298,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_settings_save->setText(QCoreApplication::translate("Form", "Save", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
     btn_Custom_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    edit_Custom_Request->setPlainText(QCoreApplication::translate("Form", "{\n"
+"    \"d\": \"Hello World!\"\n"
+"}", nullptr));
     lbl_Custom_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Custom), QCoreApplication::translate("Form", "Custom", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));

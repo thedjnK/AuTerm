@@ -31,7 +31,9 @@ SOURCES += \
     smp_message.cpp \
     smp_processor.cpp \
     smp_uart.cpp \
-    smp_group_img_mgmt.cpp
+    smp_group_img_mgmt.cpp \
+    converter/cborconverter.cpp \
+    converter/jsonconverter.cpp
 
 HEADERS += \
     ../../AuTerm/AutPlugin.h \
@@ -54,7 +56,10 @@ HEADERS += \
     smp_transport.h \
     smp_uart.h \
     smp_group.h \
-    smp_group_img_mgmt.h
+    smp_group_img_mgmt.h \
+    converter/converter.h \
+    converter/cborconverter.h \
+    converter/jsonconverter.h
 
 DISTFILES += plugin_mcumgr.json
 

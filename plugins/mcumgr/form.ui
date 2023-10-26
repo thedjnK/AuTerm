@@ -1816,7 +1816,13 @@
             <widget class="QPlainTextEdit" name="edit_Custom_Response"/>
            </item>
            <item row="2" column="0">
-            <widget class="QPlainTextEdit" name="edit_Custom_Request"/>
+            <widget class="QPlainTextEdit" name="edit_Custom_Request">
+             <property name="plainText">
+              <string>{
+    &quot;d&quot;: &quot;Hello World!&quot;
+}</string>
+             </property>
+            </widget>
            </item>
            <item row="1" column="0">
             <widget class="QSpinBox" name="spinBox_Custom_Command"/>

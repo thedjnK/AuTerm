@@ -21,33 +21,33 @@ public:
             append({it.key(), it.value()});
     }
 };
+
 using Map = VariantOrderedMap;
 Q_DECLARE_METATYPE(Map)
 
 class Converter
 {
 protected:
-    Converter();
+
 
 public:
-    static Converter *null;
+//    static Converter *null;
 
     enum class Direction { In = 1, Out = 2, InOut = In | Out };
     Q_DECLARE_FLAGS(Directions, Direction)
 
     enum Option { SupportsArbitraryMapKeys = 0x01 };
     Q_DECLARE_FLAGS(Options, Option)
-
-    virtual ~Converter() = 0;
+    Converter(){};
+    ~Converter(){};
 
     virtual QString name() const = 0;
     virtual Directions directions() const = 0;
     virtual Options outputOptions() const = 0;
     virtual const char *optionsHelp() const = 0;
     virtual bool probeFile(QIODevice *f) const = 0;
-    virtual QVariant loadFile(QIODevice *f, const Converter *&outputConverter) const = 0;
-    virtual void saveFile(QIODevice *f, const QVariant &contents,
-                          const QStringList &options) const = 0;
+    virtual QVariant load(QByteArray data, const Converter *&outputConverter) const = 0;
+    virtual QByteArray save(const QVariant &contents, const QStringList &options) const = 0;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Converter::Directions)

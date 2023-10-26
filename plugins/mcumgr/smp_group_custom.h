@@ -49,7 +49,7 @@ public:
     static bool error_define_lookup(int32_t rc, QString *error);
 
 private:
-    bool parse_command_response(QCborStreamReader &reader, QString *response);
+    QString parse_command_response(QByteArray data);
 
 
     QString mode_to_string(uint8_t mode);

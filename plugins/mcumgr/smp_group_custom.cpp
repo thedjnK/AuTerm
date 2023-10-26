@@ -22,10 +22,22 @@
 *******************************************************************************/
 #include "smp_group_custom.h"
 
+#include "converter/converter.h"
+#include "converter/jsonconverter.h"
+#include "converter/cborconverter.h"
+
 enum modes : uint8_t {
     MODE_IDLE = 0,
     MODE_COMMAND,
 };
+
+
+using namespace Qt::StringLiterals;
+
+static const JsonConverter jsonConverter;
+static const CborConverter cborConverter;
+static const CborDiagnosticDumper cborDiagnosticDumper;
+
 
 
 static QStringList smp_error_defines = QStringList() <<
@@ -43,78 +55,15 @@ smp_group_custom::smp_group_custom(smp_processor *parent) : smp_group(parent, "C
     mode = MODE_IDLE;
 }
 
-bool smp_group_custom::parse_command_response(QCborStreamReader &reader, QString *response)
+QString smp_group_custom::parse_command_response(QByteArray data)
 {
-    QString key = "";
-    bool keyset = true;
+    const Converter *outconv = &::jsonConverter;
+    QVariant intermediate_data = cborConverter.load(data, outconv);
+    
+    const QList<QString> options;
+    QByteArray result = outconv->save(intermediate_data, options);
 
-    while (!reader.lastError() && reader.hasNext())
-    {
-        if (keyset == false && !key.isEmpty())
-        {
-            key.clear();
-        }
-
-        keyset = false;
-
-        //	    qDebug() << "Key: " << key;
-        //	    qDebug() << "Type: " << reader.type();
-        switch (reader.type())
-        {
-            case QCborStreamReader::String:
-            {
-                QString data;
-                auto r = reader.readString();
-                while (r.status == QCborStreamReader::Ok)
-                {
-                    data.append(r.data);
-                    r = reader.readString();
-                }
-
-                if (r.status == QCborStreamReader::Error)
-                {
-                    data.clear();
-                    log_error() << "Error decoding string";
-                }
-                else
-                {
-                    if (key.isEmpty())
-                    {
-                        key = data;
-                        keyset = true;
-                    }
-                    else if (key == "r")
-                    {
-                        *response = data;
-                    }
-                }
-
-                break;
-            }
-
-            case QCborStreamReader::Array:
-            case QCborStreamReader::Map:
-            {
-                reader.enterContainer();
-                while (reader.lastError() == QCborError::NoError && reader.hasNext())
-                {
-                    parse_command_response(reader, response);
-                }
-                if (reader.lastError() == QCborError::NoError)
-                {
-                    reader.leaveContainer();
-                }
-                break;
-            }
-
-            default:
-            {
-                reader.next();
-            }
-        }
-    }
-
-    return true;
+    return QString(result);
 }
 
 
@@ -144,9 +93,7 @@ void smp_group_custom::receive_ok(uint8_t version, uint8_t op, uint16_t group, u
         {
             log_debug() << "decoding custom echo";
             //Response to set image state
-            QString response;
-            QCborStreamReader cbor_reader(data);
-            bool good = parse_command_response(cbor_reader, &response);
+            QString response = parse_command_response(data);
             emit status(smp_user_data, STATUS_COMPLETE, response);
         }
       
@@ -206,15 +153,20 @@ void smp_group_custom::cancel()
 
 bool smp_group_custom::start_command(int group_id, int command_id, QString data)
 {
+    const Converter *outconv = &::cborConverter;
+    QVariant intermediate_data = jsonConverter.load(data.toUtf8(), outconv);
+
+    const QList<QString> options;
+    QByteArray cbor = outconv->save(intermediate_data, options);
+
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, group_id, command_id);
-    tmp_message->writer()->append("d");
-    tmp_message->writer()->append(data);
+    
+    // start message without cbor writer
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, group_id, command_id, false);
+    tmp_message->append(cbor);
     tmp_message->end_message();
 
     mode = MODE_COMMAND;
-
-    //	    qDebug() << "len: " << message.length();
 
     processor->send(SMP_GROUP_ID_CUSTOM, tmp_message, smp_timeout, smp_retries, true);
 

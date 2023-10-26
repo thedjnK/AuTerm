@@ -11,7 +11,6 @@
 
 using namespace Qt::StringLiterals;
 
-static JsonConverter jsonConverter;
 
 static const char jsonOptionHelp[] = "compact=no|yes              Use compact JSON form.\n";
 
@@ -19,7 +18,7 @@ static QJsonDocument convertFromVariant(const QVariant &v)
 {
     QJsonDocument doc = QJsonDocument::fromVariant(v);
     if (!doc.isObject() && !doc.isArray()) {
-        fprintf(stderr, "Could not convert contents to JSON.\n");
+        qDebug()<< "Could not convert contents to JSON.";
         exit(EXIT_FAILURE);
     }
     return doc;
@@ -59,33 +58,28 @@ bool JsonConverter::probeFile(QIODevice *f) const
     return false;
 }
 
-QVariant JsonConverter::loadFile(QIODevice *f, const Converter *&outputConverter) const
+QVariant JsonConverter::load(QByteArray data, const Converter *&outputConverter) const
 {
     if (!outputConverter)
         outputConverter = this;
 
     QJsonParseError error;
     QJsonDocument doc;
-    if (auto file = qobject_cast<QFile *>(f)) {
-        const char *ptr = reinterpret_cast<char *>(file->map(0, file->size()));
-        if (ptr)
-            doc = QJsonDocument::fromJson(QByteArray::fromRawData(ptr, file->size()), &error);
-    }
+    
 
-    if (doc.isNull())
-        doc = QJsonDocument::fromJson(f->readAll(), &error);
+    doc = QJsonDocument::fromJson(data, &error);
+ 
     if (error.error) {
         fprintf(stderr, "Could not parse JSON content: offset %d: %s",
                 error.offset, qPrintable(error.errorString()));
         exit(EXIT_FAILURE);
     }
-    if (outputConverter == null)
+    if (outputConverter == nullptr)
         return QVariant();
     return doc.toVariant();
 }
 
-void JsonConverter::saveFile(QIODevice *f, const QVariant &contents,
-                             const QStringList &options) const
+QByteArray JsonConverter::save(const QVariant &contents, const QStringList &options) const
 {
     QJsonDocument::JsonFormat format = QJsonDocument::Indented;
     for (const QString &s : options) {
@@ -100,5 +94,5 @@ void JsonConverter::saveFile(QIODevice *f, const QVariant &contents,
         }
     }
 
-    f->write(convertFromVariant(contents).toJson(format));
+    return convertFromVariant(contents).toJson(format);
 }
