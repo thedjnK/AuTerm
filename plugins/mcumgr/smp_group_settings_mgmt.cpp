@@ -328,7 +328,7 @@ bool smp_group_settings_mgmt::start_read(QString name, uint32_t max_length, QByt
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_SETTINGS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -347,7 +347,7 @@ bool smp_group_settings_mgmt::start_write(QString name, QByteArray value)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_SETTINGS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -364,7 +364,7 @@ bool smp_group_settings_mgmt::start_delete(QString name)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_SETTINGS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -379,7 +379,7 @@ bool smp_group_settings_mgmt::start_commit(void)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_SETTINGS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -394,7 +394,7 @@ bool smp_group_settings_mgmt::start_load(void)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_SETTINGS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -409,7 +409,7 @@ bool smp_group_settings_mgmt::start_save(void)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_SETTINGS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }

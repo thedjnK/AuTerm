@@ -258,7 +258,7 @@ bool smp_group_shell_mgmt::start_execute(QStringList *arguments, int32_t *ret)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_SHELL, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }

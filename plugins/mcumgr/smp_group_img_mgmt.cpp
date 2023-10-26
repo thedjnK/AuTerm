@@ -695,7 +695,7 @@ log_error() << "Going in circles...";
 
         //      qDebug() << "len: " << tmp_message->data()->length();
 
-        processor->send(tmp_message, smp_timeout, smp_retries, (this->file_upload_area == 0 ? true : false));
+        processor->send(SMP_GROUP_ID_IMG, tmp_message, smp_timeout, smp_retries, (this->file_upload_area == 0 ? true : false));
     }
     else
     {
@@ -911,7 +911,7 @@ bool smp_group_img_mgmt::start_image_get(QList<image_state_t> *images)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_IMG, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -937,7 +937,7 @@ bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm, QList<i
     tmp_message->end_message();
 
     mode = MODE_SET_IMAGE;
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_IMG, tmp_message, smp_timeout, smp_retries, true);
 
 //    lbl_IMG_Status->setText(QString("Marking image ").append(radio_IMG_Test->isChecked() ? "for test." : "as confirmed."));
 
@@ -997,7 +997,7 @@ bool smp_group_img_mgmt::start_image_erase(uint8_t slot)
     tmp_message->end_message();
 
     mode = MODE_ERASE_IMAGE;
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_IMG, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }

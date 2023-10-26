@@ -345,7 +345,7 @@ bool smp_group_stat_mgmt::start_group_data(QString name, QList<stat_value_t> *st
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_STATS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -361,7 +361,7 @@ bool smp_group_stat_mgmt::start_list_groups(QStringList *groups)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_STATS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }

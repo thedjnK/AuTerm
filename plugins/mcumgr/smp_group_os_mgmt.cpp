@@ -879,7 +879,7 @@ bool smp_group_os_mgmt::start_echo(QString data)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_OS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -896,7 +896,7 @@ bool smp_group_os_mgmt::start_task_stats(QList<task_list_t> *tasks)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_OS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -913,7 +913,7 @@ bool smp_group_os_mgmt::start_memory_pool(QList<memory_pool_t> *memory)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_OS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -933,7 +933,7 @@ bool smp_group_os_mgmt::start_reset(bool force)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_OS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -948,7 +948,7 @@ bool smp_group_os_mgmt::start_mcumgr_parameters()
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_OS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -970,7 +970,7 @@ bool smp_group_os_mgmt::start_os_application_info(QString format)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_OS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -998,7 +998,7 @@ bool smp_group_os_mgmt::start_bootloader_info(QString query, QVariant *response)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_OS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }

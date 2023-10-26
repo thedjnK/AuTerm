@@ -51,7 +51,7 @@ void smp_processor::set_logger(debug_logger *object)
 }
 #endif
 
-bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check)
+bool smp_processor::send(uint32_t group_id, smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check)
 {
     if (busy)
     {
@@ -60,7 +60,7 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repe
 
     last_message = message;
     last_message_header = message->get_header();
-
+    last_sender_group_id = group_id;
     //Set message sequence
     last_message_header->nh_seq = sequence;
     last_message_version_check = allow_version_check;
@@ -81,12 +81,12 @@ bool smp_processor::is_busy()
     return busy;
 }
 
-void smp_processor::register_handler(uint16_t group, smp_group *handler)
+void smp_processor::register_handler(uint32_t group, smp_group *handler)
 {
     group_handlers.append(smp_group_match_t{group, handler});
 }
 
-void smp_processor::unregister_handler(uint16_t group)
+void smp_processor::unregister_handler(uint32_t group)
 {
     uint8_t i = 0;
     while (i < group_handlers.length())
@@ -139,17 +139,8 @@ void smp_processor::message_timeout()
 #endif
 
         //Search for the handler for this group
-        while (i < group_handlers.length())
-        {
-            if (group_handlers[i].group == group)
-            {
-                break;
-            }
-
-            ++i;
-        }
-
-        if (i == group_handlers.length())
+        int idx = get_group_handler_idx(group);
+        if(idx<0)
         {
             //There is no registered handler for this group
             log_error() << "No registered handler for group " << group << ", cannot send timeout message.";
@@ -163,7 +154,7 @@ void smp_processor::message_timeout()
             last_message_header = nullptr;
 
             cleanup();
-            group_handlers[i].handler->timeout(backup_message);
+            group_handlers[idx].handler->timeout(backup_message);
 
             //Delete backup pointer
             delete backup_message;
@@ -189,6 +180,31 @@ void smp_processor::message_timeout()
     --repeat_times;
     repeat_timer.start();
     transport->send(last_message);
+}
+
+int smp_processor::get_group_handler_idx(uint16_t group){
+    log_debug() << "finding handler, group is" << group << " last sender " << last_sender_group_id;
+    if(last_sender_group_id != (uint32_t)group) 
+    {
+        return -1;
+    }
+    int i = 0;
+    while (i < group_handlers.length())
+    {
+        if (group_handlers[i].group == last_sender_group_id)
+        {
+            break;
+        }
+
+        ++i;
+    }
+    if (i == group_handlers.length())
+    {
+        //There is no registered handler for this group,
+        return -2;
+    }
+    return i;
+
 }
 
 void smp_processor::message_received(smp_message *response)
@@ -242,19 +258,9 @@ void smp_processor::message_received(smp_message *response)
 #endif
 
         //Search for the handler for this group
-        while (i < group_handlers.length())
-        {
-            if (group_handlers[i].group == group)
-            {
-                break;
-            }
-
-            ++i;
-        }
-
-        if (i == group_handlers.length())
-        {
-            //There is no registered handler for this group, clean up
+        int idx = get_group_handler_idx(group);
+        if(idx<0)
+        {// clean up
             log_error() << "No registered handler for group " << group << ", dropping response.";
             this->cleanup();
             return;
@@ -277,12 +283,12 @@ void smp_processor::message_received(smp_message *response)
         if (error.type != SMP_ERROR_NONE)
         {
             //Received either "rc" (legacy/SMP version 1) error or "err" error (SMP version 2)
-            group_handlers[i].handler->receive_error(version, op, group, command, error);
+            group_handlers[idx].handler->receive_error(version, op, group, command, error);
         }
         else
         {
             //No error, good response
-            group_handlers[i].handler->receive_ok(version, op, group, command, response->contents());
+            group_handlers[idx].handler->receive_ok(version, op, group, command, response->contents());
         }
     }
 }

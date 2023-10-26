@@ -38,7 +38,8 @@ enum group_status : uint8_t {
     STATUS_CANCELLED
 };
 
-enum smp_group_ids : uint16_t {
+enum smp_group_ids : uint32_t {
+    
     SMP_GROUP_ID_OS = 0,
     SMP_GROUP_ID_IMG,
     SMP_GROUP_ID_STATS,
@@ -54,7 +55,7 @@ class smp_group : public QObject
     Q_OBJECT
 
 public:
-    smp_group(smp_processor *parent, QString group_name, uint16_t group_id, smp_error_lookup error_lookup_function, smp_error_define_lookup error_define_lookup_function)
+    smp_group(smp_processor *parent, QString group_name, uint32_t group_id, smp_error_lookup error_lookup_function, smp_error_define_lookup error_define_lookup_function)
     {
         processor = parent;
         processor->register_handler(group_id, this);

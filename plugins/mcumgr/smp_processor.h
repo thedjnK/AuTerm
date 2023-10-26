@@ -36,7 +36,7 @@
 class smp_group;
 
 struct smp_group_match_t {
-    uint16_t group;
+    uint32_t group;
     smp_group *handler;
 };
 
@@ -50,10 +50,10 @@ public:
 #ifndef SKIPPLUGIN_LOGGER
     void set_logger(debug_logger *object);
 #endif
-    bool send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check);
+    bool send(uint32_t group_id, smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check);
     bool is_busy();
-    void register_handler(uint16_t group, smp_group *handler);
-    void unregister_handler(uint16_t group);
+    void register_handler(uint32_t group, smp_group *handler);
+    void unregister_handler(uint32_t group);
     void set_transport(smp_transport *transport_object);
     uint16_t max_message_data_size(uint16_t mtu);
 
@@ -75,7 +75,9 @@ private:
     QTimer repeat_timer;
     uint8_t repeat_times;
     bool busy;
+    uint32_t last_sender_group_id;
     QList<smp_group_match_t> group_handlers;
+    int get_group_handler_idx(uint16_t group);
 
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;

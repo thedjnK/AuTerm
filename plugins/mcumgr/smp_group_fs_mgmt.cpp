@@ -870,7 +870,7 @@ void smp_group_fs_mgmt::upload_chunk()
     //TODO: Not always true
     file_upload_area += 64;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_FS, tmp_message, smp_timeout, smp_retries, true);
 }
 
 void smp_group_fs_mgmt::download_chunk()
@@ -890,7 +890,7 @@ void smp_group_fs_mgmt::download_chunk()
     tmp_message->writer()->append(file_upload_area);
     tmp_message->end_message();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_FS, tmp_message, smp_timeout, smp_retries, true);
 }
 
 bool smp_group_fs_mgmt::start_upload(QString file_name, QString destination_name)
@@ -951,7 +951,7 @@ bool smp_group_fs_mgmt::start_status(QString file_name, uint32_t *file_size)
     file_size_object = file_size;
     *file_size = 0;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_FS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -972,7 +972,7 @@ bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_chec
     file_size_object = file_size;
     *file_size = 0;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_FS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -986,7 +986,7 @@ bool smp_group_fs_mgmt::start_supported_hashes_checksums(QList<hash_checksum_t> 
     mode = MODE_SUPPORTED_HASHES_CHECKSUMS;
     hash_checksum_object = hash_checksum_list;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_FS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
@@ -999,7 +999,7 @@ bool smp_group_fs_mgmt::start_file_close()
 
     mode = MODE_FILE_CLOSE;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    processor->send(SMP_GROUP_ID_FS, tmp_message, smp_timeout, smp_retries, true);
 
     return true;
 }
