@@ -48,6 +48,8 @@ enum smp_group_ids : uint32_t {
     SMP_GROUP_ID_SHELL,
     SMP_GROUP_ID_ZBASIC = 63,
     SMP_GROUP_ID_USER_DEFINED,
+    SMP_GROUP_ID_MAX = 0xffff,
+    SMP_GROUP_ID_CUSTOM,
 };
 
 class smp_group : public QObject

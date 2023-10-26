@@ -184,7 +184,7 @@ void smp_processor::message_timeout()
 
 int smp_processor::get_group_handler_idx(uint16_t group){
     log_debug() << "finding handler, group is" << group << " last sender " << last_sender_group_id;
-    if(last_sender_group_id != (uint32_t)group) 
+    if(last_sender_group_id != (uint32_t)group && last_sender_group_id!=SMP_GROUP_ID_CUSTOM)
     {
         return -1;
     }
@@ -287,7 +287,7 @@ void smp_processor::message_received(smp_message *response)
         }
         else
         {
-            //No error, good response
+                        //No error, good response
             group_handlers[idx].handler->receive_ok(version, op, group, command, response->contents());
         }
     }

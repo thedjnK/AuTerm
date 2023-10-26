@@ -43,6 +43,7 @@
 #include "smp_group_settings_mgmt.h"
 #include "smp_group_shell_mgmt.h"
 #include "smp_group_stat_mgmt.h"
+#include "smp_group_custom.h"
 #include "smp_error.h"
 #include "smp_group_array.h"
 #include "error_lookup.h"
@@ -120,6 +121,8 @@ enum mcumgr_action_t {
     ACTION_SETTINGS_COMMIT,
     ACTION_SETTINGS_LOAD,
     ACTION_SETTINGS_SAVE,
+
+    ACTION_CUSTOM_REQUEST,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin
@@ -175,6 +178,7 @@ private slots:
     void on_radio_IMG_No_Action_toggled(bool checked);
     void on_btn_IMG_Preview_Copy_clicked();
     void on_btn_OS_Go_clicked();
+    void on_btn_Custom_Go_clicked();
     void on_btn_STAT_Go_clicked();
     void on_btn_SHELL_Clear_clicked();
     void on_btn_SHELL_Copy_clicked();

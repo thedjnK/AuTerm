@@ -23,6 +23,7 @@ private slots:
     void on_radio_IMG_No_Action_toggled(bool checked);
     void on_btn_IMG_Preview_Copy_clicked();
     void on_btn_OS_Go_clicked();
+    void on_btn_Custom_Go_clicked();
     void on_btn_SHELL_Go_clicked();
     void on_btn_STAT_Go_clicked();
     void on_btn_SHELL_Clear_clicked();
@@ -53,6 +54,7 @@ private slots:
     void on_check_settings_big_endian_toggled(bool checked);
     void on_check_settings_signed_decimal_value_toggled(bool checked);
     void on_edit_SHELL_Input_returnPressed();
+
 
 private:
     Ui::Form *ui;

@@ -204,3 +204,9 @@ void Form::on_edit_SHELL_Input_returnPressed()
 {
 
 }
+
+void Form::on_btn_Custom_Go_clicked()
+{
+
+}
+

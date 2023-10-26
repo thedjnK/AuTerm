@@ -1168,7 +1168,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(6);
+    tabWidget_2->setCurrentIndex(1);
     tabWidget_3->setCurrentIndex(0);
     selector_OS->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
@@ -1356,6 +1356,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_IMG_Preview_Copy, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Preview_Copy_clicked()));
     connect(btn_OS_Go, SIGNAL(clicked()), this, SLOT(on_btn_OS_Go_clicked()));
     connect(btn_STAT_Go, SIGNAL(clicked()), this, SLOT(on_btn_STAT_Go_clicked()));
+    connect(btn_Custom_Go, SIGNAL(clicked()), this, SLOT(on_btn_Custom_Go_clicked()));
     connect(btn_SHELL_Clear, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Clear_clicked()));
     connect(btn_SHELL_Copy, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Copy_clicked()));
     connect(btn_transport_connect, SIGNAL(clicked()), this, SLOT(on_btn_transport_connect_clicked()));
@@ -1417,6 +1418,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.settings_mgmt = new smp_group_settings_mgmt(processor);
     smp_groups.shell_mgmt = new smp_group_shell_mgmt(processor);
     smp_groups.stat_mgmt = new smp_group_stat_mgmt(processor);
+    smp_groups.custom = new smp_group_custom(processor);
     error_lookup_form = new error_lookup(parent_window, &smp_groups);
 
     //error_lookup_form->show();
@@ -1445,6 +1447,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(smp_groups.stat_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 //    connect(smp_groups.shell_mgmt, SIGNAL(plugin_to_hex(QByteArray*)), this, SLOT(group_to_hex(QByteArray*)));
 
+    connect(smp_groups.custom, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.custom, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
     //Make shell response text edit have a monospace font
     QFont monospace_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monospace_font.setPointSize(8);
@@ -1469,6 +1473,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.settings_mgmt->set_logger(logger);
     smp_groups.shell_mgmt->set_logger(logger);
     smp_groups.stat_mgmt->set_logger(logger);
+    smp_groups.custom->set_logger(logger);
 #endif
 
     edit_SHELL_Output->set_serial_open(true);
@@ -1491,6 +1496,7 @@ plugin_mcumgr::~plugin_mcumgr()
     delete smp_groups.os_mgmt;
     delete smp_groups.img_mgmt;
     delete smp_groups.fs_mgmt;
+    delete smp_groups.custom;
     delete processor;
     delete uart_transport;
 
@@ -1632,6 +1638,12 @@ void plugin_mcumgr::serial_closed()
         case ACTION_SETTINGS_SAVE:
         {
             smp_groups.settings_mgmt->cancel();
+            break;
+        }
+
+        case ACTION_CUSTOM_REQUEST:
+        {
+            smp_groups.custom->cancel();
             break;
         }
 
@@ -2178,6 +2190,41 @@ void plugin_mcumgr::on_btn_SHELL_Copy_clicked()
     QApplication::clipboard()->setText(edit_SHELL_Output->toPlainText());
 }
 
+void plugin_mcumgr::on_btn_Custom_Go_clicked()
+{
+    bool started = false;
+
+    if (claim_transport(lbl_Custom_Status) == false)
+    {
+        return;
+    }
+
+    if (edit_Custom_Request->toPlainText().isEmpty())
+    {
+        lbl_Custom_Status->setText("Error: No message to send");
+    }
+    else
+    {
+        edit_Custom_Response->clear();
+        mode = ACTION_CUSTOM_REQUEST;
+        processor->set_transport(active_transport());
+        smp_groups.custom->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        
+        started = smp_groups.custom->start_command(spinBox_Custom_Group->value(), spinBox_Custom_Command->value(), edit_Custom_Request->toPlainText());
+
+        if (started == true)
+        {
+            lbl_Custom_Status->setText("Message sent...");
+        }
+    }
+    
+ 
+    if (started == false)
+    {
+        relase_transport();
+    }
+}
+
 void plugin_mcumgr::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index)
 {
     uint8_t i = 0;
@@ -2644,7 +2691,24 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
         }
     }
+    else if (sender() == smp_groups.custom)
+    {
+        log_debug() << "custom sender";
+        label_status = lbl_Custom_Status;
 
+        if (status == STATUS_COMPLETE)
+        {
+            log_debug() << "complete";
+
+            if (user_data == ACTION_CUSTOM_REQUEST)
+            {
+                edit_Custom_Response->appendPlainText(error_string);
+                error_string = nullptr;
+            }
+           
+        }
+    }
+    
     if (finished == true)
     {
         mode = ACTION_IDLE;
