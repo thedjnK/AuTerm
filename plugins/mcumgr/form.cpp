@@ -210,3 +210,9 @@ void Form::on_btn_Custom_Go_clicked()
 
 }
 
+
+void Form::on_btn_Custom_RW_Toggle_clicked()
+{
+
+}
+

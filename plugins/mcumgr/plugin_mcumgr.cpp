@@ -1043,36 +1043,65 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_Custom->setObjectName("tab_Custom");
     gridLayout_17 = new QGridLayout(tab_Custom);
     gridLayout_17->setObjectName("gridLayout_17");
-    spinBox_Custom_Group = new QSpinBox(tab_Custom);
-    spinBox_Custom_Group->setObjectName("spinBox_Custom_Group");
-    spinBox_Custom_Group->setValue(64);
+    edit_Custom_Response = new QPlainTextEdit(tab_Custom);
+    edit_Custom_Response->setObjectName("edit_Custom_Response");
 
-    gridLayout_17->addWidget(spinBox_Custom_Group, 0, 0, 1, 1);
+    gridLayout_17->addWidget(edit_Custom_Response, 7, 0, 1, 1);
 
     btn_Custom_Go = new QPushButton(tab_Custom);
     btn_Custom_Go->setObjectName("btn_Custom_Go");
 
-    gridLayout_17->addWidget(btn_Custom_Go, 5, 0, 1, 1);
-
-    edit_Custom_Response = new QPlainTextEdit(tab_Custom);
-    edit_Custom_Response->setObjectName("edit_Custom_Response");
-
-    gridLayout_17->addWidget(edit_Custom_Response, 3, 0, 1, 1);
-
-    edit_Custom_Request = new QPlainTextEdit(tab_Custom);
-    edit_Custom_Request->setObjectName("edit_Custom_Request");
-
-    gridLayout_17->addWidget(edit_Custom_Request, 2, 0, 1, 1);
-
-    spinBox_Custom_Command = new QSpinBox(tab_Custom);
-    spinBox_Custom_Command->setObjectName("spinBox_Custom_Command");
-
-    gridLayout_17->addWidget(spinBox_Custom_Command, 1, 0, 1, 1);
+    gridLayout_17->addWidget(btn_Custom_Go, 9, 0, 1, 1);
 
     lbl_Custom_Status = new QLabel(tab_Custom);
     lbl_Custom_Status->setObjectName("lbl_Custom_Status");
 
-    gridLayout_17->addWidget(lbl_Custom_Status, 4, 0, 1, 1);
+    gridLayout_17->addWidget(lbl_Custom_Status, 8, 0, 1, 1);
+
+    edit_Custom_Request = new QPlainTextEdit(tab_Custom);
+    edit_Custom_Request->setObjectName("edit_Custom_Request");
+
+    gridLayout_17->addWidget(edit_Custom_Request, 6, 0, 1, 1);
+
+    horizontalLayout_18 = new QHBoxLayout();
+    horizontalLayout_18->setObjectName("horizontalLayout_18");
+    lbl_Custom_Group = new QLabel(tab_Custom);
+    lbl_Custom_Group->setObjectName("lbl_Custom_Group");
+    lbl_Custom_Group->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+    horizontalLayout_18->addWidget(lbl_Custom_Group);
+
+    spinBox_Custom_Group = new QSpinBox(tab_Custom);
+    spinBox_Custom_Group->setObjectName("spinBox_Custom_Group");
+    spinBox_Custom_Group->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+    spinBox_Custom_Group->setValue(64);
+
+    horizontalLayout_18->addWidget(spinBox_Custom_Group);
+
+    lbl_Custom_Command = new QLabel(tab_Custom);
+    lbl_Custom_Command->setObjectName("lbl_Custom_Command");
+    lbl_Custom_Command->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+    horizontalLayout_18->addWidget(lbl_Custom_Command);
+
+    spinBox_Custom_Command = new QSpinBox(tab_Custom);
+    spinBox_Custom_Command->setObjectName("spinBox_Custom_Command");
+
+    horizontalLayout_18->addWidget(spinBox_Custom_Command);
+
+    lbl_Custom_Mode = new QLabel(tab_Custom);
+    lbl_Custom_Mode->setObjectName("lbl_Custom_Mode");
+    lbl_Custom_Mode->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+    horizontalLayout_18->addWidget(lbl_Custom_Mode);
+
+    btn_Custom_RW_Toggle = new QPushButton(tab_Custom);
+    btn_Custom_RW_Toggle->setObjectName("btn_Custom_RW_Toggle");
+
+    horizontalLayout_18->addWidget(btn_Custom_RW_Toggle);
+
+
+    gridLayout_17->addLayout(horizontalLayout_18, 0, 0, 1, 1);
 
     tabWidget_2->addTab(tab_Custom, QString());
 
@@ -1298,10 +1327,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_settings_save->setText(QCoreApplication::translate("Form", "Save", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
     btn_Custom_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    lbl_Custom_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     edit_Custom_Request->setPlainText(QCoreApplication::translate("Form", "{\n"
 "    \"d\": \"Hello World!\"\n"
 "}", nullptr));
-    lbl_Custom_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    lbl_Custom_Group->setText(QCoreApplication::translate("Form", "Group:", nullptr));
+    lbl_Custom_Command->setText(QCoreApplication::translate("Form", "Command:", nullptr));
+    lbl_Custom_Mode->setText(QCoreApplication::translate("Form", "Mode:", nullptr));
+    btn_Custom_RW_Toggle->setText(QCoreApplication::translate("Form", "Read", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Custom), QCoreApplication::translate("Form", "Custom", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
@@ -1360,6 +1393,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_OS_Go, SIGNAL(clicked()), this, SLOT(on_btn_OS_Go_clicked()));
     connect(btn_STAT_Go, SIGNAL(clicked()), this, SLOT(on_btn_STAT_Go_clicked()));
     connect(btn_Custom_Go, SIGNAL(clicked()), this, SLOT(on_btn_Custom_Go_clicked()));
+    connect(btn_Custom_RW_Toggle, SIGNAL(clicked()), this, SLOT(on_btn_Custom_RW_Toggle_clicked()));
     connect(btn_SHELL_Clear, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Clear_clicked()));
     connect(btn_SHELL_Copy, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Copy_clicked()));
     connect(btn_transport_connect, SIGNAL(clicked()), this, SLOT(on_btn_transport_connect_clicked()));
@@ -2193,6 +2227,16 @@ void plugin_mcumgr::on_btn_SHELL_Copy_clicked()
     QApplication::clipboard()->setText(edit_SHELL_Output->toPlainText());
 }
 
+void plugin_mcumgr::on_btn_Custom_RW_Toggle_clicked()
+{
+    if(btn_Custom_RW_Toggle->text()=="Read"){
+        btn_Custom_RW_Toggle->setText("Write");
+    }
+    else {
+        btn_Custom_RW_Toggle->setText("Read");
+    }
+}
+
 void plugin_mcumgr::on_btn_Custom_Go_clicked()
 {
     bool started = false;
@@ -2213,7 +2257,10 @@ void plugin_mcumgr::on_btn_Custom_Go_clicked()
         processor->set_transport(active_transport());
         smp_groups.custom->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
         
-        started = smp_groups.custom->start_command(spinBox_Custom_Group->value(), spinBox_Custom_Command->value(), edit_Custom_Request->toPlainText());
+        int group_id = spinBox_Custom_Group->value();
+        int command_id = spinBox_Custom_Command->value();
+        bool read = btn_Custom_RW_Toggle->text()=="Read";
+        started = smp_groups.custom->start_command(group_id, command_id, read, edit_Custom_Request->toPlainText());
 
         if (started == true)
         {

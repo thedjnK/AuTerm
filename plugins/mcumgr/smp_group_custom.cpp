@@ -116,8 +116,8 @@ void smp_group_custom::receive_error(uint8_t version, uint8_t op, uint16_t group
 
     if (mode == MODE_COMMAND)
     {
-        //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+
+        emit status(smp_user_data, STATUS_ERROR, QString("Error: rc %1, group %2:  %3").arg(QString::number(error.rc), QString::number(error.group), smp_error::error_lookup_string(&error)) );
     }
     else
     {
@@ -151,7 +151,7 @@ void smp_group_custom::cancel()
     }
 }
 
-bool smp_group_custom::start_command(int group_id, int command_id, QString data)
+bool smp_group_custom::start_command(int group_id, int command_id, bool read, QString data)
 {
     const Converter *outconv = &::cborConverter;
     QVariant intermediate_data = jsonConverter.load(data.toUtf8(), outconv);
@@ -162,7 +162,7 @@ bool smp_group_custom::start_command(int group_id, int command_id, QString data)
     smp_message *tmp_message = new smp_message();
     
     // start message without cbor writer
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, group_id, command_id, false);
+    tmp_message->start_message(read ? SMP_OP_READ : SMP_OP_WRITE, smp_version, group_id, command_id, false);
     tmp_message->append(cbor);
     tmp_message->end_message();
 

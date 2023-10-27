@@ -1798,24 +1798,24 @@
            <string>Custom</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_17">
-           <item row="0" column="0">
-            <widget class="QSpinBox" name="spinBox_Custom_Group">
-             <property name="value">
-              <number>64</number>
-             </property>
-            </widget>
+           <item row="7" column="0">
+            <widget class="QPlainTextEdit" name="edit_Custom_Response"/>
            </item>
-           <item row="5" column="0">
+           <item row="9" column="0">
             <widget class="QPushButton" name="btn_Custom_Go">
              <property name="text">
               <string>Go</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QPlainTextEdit" name="edit_Custom_Response"/>
+           <item row="8" column="0">
+            <widget class="QLabel" name="lbl_Custom_Status">
+             <property name="text">
+              <string>[Status]</string>
+             </property>
+            </widget>
            </item>
-           <item row="2" column="0">
+           <item row="6" column="0">
             <widget class="QPlainTextEdit" name="edit_Custom_Request">
              <property name="plainText">
               <string>{
@@ -1824,15 +1824,59 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QSpinBox" name="spinBox_Custom_Command"/>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="lbl_Custom_Status">
-             <property name="text">
-              <string>[Status]</string>
-             </property>
-            </widget>
+           <item row="0" column="0">
+            <layout class="QHBoxLayout" name="horizontalLayout_18">
+             <item>
+              <widget class="QLabel" name="lbl_Custom_Group">
+               <property name="text">
+                <string>Group:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spinBox_Custom_Group">
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
+               <property name="value">
+                <number>64</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_Custom_Command">
+               <property name="text">
+                <string>Command:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spinBox_Custom_Command"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_Custom_Mode">
+               <property name="text">
+                <string>Mode:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_Custom_RW_Toggle">
+               <property name="text">
+                <string>Read</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>

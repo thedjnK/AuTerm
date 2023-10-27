@@ -43,7 +43,7 @@ public:
     void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
     void timeout(smp_message *message);
     void cancel();
-    bool start_command(int group_id, int command_id, QString data);
+    bool start_command(int group_id, int command_id, bool read, QString data);
 
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
