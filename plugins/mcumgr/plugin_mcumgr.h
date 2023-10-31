@@ -135,9 +135,7 @@ public:
     const QString plugin_about();
     bool plugin_configuration();
     static QMainWindow *get_main_window();
-#ifndef SKIPPLUGIN_LOGGER
     void setup_finished();
-#endif
 
 signals:
     void show_message_box(QString str_message);

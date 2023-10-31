@@ -26,12 +26,13 @@
 #include <QInputDialog>
 
 udp_setup *udp_window;
+QMainWindow *main_window;
 
 smp_udp::smp_udp(QObject *parent)
 {
     Q_UNUSED(parent);
 
-    QMainWindow *main_window = plugin_mcumgr::get_main_window();
+    main_window = plugin_mcumgr::get_main_window();
     udp_window = new udp_setup(nullptr);
 
     socket = new QUdpSocket(this);
@@ -45,12 +46,12 @@ smp_udp::smp_udp(QObject *parent)
 //    QObject::connect(socket, SIGNAL(readChannelFinished()), this, SLOT(socket_readchannelfinished()));
 
     QObject::connect(udp_window, SIGNAL(connect_to_device(QString,uint16_t)), this, SLOT(connect_to_device(QString,uint16_t)));
+    QObject::connect(udp_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
+    QObject::connect(udp_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
 }
 
 smp_udp::~smp_udp()
 {
-    delete udp_window;
-
     QObject::disconnect(this, SLOT(socket_readyread()));
 //    QObject::disconnect(this, SLOT(socket_connected()));
 //    QObject::disconnect(this, SLOT(socket_disconnected()));
@@ -59,6 +60,8 @@ smp_udp::~smp_udp()
 //    QObject::disconnect(this, SLOT(socket_readchannelfinished()));
 
     QObject::disconnect(this, SLOT(connect_to_device(QString,uint16_t)));
+    QObject::disconnect(udp_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
+    QObject::disconnect(udp_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
 
     if (socket_is_connected == true)
     {
@@ -66,6 +69,12 @@ smp_udp::~smp_udp()
         socket_is_connected = false;
     }
 
+    if (udp_window->isVisible())
+    {
+        udp_window->close();
+    }
+
+    delete udp_window;
     delete socket;
 }
 
@@ -266,4 +275,9 @@ void smp_udp::close_connect_dialog()
     {
         udp_window->close();
     }
+}
+
+void smp_udp::setup_finished()
+{
+    udp_window->load_settings();
 }

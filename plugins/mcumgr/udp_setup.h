@@ -25,6 +25,8 @@
 
 #include <QDialog>
 
+#define MAX_UDP_HISTORY 10
+
 namespace Ui
 {
     class udp_setup;
@@ -37,18 +39,24 @@ class udp_setup : public QDialog
 public:
     explicit udp_setup(QWidget *parent = nullptr);
     ~udp_setup();
+    void load_settings();
 
 private slots:
     void on_btn_connect_clicked();
     void on_btn_close_clicked();
-    void on_check_save_history_stateChanged(int arg1);
     void on_btn_clear_history_clicked();
+    void on_check_save_history_toggled(bool checked);
+    void on_combo_history_currentIndexChanged(int index);
 
 signals:
     void connect_to_device(QString host, uint16_t port);
+    void plugin_save_setting(QString name, QVariant data);
+    void plugin_load_setting(QString name, QVariant *data, bool *found);
 
 private:
     Ui::udp_setup *ui;
+
+    void add_to_history();
 };
 
 #endif // UDP_SETUP_H

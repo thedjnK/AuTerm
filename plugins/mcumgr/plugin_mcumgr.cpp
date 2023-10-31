@@ -3060,12 +3060,16 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
     }
 }
 
-#ifndef SKIPPLUGIN_LOGGER
 void plugin_mcumgr::setup_finished()
 {
+#ifndef SKIPPLUGIN_LOGGER
     logger->find_logger_plugin(parent_window);
-}
 #endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    udp_transport->setup_finished();
+#endif
+}
 
 void plugin_mcumgr::flip_endian(uint8_t *data, uint8_t size)
 {

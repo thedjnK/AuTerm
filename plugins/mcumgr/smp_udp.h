@@ -39,6 +39,7 @@ public:
     int is_connected() override;
     int send(smp_message *message);
     void close_connect_dialog();
+    void setup_finished();
 /*    int receive(QByteArray *data, uint16_t max_size) override;
     int receive_data_size() override;
     int get_mtu() override;

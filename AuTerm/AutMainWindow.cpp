@@ -5313,7 +5313,10 @@ void AutMainWindow::plugin_load_setting(QString name, QVariant *data, bool *foun
         *found = gpTermSettings->contains(name);
     }
 
-    *data = gpTermSettings->value(name);
+    if (data != nullptr)
+    {
+        *data = gpTermSettings->value(name);
+    }
 }
 #endif
 
