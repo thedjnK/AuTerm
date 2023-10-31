@@ -1793,6 +1793,124 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="tab_zephyr">
+          <attribute name="title">
+           <string>Zephyr</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_16">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item row="2" column="0">
+            <layout class="QHBoxLayout" name="horizontalLayout_18">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_13">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_zephyr_go">
+               <property name="text">
+                <string>Go</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_14">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="0">
+            <widget class="QTabWidget" name="tabWidget_4">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <property name="documentMode">
+              <bool>false</bool>
+             </property>
+             <property name="tabsClosable">
+              <bool>false</bool>
+             </property>
+             <property name="movable">
+              <bool>false</bool>
+             </property>
+             <property name="tabBarAutoHide">
+              <bool>false</bool>
+             </property>
+             <widget class="QWidget" name="tab_zephyr_storage_erase">
+              <attribute name="title">
+               <string>Storage Erase</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_17">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>This will erase the &quot;storage_partition&quot; flash partition on the device.</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <spacer name="verticalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lbl_zephyr_status">
+             <property name="text">
+              <string>[Status]</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>

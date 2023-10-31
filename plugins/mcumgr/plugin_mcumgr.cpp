@@ -56,6 +56,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.settings_mgmt = new smp_group_settings_mgmt(processor);
     smp_groups.shell_mgmt = new smp_group_shell_mgmt(processor);
     smp_groups.stat_mgmt = new smp_group_stat_mgmt(processor);
+    smp_groups.zephyr_mgmt = new smp_group_zephyr_mgmt(processor);
     error_lookup_form = new error_lookup(parent_window, &smp_groups);
 
 #ifndef SKIPPLUGIN_LOGGER
@@ -1054,6 +1055,61 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
 
     tabWidget_2->addTab(tab_Settings, QString());
+    tab_zephyr = new QWidget();
+    tab_zephyr->setObjectName("tab_zephyr");
+    gridLayout_16 = new QGridLayout(tab_zephyr);
+    gridLayout_16->setSpacing(2);
+    gridLayout_16->setObjectName("gridLayout_16");
+    gridLayout_16->setContentsMargins(6, 6, 6, 6);
+    horizontalLayout_18 = new QHBoxLayout();
+    horizontalLayout_18->setSpacing(2);
+    horizontalLayout_18->setObjectName("horizontalLayout_18");
+    horizontalSpacer_13 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_18->addItem(horizontalSpacer_13);
+
+    btn_zephyr_go = new QPushButton(tab_zephyr);
+    btn_zephyr_go->setObjectName("btn_zephyr_go");
+
+    horizontalLayout_18->addWidget(btn_zephyr_go);
+
+    horizontalSpacer_14 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_18->addItem(horizontalSpacer_14);
+
+
+    gridLayout_16->addLayout(horizontalLayout_18, 2, 0, 1, 1);
+
+    tabWidget_4 = new QTabWidget(tab_zephyr);
+    tabWidget_4->setObjectName("tabWidget_4");
+    tabWidget_4->setDocumentMode(false);
+    tabWidget_4->setTabsClosable(false);
+    tabWidget_4->setMovable(false);
+    tabWidget_4->setTabBarAutoHide(false);
+    tab_zephyr_storage_erase = new QWidget();
+    tab_zephyr_storage_erase->setObjectName("tab_zephyr_storage_erase");
+    gridLayout_17 = new QGridLayout(tab_zephyr_storage_erase);
+    gridLayout_17->setObjectName("gridLayout_17");
+    label_12 = new QLabel(tab_zephyr_storage_erase);
+    label_12->setObjectName("label_12");
+    label_12->setWordWrap(true);
+
+    gridLayout_17->addWidget(label_12, 0, 0, 1, 1);
+
+    verticalSpacer_7 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    gridLayout_17->addItem(verticalSpacer_7, 1, 0, 1, 1);
+
+    tabWidget_4->addTab(tab_zephyr_storage_erase, QString());
+
+    gridLayout_16->addWidget(tabWidget_4, 0, 0, 1, 1);
+
+    lbl_zephyr_status = new QLabel(tab_zephyr);
+    lbl_zephyr_status->setObjectName("lbl_zephyr_status");
+
+    gridLayout_16->addWidget(lbl_zephyr_status, 1, 0, 1, 1);
+
+    tabWidget_2->addTab(tab_zephyr, QString());
 
     verticalLayout_2->addWidget(tabWidget_2);
 
@@ -1150,6 +1206,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_2->setCurrentIndex(1);
     tabWidget_3->setCurrentIndex(0);
     selector_OS->setCurrentIndex(0);
+    tabWidget_4->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
 
     //retranslate code
@@ -1276,6 +1333,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_settings_load->setText(QCoreApplication::translate("Form", "Load", nullptr));
     radio_settings_save->setText(QCoreApplication::translate("Form", "Save", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
+    btn_zephyr_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    label_12->setText(QCoreApplication::translate("Form", "This will erase the \"storage_partition\" flash partition on the device.", nullptr));
+    tabWidget_4->setTabText(tabWidget_4->indexOf(tab_zephyr_storage_erase), QCoreApplication::translate("Form", "Storage Erase", nullptr));
+    lbl_zephyr_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_zephyr), QCoreApplication::translate("Form", "Zephyr", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
@@ -1328,6 +1390,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(smp_groups.shell_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
     connect(smp_groups.stat_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.stat_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.zephyr_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.zephyr_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 
     //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
@@ -1371,6 +1435,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(check_settings_big_endian, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_big_endian_toggled(bool)));
     connect(check_settings_signed_decimal_value, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
     connect(edit_SHELL_Output, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
+    connect(btn_zephyr_go, SIGNAL(clicked()), this, SLOT(on_btn_zephyr_go_clicked()));
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -1417,6 +1482,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.settings_mgmt->set_logger(logger);
     smp_groups.shell_mgmt->set_logger(logger);
     smp_groups.stat_mgmt->set_logger(logger);
+    smp_groups.zephyr_mgmt->set_logger(logger);
 #endif
 
     edit_SHELL_Output->set_serial_open(true);
@@ -1440,17 +1506,6 @@ plugin_mcumgr::~plugin_mcumgr()
 
     disconnect(processor, SLOT(message_received(smp_message*)));
 
-    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
-    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
-    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
-    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
-    disconnect(this, SLOT(group_to_hex(QByteArray*)));
-    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
-    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
-    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
-    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
-    disconnect(this, SLOT(status(uint8_t,group_status,QString)));
-    disconnect(this, SLOT(progress(uint8_t,uint8_t)));
     disconnect(this, SLOT(status(uint8_t,group_status,QString)));
     disconnect(this, SLOT(progress(uint8_t,uint8_t)));
 
@@ -1496,6 +1551,7 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_check_settings_big_endian_toggled(bool)));
     disconnect(this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
     disconnect(this, SLOT(enter_pressed()));
+    disconnect(this, SLOT(on_btn_zephyr_go_clicked()));
 
     //Clean up GUI
     delete tab_2;
@@ -1509,6 +1565,7 @@ plugin_mcumgr::~plugin_mcumgr()
 #endif
 
     delete error_lookup_form;
+    delete smp_groups.zephyr_mgmt;
     delete smp_groups.stat_mgmt;
     delete smp_groups.shell_mgmt;
     delete smp_groups.settings_mgmt;
@@ -1656,6 +1713,12 @@ void plugin_mcumgr::serial_closed()
         case ACTION_SETTINGS_SAVE:
         {
             smp_groups.settings_mgmt->cancel();
+            break;
+        }
+
+        case ACTION_ZEPHYR_STORAGE_ERASE:
+        {
+            smp_groups.zephyr_mgmt->cancel();
             break;
         }
 
@@ -2669,6 +2732,15 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
         }
     }
+    else if (sender() == smp_groups.zephyr_mgmt)
+    {
+        log_debug() << "zephyr sender";
+        label_status = lbl_zephyr_status;
+
+        if (user_data == ACTION_ZEPHYR_STORAGE_ERASE)
+        {
+        }
+    }
 
     if (finished == true)
     {
@@ -3324,6 +3396,34 @@ void plugin_mcumgr::enter_pressed()
         lbl_SHELL_Status->setText("Shell execute command sent...");
     }
     else
+    {
+        relase_transport();
+    }
+}
+
+void plugin_mcumgr::on_btn_zephyr_go_clicked()
+{
+    bool started = false;
+
+    if (claim_transport(lbl_zephyr_status) == false)
+    {
+        return;
+    }
+
+    if (tabWidget_4->currentWidget() == tab_zephyr_storage_erase)
+    {
+        mode = ACTION_ZEPHYR_STORAGE_ERASE;
+        processor->set_transport(active_transport());
+        smp_groups.zephyr_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.zephyr_mgmt->start_storage_erase();
+
+        if (started == true)
+        {
+            lbl_zephyr_status->setText("Erasing storage...");
+        }
+    }
+
+    if (started == false)
     {
         relase_transport();
     }

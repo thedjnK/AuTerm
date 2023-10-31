@@ -120,6 +120,8 @@ enum mcumgr_action_t {
     ACTION_SETTINGS_COMMIT,
     ACTION_SETTINGS_LOAD,
     ACTION_SETTINGS_SAVE,
+
+    ACTION_ZEPHYR_STORAGE_ERASE,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin
@@ -201,6 +203,7 @@ private slots:
     void on_radio_settings_decimal_toggled(bool checked);
     void on_check_settings_big_endian_toggled(bool checked);
     void on_check_settings_signed_decimal_value_toggled(bool checked);
+    void on_btn_zephyr_go_clicked();
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -393,6 +396,18 @@ private:
     QLineEdit *edit_settings_value;
     QLineEdit *edit_settings_decoded;
     QFrame *line_2;
+    QWidget *tab_zephyr;
+    QGridLayout *gridLayout_16;
+    QHBoxLayout *horizontalLayout_18;
+    QSpacerItem *horizontalSpacer_13;
+    QPushButton *btn_zephyr_go;
+    QSpacerItem *horizontalSpacer_14;
+    QTabWidget *tabWidget_4;
+    QWidget *tab_zephyr_storage_erase;
+    QGridLayout *gridLayout_17;
+    QLabel *label_12;
+    QSpacerItem *verticalSpacer_7;
+    QLabel *lbl_zephyr_status;
     QWidget *tab_2;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;

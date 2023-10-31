@@ -204,3 +204,8 @@ void Form::on_edit_SHELL_Input_returnPressed()
 {
 
 }
+
+void Form::on_btn_zephyr_go_clicked()
+{
+
+}

@@ -53,6 +53,7 @@ private slots:
     void on_check_settings_big_endian_toggled(bool checked);
     void on_check_settings_signed_decimal_value_toggled(bool checked);
     void on_edit_SHELL_Input_returnPressed();
+    void on_btn_zephyr_go_clicked();
 
 private:
     Ui::Form *ui;
