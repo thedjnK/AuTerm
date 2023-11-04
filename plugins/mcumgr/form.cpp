@@ -209,3 +209,18 @@ void Form::on_btn_zephyr_go_clicked()
 {
 
 }
+
+void Form::on_check_os_rtc_use_pc_date_time_toggled(bool checked)
+{
+
+}
+
+void Form::on_radio_os_rtc_get_toggled(bool checked)
+{
+
+}
+
+void Form::on_radio_os_rtc_set_toggled(bool checked)
+{
+
+}

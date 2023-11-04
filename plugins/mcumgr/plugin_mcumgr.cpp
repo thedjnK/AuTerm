@@ -25,6 +25,7 @@
 #include <QStandardItemModel>
 #include <QRegularExpression>
 #include <QClipboard>
+#include <QTimeZone>
 #include "plugin_mcumgr.h"
 
 const uint8_t retries = 3;
@@ -616,6 +617,80 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_12->addItem(verticalSpacer_3, 1, 0, 1, 1);
 
     selector_OS->addTab(tab_OS_Reset, QString());
+    tab_os_rtc = new QWidget();
+    tab_os_rtc->setObjectName("tab_os_rtc");
+    gridLayout_18 = new QGridLayout(tab_os_rtc);
+    gridLayout_18->setSpacing(2);
+    gridLayout_18->setObjectName("gridLayout_18");
+    gridLayout_18->setContentsMargins(6, 6, 6, 6);
+    verticalSpacer_8 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    gridLayout_18->addItem(verticalSpacer_8, 5, 1, 1, 1);
+
+    combo_os_rtc_timezone = new QComboBox(tab_os_rtc);
+    combo_os_rtc_timezone->setObjectName("combo_os_rtc_timezone");
+
+    gridLayout_18->addWidget(combo_os_rtc_timezone, 1, 1, 1, 1);
+
+    horizontalLayout_19 = new QHBoxLayout();
+    horizontalLayout_19->setSpacing(2);
+    horizontalLayout_19->setObjectName("horizontalLayout_19");
+    horizontalLayout_19->setContentsMargins(-1, 0, -1, -1);
+    radio_os_rtc_get = new QRadioButton(tab_os_rtc);
+    radio_os_rtc_get->setObjectName("radio_os_rtc_get");
+    radio_os_rtc_get->setChecked(true);
+
+    horizontalLayout_19->addWidget(radio_os_rtc_get);
+
+    radio_os_rtc_set = new QRadioButton(tab_os_rtc);
+    radio_os_rtc_set->setObjectName("radio_os_rtc_set");
+
+    horizontalLayout_19->addWidget(radio_os_rtc_set);
+
+    horizontalSpacer_15 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_19->addItem(horizontalSpacer_15);
+
+
+    gridLayout_18->addLayout(horizontalLayout_19, 3, 0, 1, 2);
+
+    label_13 = new QLabel(tab_os_rtc);
+    label_13->setObjectName("label_13");
+    label_13->setMaximumSize(QSize(80, 16777215));
+
+    gridLayout_18->addWidget(label_13, 0, 0, 1, 1);
+
+    label_31 = new QLabel(tab_os_rtc);
+    label_31->setObjectName("label_31");
+    label_31->setMaximumSize(QSize(100, 16777215));
+
+    gridLayout_18->addWidget(label_31, 2, 0, 1, 1);
+
+    edit_os_rtc_date_time = new QDateTimeEdit(tab_os_rtc);
+    edit_os_rtc_date_time->setObjectName("edit_os_rtc_date_time");
+    edit_os_rtc_date_time->setMinimumSize(QSize(250, 0));
+    edit_os_rtc_date_time->setMaximumSize(QSize(300, 16777215));
+    edit_os_rtc_date_time->setAccelerated(true);
+    edit_os_rtc_date_time->setProperty("showGroupSeparator", QVariant(true));
+    edit_os_rtc_date_time->setMinimumDate(QDate(1970, 1, 1));
+    edit_os_rtc_date_time->setCurrentSection(QDateTimeEdit::YearSection);
+    edit_os_rtc_date_time->setCalendarPopup(true);
+    edit_os_rtc_date_time->setTimeSpec(Qt::OffsetFromUTC);
+
+    gridLayout_18->addWidget(edit_os_rtc_date_time, 0, 1, 1, 1);
+
+    label_30 = new QLabel(tab_os_rtc);
+    label_30->setObjectName("label_30");
+    label_30->setMaximumSize(QSize(100, 16777215));
+
+    gridLayout_18->addWidget(label_30, 1, 0, 1, 1);
+
+    check_os_rtc_use_pc_date_time = new QCheckBox(tab_os_rtc);
+    check_os_rtc_use_pc_date_time->setObjectName("check_os_rtc_use_pc_date_time");
+
+    gridLayout_18->addWidget(check_os_rtc_use_pc_date_time, 2, 1, 1, 1);
+
+    selector_OS->addTab(tab_os_rtc, QString());
     tab_OS_Info = new QWidget();
     tab_OS_Info->setObjectName("tab_OS_Info");
     gridLayout_13 = new QGridLayout(tab_OS_Info);
@@ -1203,9 +1278,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(1);
+    tabWidget_2->setCurrentIndex(2);
     tabWidget_3->setCurrentIndex(0);
-    selector_OS->setCurrentIndex(0);
+    selector_OS->setCurrentIndex(4);
     tabWidget_4->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
 
@@ -1286,6 +1361,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Memory), QCoreApplication::translate("Form", "Memory", nullptr));
     check_OS_Force_Reboot->setText(QCoreApplication::translate("Form", "Force reboot", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Reset), QCoreApplication::translate("Form", "Reset", nullptr));
+    radio_os_rtc_get->setText(QCoreApplication::translate("Form", "Get", nullptr));
+    radio_os_rtc_set->setText(QCoreApplication::translate("Form", "Set", nullptr));
+    label_13->setText(QCoreApplication::translate("Form", "Date/time:", nullptr));
+    label_31->setText(QCoreApplication::translate("Form", "Sync:", nullptr));
+    edit_os_rtc_date_time->setDisplayFormat(QCoreApplication::translate("Form", "yyyy-MM-dd HH:mm:ss t", nullptr));
+    label_30->setText(QCoreApplication::translate("Form", "Timezone:", nullptr));
+    check_os_rtc_use_pc_date_time->setText(QCoreApplication::translate("Form", "Use PC date and time", nullptr));
+    selector_OS->setTabText(selector_OS->indexOf(tab_os_rtc), QCoreApplication::translate("Form", "RTC", nullptr));
     label_17->setText(QCoreApplication::translate("Form", "uname:", nullptr));
     radio_OS_Buffer_Info->setText(QCoreApplication::translate("Form", "Buffer info", nullptr));
     radio_OS_uname->setText(QCoreApplication::translate("Form", "uname", nullptr));
@@ -1436,6 +1519,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(check_settings_signed_decimal_value, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
     connect(edit_SHELL_Output, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
     connect(btn_zephyr_go, SIGNAL(clicked()), this, SLOT(on_btn_zephyr_go_clicked()));
+    connect(btn_zephyr_go, SIGNAL(clicked()), this, SLOT(on_btn_zephyr_go_clicked()));
+    connect(check_os_rtc_use_pc_date_time, SIGNAL(toggled(bool)), this, SLOT(on_check_os_rtc_use_pc_date_time_toggled(bool)));
+    connect(radio_os_rtc_get, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_rtc_get_toggled(bool)));
+    connect(radio_os_rtc_set, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_rtc_set_toggled(bool)));
+
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -1486,6 +1574,16 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 #endif
 
     edit_SHELL_Output->set_serial_open(true);
+
+    //Setup list of timezones
+    QList<QByteArray> items = QTimeZone::availableTimeZoneIds();
+    foreach (QByteArray item, items)
+    {
+        if (item.length() > 3 && (item.left(3) == "Etc" || item.left(3) == "UTC"))
+        {
+            combo_os_rtc_timezone->addItem(item);
+        }
+    }
 }
 
 plugin_mcumgr::~plugin_mcumgr()
@@ -1552,6 +1650,9 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
     disconnect(this, SLOT(enter_pressed()));
     disconnect(this, SLOT(on_btn_zephyr_go_clicked()));
+    disconnect(this, SLOT(on_check_os_rtc_use_pc_date_time_toggled(bool)));
+    disconnect(this, SLOT(on_radio_os_rtc_get_toggled(bool)));
+    disconnect(this, SLOT(on_radio_os_rtc_set_toggled(bool)));
 
     //Clean up GUI
     delete tab_2;
@@ -1674,6 +1775,8 @@ void plugin_mcumgr::serial_closed()
         case ACTION_OS_TASK_STATS:
         case ACTION_OS_MEMORY_POOL:
         case ACTION_OS_RESET:
+        case ACTION_OS_RTC_GET:
+        case ACTION_OS_RTC_SET:
         case ACTION_OS_MCUMGR_BUFFER:
         case ACTION_OS_OS_APPLICATION_INFO:
         case ACTION_OS_BOOTLOADER_INFO:
@@ -2158,6 +2261,47 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             lbl_OS_Status->setText("Reset command...");
         }
     }
+    else if (selector_OS->currentWidget() == tab_os_rtc)
+    {
+        processor->set_transport(active_transport());
+
+        if (radio_os_rtc_get->isChecked())
+        {
+            mode = ACTION_OS_RTC_GET;
+
+            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.os_mgmt->start_date_time_get(&rtc_time_date_response);
+
+            if (started == true)
+            {
+                lbl_OS_Status->setText("RTC get...");
+            }
+        }
+        else if (radio_os_rtc_set->isChecked())
+        {
+            QDateTime date_time;
+            mode = ACTION_OS_RTC_SET;
+
+            if (check_os_rtc_use_pc_date_time->isChecked())
+            {
+                date_time = QDateTime::currentDateTime();
+                date_time.setTimeZone(date_time.timeZone());
+            }
+            else
+            {
+                date_time = edit_os_rtc_date_time->dateTime();
+                date_time.setTimeZone(QTimeZone(combo_os_rtc_timezone->currentText().toUtf8()));
+            }
+
+            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            started = smp_groups.os_mgmt->start_date_time_set(date_time);
+
+            if (started == true)
+            {
+                lbl_OS_Status->setText("RTC set...");
+            }
+        }
+    }
     else if (selector_OS->currentWidget() == tab_OS_Info)
     {
         if (radio_OS_uname->isChecked())
@@ -2428,6 +2572,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             else if (user_data == ACTION_OS_UPLOAD_RESET)
             {
             }
+            else if (user_data == ACTION_OS_RESET)
+            {
+            }
             else if (user_data == ACTION_OS_MEMORY_POOL)
             {
                 uint16_t i = 0;
@@ -2587,6 +2734,24 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                         error_string = "Invalid";
                     }
                 }
+            }
+            else if (user_data == ACTION_OS_RTC_GET)
+            {
+                int index;
+                log_debug() << "RTC response: " << rtc_time_date_response;
+
+                rtc_time_date_response.setTimeZone(rtc_time_date_response.timeZone());
+                index = combo_os_rtc_timezone->findText(rtc_time_date_response.timeZone().displayName(rtc_time_date_response, QTimeZone::OffsetName));
+
+                if (index >= 0)
+                {
+                    combo_os_rtc_timezone->setCurrentIndex(index);
+                }
+
+                edit_os_rtc_date_time->setDateTime(rtc_time_date_response);
+            }
+            else if (user_data == ACTION_OS_RTC_SET)
+            {
             }
         }
     }
@@ -3426,5 +3591,33 @@ void plugin_mcumgr::on_btn_zephyr_go_clicked()
     if (started == false)
     {
         relase_transport();
+    }
+}
+
+void plugin_mcumgr::on_check_os_rtc_use_pc_date_time_toggled(bool checked)
+{
+    combo_os_rtc_timezone->setEnabled(!checked);
+    edit_os_rtc_date_time->setEnabled(!checked);
+    edit_os_rtc_date_time->setReadOnly(checked);
+}
+
+void plugin_mcumgr::on_radio_os_rtc_get_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        check_os_rtc_use_pc_date_time->setEnabled(false);
+        combo_os_rtc_timezone->setEnabled(false);
+        edit_os_rtc_date_time->setReadOnly(true);
+        edit_os_rtc_date_time->setDisplayFormat("yyyy-MM-dd HH:mm:ss t");
+    }
+}
+
+void plugin_mcumgr::on_radio_os_rtc_set_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        check_os_rtc_use_pc_date_time->setEnabled(true);
+        edit_os_rtc_date_time->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+        on_check_os_rtc_use_pc_date_time_toggled(check_os_rtc_use_pc_date_time->isChecked());
     }
 }

@@ -58,12 +58,14 @@
 
 //Form includes
 ///AUTOGEN_START_INCLUDES
+#include <QtCore/QDate>
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QColumnView>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
@@ -99,6 +101,8 @@ enum mcumgr_action_t {
     ACTION_OS_TASK_STATS,
     ACTION_OS_MEMORY_POOL,
     ACTION_OS_RESET,
+    ACTION_OS_RTC_GET,
+    ACTION_OS_RTC_SET,
     ACTION_OS_MCUMGR_BUFFER,
     ACTION_OS_OS_APPLICATION_INFO,
     ACTION_OS_BOOTLOADER_INFO,
@@ -204,6 +208,9 @@ private slots:
     void on_check_settings_big_endian_toggled(bool checked);
     void on_check_settings_signed_decimal_value_toggled(bool checked);
     void on_btn_zephyr_go_clicked();
+    void on_check_os_rtc_use_pc_date_time_toggled(bool checked);
+    void on_radio_os_rtc_get_toggled(bool checked);
+    void on_radio_os_rtc_set_toggled(bool checked);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -322,6 +329,19 @@ private:
     QGridLayout *gridLayout_12;
     QCheckBox *check_OS_Force_Reboot;
     QSpacerItem *verticalSpacer_3;
+    QWidget *tab_os_rtc;
+    QGridLayout *gridLayout_18;
+    QSpacerItem *verticalSpacer_8;
+    QComboBox *combo_os_rtc_timezone;
+    QHBoxLayout *horizontalLayout_19;
+    QRadioButton *radio_os_rtc_get;
+    QRadioButton *radio_os_rtc_set;
+    QSpacerItem *horizontalSpacer_15;
+    QLabel *label_13;
+    QLabel *label_31;
+    QDateTimeEdit *edit_os_rtc_date_time;
+    QLabel *label_30;
+    QCheckBox *check_os_rtc_use_pc_date_time;
     QWidget *tab_OS_Info;
     QGridLayout *gridLayout_13;
     QLabel *label_17;
@@ -464,6 +484,7 @@ private:
     debug_logger *logger;
 #endif
     bool uart_transport_locked;
+    QDateTime rtc_time_date_response;
 };
 
 #endif // PLUGIN_MCUMGR_H

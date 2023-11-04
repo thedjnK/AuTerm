@@ -66,10 +66,8 @@ public:
     bool start_reset(bool force);
     bool start_mcumgr_parameters();
     bool start_os_application_info(QString format);
-    /*
-    bool start_date_time_get();
-    bool start_date_time_set();
-    */
+    bool start_date_time_get(QDateTime *date_time);
+    bool start_date_time_set(QDateTime date_time);
     bool start_bootloader_info(QString query, QVariant *response);
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
@@ -80,9 +78,7 @@ private:
     bool parse_memory_pool_response(QCborStreamReader &reader, memory_pool_t *current_memory, QList<memory_pool_t> *memory_array);
     bool parse_mcumgr_parameters_response(QCborStreamReader &reader, uint32_t *buffer_size, uint32_t *buffer_count);
     bool parse_os_application_info_response(QCborStreamReader &reader, QString *response);
-    /*
-    bool parse_date_time_response(QCborStreamReader &reader, );
-    */
+    bool parse_date_time_response(QCborStreamReader &reader, QDateTime *date_time);
     bool parse_bootloader_info_response(QCborStreamReader &reader, QVariant *response);
 
     QString mode_to_string(uint8_t mode);
@@ -94,6 +90,7 @@ private:
     QList<memory_pool_t> *memory_list;
     QString bootloader_query_value;
     QVariant *bootloader_info_response;
+    QDateTime *rtc_get_date_time;
 };
 
 #endif // SMP_GROUP_OS_MGMT_H

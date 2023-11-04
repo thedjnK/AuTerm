@@ -693,6 +693,82 @@ bool smp_group_os_mgmt::parse_bootloader_info_response(QCborStreamReader &reader
     return true;
 }
 
+bool smp_group_os_mgmt::parse_date_time_response(QCborStreamReader &reader, QDateTime *date_time)
+{
+    QString key = "";
+    bool keyset = true;
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
+        //	    qDebug() << "Key: " << key;
+        //	    qDebug() << "Type: " << reader.type();
+        switch (reader.type())
+        {
+            case QCborStreamReader::String:
+            {
+                QString data;
+                auto r = reader.readString();
+
+                while (r.status == QCborStreamReader::Ok)
+                {
+                    data.append(r.data);
+                    r = reader.readString();
+                }
+
+                if (r.status == QCborStreamReader::Error)
+                {
+                    data.clear();
+                    log_error() << "Error decoding string";
+                }
+                else
+                {
+                    if (key.isEmpty())
+                    {
+                        key = data;
+                        keyset = true;
+                    }
+                    else if (key == "datetime")
+                    {
+                        //TODO: check validity
+                        *date_time = QDateTime::fromString(data, Qt::ISODate);
+                    }
+                }
+
+                break;
+            }
+
+            case QCborStreamReader::Array:
+            case QCborStreamReader::Map:
+            {
+                reader.enterContainer();
+                while (reader.lastError() == QCborError::NoError && reader.hasNext())
+                {
+                    parse_date_time_response(reader, date_time);
+                }
+                if (reader.lastError() == QCborError::NoError)
+                {
+                    reader.leaveContainer();
+                }
+                break;
+            }
+
+            default:
+            {
+                reader.next();
+            }
+        }
+    }
+
+    return true;
+}
+
 void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data)
 {
     Q_UNUSED(op);
@@ -722,7 +798,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
         if (finished_mode == MODE_ECHO && command == COMMAND_ECHO)
         {
-            //Response to set image state
+            //Response to echo
             QString response;
             QCborStreamReader cbor_reader(data);
             bool good = parse_echo_response(cbor_reader, &response);
@@ -730,7 +806,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         }
         else if (finished_mode == MODE_TASK_STATS && command == COMMAND_TASK_STATS)
         {
-            //Response to set image state
+            //Response to get task stats
             QCborStreamReader cbor_reader(data);
             bool in_tasks = false;
             task_list_t current_task;
@@ -740,11 +816,24 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         }
         else if (finished_mode == MODE_MEMORY_POOL && command == COMMAND_MEMORY_POOL)
         {
-            //Response to set image state
+            //Response to get memory pool stats
             QCborStreamReader cbor_reader(data);
             memory_pool_t current_memory;
             bool good = parse_memory_pool_response(cbor_reader, &current_memory, memory_list);
 
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
+        else if (finished_mode == MODE_DATE_TIME_GET && command == COMMAND_DATE_TIME)
+        {
+            //Response to get date time
+            QCborStreamReader cbor_reader(data);
+            bool good = parse_date_time_response(cbor_reader, rtc_get_date_time);
+
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+        }
+        else if (finished_mode == MODE_DATE_TIME_SET && command == COMMAND_DATE_TIME)
+        {
+            //No need to check response, it would have returned success to come through this callback
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (finished_mode == MODE_RESET && command == COMMAND_RESET)
@@ -777,7 +866,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         }
         else if (finished_mode == MODE_BOOTLOADER_INFO && command == COMMAND_BOOTLOADER_INFO)
         {
-            //Response to OS/application info
+            //Response to bootloader info
             QCborStreamReader cbor_reader(data);
             bool good = parse_bootloader_info_response(cbor_reader, bootloader_info_response);
 
@@ -811,6 +900,16 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_MEMORY_POOL && mode == MODE_MEMORY_POOL)
+    {
+        //TODO
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+    }
+    else if (command == COMMAND_DATE_TIME && mode == MODE_DATE_TIME_GET)
+    {
+        //TODO
+        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+    }
+    else if (command == COMMAND_DATE_TIME && mode == MODE_DATE_TIME_SET)
     {
         //TODO
         emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
@@ -967,6 +1066,39 @@ bool smp_group_os_mgmt::start_os_application_info(QString format)
     tmp_message->end_message();
 
     mode = MODE_OS_APPLICATION_INFO;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_os_mgmt::start_date_time_get(QDateTime *date_time)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_DATE_TIME);
+    tmp_message->end_message();
+
+    mode = MODE_DATE_TIME_GET;
+    rtc_get_date_time = date_time;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
+bool smp_group_os_mgmt::start_date_time_set(QDateTime date_time)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_DATE_TIME);
+    tmp_message->writer()->append("datetime");
+    tmp_message->writer()->append(date_time.toString(Qt::ISODate));
+    tmp_message->end_message();
+
+    mode = MODE_DATE_TIME_SET;
 
     //	    qDebug() << "len: " << message.length();
 

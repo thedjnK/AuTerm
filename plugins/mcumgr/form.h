@@ -54,6 +54,9 @@ private slots:
     void on_check_settings_signed_decimal_value_toggled(bool checked);
     void on_edit_SHELL_Input_returnPressed();
     void on_btn_zephyr_go_clicked();
+    void on_check_os_rtc_use_pc_date_time_toggled(bool checked);
+    void on_radio_os_rtc_get_toggled(bool checked);
+    void on_radio_os_rtc_set_toggled(bool checked);
 
 private:
     Ui::Form *ui;
