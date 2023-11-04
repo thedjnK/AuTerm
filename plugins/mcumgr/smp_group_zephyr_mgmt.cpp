@@ -27,7 +27,7 @@ enum modes : uint8_t {
     MODE_STORAGE_ERASE,
 };
 
-enum settings_mgmt_commands : uint8_t {
+enum zephyr_mgmt_commands : uint8_t {
     COMMAND_STORAGE_ERASE = 0,
 };
 
