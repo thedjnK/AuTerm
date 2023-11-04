@@ -24,6 +24,7 @@
 #define UDP_SETUP_H
 
 #include <QDialog>
+#include <QVariant>
 
 #define MAX_UDP_HISTORY 10
 
