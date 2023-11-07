@@ -64,6 +64,12 @@ QString smp_error::error_lookup_string(smp_error_t *error)
     QString error_string;
     uint16_t i = 0;
 
+    if (error->rc < 0)
+    {
+        //MCUmgr error codes are 0 or greater, this is not a valid error code
+        return "Provided error code is not a valid MCUmgr error code value";
+    }
+
     if (error->type == SMP_ERROR_RC)
     {
         if (error->rc < smp_error_values.length())
