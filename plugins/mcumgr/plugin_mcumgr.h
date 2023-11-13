@@ -101,8 +101,8 @@ enum mcumgr_action_t {
     ACTION_OS_TASK_STATS,
     ACTION_OS_MEMORY_POOL,
     ACTION_OS_RESET,
-    ACTION_OS_RTC_GET,
-    ACTION_OS_RTC_SET,
+    ACTION_OS_DATETIME_GET,
+    ACTION_OS_DATETIME_SET,
     ACTION_OS_MCUMGR_BUFFER,
     ACTION_OS_OS_APPLICATION_INFO,
     ACTION_OS_BOOTLOADER_INFO,
@@ -208,9 +208,9 @@ private slots:
     void on_check_settings_big_endian_toggled(bool checked);
     void on_check_settings_signed_decimal_value_toggled(bool checked);
     void on_btn_zephyr_go_clicked();
-    void on_check_os_rtc_use_pc_date_time_toggled(bool checked);
-    void on_radio_os_rtc_get_toggled(bool checked);
-    void on_radio_os_rtc_set_toggled(bool checked);
+    void on_check_os_datetime_use_pc_date_time_toggled(bool checked);
+    void on_radio_os_datetime_get_toggled(bool checked);
+    void on_radio_os_datetime_set_toggled(bool checked);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -237,32 +237,6 @@ private:
     QPushButton *btn_transport_connect;
     QSpacerItem *horizontalSpacer_6;
     QTabWidget *tabWidget_2;
-    QWidget *tab_FS;
-    QGridLayout *gridLayout_2;
-    QLabel *label_28;
-    QLabel *lbl_FS_Status;
-    QLabel *label_29;
-    QLabel *label_2;
-    QProgressBar *progress_FS_Complete;
-    QToolButton *btn_FS_Local;
-    QLabel *label_3;
-    QComboBox *combo_FS_type;
-    QHBoxLayout *horizontalLayout;
-    QRadioButton *radio_FS_Upload;
-    QRadioButton *radio_FS_Download;
-    QRadioButton *radio_FS_Size;
-    QRadioButton *radio_FS_HashChecksum;
-    QRadioButton *radio_FS_Hash_Checksum_Types;
-    QLabel *label_19;
-    QLineEdit *edit_FS_Remote;
-    QHBoxLayout *horizontalLayout_2;
-    QSpacerItem *horizontalSpacer;
-    QPushButton *btn_FS_Go;
-    QSpacerItem *horizontalSpacer_2;
-    QSpacerItem *verticalSpacer_6;
-    QLineEdit *edit_FS_Local;
-    QLineEdit *edit_FS_Result;
-    QLineEdit *edit_FS_Size;
     QWidget *tab_IMG;
     QGridLayout *gridLayout_3;
     QTabWidget *tabWidget_3;
@@ -305,6 +279,32 @@ private:
     QPushButton *btn_IMG_Go;
     QSpacerItem *horizontalSpacer_4;
     QLabel *lbl_IMG_Status;
+    QWidget *tab_FS;
+    QGridLayout *gridLayout_2;
+    QLabel *label_28;
+    QLabel *lbl_FS_Status;
+    QLabel *label_29;
+    QLabel *label_2;
+    QProgressBar *progress_FS_Complete;
+    QToolButton *btn_FS_Local;
+    QLabel *label_3;
+    QComboBox *combo_FS_type;
+    QHBoxLayout *horizontalLayout;
+    QRadioButton *radio_FS_Upload;
+    QRadioButton *radio_FS_Download;
+    QRadioButton *radio_FS_Size;
+    QRadioButton *radio_FS_HashChecksum;
+    QRadioButton *radio_FS_Hash_Checksum_Types;
+    QLabel *label_19;
+    QLineEdit *edit_FS_Remote;
+    QHBoxLayout *horizontalLayout_2;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *btn_FS_Go;
+    QSpacerItem *horizontalSpacer_2;
+    QSpacerItem *verticalSpacer_6;
+    QLineEdit *edit_FS_Local;
+    QLineEdit *edit_FS_Result;
+    QLineEdit *edit_FS_Size;
     QWidget *tab_OS;
     QGridLayout *gridLayout_7;
     QHBoxLayout *horizontalLayout_13;
@@ -329,19 +329,19 @@ private:
     QGridLayout *gridLayout_12;
     QCheckBox *check_OS_Force_Reboot;
     QSpacerItem *verticalSpacer_3;
-    QWidget *tab_os_rtc;
+    QWidget *tab_os_datetime;
     QGridLayout *gridLayout_18;
     QSpacerItem *verticalSpacer_8;
-    QComboBox *combo_os_rtc_timezone;
+    QComboBox *combo_os_datetime_timezone;
     QHBoxLayout *horizontalLayout_19;
-    QRadioButton *radio_os_rtc_get;
-    QRadioButton *radio_os_rtc_set;
+    QRadioButton *radio_os_datetime_get;
+    QRadioButton *radio_os_datetime_set;
     QSpacerItem *horizontalSpacer_15;
     QLabel *label_13;
     QLabel *label_31;
-    QDateTimeEdit *edit_os_rtc_date_time;
+    QDateTimeEdit *edit_os_datetime_date_time;
     QLabel *label_30;
-    QCheckBox *check_os_rtc_use_pc_date_time;
+    QCheckBox *check_os_datetime_use_pc_date_time;
     QWidget *tab_OS_Info;
     QGridLayout *gridLayout_13;
     QLabel *label_17;

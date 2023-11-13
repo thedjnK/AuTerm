@@ -129,229 +129,8 @@
           <enum>QTabWidget::West</enum>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
-         <widget class="QWidget" name="tab_FS">
-          <attribute name="title">
-           <string>FS</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <property name="leftMargin">
-            <number>6</number>
-           </property>
-           <property name="topMargin">
-            <number>6</number>
-           </property>
-           <property name="rightMargin">
-            <number>6</number>
-           </property>
-           <property name="bottomMargin">
-            <number>6</number>
-           </property>
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_28">
-             <property name="text">
-              <string>Hash/Checksum:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0" colspan="2">
-            <widget class="QLabel" name="lbl_FS_Status">
-             <property name="text">
-              <string>[Status]</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_29">
-             <property name="text">
-              <string>File size:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Local file:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0" colspan="3">
-            <widget class="QProgressBar" name="progress_FS_Complete">
-             <property name="value">
-              <number>0</number>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QToolButton" name="btn_FS_Local">
-             <property name="text">
-              <string>...</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Device file:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1" colspan="2">
-            <widget class="QComboBox" name="combo_FS_type">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="editable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0" colspan="3">
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="spacing">
-              <number>2</number>
-             </property>
-             <item>
-              <widget class="QRadioButton" name="radio_FS_Upload">
-               <property name="text">
-                <string>Upload</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radio_FS_Download">
-               <property name="text">
-                <string>Download</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radio_FS_Size">
-               <property name="text">
-                <string>Size</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radio_FS_HashChecksum">
-               <property name="text">
-                <string>Hash/checksum</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radio_FS_Hash_Checksum_Types">
-               <property name="text">
-                <string>Types</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_19">
-             <property name="text">
-              <string>Type:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QLineEdit" name="edit_FS_Remote"/>
-           </item>
-           <item row="9" column="0" colspan="3">
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <property name="spacing">
-              <number>2</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btn_FS_Go">
-               <property name="text">
-                <string>Go</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item row="7" column="0">
-            <spacer name="verticalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="edit_FS_Local"/>
-           </item>
-           <item row="3" column="1" colspan="2">
-            <widget class="QLineEdit" name="edit_FS_Result">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="edit_FS_Size">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>80</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
          <widget class="QWidget" name="tab_IMG">
           <attribute name="title">
            <string>Img</string>
@@ -721,6 +500,227 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="tab_FS">
+          <attribute name="title">
+           <string>FS</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_28">
+             <property name="text">
+              <string>Hash/Checksum:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0" colspan="2">
+            <widget class="QLabel" name="lbl_FS_Status">
+             <property name="text">
+              <string>[Status]</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_29">
+             <property name="text">
+              <string>File size:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Local file:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0" colspan="3">
+            <widget class="QProgressBar" name="progress_FS_Complete">
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QToolButton" name="btn_FS_Local">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Device file:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" colspan="2">
+            <widget class="QComboBox" name="combo_FS_type">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="3">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_Upload">
+               <property name="text">
+                <string>Upload</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_Download">
+               <property name="text">
+                <string>Download</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_Size">
+               <property name="text">
+                <string>Size</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_HashChecksum">
+               <property name="text">
+                <string>Hash/checksum</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radio_FS_Hash_Checksum_Types">
+               <property name="text">
+                <string>Types</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>Type:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="QLineEdit" name="edit_FS_Remote"/>
+           </item>
+           <item row="9" column="0" colspan="3">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_FS_Go">
+               <property name="text">
+                <string>Go</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="7" column="0">
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="edit_FS_Local"/>
+           </item>
+           <item row="3" column="1" colspan="2">
+            <widget class="QLineEdit" name="edit_FS_Result">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="edit_FS_Size">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>80</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
          <widget class="QWidget" name="tab_OS">
           <attribute name="title">
            <string>OS</string>
@@ -794,7 +794,7 @@
            <item row="0" column="0">
             <widget class="QTabWidget" name="selector_OS">
              <property name="currentIndex">
-              <number>4</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="tab_OS_Echo">
               <attribute name="title">
@@ -981,9 +981,9 @@
                </item>
               </layout>
              </widget>
-             <widget class="QWidget" name="tab_os_rtc">
+             <widget class="QWidget" name="tab_os_datetime">
               <attribute name="title">
-               <string>RTC</string>
+               <string>Date/time</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_18">
                <property name="leftMargin">
@@ -1015,7 +1015,7 @@
                 </spacer>
                </item>
                <item row="1" column="1">
-                <widget class="QComboBox" name="combo_os_rtc_timezone">
+                <widget class="QComboBox" name="combo_os_datetime_timezone">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
@@ -1030,7 +1030,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QRadioButton" name="radio_os_rtc_get">
+                  <widget class="QRadioButton" name="radio_os_datetime_get">
                    <property name="text">
                     <string>Get</string>
                    </property>
@@ -1040,7 +1040,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QRadioButton" name="radio_os_rtc_set">
+                  <widget class="QRadioButton" name="radio_os_datetime_set">
                    <property name="text">
                     <string>Set</string>
                    </property>
@@ -1088,7 +1088,7 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QDateTimeEdit" name="edit_os_rtc_date_time">
+                <widget class="QDateTimeEdit" name="edit_os_datetime_date_time">
                  <property name="minimumSize">
                   <size>
                    <width>250</width>
@@ -1145,7 +1145,7 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QCheckBox" name="check_os_rtc_use_pc_date_time">
+                <widget class="QCheckBox" name="check_os_datetime_use_pc_date_time">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>

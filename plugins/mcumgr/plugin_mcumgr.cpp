@@ -139,142 +139,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_2 = new QTabWidget(tab);
     tabWidget_2->setObjectName("tabWidget_2");
     tabWidget_2->setTabPosition(QTabWidget::West);
-    tab_FS = new QWidget();
-    tab_FS->setObjectName("tab_FS");
-    gridLayout_2 = new QGridLayout(tab_FS);
-    gridLayout_2->setSpacing(2);
-    gridLayout_2->setObjectName("gridLayout_2");
-    gridLayout_2->setContentsMargins(6, 6, 6, 6);
-    label_28 = new QLabel(tab_FS);
-    label_28->setObjectName("label_28");
-
-    gridLayout_2->addWidget(label_28, 3, 0, 1, 1);
-
-    lbl_FS_Status = new QLabel(tab_FS);
-    lbl_FS_Status->setObjectName("lbl_FS_Status");
-
-    gridLayout_2->addWidget(lbl_FS_Status, 8, 0, 1, 2);
-
-    label_29 = new QLabel(tab_FS);
-    label_29->setObjectName("label_29");
-
-    gridLayout_2->addWidget(label_29, 4, 0, 1, 1);
-
-    label_2 = new QLabel(tab_FS);
-    label_2->setObjectName("label_2");
-
-    gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
-
-    progress_FS_Complete = new QProgressBar(tab_FS);
-    progress_FS_Complete->setObjectName("progress_FS_Complete");
-    progress_FS_Complete->setValue(0);
-
-    gridLayout_2->addWidget(progress_FS_Complete, 6, 0, 1, 3);
-
-    btn_FS_Local = new QToolButton(tab_FS);
-    btn_FS_Local->setObjectName("btn_FS_Local");
-
-    gridLayout_2->addWidget(btn_FS_Local, 0, 2, 1, 1);
-
-    label_3 = new QLabel(tab_FS);
-    label_3->setObjectName("label_3");
-
-    gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
-
-    combo_FS_type = new QComboBox(tab_FS);
-    combo_FS_type->setObjectName("combo_FS_type");
-    combo_FS_type->setEnabled(false);
-    combo_FS_type->setEditable(true);
-
-    gridLayout_2->addWidget(combo_FS_type, 2, 1, 1, 2);
-
-    horizontalLayout = new QHBoxLayout();
-    horizontalLayout->setSpacing(2);
-    horizontalLayout->setObjectName("horizontalLayout");
-    radio_FS_Upload = new QRadioButton(tab_FS);
-    radio_FS_Upload->setObjectName("radio_FS_Upload");
-    radio_FS_Upload->setChecked(true);
-
-    horizontalLayout->addWidget(radio_FS_Upload);
-
-    radio_FS_Download = new QRadioButton(tab_FS);
-    radio_FS_Download->setObjectName("radio_FS_Download");
-
-    horizontalLayout->addWidget(radio_FS_Download);
-
-    radio_FS_Size = new QRadioButton(tab_FS);
-    radio_FS_Size->setObjectName("radio_FS_Size");
-
-    horizontalLayout->addWidget(radio_FS_Size);
-
-    radio_FS_HashChecksum = new QRadioButton(tab_FS);
-    radio_FS_HashChecksum->setObjectName("radio_FS_HashChecksum");
-
-    horizontalLayout->addWidget(radio_FS_HashChecksum);
-
-    radio_FS_Hash_Checksum_Types = new QRadioButton(tab_FS);
-    radio_FS_Hash_Checksum_Types->setObjectName("radio_FS_Hash_Checksum_Types");
-
-    horizontalLayout->addWidget(radio_FS_Hash_Checksum_Types);
-
-
-    gridLayout_2->addLayout(horizontalLayout, 5, 0, 1, 3);
-
-    label_19 = new QLabel(tab_FS);
-    label_19->setObjectName("label_19");
-
-    gridLayout_2->addWidget(label_19, 2, 0, 1, 1);
-
-    edit_FS_Remote = new QLineEdit(tab_FS);
-    edit_FS_Remote->setObjectName("edit_FS_Remote");
-
-    gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
-
-    horizontalLayout_2 = new QHBoxLayout();
-    horizontalLayout_2->setSpacing(2);
-    horizontalLayout_2->setObjectName("horizontalLayout_2");
-    horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    horizontalLayout_2->addItem(horizontalSpacer);
-
-    btn_FS_Go = new QPushButton(tab_FS);
-    btn_FS_Go->setObjectName("btn_FS_Go");
-
-    horizontalLayout_2->addWidget(btn_FS_Go);
-
-    horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    horizontalLayout_2->addItem(horizontalSpacer_2);
-
-
-    gridLayout_2->addLayout(horizontalLayout_2, 9, 0, 1, 3);
-
-    verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-    gridLayout_2->addItem(verticalSpacer_6, 7, 0, 1, 1);
-
-    edit_FS_Local = new QLineEdit(tab_FS);
-    edit_FS_Local->setObjectName("edit_FS_Local");
-
-    gridLayout_2->addWidget(edit_FS_Local, 0, 1, 1, 1);
-
-    edit_FS_Result = new QLineEdit(tab_FS);
-    edit_FS_Result->setObjectName("edit_FS_Result");
-    edit_FS_Result->setEnabled(false);
-    edit_FS_Result->setReadOnly(true);
-
-    gridLayout_2->addWidget(edit_FS_Result, 3, 1, 1, 2);
-
-    edit_FS_Size = new QLineEdit(tab_FS);
-    edit_FS_Size->setObjectName("edit_FS_Size");
-    edit_FS_Size->setEnabled(false);
-    edit_FS_Size->setMaximumSize(QSize(80, 16777215));
-    edit_FS_Size->setReadOnly(true);
-
-    gridLayout_2->addWidget(edit_FS_Size, 4, 1, 1, 1);
-
-    tabWidget_2->addTab(tab_FS, QString());
     tab_IMG = new QWidget();
     tab_IMG->setObjectName("tab_IMG");
     gridLayout_3 = new QGridLayout(tab_IMG);
@@ -481,6 +345,142 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_3->addWidget(lbl_IMG_Status, 3, 0, 1, 2);
 
     tabWidget_2->addTab(tab_IMG, QString());
+    tab_FS = new QWidget();
+    tab_FS->setObjectName("tab_FS");
+    gridLayout_2 = new QGridLayout(tab_FS);
+    gridLayout_2->setSpacing(2);
+    gridLayout_2->setObjectName("gridLayout_2");
+    gridLayout_2->setContentsMargins(6, 6, 6, 6);
+    label_28 = new QLabel(tab_FS);
+    label_28->setObjectName("label_28");
+
+    gridLayout_2->addWidget(label_28, 3, 0, 1, 1);
+
+    lbl_FS_Status = new QLabel(tab_FS);
+    lbl_FS_Status->setObjectName("lbl_FS_Status");
+
+    gridLayout_2->addWidget(lbl_FS_Status, 8, 0, 1, 2);
+
+    label_29 = new QLabel(tab_FS);
+    label_29->setObjectName("label_29");
+
+    gridLayout_2->addWidget(label_29, 4, 0, 1, 1);
+
+    label_2 = new QLabel(tab_FS);
+    label_2->setObjectName("label_2");
+
+    gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
+
+    progress_FS_Complete = new QProgressBar(tab_FS);
+    progress_FS_Complete->setObjectName("progress_FS_Complete");
+    progress_FS_Complete->setValue(0);
+
+    gridLayout_2->addWidget(progress_FS_Complete, 6, 0, 1, 3);
+
+    btn_FS_Local = new QToolButton(tab_FS);
+    btn_FS_Local->setObjectName("btn_FS_Local");
+
+    gridLayout_2->addWidget(btn_FS_Local, 0, 2, 1, 1);
+
+    label_3 = new QLabel(tab_FS);
+    label_3->setObjectName("label_3");
+
+    gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
+
+    combo_FS_type = new QComboBox(tab_FS);
+    combo_FS_type->setObjectName("combo_FS_type");
+    combo_FS_type->setEnabled(false);
+    combo_FS_type->setEditable(true);
+
+    gridLayout_2->addWidget(combo_FS_type, 2, 1, 1, 2);
+
+    horizontalLayout = new QHBoxLayout();
+    horizontalLayout->setSpacing(2);
+    horizontalLayout->setObjectName("horizontalLayout");
+    radio_FS_Upload = new QRadioButton(tab_FS);
+    radio_FS_Upload->setObjectName("radio_FS_Upload");
+    radio_FS_Upload->setChecked(true);
+
+    horizontalLayout->addWidget(radio_FS_Upload);
+
+    radio_FS_Download = new QRadioButton(tab_FS);
+    radio_FS_Download->setObjectName("radio_FS_Download");
+
+    horizontalLayout->addWidget(radio_FS_Download);
+
+    radio_FS_Size = new QRadioButton(tab_FS);
+    radio_FS_Size->setObjectName("radio_FS_Size");
+
+    horizontalLayout->addWidget(radio_FS_Size);
+
+    radio_FS_HashChecksum = new QRadioButton(tab_FS);
+    radio_FS_HashChecksum->setObjectName("radio_FS_HashChecksum");
+
+    horizontalLayout->addWidget(radio_FS_HashChecksum);
+
+    radio_FS_Hash_Checksum_Types = new QRadioButton(tab_FS);
+    radio_FS_Hash_Checksum_Types->setObjectName("radio_FS_Hash_Checksum_Types");
+
+    horizontalLayout->addWidget(radio_FS_Hash_Checksum_Types);
+
+
+    gridLayout_2->addLayout(horizontalLayout, 5, 0, 1, 3);
+
+    label_19 = new QLabel(tab_FS);
+    label_19->setObjectName("label_19");
+
+    gridLayout_2->addWidget(label_19, 2, 0, 1, 1);
+
+    edit_FS_Remote = new QLineEdit(tab_FS);
+    edit_FS_Remote->setObjectName("edit_FS_Remote");
+
+    gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
+
+    horizontalLayout_2 = new QHBoxLayout();
+    horizontalLayout_2->setSpacing(2);
+    horizontalLayout_2->setObjectName("horizontalLayout_2");
+    horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
+    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_2->addItem(horizontalSpacer);
+
+    btn_FS_Go = new QPushButton(tab_FS);
+    btn_FS_Go->setObjectName("btn_FS_Go");
+
+    horizontalLayout_2->addWidget(btn_FS_Go);
+
+    horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_2->addItem(horizontalSpacer_2);
+
+
+    gridLayout_2->addLayout(horizontalLayout_2, 9, 0, 1, 3);
+
+    verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    gridLayout_2->addItem(verticalSpacer_6, 7, 0, 1, 1);
+
+    edit_FS_Local = new QLineEdit(tab_FS);
+    edit_FS_Local->setObjectName("edit_FS_Local");
+
+    gridLayout_2->addWidget(edit_FS_Local, 0, 1, 1, 1);
+
+    edit_FS_Result = new QLineEdit(tab_FS);
+    edit_FS_Result->setObjectName("edit_FS_Result");
+    edit_FS_Result->setEnabled(false);
+    edit_FS_Result->setReadOnly(true);
+
+    gridLayout_2->addWidget(edit_FS_Result, 3, 1, 1, 2);
+
+    edit_FS_Size = new QLineEdit(tab_FS);
+    edit_FS_Size->setObjectName("edit_FS_Size");
+    edit_FS_Size->setEnabled(false);
+    edit_FS_Size->setMaximumSize(QSize(80, 16777215));
+    edit_FS_Size->setReadOnly(true);
+
+    gridLayout_2->addWidget(edit_FS_Size, 4, 1, 1, 1);
+
+    tabWidget_2->addTab(tab_FS, QString());
     tab_OS = new QWidget();
     tab_OS->setObjectName("tab_OS");
     gridLayout_7 = new QGridLayout(tab_OS);
@@ -617,9 +617,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_12->addItem(verticalSpacer_3, 1, 0, 1, 1);
 
     selector_OS->addTab(tab_OS_Reset, QString());
-    tab_os_rtc = new QWidget();
-    tab_os_rtc->setObjectName("tab_os_rtc");
-    gridLayout_18 = new QGridLayout(tab_os_rtc);
+    tab_os_datetime = new QWidget();
+    tab_os_datetime->setObjectName("tab_os_datetime");
+    gridLayout_18 = new QGridLayout(tab_os_datetime);
     gridLayout_18->setSpacing(2);
     gridLayout_18->setObjectName("gridLayout_18");
     gridLayout_18->setContentsMargins(6, 6, 6, 6);
@@ -627,25 +627,26 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_18->addItem(verticalSpacer_8, 5, 1, 1, 1);
 
-    combo_os_rtc_timezone = new QComboBox(tab_os_rtc);
-    combo_os_rtc_timezone->setObjectName("combo_os_rtc_timezone");
+    combo_os_datetime_timezone = new QComboBox(tab_os_datetime);
+    combo_os_datetime_timezone->setObjectName("combo_os_datetime_timezone");
+    combo_os_datetime_timezone->setEnabled(false);
 
-    gridLayout_18->addWidget(combo_os_rtc_timezone, 1, 1, 1, 1);
+    gridLayout_18->addWidget(combo_os_datetime_timezone, 1, 1, 1, 1);
 
     horizontalLayout_19 = new QHBoxLayout();
     horizontalLayout_19->setSpacing(2);
     horizontalLayout_19->setObjectName("horizontalLayout_19");
     horizontalLayout_19->setContentsMargins(-1, 0, -1, -1);
-    radio_os_rtc_get = new QRadioButton(tab_os_rtc);
-    radio_os_rtc_get->setObjectName("radio_os_rtc_get");
-    radio_os_rtc_get->setChecked(true);
+    radio_os_datetime_get = new QRadioButton(tab_os_datetime);
+    radio_os_datetime_get->setObjectName("radio_os_datetime_get");
+    radio_os_datetime_get->setChecked(true);
 
-    horizontalLayout_19->addWidget(radio_os_rtc_get);
+    horizontalLayout_19->addWidget(radio_os_datetime_get);
 
-    radio_os_rtc_set = new QRadioButton(tab_os_rtc);
-    radio_os_rtc_set->setObjectName("radio_os_rtc_set");
+    radio_os_datetime_set = new QRadioButton(tab_os_datetime);
+    radio_os_datetime_set->setObjectName("radio_os_datetime_set");
 
-    horizontalLayout_19->addWidget(radio_os_rtc_set);
+    horizontalLayout_19->addWidget(radio_os_datetime_set);
 
     horizontalSpacer_15 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -654,43 +655,46 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_18->addLayout(horizontalLayout_19, 3, 0, 1, 2);
 
-    label_13 = new QLabel(tab_os_rtc);
+    label_13 = new QLabel(tab_os_datetime);
     label_13->setObjectName("label_13");
     label_13->setMaximumSize(QSize(80, 16777215));
 
     gridLayout_18->addWidget(label_13, 0, 0, 1, 1);
 
-    label_31 = new QLabel(tab_os_rtc);
+    label_31 = new QLabel(tab_os_datetime);
     label_31->setObjectName("label_31");
     label_31->setMaximumSize(QSize(100, 16777215));
 
     gridLayout_18->addWidget(label_31, 2, 0, 1, 1);
 
-    edit_os_rtc_date_time = new QDateTimeEdit(tab_os_rtc);
-    edit_os_rtc_date_time->setObjectName("edit_os_rtc_date_time");
-    edit_os_rtc_date_time->setMinimumSize(QSize(250, 0));
-    edit_os_rtc_date_time->setMaximumSize(QSize(300, 16777215));
-    edit_os_rtc_date_time->setAccelerated(true);
-    edit_os_rtc_date_time->setProperty("showGroupSeparator", QVariant(true));
-    edit_os_rtc_date_time->setMinimumDate(QDate(1970, 1, 1));
-    edit_os_rtc_date_time->setCurrentSection(QDateTimeEdit::YearSection);
-    edit_os_rtc_date_time->setCalendarPopup(true);
-    edit_os_rtc_date_time->setTimeSpec(Qt::OffsetFromUTC);
+    edit_os_datetime_date_time = new QDateTimeEdit(tab_os_datetime);
+    edit_os_datetime_date_time->setObjectName("edit_os_datetime_date_time");
+    edit_os_datetime_date_time->setMinimumSize(QSize(250, 0));
+    edit_os_datetime_date_time->setMaximumSize(QSize(300, 16777215));
+    edit_os_datetime_date_time->setReadOnly(true);
+    edit_os_datetime_date_time->setAccelerated(true);
+    edit_os_datetime_date_time->setProperty("showGroupSeparator", QVariant(true));
+    edit_os_datetime_date_time->setMinimumDate(QDate(1970, 1, 1));
+    edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::YearSection);
+    edit_os_datetime_date_time->setCalendarPopup(true);
+    edit_os_datetime_date_time->setTimeSpec(Qt::LocalTime);
 
-    gridLayout_18->addWidget(edit_os_rtc_date_time, 0, 1, 1, 1);
+    gridLayout_18->addWidget(edit_os_datetime_date_time, 0, 1, 1, 1);
 
-    label_30 = new QLabel(tab_os_rtc);
+    label_30 = new QLabel(tab_os_datetime);
     label_30->setObjectName("label_30");
     label_30->setMaximumSize(QSize(100, 16777215));
 
     gridLayout_18->addWidget(label_30, 1, 0, 1, 1);
 
-    check_os_rtc_use_pc_date_time = new QCheckBox(tab_os_rtc);
-    check_os_rtc_use_pc_date_time->setObjectName("check_os_rtc_use_pc_date_time");
+    check_os_datetime_use_pc_date_time = new QCheckBox(tab_os_datetime);
+    check_os_datetime_use_pc_date_time->setObjectName("check_os_datetime_use_pc_date_time");
+    check_os_datetime_use_pc_date_time->setEnabled(false);
+    check_os_datetime_use_pc_date_time->setChecked(true);
 
-    gridLayout_18->addWidget(check_os_rtc_use_pc_date_time, 2, 1, 1, 1);
+    gridLayout_18->addWidget(check_os_datetime_use_pc_date_time, 2, 1, 1, 1);
 
-    selector_OS->addTab(tab_os_rtc, QString());
+    selector_OS->addTab(tab_os_datetime, QString());
     tab_OS_Info = new QWidget();
     tab_OS_Info->setObjectName("tab_OS_Info");
     gridLayout_13 = new QGridLayout(tab_OS_Info);
@@ -1278,9 +1282,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(2);
+    tabWidget_2->setCurrentIndex(0);
     tabWidget_3->setCurrentIndex(0);
-    selector_OS->setCurrentIndex(4);
+    selector_OS->setCurrentIndex(0);
     tabWidget_4->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
 
@@ -1293,20 +1297,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
     radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
-    label_28->setText(QCoreApplication::translate("Form", "Hash/Checksum:", nullptr));
-    lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    label_29->setText(QCoreApplication::translate("Form", "File size:", nullptr));
-    label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
-    btn_FS_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
-    label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
-    radio_FS_Upload->setText(QCoreApplication::translate("Form", "Upload", nullptr));
-    radio_FS_Download->setText(QCoreApplication::translate("Form", "Download", nullptr));
-    radio_FS_Size->setText(QCoreApplication::translate("Form", "Size", nullptr));
-    radio_FS_HashChecksum->setText(QCoreApplication::translate("Form", "Hash/checksum", nullptr));
-    radio_FS_Hash_Checksum_Types->setText(QCoreApplication::translate("Form", "Types", nullptr));
-    label_19->setText(QCoreApplication::translate("Form", "Type:", nullptr));
-    btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
     label_4->setText(QCoreApplication::translate("Form", "File:", nullptr));
     check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
@@ -1328,6 +1318,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_IMG), QCoreApplication::translate("Form", "Img", nullptr));
+    label_28->setText(QCoreApplication::translate("Form", "Hash/Checksum:", nullptr));
+    lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    label_29->setText(QCoreApplication::translate("Form", "File size:", nullptr));
+    label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
+    btn_FS_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
+    label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
+    radio_FS_Upload->setText(QCoreApplication::translate("Form", "Upload", nullptr));
+    radio_FS_Download->setText(QCoreApplication::translate("Form", "Download", nullptr));
+    radio_FS_Size->setText(QCoreApplication::translate("Form", "Size", nullptr));
+    radio_FS_HashChecksum->setText(QCoreApplication::translate("Form", "Hash/checksum", nullptr));
+    radio_FS_Hash_Checksum_Types->setText(QCoreApplication::translate("Form", "Types", nullptr));
+    label_19->setText(QCoreApplication::translate("Form", "Type:", nullptr));
+    btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
     btn_OS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_OS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     label_10->setText(QCoreApplication::translate("Form", "Input:", nullptr));
@@ -1361,14 +1365,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Memory), QCoreApplication::translate("Form", "Memory", nullptr));
     check_OS_Force_Reboot->setText(QCoreApplication::translate("Form", "Force reboot", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Reset), QCoreApplication::translate("Form", "Reset", nullptr));
-    radio_os_rtc_get->setText(QCoreApplication::translate("Form", "Get", nullptr));
-    radio_os_rtc_set->setText(QCoreApplication::translate("Form", "Set", nullptr));
+    radio_os_datetime_get->setText(QCoreApplication::translate("Form", "Get", nullptr));
+    radio_os_datetime_set->setText(QCoreApplication::translate("Form", "Set", nullptr));
     label_13->setText(QCoreApplication::translate("Form", "Date/time:", nullptr));
     label_31->setText(QCoreApplication::translate("Form", "Sync:", nullptr));
-    edit_os_rtc_date_time->setDisplayFormat(QCoreApplication::translate("Form", "yyyy-MM-dd HH:mm:ss t", nullptr));
+    edit_os_datetime_date_time->setDisplayFormat(QCoreApplication::translate("Form", "yyyy-MM-dd HH:mm:ss t", nullptr));
     label_30->setText(QCoreApplication::translate("Form", "Timezone:", nullptr));
-    check_os_rtc_use_pc_date_time->setText(QCoreApplication::translate("Form", "Use PC date and time", nullptr));
-    selector_OS->setTabText(selector_OS->indexOf(tab_os_rtc), QCoreApplication::translate("Form", "RTC", nullptr));
+    check_os_datetime_use_pc_date_time->setText(QCoreApplication::translate("Form", "Use PC date and time", nullptr));
+    selector_OS->setTabText(selector_OS->indexOf(tab_os_datetime), QCoreApplication::translate("Form", "Date/time", nullptr));
     label_17->setText(QCoreApplication::translate("Form", "uname:", nullptr));
     radio_OS_Buffer_Info->setText(QCoreApplication::translate("Form", "Buffer info", nullptr));
     radio_OS_uname->setText(QCoreApplication::translate("Form", "uname", nullptr));
@@ -1520,9 +1524,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(edit_SHELL_Output, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
     connect(btn_zephyr_go, SIGNAL(clicked()), this, SLOT(on_btn_zephyr_go_clicked()));
     connect(btn_zephyr_go, SIGNAL(clicked()), this, SLOT(on_btn_zephyr_go_clicked()));
-    connect(check_os_rtc_use_pc_date_time, SIGNAL(toggled(bool)), this, SLOT(on_check_os_rtc_use_pc_date_time_toggled(bool)));
-    connect(radio_os_rtc_get, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_rtc_get_toggled(bool)));
-    connect(radio_os_rtc_set, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_rtc_set_toggled(bool)));
+    connect(check_os_datetime_use_pc_date_time, SIGNAL(toggled(bool)), this, SLOT(on_check_os_datetime_use_pc_date_time_toggled(bool)));
+    connect(radio_os_datetime_get, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_datetime_get_toggled(bool)));
+    connect(radio_os_datetime_set, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_datetime_set_toggled(bool)));
 
 
     //Use monospace font for shell
@@ -1581,7 +1585,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     {
         if (item.length() > 3 && (item.left(3) == "Etc" || item.left(3) == "UTC"))
         {
-            combo_os_rtc_timezone->addItem(item);
+            combo_os_datetime_timezone->addItem(item);
         }
     }
 }
@@ -1650,9 +1654,9 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
     disconnect(this, SLOT(enter_pressed()));
     disconnect(this, SLOT(on_btn_zephyr_go_clicked()));
-    disconnect(this, SLOT(on_check_os_rtc_use_pc_date_time_toggled(bool)));
-    disconnect(this, SLOT(on_radio_os_rtc_get_toggled(bool)));
-    disconnect(this, SLOT(on_radio_os_rtc_set_toggled(bool)));
+    disconnect(this, SLOT(on_check_os_datetime_use_pc_date_time_toggled(bool)));
+    disconnect(this, SLOT(on_radio_os_datetime_get_toggled(bool)));
+    disconnect(this, SLOT(on_radio_os_datetime_set_toggled(bool)));
 
     //Clean up GUI
     delete tab_2;
@@ -1775,8 +1779,8 @@ void plugin_mcumgr::serial_closed()
         case ACTION_OS_TASK_STATS:
         case ACTION_OS_MEMORY_POOL:
         case ACTION_OS_RESET:
-        case ACTION_OS_RTC_GET:
-        case ACTION_OS_RTC_SET:
+        case ACTION_OS_DATETIME_GET:
+        case ACTION_OS_DATETIME_SET:
         case ACTION_OS_MCUMGR_BUFFER:
         case ACTION_OS_OS_APPLICATION_INFO:
         case ACTION_OS_BOOTLOADER_INFO:
@@ -2261,13 +2265,13 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             lbl_OS_Status->setText("Reset command...");
         }
     }
-    else if (selector_OS->currentWidget() == tab_os_rtc)
+    else if (selector_OS->currentWidget() == tab_os_datetime)
     {
         processor->set_transport(active_transport());
 
-        if (radio_os_rtc_get->isChecked())
+        if (radio_os_datetime_get->isChecked())
         {
-            mode = ACTION_OS_RTC_GET;
+            mode = ACTION_OS_DATETIME_GET;
 
             smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
             started = smp_groups.os_mgmt->start_date_time_get(&rtc_time_date_response);
@@ -2277,20 +2281,20 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
                 lbl_OS_Status->setText("RTC get...");
             }
         }
-        else if (radio_os_rtc_set->isChecked())
+        else if (radio_os_datetime_set->isChecked())
         {
             QDateTime date_time;
-            mode = ACTION_OS_RTC_SET;
+            mode = ACTION_OS_DATETIME_SET;
 
-            if (check_os_rtc_use_pc_date_time->isChecked())
+            if (check_os_datetime_use_pc_date_time->isChecked())
             {
                 date_time = QDateTime::currentDateTime();
                 date_time.setTimeZone(date_time.timeZone());
             }
             else
             {
-                date_time = edit_os_rtc_date_time->dateTime();
-                date_time.setTimeZone(QTimeZone(combo_os_rtc_timezone->currentText().toUtf8()));
+                date_time = edit_os_datetime_date_time->dateTime();
+                date_time.setTimeZone(QTimeZone(combo_os_datetime_timezone->currentText().toUtf8()));
             }
 
             smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
@@ -2735,22 +2739,22 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     }
                 }
             }
-            else if (user_data == ACTION_OS_RTC_GET)
+            else if (user_data == ACTION_OS_DATETIME_GET)
             {
                 int index;
                 log_debug() << "RTC response: " << rtc_time_date_response;
 
                 rtc_time_date_response.setTimeZone(rtc_time_date_response.timeZone());
-                index = combo_os_rtc_timezone->findText(rtc_time_date_response.timeZone().displayName(rtc_time_date_response, QTimeZone::OffsetName));
+                index = combo_os_datetime_timezone->findText(rtc_time_date_response.timeZone().displayName(rtc_time_date_response, QTimeZone::OffsetName));
 
                 if (index >= 0)
                 {
-                    combo_os_rtc_timezone->setCurrentIndex(index);
+                    combo_os_datetime_timezone->setCurrentIndex(index);
                 }
 
-                edit_os_rtc_date_time->setDateTime(rtc_time_date_response);
+                edit_os_datetime_date_time->setDateTime(rtc_time_date_response);
             }
-            else if (user_data == ACTION_OS_RTC_SET)
+            else if (user_data == ACTION_OS_DATETIME_SET)
             {
             }
         }
@@ -3594,30 +3598,31 @@ void plugin_mcumgr::on_btn_zephyr_go_clicked()
     }
 }
 
-void plugin_mcumgr::on_check_os_rtc_use_pc_date_time_toggled(bool checked)
+void plugin_mcumgr::on_check_os_datetime_use_pc_date_time_toggled(bool checked)
 {
-    combo_os_rtc_timezone->setEnabled(!checked);
-    edit_os_rtc_date_time->setEnabled(!checked);
-    edit_os_rtc_date_time->setReadOnly(checked);
+    combo_os_datetime_timezone->setEnabled(!checked);
+    edit_os_datetime_date_time->setEnabled(!checked);
+    edit_os_datetime_date_time->setReadOnly(checked);
 }
 
-void plugin_mcumgr::on_radio_os_rtc_get_toggled(bool checked)
+void plugin_mcumgr::on_radio_os_datetime_get_toggled(bool checked)
 {
     if (checked == true)
     {
-        check_os_rtc_use_pc_date_time->setEnabled(false);
-        combo_os_rtc_timezone->setEnabled(false);
-        edit_os_rtc_date_time->setReadOnly(true);
-        edit_os_rtc_date_time->setDisplayFormat("yyyy-MM-dd HH:mm:ss t");
+        check_os_datetime_use_pc_date_time->setEnabled(false);
+        combo_os_datetime_timezone->setEnabled(false);
+        edit_os_datetime_date_time->setReadOnly(true);
+        edit_os_datetime_date_time->setEnabled(true);
+        edit_os_datetime_date_time->setDisplayFormat("yyyy-MM-dd HH:mm:ss t");
     }
 }
 
-void plugin_mcumgr::on_radio_os_rtc_set_toggled(bool checked)
+void plugin_mcumgr::on_radio_os_datetime_set_toggled(bool checked)
 {
     if (checked == true)
     {
-        check_os_rtc_use_pc_date_time->setEnabled(true);
-        edit_os_rtc_date_time->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
-        on_check_os_rtc_use_pc_date_time_toggled(check_os_rtc_use_pc_date_time->isChecked());
+        check_os_datetime_use_pc_date_time->setEnabled(true);
+        edit_os_datetime_date_time->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+        on_check_os_datetime_use_pc_date_time_toggled(check_os_datetime_use_pc_date_time->isChecked());
     }
 }
