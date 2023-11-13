@@ -104,7 +104,7 @@
 // Constants
 /******************************************************************************/
 //Constants for version and functions
-const QString UwVersion                         = "0.27"; //Version string
+const QString UwVersion                         = "0.28"; //Version string
 //Constants for timeouts and streaming
 const qint16 FileReadBlock                      = 512;     //Number of bytes to read per block when streaming files
 const qint16 StreamProgress                     = 10000;   //Number of bytes between streaming progress updates
