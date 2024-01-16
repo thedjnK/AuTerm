@@ -445,6 +445,7 @@ private:
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
     QButtonGroup *buttonGroup_2;
+    QButtonGroup *buttonGroup_3;
     QButtonGroup *buttonGroup;
 ///AUTOGEN_END_OBJECTS
 

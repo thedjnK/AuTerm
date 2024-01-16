@@ -109,18 +109,25 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_7->addWidget(check_V2_Protocol);
 
     radio_transport_uart = new QRadioButton(tab);
+    buttonGroup_3 = new QButtonGroup(tab);
+    buttonGroup_3->setObjectName("buttonGroup_3");
+    buttonGroup_3->addButton(radio_transport_uart);
     radio_transport_uart->setObjectName("radio_transport_uart");
     radio_transport_uart->setChecked(true);
 
     horizontalLayout_7->addWidget(radio_transport_uart);
 
     radio_transport_udp = new QRadioButton(tab);
+    buttonGroup_3->addButton(radio_transport_udp);
     radio_transport_udp->setObjectName("radio_transport_udp");
+    radio_transport_udp->setAutoExclusive(true);
 
     horizontalLayout_7->addWidget(radio_transport_udp);
 
     radio_transport_bluetooth = new QRadioButton(tab);
+    buttonGroup_3->addButton(radio_transport_bluetooth);
     radio_transport_bluetooth->setObjectName("radio_transport_bluetooth");
+    radio_transport_bluetooth->setAutoExclusive(true);
 
     horizontalLayout_7->addWidget(radio_transport_bluetooth);
 
