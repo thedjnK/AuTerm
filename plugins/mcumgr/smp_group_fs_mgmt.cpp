@@ -674,7 +674,7 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         {
             //Response to download
             uint32_t off;
-            uint32_t len;
+            uint32_t len = 0;
             QByteArray file_data;
             QCborStreamReader cbor_reader(data);
             bool good = parse_download_response(cbor_reader, &off, &len, &file_data);
