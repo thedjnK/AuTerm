@@ -34,6 +34,7 @@ $Replacement2 = array(
 	array('tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("Form", "Page", nullptr));', '//', 1),
 	array('buttonGroup_2 = new QButtonGroup(Form);', 'buttonGroup_2 = new QButtonGroup(tab_Settings);', 0),
 	array('buttonGroup = new QButtonGroup(Form);', 'buttonGroup = new QButtonGroup(tab_Settings);', 0),
+	array('buttonGroup_3 = new QButtonGroup(Form);', 'buttonGroup_3 = new QButtonGroup(tab);', 0),
 );
 
 $Replacement3 = array(
