@@ -293,12 +293,12 @@ void smp_group_stat_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gr
     if (command == COMMAND_GROUP_DATA && mode == MODE_GROUP_DATA)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_LIST_GROUPS && mode == MODE_LIST_GROUPS)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else
     {

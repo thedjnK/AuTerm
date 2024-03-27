@@ -783,32 +783,32 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
             log_error() << "Possible MCUmgr FS upload transport clash";
         }
 
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_UPLOAD_DOWNLOAD && mode == MODE_DOWNLOAD)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_STATUS && mode == MODE_STATUS)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_HASH_CHECKSUM && mode == MODE_HASH_CHECKSUM)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_SUPPORTED_HASHES_CHECKSUMS && mode == MODE_SUPPORTED_HASHES_CHECKSUMS)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_FILE_CLOSE && mode == MODE_FILE_CLOSE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else
     {

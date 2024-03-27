@@ -31,6 +31,24 @@ enum smp_error_type {
     SMP_ERROR_RET,
 };
 
+enum smp_rc_errors {
+    //Error index starts from 0
+    SMP_RC_ERROR_EOK = 0,
+    SMP_RC_ERROR_EUNKNOWN,
+    SMP_RC_ERROR_ENOMEM,
+    SMP_RC_ERROR_EINVAL,
+    SMP_RC_ERROR_ETIMEOUT,
+    SMP_RC_ERROR_ENOENT,
+    SMP_RC_ERROR_EBADSTATE,
+    SMP_RC_ERROR_EMSGSIZE,
+    SMP_RC_ERROR_ENOTSUP,
+    SMP_RC_ERROR_ECORRUPT,
+    SMP_RC_ERROR_EBUSY,
+    SMP_RC_ERROR_EACCESSDENIED,
+    SMP_RC_ERROR_UNSUPPORTED_TOO_OLD,
+    SMP_RC_ERROR_UNSUPPORTED_TOO_NEW,
+};
+
 struct smp_error_t {
     smp_error_type type;
     int32_t rc;

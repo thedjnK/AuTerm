@@ -34,6 +34,7 @@
 enum group_status : uint8_t {
     STATUS_COMPLETE = 0,
     STATUS_ERROR,
+    STATUS_UNSUPPORTED,
     STATUS_TIMEOUT,
     STATUS_CANCELLED
 };
@@ -111,6 +112,20 @@ public:
     virtual void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) = 0;
     virtual void timeout(smp_message *message) = 0;
     virtual void cancel() = 0;
+
+protected:
+    static enum group_status status_error_return(smp_error_t error)
+    {
+        if (error.type == SMP_ERROR_RC)
+        {
+            if (error.rc == SMP_RC_ERROR_ENOTSUP)
+            {
+                return STATUS_UNSUPPORTED;
+            }
+        }
+
+        return STATUS_ERROR;
+    }
 
 signals:
     void status(uint8_t user_data, group_status status, QString error_string);

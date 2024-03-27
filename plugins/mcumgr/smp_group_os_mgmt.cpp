@@ -892,47 +892,47 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
     if (command == COMMAND_ECHO && mode == MODE_ECHO)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_TASK_STATS && mode == MODE_TASK_STATS)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_MEMORY_POOL && mode == MODE_MEMORY_POOL)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_DATE_TIME && mode == MODE_DATE_TIME_GET)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_DATE_TIME && mode == MODE_DATE_TIME_SET)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_RESET && mode == MODE_RESET)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_MCUMGR_PARAMETERS && mode == MODE_MCUMGR_PARAMETERS)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_OS_APPLICATION_INFO && mode == MODE_OS_APPLICATION_INFO)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_BOOTLOADER_INFO && mode == MODE_BOOTLOADER_INFO)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else
     {

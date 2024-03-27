@@ -201,7 +201,7 @@ void smp_group_shell_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t g
     if (command == COMMAND_EXECUTE && mode == MODE_EXECUTE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else
     {

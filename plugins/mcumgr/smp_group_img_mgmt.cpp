@@ -912,22 +912,24 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
     if (command == COMMAND_STATE && mode == MODE_LIST_IMAGES)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        //error.type == SMP_ERROR_RC && error.rc ==
+//            STATUS_UNSUPPORTED
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_STATE && mode == MODE_SET_IMAGE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_UPLOAD && mode == MODE_UPLOAD_FIRMWARE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_ERASE && mode == MODE_ERASE_IMAGE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else
     {

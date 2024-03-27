@@ -100,7 +100,7 @@ void smp_group_zephyr_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t 
     if (command == COMMAND_STORAGE_ERASE && mode == MODE_STORAGE_ERASE)
     {
         //TODO
-        emit status(smp_user_data, STATUS_ERROR, smp_error::error_lookup_string(&error));
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else
     {
