@@ -2565,6 +2565,28 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 }
             }
         }
+        else if (status == STATUS_UNSUPPORTED)
+        {
+            log_debug() << "unsupported";
+
+            //Advance to next stage of image upload, this is likely to occur in MCUboot serial recovery whereby the image state functionality is not included
+            if (user_data == ACTION_IMG_UPLOAD_SET)
+            {
+                if (check_IMG_Reset->isChecked())
+                {
+                    //Reboot device
+                    finished = false;
+
+                    mode = ACTION_OS_UPLOAD_RESET;
+                    processor->set_transport(active_transport());
+                    smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+                    bool started = smp_groups.os_mgmt->start_reset(false);
+                    //todo: check status
+
+                    log_debug() << "do reset";
+                }
+            }
+        }
     }
     else if (sender() == smp_groups.os_mgmt)
     {
