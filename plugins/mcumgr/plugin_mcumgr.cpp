@@ -58,6 +58,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.shell_mgmt = new smp_group_shell_mgmt(processor);
     smp_groups.stat_mgmt = new smp_group_stat_mgmt(processor);
     smp_groups.zephyr_mgmt = new smp_group_zephyr_mgmt(processor);
+    smp_groups.enum_mgmt = new smp_group_enum_mgmt(processor);
     error_lookup_form = new error_lookup(parent_window, &smp_groups);
 
 #ifndef SKIPPLUGIN_LOGGER
@@ -145,7 +146,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_2 = new QTabWidget(tab);
     tabWidget_2->setObjectName("tabWidget_2");
-    tabWidget_2->setTabPosition(QTabWidget::West);
+    tabWidget_2->setTabPosition(QTabWidget::TabPosition::West);
     tab_IMG = new QWidget();
     tab_IMG->setObjectName("tab_IMG");
     gridLayout_3 = new QGridLayout(tab_IMG);
@@ -160,20 +161,32 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_4->setSpacing(2);
     gridLayout_4->setObjectName("gridLayout_4");
     gridLayout_4->setContentsMargins(6, 6, 6, 6);
-    label_4 = new QLabel(tab_IMG_Upload);
-    label_4->setObjectName("label_4");
-
-    gridLayout_4->addWidget(label_4, 0, 0, 1, 1);
-
-    check_IMG_Reset = new QCheckBox(tab_IMG_Upload);
-    check_IMG_Reset->setObjectName("check_IMG_Reset");
-
-    gridLayout_4->addWidget(check_IMG_Reset, 2, 1, 1, 1);
-
     label_6 = new QLabel(tab_IMG_Upload);
     label_6->setObjectName("label_6");
 
     gridLayout_4->addWidget(label_6, 3, 0, 1, 1);
+
+    check_IMG_Reset = new QCheckBox(tab_IMG_Upload);
+    check_IMG_Reset->setObjectName("check_IMG_Reset");
+    check_IMG_Reset->setChecked(false);
+
+    gridLayout_4->addWidget(check_IMG_Reset, 2, 1, 1, 1);
+
+    progress_IMG_Complete = new QProgressBar(tab_IMG_Upload);
+    progress_IMG_Complete->setObjectName("progress_IMG_Complete");
+    progress_IMG_Complete->setValue(0);
+
+    gridLayout_4->addWidget(progress_IMG_Complete, 3, 1, 1, 1);
+
+    label_9 = new QLabel(tab_IMG_Upload);
+    label_9->setObjectName("label_9");
+
+    gridLayout_4->addWidget(label_9, 2, 0, 1, 1);
+
+    label_4 = new QLabel(tab_IMG_Upload);
+    label_4->setObjectName("label_4");
+
+    gridLayout_4->addWidget(label_4, 1, 0, 1, 1);
 
     horizontalLayout_5 = new QHBoxLayout();
     horizontalLayout_5->setSpacing(2);
@@ -194,7 +207,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_41 = new QLabel(tab_IMG_Upload);
     label_41->setObjectName("label_41");
 
-    gridLayout_4->addWidget(label_41, 1, 0, 1, 1);
+    gridLayout_4->addWidget(label_41, 0, 0, 1, 1);
 
     horizontalLayout_4 = new QHBoxLayout();
     horizontalLayout_4->setSpacing(2);
@@ -223,17 +236,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 
     gridLayout_4->addLayout(horizontalLayout_4, 1, 1, 1, 1);
-
-    progress_IMG_Complete = new QProgressBar(tab_IMG_Upload);
-    progress_IMG_Complete->setObjectName("progress_IMG_Complete");
-    progress_IMG_Complete->setValue(0);
-
-    gridLayout_4->addWidget(progress_IMG_Complete, 3, 1, 1, 1);
-
-    label_9 = new QLabel(tab_IMG_Upload);
-    label_9->setObjectName("label_9");
-
-    gridLayout_4->addWidget(label_9, 2, 0, 1, 1);
 
     verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -279,7 +281,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line = new QFrame(tab_IMG_Images);
     line->setObjectName("line");
-    line->setFrameShape(QFrame::VLine);
+    line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
 
     horizontalLayout_6->addWidget(line);
@@ -572,11 +574,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
     table_OS_Tasks->setHorizontalHeaderItem(7, __qtablewidgetitem7);
     table_OS_Tasks->setObjectName("table_OS_Tasks");
-    table_OS_Tasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_OS_Tasks->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     table_OS_Tasks->setProperty("showDropIndicator", QVariant(false));
     table_OS_Tasks->setDragDropOverwriteMode(false);
     table_OS_Tasks->setAlternatingRowColors(true);
-    table_OS_Tasks->setSelectionMode(QAbstractItemView::NoSelection);
+    table_OS_Tasks->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
     table_OS_Tasks->setSortingEnabled(true);
     table_OS_Tasks->setCornerButtonEnabled(false);
 
@@ -599,11 +601,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
     table_OS_Memory->setHorizontalHeaderItem(3, __qtablewidgetitem11);
     table_OS_Memory->setObjectName("table_OS_Memory");
-    table_OS_Memory->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_OS_Memory->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     table_OS_Memory->setProperty("showDropIndicator", QVariant(false));
     table_OS_Memory->setDragDropOverwriteMode(false);
     table_OS_Memory->setAlternatingRowColors(true);
-    table_OS_Memory->setSelectionMode(QAbstractItemView::NoSelection);
+    table_OS_Memory->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
     table_OS_Memory->setSortingEnabled(true);
     table_OS_Memory->setCornerButtonEnabled(false);
 
@@ -682,9 +684,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_os_datetime_date_time->setAccelerated(true);
     edit_os_datetime_date_time->setProperty("showGroupSeparator", QVariant(true));
     edit_os_datetime_date_time->setMinimumDate(QDate(1970, 1, 1));
-    edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::YearSection);
+    edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::Section::YearSection);
     edit_os_datetime_date_time->setCalendarPopup(true);
-    edit_os_datetime_date_time->setTimeSpec(Qt::LocalTime);
+    edit_os_datetime_date_time->setTimeSpec(Qt::TimeSpec::LocalTime);
 
     gridLayout_18->addWidget(edit_os_datetime_date_time, 0, 1, 1, 1);
 
@@ -753,7 +755,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_OS_Bootloader->setObjectName("tab_OS_Bootloader");
     formLayout_2 = new QFormLayout(tab_OS_Bootloader);
     formLayout_2->setObjectName("formLayout_2");
-    formLayout_2->setFormAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+    formLayout_2->setFormAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
     formLayout_2->setHorizontalSpacing(2);
     formLayout_2->setVerticalSpacing(2);
     formLayout_2->setContentsMargins(6, 6, 6, 6);
@@ -855,7 +857,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
     table_STAT_Values->setHorizontalHeaderItem(1, __qtablewidgetitem13);
     table_STAT_Values->setObjectName("table_STAT_Values");
-    table_STAT_Values->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_STAT_Values->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     table_STAT_Values->setProperty("showDropIndicator", QVariant(false));
     table_STAT_Values->setDragDropOverwriteMode(false);
     table_STAT_Values->setAlternatingRowColors(true);
@@ -1196,6 +1198,92 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_16->addWidget(lbl_zephyr_status, 1, 0, 1, 1);
 
     tabWidget_2->addTab(tab_zephyr, QString());
+    tab_Enum = new QWidget();
+    tab_Enum->setObjectName("tab_Enum");
+    verticalLayout_3 = new QVBoxLayout(tab_Enum);
+    verticalLayout_3->setSpacing(2);
+    verticalLayout_3->setObjectName("verticalLayout_3");
+    verticalLayout_3->setContentsMargins(6, 6, 6, 6);
+    horizontalLayout_21 = new QHBoxLayout();
+    horizontalLayout_21->setObjectName("horizontalLayout_21");
+    radio_Enum_Count = new QRadioButton(tab_Enum);
+    radio_Enum_Count->setObjectName("radio_Enum_Count");
+    radio_Enum_Count->setChecked(true);
+
+    horizontalLayout_21->addWidget(radio_Enum_Count);
+
+    radio_Enum_List = new QRadioButton(tab_Enum);
+    radio_Enum_List->setObjectName("radio_Enum_List");
+
+    horizontalLayout_21->addWidget(radio_Enum_List);
+
+    radio_Enum_Details = new QRadioButton(tab_Enum);
+    radio_Enum_Details->setObjectName("radio_Enum_Details");
+
+    horizontalLayout_21->addWidget(radio_Enum_Details);
+
+
+    verticalLayout_3->addLayout(horizontalLayout_21);
+
+    horizontalLayout_22 = new QHBoxLayout();
+    horizontalLayout_22->setObjectName("horizontalLayout_22");
+    label_32 = new QLabel(tab_Enum);
+    label_32->setObjectName("label_32");
+
+    horizontalLayout_22->addWidget(label_32);
+
+    edit_Enum_Count = new QLineEdit(tab_Enum);
+    edit_Enum_Count->setObjectName("edit_Enum_Count");
+    edit_Enum_Count->setReadOnly(true);
+
+    horizontalLayout_22->addWidget(edit_Enum_Count);
+
+
+    verticalLayout_3->addLayout(horizontalLayout_22);
+
+    table_Enum_List_Details = new QTableWidget(tab_Enum);
+    if (table_Enum_List_Details->columnCount() < 3)
+        table_Enum_List_Details->setColumnCount(3);
+    QTableWidgetItem *__qtablewidgetitem14 = new QTableWidgetItem();
+    table_Enum_List_Details->setHorizontalHeaderItem(0, __qtablewidgetitem14);
+    QTableWidgetItem *__qtablewidgetitem15 = new QTableWidgetItem();
+    table_Enum_List_Details->setHorizontalHeaderItem(1, __qtablewidgetitem15);
+    QTableWidgetItem *__qtablewidgetitem16 = new QTableWidgetItem();
+    table_Enum_List_Details->setHorizontalHeaderItem(2, __qtablewidgetitem16);
+    table_Enum_List_Details->setObjectName("table_Enum_List_Details");
+    table_Enum_List_Details->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    table_Enum_List_Details->setDragDropOverwriteMode(false);
+    table_Enum_List_Details->setAlternatingRowColors(true);
+    table_Enum_List_Details->setSortingEnabled(true);
+    table_Enum_List_Details->setWordWrap(false);
+
+    verticalLayout_3->addWidget(table_Enum_List_Details);
+
+    lbl_enum_status = new QLabel(tab_Enum);
+    lbl_enum_status->setObjectName("lbl_enum_status");
+
+    verticalLayout_3->addWidget(lbl_enum_status);
+
+    horizontalLayout_20 = new QHBoxLayout();
+    horizontalLayout_20->setSpacing(2);
+    horizontalLayout_20->setObjectName("horizontalLayout_20");
+    horizontalSpacer_16 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_20->addItem(horizontalSpacer_16);
+
+    btn_enum_go = new QPushButton(tab_Enum);
+    btn_enum_go->setObjectName("btn_enum_go");
+
+    horizontalLayout_20->addWidget(btn_enum_go);
+
+    horizontalSpacer_21 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    horizontalLayout_20->addItem(horizontalSpacer_21);
+
+
+    verticalLayout_3->addLayout(horizontalLayout_20);
+
+    tabWidget_2->addTab(tab_Enum, QString());
 
     verticalLayout_2->addWidget(tabWidget_2);
 
@@ -1211,7 +1299,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout->setContentsMargins(6, 6, 8, 6);
     formLayout = new QFormLayout();
     formLayout->setObjectName("formLayout");
-    formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+    formLayout->setFieldGrowthPolicy(QFormLayout::FieldGrowthPolicy::ExpandingFieldsGrow);
     formLayout->setHorizontalSpacing(2);
     formLayout->setVerticalSpacing(2);
     label_7 = new QLabel(verticalLayoutWidget);
@@ -1304,15 +1392,15 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
     radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
-    label_4->setText(QCoreApplication::translate("Form", "File:", nullptr));
-    check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
+    check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
+    label_9->setText(QCoreApplication::translate("Form", "Reset:", nullptr));
+    label_4->setText(QCoreApplication::translate("Form", "Image:", nullptr));
     btn_IMG_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
-    label_41->setText(QCoreApplication::translate("Form", "Image:", nullptr));
+    label_41->setText(QCoreApplication::translate("Form", "File:", nullptr));
     radio_IMG_No_Action->setText(QCoreApplication::translate("Form", "No action", nullptr));
     radio_IMG_Test->setText(QCoreApplication::translate("Form", "Test", nullptr));
     radio_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
-    label_9->setText(QCoreApplication::translate("Form", "Reset:", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Upload), QCoreApplication::translate("Form", "Upload", nullptr));
     label_5->setText(QCoreApplication::translate("Form", "State:", nullptr));
     radio_IMG_Get->setText(QCoreApplication::translate("Form", "Get", nullptr));
@@ -1432,6 +1520,19 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_4->setTabText(tabWidget_4->indexOf(tab_zephyr_storage_erase), QCoreApplication::translate("Form", "Storage Erase", nullptr));
     lbl_zephyr_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_zephyr), QCoreApplication::translate("Form", "Zephyr", nullptr));
+    radio_Enum_Count->setText(QCoreApplication::translate("Form", "Count", nullptr));
+    radio_Enum_List->setText(QCoreApplication::translate("Form", "List", nullptr));
+    radio_Enum_Details->setText(QCoreApplication::translate("Form", "Details", nullptr));
+    label_32->setText(QCoreApplication::translate("Form", "Count:", nullptr));
+    QTableWidgetItem *___qtablewidgetitem14 = table_Enum_List_Details->horizontalHeaderItem(0);
+    ___qtablewidgetitem14->setText(QCoreApplication::translate("Form", "ID", nullptr));
+    QTableWidgetItem *___qtablewidgetitem15 = table_Enum_List_Details->horizontalHeaderItem(1);
+    ___qtablewidgetitem15->setText(QCoreApplication::translate("Form", "Name", nullptr));
+    QTableWidgetItem *___qtablewidgetitem16 = table_Enum_List_Details->horizontalHeaderItem(2);
+    ___qtablewidgetitem16->setText(QCoreApplication::translate("Form", "Handlers", nullptr));
+    lbl_enum_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    btn_enum_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Enum), QCoreApplication::translate("Form", "Enum", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
@@ -1486,6 +1587,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(smp_groups.stat_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
     connect(smp_groups.zephyr_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.zephyr_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.enum_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.enum_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 
     //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
@@ -1534,7 +1637,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(check_os_datetime_use_pc_date_time, SIGNAL(toggled(bool)), this, SLOT(on_check_os_datetime_use_pc_date_time_toggled(bool)));
     connect(radio_os_datetime_get, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_datetime_get_toggled(bool)));
     connect(radio_os_datetime_set, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_datetime_set_toggled(bool)));
-
+    connect(btn_enum_go, SIGNAL(clicked()), this, SLOT(on_btn_enum_go_clicked()));
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -1582,6 +1685,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.shell_mgmt->set_logger(logger);
     smp_groups.stat_mgmt->set_logger(logger);
     smp_groups.zephyr_mgmt->set_logger(logger);
+    smp_groups.enum_mgmt->set_logger(logger);
 #endif
 
     edit_SHELL_Output->set_serial_open(true);
@@ -1595,6 +1699,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
             combo_os_datetime_timezone->addItem(item);
         }
     }
+
+    //Setup widths of enum mgmt table
+    table_Enum_List_Details->setColumnWidth(0, 80);
+    table_Enum_List_Details->setColumnWidth(1, 300);
+    table_Enum_List_Details->setColumnWidth(2, 80);
 }
 
 plugin_mcumgr::~plugin_mcumgr()
@@ -1677,6 +1786,7 @@ plugin_mcumgr::~plugin_mcumgr()
 #endif
 
     delete error_lookup_form;
+    delete smp_groups.enum_mgmt;
     delete smp_groups.zephyr_mgmt;
     delete smp_groups.stat_mgmt;
     delete smp_groups.shell_mgmt;
@@ -1835,6 +1945,14 @@ void plugin_mcumgr::serial_closed()
             smp_groups.zephyr_mgmt->cancel();
             break;
         }
+
+        case ACTION_ENUM_COUNT:
+        case ACTION_ENUM_LIST:
+        case ACTION_ENUM_DETAILS:
+            {
+                smp_groups.enum_mgmt->cancel();
+                break;
+            }
 
         default:
         {
@@ -2939,6 +3057,94 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
         {
         }
     }
+    else if (sender() == smp_groups.enum_mgmt)
+    {
+        log_debug() << "enum sender";
+        label_status = lbl_enum_status;
+
+        if (user_data == ACTION_ENUM_COUNT)
+        {
+            edit_Enum_Count->setText(QString::number(enum_count));
+        }
+        else if (user_data == ACTION_ENUM_LIST)
+        {
+            uint16_t i = 0;
+            uint16_t l = table_Enum_List_Details->rowCount();
+
+            table_Enum_List_Details->setSortingEnabled(false);
+
+            while (i < enum_groups.length())
+            {
+                if (i >= l)
+                {
+                    table_Enum_List_Details->insertRow(i);
+
+                    QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(enum_groups[i]));
+                    QTableWidgetItem *row_name = new QTableWidgetItem("");
+                    QTableWidgetItem *row_handlers = new QTableWidgetItem("");
+
+                    table_Enum_List_Details->setItem(i, 0, row_id);
+                    table_Enum_List_Details->setItem(i, 1, row_name);
+                    table_Enum_List_Details->setItem(i, 2, row_handlers);
+                }
+                else
+                {
+                    table_Enum_List_Details->item(i, 0)->setText(QString::number(enum_groups[i]));
+                    table_Enum_List_Details->item(i, 1)->setText("");
+                    table_Enum_List_Details->item(i, 2)->setText("");
+                }
+
+                ++i;
+            }
+
+            while (i < l)
+            {
+                table_Enum_List_Details->removeRow((table_Enum_List_Details->rowCount() - 1));
+                ++i;
+            }
+
+            table_Enum_List_Details->setSortingEnabled(true);
+        }
+        else if (user_data == ACTION_ENUM_DETAILS)
+        {
+            uint16_t i = 0;
+            uint16_t l = table_Enum_List_Details->rowCount();
+
+            table_Enum_List_Details->setSortingEnabled(false);
+
+            while (i < enum_details.length())
+            {
+                if (i >= l)
+                {
+                    table_Enum_List_Details->insertRow(i);
+
+                    QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(enum_details[i].id));
+                    QTableWidgetItem *row_name = new QTableWidgetItem(enum_details[i].name);
+                    QTableWidgetItem *row_handlers = new QTableWidgetItem(QString::number(enum_details[i].handlers));
+
+                    table_Enum_List_Details->setItem(i, 0, row_id);
+                    table_Enum_List_Details->setItem(i, 1, row_name);
+                    table_Enum_List_Details->setItem(i, 2, row_handlers);
+                }
+                else
+                {
+                    table_Enum_List_Details->item(i, 0)->setText(QString::number(enum_details[i].id));
+                    table_Enum_List_Details->item(i, 1)->setText(enum_details[i].name);
+                    table_Enum_List_Details->item(i, 2)->setText(QString::number(enum_details[i].handlers));
+                }
+
+                ++i;
+            }
+
+            while (i < l)
+            {
+                table_Enum_List_Details->removeRow((table_Enum_List_Details->rowCount() - 1));
+                ++i;
+            }
+
+            table_Enum_List_Details->setSortingEnabled(true);
+        }
+    }
 
     if (finished == true)
     {
@@ -3653,5 +3859,60 @@ void plugin_mcumgr::on_radio_os_datetime_set_toggled(bool checked)
         check_os_datetime_use_pc_date_time->setEnabled(true);
         edit_os_datetime_date_time->setDisplayFormat("yyyy-MM-dd HH:mm:ss");
         on_check_os_datetime_use_pc_date_time_toggled(check_os_datetime_use_pc_date_time->isChecked());
+    }
+}
+
+void plugin_mcumgr::on_btn_enum_go_clicked()
+{
+    bool started = false;
+
+    if (claim_transport(lbl_FS_Status) == false)
+    {
+        return;
+    }
+
+    if (radio_Enum_Count->isChecked())
+    {
+        mode = ACTION_ENUM_COUNT;
+        processor->set_transport(active_transport());
+        smp_groups.enum_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.enum_mgmt->start_enum_count(&enum_count);
+
+        if (started == true)
+        {
+            lbl_enum_status->setText("Count...");
+        }
+    }
+    else if (radio_Enum_List->isChecked())
+    {
+        mode = ACTION_ENUM_LIST;
+        processor->set_transport(active_transport());
+        smp_groups.enum_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.enum_mgmt->start_enum_list(&enum_groups);
+
+        if (started == true)
+        {
+            lbl_enum_status->setText("List...");
+        }
+    }
+    else if (radio_Enum_Details->isChecked())
+    {
+        mode = ACTION_ENUM_DETAILS;
+        processor->set_transport(active_transport());
+        smp_groups.enum_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        started = smp_groups.enum_mgmt->start_enum_details(&enum_details, &enum_details_present_fields);
+
+        if (started == true)
+        {
+            lbl_enum_status->setText("Details...");
+        }
+    }
+
+    if (started == true)
+    {
+    }
+    else
+    {
+        relase_transport();
     }
 }

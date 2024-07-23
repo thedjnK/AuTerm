@@ -224,3 +224,9 @@ void Form::on_radio_os_rtc_set_toggled(bool checked)
 {
 
 }
+
+void Form::on_btn_enum_go_clicked()
+{
+
+}
+

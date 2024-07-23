@@ -22,6 +22,7 @@ SOURCES += \
     error_lookup.cpp \
     plugin_mcumgr.cpp \
     smp_error.cpp \
+    smp_group_enum_mgmt.cpp \
     smp_group_fs_mgmt.cpp \
     smp_group_os_mgmt.cpp \
     smp_group_settings_mgmt.cpp \
@@ -43,6 +44,7 @@ HEADERS += \
     plugin_mcumgr.h \
     smp_error.h \
     smp_group_array.h \
+    smp_group_enum_mgmt.h \
     smp_group_fs_mgmt.h \
     smp_group_os_mgmt.h \
     smp_group_settings_mgmt.h \

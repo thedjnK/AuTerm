@@ -126,6 +126,10 @@ enum mcumgr_action_t {
     ACTION_SETTINGS_SAVE,
 
     ACTION_ZEPHYR_STORAGE_ERASE,
+
+    ACTION_ENUM_COUNT,
+    ACTION_ENUM_LIST,
+    ACTION_ENUM_DETAILS,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin
@@ -211,6 +215,7 @@ private slots:
     void on_check_os_datetime_use_pc_date_time_toggled(bool checked);
     void on_radio_os_datetime_get_toggled(bool checked);
     void on_radio_os_datetime_set_toggled(bool checked);
+    void on_btn_enum_go_clicked();
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -242,9 +247,11 @@ private:
     QTabWidget *tabWidget_3;
     QWidget *tab_IMG_Upload;
     QGridLayout *gridLayout_4;
-    QLabel *label_4;
-    QCheckBox *check_IMG_Reset;
     QLabel *label_6;
+    QCheckBox *check_IMG_Reset;
+    QProgressBar *progress_IMG_Complete;
+    QLabel *label_9;
+    QLabel *label_4;
     QHBoxLayout *horizontalLayout_5;
     QLineEdit *edit_IMG_Local;
     QToolButton *btn_IMG_Local;
@@ -254,8 +261,6 @@ private:
     QRadioButton *radio_IMG_No_Action;
     QRadioButton *radio_IMG_Test;
     QRadioButton *radio_IMG_Confirm;
-    QProgressBar *progress_IMG_Complete;
-    QLabel *label_9;
     QSpacerItem *verticalSpacer_4;
     QWidget *tab_IMG_Images;
     QGridLayout *gridLayout_5;
@@ -428,6 +433,21 @@ private:
     QLabel *label_12;
     QSpacerItem *verticalSpacer_7;
     QLabel *lbl_zephyr_status;
+    QWidget *tab_Enum;
+    QVBoxLayout *verticalLayout_3;
+    QHBoxLayout *horizontalLayout_21;
+    QRadioButton *radio_Enum_Count;
+    QRadioButton *radio_Enum_List;
+    QRadioButton *radio_Enum_Details;
+    QHBoxLayout *horizontalLayout_22;
+    QLabel *label_32;
+    QLineEdit *edit_Enum_Count;
+    QTableWidget *table_Enum_List_Details;
+    QLabel *lbl_enum_status;
+    QHBoxLayout *horizontalLayout_20;
+    QSpacerItem *horizontalSpacer_16;
+    QPushButton *btn_enum_go;
+    QSpacerItem *horizontalSpacer_21;
     QWidget *tab_2;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
@@ -444,8 +464,8 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup_2;
     QButtonGroup *buttonGroup_3;
+    QButtonGroup *buttonGroup_2;
     QButtonGroup *buttonGroup;
 ///AUTOGEN_END_OBJECTS
 
@@ -466,6 +486,10 @@ private:
     smp_processor *processor;
     smp_group_array smp_groups;
     class smp_uart *uart_transport;
+    uint16_t enum_count;
+    QList<uint16_t> enum_groups;
+    QList<enum_details_t> enum_details;
+    enum_fields_present_t enum_details_present_fields;
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     class smp_udp *udp_transport;

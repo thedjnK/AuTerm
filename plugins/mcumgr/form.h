@@ -57,6 +57,7 @@ private slots:
     void on_check_os_rtc_use_pc_date_time_toggled(bool checked);
     void on_radio_os_rtc_get_toggled(bool checked);
     void on_radio_os_rtc_set_toggled(bool checked);
+    void on_btn_enum_go_clicked();
 
 private:
     Ui::Form *ui;

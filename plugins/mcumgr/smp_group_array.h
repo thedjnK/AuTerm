@@ -8,6 +8,7 @@
 #include <smp_group_shell_mgmt.h>
 #include <smp_group_stat_mgmt.h>
 #include <smp_group_zephyr_mgmt.h>
+#include <smp_group_enum_mgmt.h>
 
 struct smp_group_array {
     smp_group_fs_mgmt *fs_mgmt;
@@ -17,6 +18,7 @@ struct smp_group_array {
     smp_group_shell_mgmt *shell_mgmt;
     smp_group_stat_mgmt *stat_mgmt;
     smp_group_zephyr_mgmt *zephyr_mgmt;
+    smp_group_enum_mgmt *enum_mgmt;
 };
 
 #endif // SMP_GROUP_ARRAY_H

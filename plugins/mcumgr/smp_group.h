@@ -46,6 +46,7 @@ enum smp_group_ids : uint16_t {
     SMP_GROUP_ID_SETTINGS,
     SMP_GROUP_ID_FS = 8,
     SMP_GROUP_ID_SHELL,
+    SMP_GROUP_ID_ENUM,
     SMP_GROUP_ID_ZEPHYR = 63,
     SMP_GROUP_ID_USER_DEFINED,
 };
