@@ -29,27 +29,28 @@
 #include <QTimer>
 
 //Aim for a connection interval of between 7.5us-30us with a 4 second supervision timeout
-const double connection_interval_min = 7.5;
-const double connection_interval_max = 30;
-const int connection_latency = 0;
-const int connection_supervision_timeout = 4000;
+static const double connection_interval_min = 7.5;
+static const double connection_interval_max = 30;
+static const int connection_latency = 0;
+static const int connection_supervision_timeout = 4000;
 
 //Default MTU of 490 - less than 512 maximum with a bit of safety
-const int default_mtu = 490;
+static const int default_mtu = 490;
 
-QList<QBluetoothDeviceInfo> bluetooth_device_list;
-QList<QBluetoothUuid> services;
+static QList<QBluetoothDeviceInfo> bluetooth_device_list;
+static QList<QBluetoothUuid> services;
 
-QLowEnergyService *bluetooth_service_mcumgr = nullptr;
-QLowEnergyCharacteristic bluetooth_characteristic_transmit;
-uint16_t mtu;
-uint16_t mtu_max_worked;
-QByteArray sendbuffer;
+static QLowEnergyService *bluetooth_service_mcumgr = nullptr;
+static QLowEnergyCharacteristic bluetooth_characteristic_transmit;
+static uint16_t mtu;
+static uint16_t mtu_max_worked;
+static QByteArray sendbuffer;
 
-bluetooth_setup *bluetooth_window;
-QTimer retry_timer;
-QTimer discover_timer;
-int retry_count;
+static bluetooth_setup *bluetooth_window;
+static QTimer retry_timer;
+static QTimer discover_timer;
+static int retry_count;
+static bool debug_logging = false;
 
 smp_bluetooth::smp_bluetooth(QObject *parent)
 {
@@ -61,6 +62,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
     QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t)), this, SLOT(form_connect_to_device(uint16_t)));
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
     QObject::connect(bluetooth_window, SIGNAL(bluetooth_status(bool*,bool*)), this, SLOT(form_bluetooth_status(bool*,bool*)));
+    QObject::connect(bluetooth_window, SIGNAL(debug_log_state_changed(bool)), this, SLOT(form_debug_state_changed(bool)));
 
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
     discoveryAgent->setLowEnergyDiscoveryTimeout(8000);
@@ -221,7 +223,10 @@ void smp_bluetooth::service_discovered(QBluetoothUuid service_uuid)
 
 void smp_bluetooth::mcumgr_service_characteristic_changed(QLowEnergyCharacteristic lecCharacteristic, QByteArray baData)
 {
-    bluetooth_window->add_debug(QString("CHANGED!!"));
+    if (debug_logging == true)
+    {
+        bluetooth_window->add_debug(QString("CHANGED!!"));
+    }
 
     received_data.append(&baData);
 
@@ -236,8 +241,12 @@ void smp_bluetooth::mcumgr_service_characteristic_changed(QLowEnergyCharacterist
 
 void smp_bluetooth::mcumgr_service_characteristic_written(QLowEnergyCharacteristic lecCharacteristic, QByteArray baData)
 {
-    bluetooth_window->add_debug(QString("WRITTEN!!"));
-    qDebug() << baData;
+    if (debug_logging == true)
+    {
+        bluetooth_window->add_debug(QString("WRITTEN!!"));
+        qDebug() << baData;
+    }
+
 
     if (baData.length() > mtu_max_worked)
     {
@@ -253,7 +262,11 @@ void smp_bluetooth::mcumgr_service_characteristic_written(QLowEnergyCharacterist
         if (sendbuffer.length() > 0)
         {
             bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, sendbuffer.left(mtu));
-            bluetooth_window->add_debug(QString("Writing ").append(QString::number(mtu)));
+
+            if (debug_logging == true)
+            {
+                bluetooth_window->add_debug(QString("Writing ").append(QString::number(sendbuffer.length() > mtu ? mtu : sendbuffer.length())));
+            }
         }
     }
 }
@@ -413,7 +426,12 @@ int smp_bluetooth::send(smp_message *message)
 
     sendbuffer.append(*message->data());
     bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, sendbuffer.left(mtu));
-    bluetooth_window->add_debug(QString("Writing ").append(QString::number(mtu)).append(sendbuffer.left(mtu)));
+
+    if (debug_logging == true)
+    {
+        //bluetooth_window->add_debug(QString("Writing ").append(QString::number(mtu)).append(sendbuffer.left(mtu)));
+        bluetooth_window->add_debug(QString("Writing ").append(QString::number(sendbuffer.length() > mtu ? mtu : sendbuffer.length())));
+    }
 
     return 0;
 }
@@ -588,4 +606,9 @@ void smp_bluetooth::form_bluetooth_status(bool *scanning, bool *connecting)
 {
     *scanning = discoveryAgent->isActive();
     *connecting = device_connected;
+}
+
+void smp_bluetooth::form_debug_state_changed(bool enabled)
+{
+    debug_logging = enabled;
 }
