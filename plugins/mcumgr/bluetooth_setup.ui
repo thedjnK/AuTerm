@@ -24,6 +24,9 @@
    </property>
   </widget>
   <widget class="QPushButton" name="btn_refresh">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -37,6 +40,9 @@
    </property>
   </widget>
   <widget class="QPushButton" name="btn_connect">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -50,6 +56,9 @@
    </property>
   </widget>
   <widget class="QPushButton" name="btn_disconnect">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>180</x>

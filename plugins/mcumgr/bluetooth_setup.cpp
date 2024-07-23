@@ -28,6 +28,9 @@ bluetooth_setup::bluetooth_setup(QWidget *parent) :
     ui(new Ui::bluetooth_setup)
 {
     ui->setupUi(this);
+    ui->btn_connect->setEnabled(false);
+    ui->btn_disconnect->setEnabled(false);
+    ui->btn_refresh->setEnabled(false);
 }
 
 bluetooth_setup::~bluetooth_setup()
@@ -78,3 +81,37 @@ void bluetooth_setup::add_debug(QString data)
     ui->edit_debug->appendPlainText(data);
 }
 
+void bluetooth_setup::discovery_state(bool started)
+{
+    ui->btn_refresh->setEnabled(!started);
+
+    if (started == true)
+    {
+        ui->btn_connect->setEnabled(false);
+        ui->btn_disconnect->setEnabled(false);
+    }
+}
+
+void bluetooth_setup::connection_state(bool connected)
+{
+    ui->btn_connect->setEnabled(!connected);
+    ui->btn_disconnect->setEnabled(connected);
+    ui->btn_refresh->setEnabled(!connected);
+}
+
+void bluetooth_setup::on_list_devices_currentRowChanged(int row)
+{
+    if (row >= 0)
+    {
+        bool scanning;
+        bool connecting;
+
+        emit bluetooth_status(&scanning, &connecting);
+
+        ui->btn_connect->setEnabled((connecting == false ? true : false));
+    }
+    else
+    {
+        ui->btn_connect->setEnabled(false);
+    }
+}

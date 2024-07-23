@@ -40,6 +40,8 @@ public:
     void clear_devices();
     void add_device(QString *data);
     void add_debug(QString data);
+    void discovery_state(bool started);
+    void connection_state(bool connected);
 
 private slots:
     void on_btn_refresh_clicked();
@@ -47,11 +49,13 @@ private slots:
     void on_btn_disconnect_clicked();
     void on_btn_close_clicked();
     void on_list_devices_itemDoubleClicked(QListWidgetItem *item);
+    void on_list_devices_currentRowChanged(int row);
 
 signals:
     void refresh_devices();
     void connect_to_device(uint16_t index);
     void disconnect_from_device();
+    void bluetooth_status(bool *scanning, bool *connecting);
 
 private:
     Ui::bluetooth_setup *ui;

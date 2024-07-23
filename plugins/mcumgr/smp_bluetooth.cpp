@@ -60,6 +60,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
     QObject::connect(bluetooth_window, SIGNAL(refresh_devices()), this, SLOT(form_refresh_devices()));
     QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t)), this, SLOT(form_connect_to_device(uint16_t)));
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
+    QObject::connect(bluetooth_window, SIGNAL(bluetooth_status(bool*,bool*)), this, SLOT(form_bluetooth_status(bool*,bool*)));
 
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
     discoveryAgent->setLowEnergyDiscoveryTimeout(8000);
@@ -132,6 +133,7 @@ void smp_bluetooth::deviceUpdated(const QBluetoothDeviceInfo &info, QBluetoothDe
 void smp_bluetooth::finished()
 {
     bluetooth_window->add_debug("Discovery finished");
+    bluetooth_window->discovery_state(false);
 }
 
 void smp_bluetooth::connected()
@@ -174,6 +176,8 @@ void smp_bluetooth::disconnected()
 
         controller = nullptr;
     }
+
+    bluetooth_window->connection_state(false);
 }
 
 void smp_bluetooth::discovery_finished()
@@ -299,7 +303,81 @@ void smp_bluetooth::mcumgr_service_state_changed(QLowEnergyService::ServiceState
 
 void smp_bluetooth::errorz(QLowEnergyController::Error error)
 {
-    bluetooth_window->add_debug(QString::number(error));
+    bool disconnect_from_device = false;
+    QString err;
+    switch (error) {
+        case QLowEnergyController::NoError:
+    {
+        err = "No error";
+        break;
+    }
+        case QLowEnergyController::UnknownError:
+    {
+        disconnect_from_device = true;
+        err = "Unknown error";
+        break;
+        }
+        case QLowEnergyController::UnknownRemoteDeviceError:
+    {
+            disconnect_from_device = true;
+            err = "Unknown remote device";
+            break;
+        }
+        case QLowEnergyController::NetworkError:
+    {
+            disconnect_from_device = true;
+            err = "Network error";
+            break;
+        }
+        case QLowEnergyController::InvalidBluetoothAdapterError:
+    {
+            disconnect_from_device = true;
+            err = "Invalud bluetooth adapter";
+            break;
+        }
+        case QLowEnergyController::ConnectionError:
+    {
+            disconnect_from_device = true;
+            err = "Connection error";
+            break;
+        }
+        case QLowEnergyController::AdvertisingError:
+    {
+            err = "Advertising error";
+            break;
+        }
+        case QLowEnergyController::RemoteHostClosedError:
+    {
+            disconnect_from_device = true;
+            err = "Remote host closed";
+            break;
+        }
+        case QLowEnergyController::AuthorizationError:
+    {
+            err = "Authorisation error";
+            break;
+        }
+        default:
+    {
+        err = "Other";
+        break;
+    }
+        };
+//    bluetooth_window->add_debug(QString::number(error));
+    bluetooth_window->add_debug(err);
+
+        if (disconnect_from_device == true)
+    {
+        if (device_connected == true)
+            {
+        disconnect(true);
+        }
+        else
+        {
+        bluetooth_window->discovery_state(false);
+        bluetooth_window->connection_state(false);
+        }
+    }
 }
 
 int smp_bluetooth::is_connected()
@@ -320,6 +398,11 @@ void smp_bluetooth::connection_updated(QLowEnergyConnectionParameters parameters
 
 int smp_bluetooth::send(smp_message *message)
 {
+    if (device_connected == false)
+    {
+        return -1;
+    }
+
     retry_count = 0;
     sendbuffer.clear();
 
@@ -375,6 +458,11 @@ void smp_bluetooth::mcumgr_service_error(QLowEnergyService::ServiceError error)
 
 void smp_bluetooth::form_refresh_devices()
 {
+    if (device_connected == true)
+    {
+        return;
+    }
+
     bluetooth_window->clear_devices();
     bluetooth_device_list.clear();
 
@@ -384,10 +472,16 @@ void smp_bluetooth::form_refresh_devices()
     }
 
     discoveryAgent->start();
+    bluetooth_window->discovery_state(true);
 }
 
 void smp_bluetooth::form_connect_to_device(uint16_t index)
 {
+    if (discoveryAgent->isActive())
+    {
+        discoveryAgent->stop();
+    }
+
     if (controller)
     {
         QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
@@ -421,18 +515,30 @@ void smp_bluetooth::form_connect_to_device(uint16_t index)
     //         controller->setRemoteAddressType(QLowEnergyController::PublicAddress);
     //     }
     controller->connectToDevice();
+
+    bluetooth_window->connection_state(true);
 }
 
 void smp_bluetooth::form_disconnect_from_device()
 {
-    controller->disconnectFromDevice();
+    if (device_connected == true)
+    {
+        controller->disconnectFromDevice();
+    }
 }
-
 
 int smp_bluetooth::connect()
 {
     bluetooth_window->show();
-    discoveryAgent->start();
+
+    if (device_connected == false)
+    {
+        bluetooth_window->clear_devices();
+        bluetooth_device_list.clear();
+        discoveryAgent->start();
+        bluetooth_window->discovery_state(true);
+    }
+
     return 0;
 }
 
@@ -441,6 +547,10 @@ int smp_bluetooth::disconnect(bool force)
     if (controller != nullptr && device_connected == true)
     {
         controller->disconnectFromDevice();
+    }
+    else
+    {
+        bluetooth_window->connection_state(false);
     }
 
     return 0;
@@ -472,4 +582,10 @@ void smp_bluetooth::close_connect_dialog()
     {
         bluetooth_window->close();
     }
+}
+
+void smp_bluetooth::form_bluetooth_status(bool *scanning, bool *connecting)
+{
+    *scanning = discoveryAgent->isActive();
+    *connecting = device_connected;
 }
