@@ -29,12 +29,14 @@ enum modes : uint8_t {
     MODE_IDLE = 0,
     MODE_COUNT,
     MODE_LIST,
+    MODE_SINGLE,
     MODE_DETAILS,
 };
 
 enum enum_mgmt_commands : uint8_t {
     COMMAND_COUNT = 0,
     COMMAND_LIST,
+    COMMAND_SINGLE,
     COMMAND_DETAILS
 };
 
@@ -219,7 +221,102 @@ bool smp_group_enum_mgmt::parse_list_response(QCborStreamReader &reader, const Q
     return true;
 }
 
-bool smp_group_enum_mgmt::parse_details_response(QCborStreamReader &reader, uint8_t layers, const QString *list_key, QList<enum_details_t> *groups, bool *groups_found, enum_fields_present_t *fields_present)
+bool smp_group_enum_mgmt::parse_single_response(QCborStreamReader &reader, uint16_t *id, bool *end, bool *group_found)
+{
+    QString key = "";
+    bool keyset = true;
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
+        //	    qDebug() << "Key: " << key;
+        //	    qDebug() << "Type: " << reader.type();
+        switch (reader.type())
+        {
+        case QCborStreamReader::SimpleType:
+        {
+            if (key == "end")
+            {
+                //			    qDebug() << "found group";
+                *end = reader.toBool();
+            }
+
+            reader.next();
+            break;
+        }
+
+        case QCborStreamReader::UnsignedInteger:
+        {
+            if (key == "group")
+            {
+                //			    qDebug() << "found group";
+                *id = (uint16_t)reader.toUnsignedInteger();
+                *group_found = true;
+            }
+
+            reader.next();
+            break;
+        }
+
+        case QCborStreamReader::String:
+        {
+            QString data;
+            auto r = reader.readString();
+            while (r.status == QCborStreamReader::Ok)
+            {
+                data.append(r.data);
+                r = reader.readString();
+            }
+
+            if (r.status == QCborStreamReader::Error)
+            {
+                data.clear();
+                log_error() << "Error decoding string";
+            }
+            else
+            {
+                if (key.isEmpty())
+                {
+                    key = data;
+                    keyset = true;
+                }
+            }
+
+            break;
+        }
+
+        case QCborStreamReader::Array:
+        case QCborStreamReader::Map:
+        {
+            reader.enterContainer();
+            while (reader.lastError() == QCborError::NoError && reader.hasNext())
+            {
+                parse_single_response(reader, id, end, group_found);
+            }
+            if (reader.lastError() == QCborError::NoError)
+            {
+                reader.leaveContainer();
+            }
+            break;
+        }
+
+        default:
+        {
+            reader.next();
+        }
+        }
+    }
+
+    return true;
+}
+
+bool smp_group_enum_mgmt::parse_details_response(QCborStreamReader &reader, uint8_t layers, QList<enum_details_t> *groups, bool *groups_found, enum_fields_present_t *fields_present)
 {
     QString key = "";
     bool keyset = true;
@@ -303,7 +400,7 @@ bool smp_group_enum_mgmt::parse_details_response(QCborStreamReader &reader, uint
             reader.enterContainer();
             while (reader.lastError() == QCborError::NoError && reader.hasNext())
             {
-                parse_details_response(reader, (layers + 1), (key.isEmpty() ? list_key : &key), groups, groups_found, fields_present);
+                parse_details_response(reader, (layers + 1), groups, groups_found, fields_present);
             }
             if (reader.lastError() == QCborError::NoError)
             {
@@ -403,12 +500,37 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
 
             mode = MODE_IDLE;
         }
+        else if (mode == MODE_SINGLE && command == COMMAND_SINGLE)
+        {
+            //Response to fetch command group ID
+            QCborStreamReader cbor_reader(data);
+            bool group_found = false;
+            bool good = parse_single_response(cbor_reader, group_single_id, group_single_end, &group_found);
+
+            if (good == true)
+            {
+                if (group_found == true)
+                {
+                    emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+                }
+                else
+                {
+                    emit status(smp_user_data, STATUS_ERROR, "Missing group parameter");
+                }
+            }
+            else
+            {
+                emit status(smp_user_data, STATUS_ERROR, "Did not decode response successfully");
+            }
+
+            mode = MODE_IDLE;
+        }
         else if (mode == MODE_DETAILS && command == COMMAND_DETAILS)
         {
             //Response to get command group details
             QCborStreamReader cbor_reader(data);
             bool groups_found = false;
-            bool good = parse_details_response(cbor_reader, 0, nullptr, groups_details, &groups_found, groups_details_fields_present);
+            bool good = parse_details_response(cbor_reader, 0, groups_details, &groups_found, groups_details_fields_present);
 
             if (good == true)
             {
@@ -452,6 +574,11 @@ void smp_group_enum_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gr
         emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_LIST && mode == MODE_LIST)
+    {
+        //TODO
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
+    }
+    else if (command == COMMAND_SINGLE && mode == MODE_SINGLE)
     {
         //TODO
         emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
@@ -527,6 +654,32 @@ bool smp_group_enum_mgmt::start_enum_list(QList<uint16_t> *groups)
     return true;
 }
 
+bool smp_group_enum_mgmt::start_enum_single(uint16_t index, uint16_t *id, bool *end)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_SINGLE);
+
+    if (index > 0)
+    {
+        tmp_message->writer()->append("index");
+        tmp_message->writer()->append(index);
+    }
+
+    tmp_message->end_message();
+
+    mode = MODE_SINGLE;
+    group_single_id = id;
+    group_single_end = end;
+    *group_single_id = 0;
+    *group_single_end = false;
+
+    //	    qDebug() << "len: " << message.length();
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
 bool smp_group_enum_mgmt::start_enum_details(QList<enum_details_t> *groups, enum_fields_present_t *fields_present)
 {
     smp_message *tmp_message = new smp_message();
@@ -558,6 +711,8 @@ QString smp_group_enum_mgmt::mode_to_string(uint8_t mode)
             return "Count command groups";
         case MODE_LIST:
             return "List command groups";
+        case MODE_SINGLE:
+            return "Fetch single command group ID";
         case MODE_DETAILS:
             return "Get command group details";
         default:
@@ -573,6 +728,8 @@ QString smp_group_enum_mgmt::command_to_string(uint8_t command)
             return "Count command groups";
         case COMMAND_LIST:
             return "List command groups";
+        case COMMAND_SINGLE:
+            return "Fetch single command group ID";
         case COMMAND_DETAILS:
             return "Get command group details";
         default:

@@ -131,6 +131,7 @@ enum mcumgr_action_t {
 
     ACTION_ENUM_COUNT,
     ACTION_ENUM_LIST,
+    ACTION_ENUM_SINGLE,
     ACTION_ENUM_DETAILS,
 };
 
@@ -442,10 +443,19 @@ private:
     QHBoxLayout *horizontalLayout_21;
     QRadioButton *radio_Enum_Count;
     QRadioButton *radio_Enum_List;
+    QRadioButton *radio_Enum_Single;
     QRadioButton *radio_Enum_Details;
     QHBoxLayout *horizontalLayout_22;
     QLabel *label_32;
     QLineEdit *edit_Enum_Count;
+    QHBoxLayout *horizontalLayout_23;
+    QLabel *label_33;
+    QSpinBox *edit_Enum_Index;
+    QFrame *line_3;
+    QLabel *label_34;
+    QLineEdit *edit_Enum_Group_ID;
+    QCheckBox *edit_Enum_Group_Additional;
+    QSpacerItem *horizontalSpacer_22;
     QTableWidget *table_Enum_List_Details;
     QLabel *lbl_enum_status;
     QHBoxLayout *horizontalLayout_20;
@@ -468,9 +478,9 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
+    QButtonGroup *buttonGroup_3;
     QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_2;
-    QButtonGroup *buttonGroup_3;
 ///AUTOGEN_END_OBJECTS
 
     //
@@ -492,6 +502,8 @@ private:
     class smp_uart *uart_transport;
     uint16_t enum_count;
     QList<uint16_t> enum_groups;
+    uint16_t enum_single_id;
+    bool enum_single_end;
     QList<enum_details_t> enum_details;
     enum_fields_present_t enum_details_present_fields;
 

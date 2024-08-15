@@ -56,6 +56,7 @@ public:
     void cancel();
     bool start_enum_count(uint16_t *count);
     bool start_enum_list(QList<uint16_t> *groups);
+    bool start_enum_single(uint16_t index, uint16_t *id, bool *end);
     bool start_enum_details(QList<enum_details_t> *groups, enum_fields_present_t *fields_present);
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
@@ -63,7 +64,8 @@ public:
 private:
     bool parse_count_response(QCborStreamReader &reader, uint16_t *count, bool *count_found);
     bool parse_list_response(QCborStreamReader &reader, const QString *list_key, QList<uint16_t> *groups, bool *groups_found);
-    bool parse_details_response(QCborStreamReader &reader, uint8_t layers, const QString *list_key, QList<enum_details_t> *groups, bool *groups_found, enum_fields_present_t *fields_present);
+    bool parse_single_response(QCborStreamReader &reader, uint16_t *id, bool *end, bool *group_found);
+    bool parse_details_response(QCborStreamReader &reader, uint8_t layers, QList<enum_details_t> *groups, bool *groups_found, enum_fields_present_t *fields_present);
     QString mode_to_string(uint8_t mode);
     QString command_to_string(uint8_t command);
 
@@ -71,6 +73,8 @@ private:
     uint8_t mode;
     uint16_t *groups_count;
     QList<uint16_t> *groups_list;
+    uint16_t *group_single_id;
+    bool *group_single_end;
     QList<enum_details_t> *groups_details;
     enum_fields_present_t *groups_details_fields_present;
 };
