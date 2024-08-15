@@ -91,6 +91,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_7->setObjectName("horizontalLayout_7");
     label = new QLabel(tab);
     label->setObjectName("label");
+    label->setMaximumSize(QSize(16777215, 16777215));
 
     horizontalLayout_7->addWidget(label);
 
@@ -137,7 +138,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_7->addWidget(btn_transport_connect);
 
-    horizontalSpacer_6 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_6 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_7->addItem(horizontalSpacer_6);
 
@@ -146,7 +147,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_2 = new QTabWidget(tab);
     tabWidget_2->setObjectName("tabWidget_2");
-    tabWidget_2->setTabPosition(QTabWidget::TabPosition::West);
+    tabWidget_2->setTabPosition(QTabWidget::West);
     tab_IMG = new QWidget();
     tab_IMG->setObjectName("tab_IMG");
     gridLayout_3 = new QGridLayout(tab_IMG);
@@ -281,8 +282,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line = new QFrame(tab_IMG_Images);
     line->setObjectName("line");
-    line->setFrameShape(QFrame::Shape::VLine);
-    line->setFrameShadow(QFrame::Shadow::Sunken);
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Sunken);
 
     horizontalLayout_6->addWidget(line);
 
@@ -292,7 +293,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_6->addWidget(check_IMG_Confirm);
 
-    horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
     horizontalLayout_6->addItem(horizontalSpacer_5);
 
@@ -309,7 +310,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_10->addWidget(label_14, 0, 0, 1, 1);
 
-    horizontalSpacer_9 = new QSpacerItem(235, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_9 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     gridLayout_10->addItem(horizontalSpacer_9, 0, 2, 1, 1);
 
@@ -341,7 +342,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_3->setSpacing(2);
     horizontalLayout_3->setObjectName("horizontalLayout_3");
     horizontalLayout_3->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_3 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_3->addItem(horizontalSpacer_3);
 
@@ -350,7 +351,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_3->addWidget(btn_IMG_Go);
 
-    horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_4 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_3->addItem(horizontalSpacer_4);
 
@@ -458,7 +459,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_2->setSpacing(2);
     horizontalLayout_2->setObjectName("horizontalLayout_2");
     horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_2->addItem(horizontalSpacer);
 
@@ -467,7 +468,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_2->addWidget(btn_FS_Go);
 
-    horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_2->addItem(horizontalSpacer_2);
 
@@ -509,7 +510,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_13->setSpacing(2);
     horizontalLayout_13->setObjectName("horizontalLayout_13");
     horizontalLayout_13->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer_17 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_17 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_13->addItem(horizontalSpacer_17);
 
@@ -518,7 +519,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_13->addWidget(btn_OS_Go);
 
-    horizontalSpacer_18 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_18 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_13->addItem(horizontalSpacer_18);
 
@@ -583,11 +584,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
     table_OS_Tasks->setHorizontalHeaderItem(7, __qtablewidgetitem7);
     table_OS_Tasks->setObjectName("table_OS_Tasks");
-    table_OS_Tasks->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    table_OS_Tasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table_OS_Tasks->setProperty("showDropIndicator", QVariant(false));
     table_OS_Tasks->setDragDropOverwriteMode(false);
     table_OS_Tasks->setAlternatingRowColors(true);
-    table_OS_Tasks->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
+    table_OS_Tasks->setSelectionMode(QAbstractItemView::NoSelection);
     table_OS_Tasks->setSortingEnabled(true);
     table_OS_Tasks->setCornerButtonEnabled(false);
 
@@ -610,11 +611,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
     table_OS_Memory->setHorizontalHeaderItem(3, __qtablewidgetitem11);
     table_OS_Memory->setObjectName("table_OS_Memory");
-    table_OS_Memory->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    table_OS_Memory->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table_OS_Memory->setProperty("showDropIndicator", QVariant(false));
     table_OS_Memory->setDragDropOverwriteMode(false);
     table_OS_Memory->setAlternatingRowColors(true);
-    table_OS_Memory->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
+    table_OS_Memory->setSelectionMode(QAbstractItemView::NoSelection);
     table_OS_Memory->setSortingEnabled(true);
     table_OS_Memory->setCornerButtonEnabled(false);
 
@@ -666,7 +667,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_19->addWidget(radio_os_datetime_set);
 
-    horizontalSpacer_15 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_15 = new QSpacerItem(40, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
     horizontalLayout_19->addItem(horizontalSpacer_15);
 
@@ -693,9 +694,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_os_datetime_date_time->setAccelerated(true);
     edit_os_datetime_date_time->setProperty("showGroupSeparator", QVariant(true));
     edit_os_datetime_date_time->setMinimumDate(QDate(1970, 1, 1));
-    edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::Section::YearSection);
+    edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::YearSection);
     edit_os_datetime_date_time->setCalendarPopup(true);
-    edit_os_datetime_date_time->setTimeSpec(Qt::TimeSpec::LocalTime);
+    edit_os_datetime_date_time->setTimeSpec(Qt::LocalTime);
 
     gridLayout_18->addWidget(edit_os_datetime_date_time, 0, 1, 1, 1);
 
@@ -764,7 +765,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_OS_Bootloader->setObjectName("tab_OS_Bootloader");
     formLayout_2 = new QFormLayout(tab_OS_Bootloader);
     formLayout_2->setObjectName("formLayout_2");
-    formLayout_2->setFormAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
+    formLayout_2->setFormAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
     formLayout_2->setHorizontalSpacing(2);
     formLayout_2->setVerticalSpacing(2);
     formLayout_2->setContentsMargins(6, 6, 6, 6);
@@ -832,7 +833,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_14->setSpacing(2);
     horizontalLayout_14->setObjectName("horizontalLayout_14");
     horizontalLayout_14->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer_19 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_19 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_14->addItem(horizontalSpacer_19);
 
@@ -841,7 +842,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_14->addWidget(btn_STAT_Go);
 
-    horizontalSpacer_20 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_20 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_14->addItem(horizontalSpacer_20);
 
@@ -866,7 +867,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
     table_STAT_Values->setHorizontalHeaderItem(1, __qtablewidgetitem13);
     table_STAT_Values->setObjectName("table_STAT_Values");
-    table_STAT_Values->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    table_STAT_Values->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table_STAT_Values->setProperty("showDropIndicator", QVariant(false));
     table_STAT_Values->setDragDropOverwriteMode(false);
     table_STAT_Values->setAlternatingRowColors(true);
@@ -924,7 +925,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_8->setSpacing(2);
     horizontalLayout_8->setObjectName("horizontalLayout_8");
     horizontalLayout_8->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_7 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_8->addItem(horizontalSpacer_7);
 
@@ -938,7 +939,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_8->addWidget(btn_SHELL_Copy);
 
-    horizontalSpacer_8 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_8 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_8->addItem(horizontalSpacer_8);
 
@@ -962,7 +963,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_17->addWidget(check_shel_unescape_strings);
 
-    horizontalSpacer_12 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_12 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_17->addItem(horizontalSpacer_12);
 
@@ -1041,7 +1042,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_15 = new QHBoxLayout();
     horizontalLayout_15->setSpacing(2);
     horizontalLayout_15->setObjectName("horizontalLayout_15");
-    horizontalSpacer_10 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_10 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_15->addItem(horizontalSpacer_10);
 
@@ -1050,7 +1051,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_15->addWidget(btn_settings_go);
 
-    horizontalSpacer_11 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_11 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_15->addItem(horizontalSpacer_11);
 
@@ -1146,8 +1147,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     line_2 = new QFrame(tab_Settings);
     line_2->setObjectName("line_2");
     line_2->setLineWidth(1);
-    line_2->setFrameShape(QFrame::Shape::HLine);
-    line_2->setFrameShadow(QFrame::Shadow::Sunken);
+    line_2->setFrameShape(QFrame::VLine);
+    line_2->setFrameShadow(QFrame::Sunken);
 
     gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
 
@@ -1161,7 +1162,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_18 = new QHBoxLayout();
     horizontalLayout_18->setSpacing(2);
     horizontalLayout_18->setObjectName("horizontalLayout_18");
-    horizontalSpacer_13 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_13 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_18->addItem(horizontalSpacer_13);
 
@@ -1170,7 +1171,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_18->addWidget(btn_zephyr_go);
 
-    horizontalSpacer_14 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_14 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_18->addItem(horizontalSpacer_14);
 
@@ -1270,8 +1271,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line_3 = new QFrame(tab_Enum);
     line_3->setObjectName("line_3");
-    line_3->setFrameShape(QFrame::Shape::VLine);
-    line_3->setFrameShadow(QFrame::Shadow::Sunken);
+    line_3->setFrameShape(QFrame::VLine);
+    line_3->setFrameShadow(QFrame::Sunken);
 
     horizontalLayout_23->addWidget(line_3);
 
@@ -1295,7 +1296,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_23->addWidget(edit_Enum_Group_Additional);
 
-    horizontalSpacer_22 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_22 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_23->addItem(horizontalSpacer_22);
 
@@ -1312,7 +1313,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem16 = new QTableWidgetItem();
     table_Enum_List_Details->setHorizontalHeaderItem(2, __qtablewidgetitem16);
     table_Enum_List_Details->setObjectName("table_Enum_List_Details");
-    table_Enum_List_Details->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    table_Enum_List_Details->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table_Enum_List_Details->setDragDropOverwriteMode(false);
     table_Enum_List_Details->setAlternatingRowColors(true);
     table_Enum_List_Details->setSortingEnabled(true);
@@ -1328,7 +1329,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_20 = new QHBoxLayout();
     horizontalLayout_20->setSpacing(2);
     horizontalLayout_20->setObjectName("horizontalLayout_20");
-    horizontalSpacer_16 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_16 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_20->addItem(horizontalSpacer_16);
 
@@ -1337,7 +1338,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_20->addWidget(btn_enum_go);
 
-    horizontalSpacer_21 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_21 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_20->addItem(horizontalSpacer_21);
 
@@ -1353,14 +1354,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_2->setObjectName("tab_2");
     verticalLayoutWidget = new QWidget(tab_2);
     verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-    verticalLayoutWidget->setGeometry(QRect(6, 6, 229, 182));
+    verticalLayoutWidget->setGeometry(QRect(210, 120, 229, 196));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
     verticalLayout->setObjectName("verticalLayout");
     verticalLayout->setContentsMargins(6, 6, 8, 6);
     formLayout = new QFormLayout();
     formLayout->setObjectName("formLayout");
-    formLayout->setFieldGrowthPolicy(QFormLayout::FieldGrowthPolicy::ExpandingFieldsGrow);
+    formLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
     formLayout->setHorizontalSpacing(2);
     formLayout->setVerticalSpacing(2);
     label_7 = new QLabel(verticalLayoutWidget);
@@ -1438,7 +1439,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(7);
+    tabWidget_2->setCurrentIndex(0);
     tabWidget_3->setCurrentIndex(0);
     selector_OS->setCurrentIndex(0);
     tabWidget_4->setCurrentIndex(0);

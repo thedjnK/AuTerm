@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>526</width>
-    <height>373</height>
+    <width>529</width>
+    <height>390</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,6 +43,12 @@
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <widget class="QLabel" name="label">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string>MTU:</string>
            </property>
@@ -126,11 +132,11 @@
          <item>
           <spacer name="horizontalSpacer_6">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
+             <width>20</width>
              <height>20</height>
             </size>
            </property>
@@ -141,10 +147,10 @@
        <item>
         <widget class="QTabWidget" name="tabWidget_2">
          <property name="tabPosition">
-          <enum>QTabWidget::TabPosition::West</enum>
+          <enum>QTabWidget::West</enum>
          </property>
          <property name="currentIndex">
-          <number>7</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tab_IMG">
           <attribute name="title">
@@ -297,7 +303,7 @@
                <item row="4" column="0">
                 <spacer name="verticalSpacer_4">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -377,7 +383,7 @@
                  <item>
                   <widget class="Line" name="line">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Vertical</enum>
+                    <enum>Qt::Vertical</enum>
                    </property>
                   </widget>
                  </item>
@@ -394,7 +400,7 @@
                  <item>
                   <spacer name="horizontalSpacer_5">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
+                    <enum>Qt::Vertical</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -423,11 +429,11 @@
                <item row="0" column="2">
                 <spacer name="horizontalSpacer_9">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
+                  <enum>Qt::Horizontal</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>235</width>
+                   <width>20</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -452,7 +458,7 @@
                <item row="1" column="0">
                 <spacer name="verticalSpacer_2">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -497,11 +503,11 @@
              <item>
               <spacer name="horizontalSpacer_3">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -517,11 +523,11 @@
              <item>
               <spacer name="horizontalSpacer_4">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -683,11 +689,11 @@
              <item>
               <spacer name="horizontalSpacer">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -703,11 +709,11 @@
              <item>
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -718,7 +724,7 @@
            <item row="7" column="0">
             <spacer name="verticalSpacer_6">
              <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
+              <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -790,11 +796,11 @@
              <item>
               <spacer name="horizontalSpacer_17">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -810,11 +816,11 @@
              <item>
               <spacer name="horizontalSpacer_18">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -876,7 +882,7 @@
                <item row="0" column="0">
                 <widget class="QTableWidget" name="table_OS_Tasks">
                  <property name="editTriggers">
-                  <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+                  <set>QAbstractItemView::NoEditTriggers</set>
                  </property>
                  <property name="showDropIndicator" stdset="0">
                   <bool>false</bool>
@@ -888,7 +894,7 @@
                   <bool>true</bool>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+                  <enum>QAbstractItemView::NoSelection</enum>
                  </property>
                  <property name="sortingEnabled">
                   <bool>true</bool>
@@ -948,7 +954,7 @@
                <item>
                 <widget class="QTableWidget" name="table_OS_Memory">
                  <property name="editTriggers">
-                  <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+                  <set>QAbstractItemView::NoEditTriggers</set>
                  </property>
                  <property name="showDropIndicator" stdset="0">
                   <bool>false</bool>
@@ -960,7 +966,7 @@
                   <bool>true</bool>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+                  <enum>QAbstractItemView::NoSelection</enum>
                  </property>
                  <property name="sortingEnabled">
                   <bool>true</bool>
@@ -1007,7 +1013,7 @@
                <item row="1" column="0">
                 <spacer name="verticalSpacer_3">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -1042,7 +1048,7 @@
                <item row="5" column="1">
                 <spacer name="verticalSpacer_8">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -1087,7 +1093,7 @@
                  <item>
                   <spacer name="horizontalSpacer_15">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
+                    <enum>Qt::Vertical</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1156,7 +1162,7 @@
                   </date>
                  </property>
                  <property name="currentSection">
-                  <enum>QDateTimeEdit::Section::YearSection</enum>
+                  <enum>QDateTimeEdit::YearSection</enum>
                  </property>
                  <property name="displayFormat">
                   <string>yyyy-MM-dd HH:mm:ss t</string>
@@ -1165,7 +1171,7 @@
                   <bool>true</bool>
                  </property>
                  <property name="timeSpec">
-                  <enum>Qt::TimeSpec::LocalTime</enum>
+                  <enum>Qt::LocalTime</enum>
                  </property>
                 </widget>
                </item>
@@ -1271,7 +1277,7 @@
               </attribute>
               <layout class="QFormLayout" name="formLayout_2">
                <property name="formAlignment">
-                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
                </property>
                <property name="horizontalSpacing">
                 <number>2</number>
@@ -1394,11 +1400,11 @@
              <item>
               <spacer name="horizontalSpacer_19">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1414,11 +1420,11 @@
              <item>
               <spacer name="horizontalSpacer_20">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1443,7 +1449,7 @@
            <item row="1" column="1">
             <widget class="QTableWidget" name="table_STAT_Values">
              <property name="editTriggers">
-              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+              <set>QAbstractItemView::NoEditTriggers</set>
              </property>
              <property name="showDropIndicator" stdset="0">
               <bool>false</bool>
@@ -1628,11 +1634,11 @@
              <item>
               <spacer name="horizontalSpacer_7">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1655,11 +1661,11 @@
              <item>
               <spacer name="horizontalSpacer_8">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1701,11 +1707,11 @@
              <item>
               <spacer name="horizontalSpacer_12">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1755,7 +1761,7 @@
            <item row="9" column="0">
             <spacer name="verticalSpacer_5">
              <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
+              <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -1837,11 +1843,11 @@
              <item>
               <spacer name="horizontalSpacer_10">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1857,11 +1863,11 @@
              <item>
               <spacer name="horizontalSpacer_11">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -2003,7 +2009,7 @@
               <number>1</number>
              </property>
              <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
+              <enum>Qt::Vertical</enum>
              </property>
             </widget>
            </item>
@@ -2037,11 +2043,11 @@
              <item>
               <spacer name="horizontalSpacer_13">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -2057,11 +2063,11 @@
              <item>
               <spacer name="horizontalSpacer_14">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -2104,7 +2110,7 @@
                <item row="1" column="0">
                 <spacer name="verticalSpacer_7">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -2222,7 +2228,7 @@
              <item>
               <widget class="Line" name="line_3">
                <property name="orientation">
-                <enum>Qt::Orientation::Vertical</enum>
+                <enum>Qt::Vertical</enum>
                </property>
               </widget>
              </item>
@@ -2262,11 +2268,11 @@
              <item>
               <spacer name="horizontalSpacer_22">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -2277,7 +2283,7 @@
            <item>
             <widget class="QTableWidget" name="table_Enum_List_Details">
              <property name="editTriggers">
-              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+              <set>QAbstractItemView::NoEditTriggers</set>
              </property>
              <property name="dragDropOverwriteMode">
               <bool>false</bool>
@@ -2323,11 +2329,11 @@
              <item>
               <spacer name="horizontalSpacer_16">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -2343,11 +2349,11 @@
              <item>
               <spacer name="horizontalSpacer_21">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -2371,7 +2377,7 @@
          <x>210</x>
          <y>120</y>
          <width>229</width>
-         <height>182</height>
+         <height>196</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -2393,7 +2399,7 @@
         <item>
          <layout class="QFormLayout" name="formLayout">
           <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::FieldGrowthPolicy::ExpandingFieldsGrow</enum>
+           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
           </property>
           <property name="horizontalSpacing">
            <number>2</number>
@@ -2489,7 +2495,7 @@
         <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -2516,8 +2522,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>
