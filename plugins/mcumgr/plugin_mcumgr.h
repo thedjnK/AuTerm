@@ -82,6 +82,7 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "AutScrollEdit.h"
@@ -96,6 +97,7 @@ enum mcumgr_action_t {
     ACTION_IMG_IMAGE_LIST,
     ACTION_IMG_IMAGE_SET,
     ACTION_IMG_IMAGE_ERASE,
+    ACTION_IMG_IMAGE_SLOT_INFO,
 
     ACTION_OS_ECHO,
     ACTION_OS_TASK_STATS,
@@ -279,6 +281,8 @@ private:
     QSpacerItem *horizontalSpacer_9;
     QSpinBox *edit_IMG_Erase_Slot;
     QSpacerItem *verticalSpacer_2;
+    QWidget *tab_IMG_Slots;
+    QTreeWidget *tree_IMG_Slot_Info;
     QHBoxLayout *horizontalLayout_3;
     QSpacerItem *horizontalSpacer_3;
     QPushButton *btn_IMG_Go;
@@ -464,9 +468,9 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup_3;
-    QButtonGroup *buttonGroup_2;
     QButtonGroup *buttonGroup;
+    QButtonGroup *buttonGroup_2;
+    QButtonGroup *buttonGroup_3;
 ///AUTOGEN_END_OBJECTS
 
     //

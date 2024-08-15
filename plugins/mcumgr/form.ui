@@ -464,6 +464,26 @@
                </item>
               </layout>
              </widget>
+             <widget class="QWidget" name="tab_IMG_Slots">
+              <attribute name="title">
+               <string>Slots</string>
+              </attribute>
+              <widget class="QTreeWidget" name="tree_IMG_Slot_Info">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>10</y>
+                 <width>256</width>
+                 <height>161</height>
+                </rect>
+               </property>
+               <column>
+                <property name="text">
+                 <string notr="true">1</string>
+                </property>
+               </column>
+              </widget>
+             </widget>
             </widget>
            </item>
            <item row="5" column="0" colspan="3">
@@ -2415,8 +2435,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

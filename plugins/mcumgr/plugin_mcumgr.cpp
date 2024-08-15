@@ -325,6 +325,15 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_10->addItem(verticalSpacer_2, 1, 0, 1, 1);
 
     tabWidget_3->addTab(tab_IMG_Erase, QString());
+    tab_IMG_Slots = new QWidget();
+    tab_IMG_Slots->setObjectName(QString::fromUtf8("tab_IMG_Slots"));
+    tree_IMG_Slot_Info = new QTreeWidget(tab_IMG_Slots);
+    QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+    __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
+    tree_IMG_Slot_Info->setHeaderItem(__qtreewidgetitem);
+    tree_IMG_Slot_Info->setObjectName(QString::fromUtf8("tree_IMG_Slot_Info"));
+    tree_IMG_Slot_Info->setGeometry(QRect(10, 10, 256, 161));
+    tabWidget_3->addTab(tab_IMG_Slots, QString());
 
     gridLayout_3->addWidget(tabWidget_3, 0, 0, 1, 1);
 
@@ -1410,6 +1419,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
+    tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Slots), QCoreApplication::translate("Form", "Slots", nullptr));
     btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_IMG), QCoreApplication::translate("Form", "Img", nullptr));
@@ -1886,6 +1896,7 @@ void plugin_mcumgr::serial_closed()
         case ACTION_IMG_IMAGE_LIST:
         case ACTION_IMG_IMAGE_SET:
         case ACTION_IMG_IMAGE_ERASE:
+        case ACTION_IMG_IMAGE_SLOT_INFO:
         {
             smp_groups.img_mgmt->cancel();
             break;
@@ -2304,6 +2315,19 @@ finished:
         if (started == true)
         {
             lbl_IMG_Status->setText("Erasing...");
+        }
+    }
+    else if (tabWidget_3->currentWidget() == tab_IMG_Slots)
+    {
+        //Slot info
+        mode = ACTION_IMG_IMAGE_SLOT_INFO;
+        processor->set_transport(active_transport());
+        smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
+        started = smp_groups.img_mgmt->start_image_slot_info(nullptr);
+
+        if (started == true)
+        {
+            lbl_IMG_Status->setText("Fetching slot info...");
         }
     }
 

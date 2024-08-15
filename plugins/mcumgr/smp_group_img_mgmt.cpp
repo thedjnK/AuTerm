@@ -30,13 +30,15 @@ enum modes : uint8_t {
     MODE_UPLOAD_FIRMWARE,
     MODE_LIST_IMAGES,
     MODE_SET_IMAGE,
-    MODE_ERASE_IMAGE
+    MODE_ERASE_IMAGE,
+    MODE_SLOT_INFO
 };
 
 enum img_mgmt_commands : uint8_t {
     COMMAND_STATE = 0,
     COMMAND_UPLOAD,
-    COMMAND_ERASE = 5
+    COMMAND_ERASE = 5,
+    COMMAND_SLOT_INFO
 };
 
 //MCUboot TLV (Tag-Length-Value) related constants
@@ -630,6 +632,223 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
     return (reader.lastError() ? false : true);
 }
 
+#if 0
+bool smp_group_img_mgmt::parse_slot_info_response(QCborStreamReader &reader, QList<slot_info_t> *images)
+{
+    //TODO
+    QString array_name_dupe = array_name;
+    QString key = "";
+    bool keyset = true;
+
+    image_state_buffer.image = 0;
+    image_state_buffer.image_set = false;
+    image_state_buffer.slot_list.clear();
+    image_state_buffer.item = nullptr;
+    slot_state_buffer.slot = 0;
+    slot_state_buffer.version.clear();
+    slot_state_buffer.hash.clear();
+    slot_state_buffer.bootable = false;
+    slot_state_buffer.pending = false;
+    slot_state_buffer.confirmed = false;
+    slot_state_buffer.active = false;
+    slot_state_buffer.permanent = false;
+    slot_state_buffer.splitstatus = false;
+    slot_state_buffer.item = nullptr;
+
+    while (!reader.lastError() && reader.hasNext())
+    {
+        if (keyset == false && !key.isEmpty())
+        {
+            key.clear();
+        }
+
+        keyset = false;
+
+        //	    qDebug() << "Key: " << key;
+        //	    qDebug() << "Type: " << reader.type();
+        switch (reader.type())
+        {
+        case QCborStreamReader::SimpleType:
+        {
+            bool *index = NULL;
+            if (key == "bootable")
+            {
+                index = &slot_state_buffer.bootable;
+            }
+            else if (key == "pending")
+            {
+                index = &slot_state_buffer.pending;
+            }
+            else if (key == "confirmed")
+            {
+                index = &slot_state_buffer.confirmed;
+            }
+            else if (key == "active")
+            {
+                index = &slot_state_buffer.active;
+            }
+            else if (key == "permanent")
+            {
+                index = &slot_state_buffer.permanent;
+            }
+            else if (key == "splitStatus")
+            {
+                index = &slot_state_buffer.splitstatus;
+            }
+
+            if (index != NULL)
+            {
+                *index = reader.toBool();
+            }
+
+            reader.next();
+            break;
+        }
+
+        case QCborStreamReader::UnsignedInteger:
+        case QCborStreamReader::NegativeInteger:
+        {
+            //	handleFixedWidth(reader);
+            if (key == "image")
+            {
+                image_state_buffer.image = reader.toUnsignedInteger();
+                image_state_buffer.image_set = true;
+            }
+            else if (key == "slot")
+            {
+                slot_state_buffer.slot = reader.toUnsignedInteger();
+            }
+
+            reader.next();
+            break;
+        }
+
+        case QCborStreamReader::ByteArray:
+        {
+            QByteArray data;
+            auto r = reader.readByteArray();
+            while (r.status == QCborStreamReader::Ok)
+            {
+                data.append(r.data);
+                r = reader.readByteArray();
+            }
+
+            if (key == "hash")
+            {
+                slot_state_buffer.hash = data;
+            }
+
+            break;
+        }
+
+        case QCborStreamReader::String:
+        {
+            QString data;
+            auto r = reader.readString();
+            while (r.status == QCborStreamReader::Ok)
+            {
+                data.append(r.data);
+                r = reader.readString();
+            }
+
+            if (r.status == QCborStreamReader::Error)
+            {
+                data.clear();
+                log_error() << "Error decoding string";
+            }
+            else
+            {
+                if (key.isEmpty())
+                {
+                    key = data;
+                    keyset = true;
+                }
+                else if (key == "version")
+                {
+                    slot_state_buffer.version = data.toUtf8();
+                }
+            }
+
+            break;
+        }
+
+        case QCborStreamReader::Array:
+        case QCborStreamReader::Map:
+        {
+            if (reader.type() == QCborStreamReader::Array)
+            {
+                array_name_dupe = key;
+            }
+
+            reader.enterContainer();
+
+            while (reader.lastError() == QCborError::NoError && reader.hasNext())
+            {
+                log_debug() << "container/map";
+                parse_state_response(reader, array_name_dupe);
+            }
+
+            if (reader.lastError() == QCborError::NoError)
+            {
+                log_debug() << "leave";
+                reader.leaveContainer();
+
+                if (array_name == "images")
+                {
+                    image_state_t *image_state_ptr = nullptr;
+
+                    if (host_images != nullptr && host_images->length() > 0)
+                    {
+                        uint8_t i = 0;
+                        while (i < host_images->length())
+                        {
+                            if (host_images->at(i).image_set == image_state_buffer.image_set && (image_state_buffer.image_set == false || host_images->at(i).image == image_state_buffer.image))
+                            {
+                                image_state_ptr = &((*host_images)[i]);
+                                break;
+                            }
+
+                            ++i;
+                        }
+                    }
+
+                    if (host_images != nullptr && image_state_ptr == nullptr)
+                    {
+                        if (image_state_buffer.image_set == true)
+                        {
+                            image_state_buffer.item = new QStandardItem(QString("Image ").append(QString::number(image_state_buffer.image)));
+                        }
+                        else
+                        {
+                            image_state_buffer.item = new QStandardItem("Images");
+                        }
+
+                        host_images->append(image_state_buffer);
+                        image_state_ptr = &host_images->last();
+                    }
+
+                    if (image_state_ptr != nullptr)
+                    {
+                        slot_state_buffer.item = new QStandardItem(QString("Slot ").append(QString::number(slot_state_buffer.slot)));
+                        image_state_ptr->slot_list.append(slot_state_buffer);
+                        image_state_ptr->item->appendRow(slot_state_buffer.item);
+                    }
+                }
+            }
+            break;
+        }
+
+        default:
+        {
+            reader.next();
+        }
+        }
+    }
+
+    return (reader.lastError() ? false : true);
+}
+#endif
+
 void smp_group_img_mgmt::file_upload(QByteArray *message)
 {
     int64_t off = -1;
@@ -891,6 +1110,12 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
             mode = MODE_IDLE;
         }
+        else if (mode == MODE_SLOT_INFO && command == COMMAND_SLOT_INFO)
+        {
+            //Response to slot info
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
+            mode = MODE_IDLE;
+        }
         else
         {
             log_error() << "Unsupported command received";
@@ -927,6 +1152,11 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
         emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
     }
     else if (command == COMMAND_ERASE && mode == MODE_ERASE_IMAGE)
+    {
+        //TODO
+        emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
+    }
+    else if (command == COMMAND_SLOT_INFO && mode == MODE_SLOT_INFO)
     {
         //TODO
         emit status(smp_user_data, status_error_return(error), smp_error::error_lookup_string(&error));
@@ -1105,6 +1335,23 @@ bool smp_group_img_mgmt::start_image_erase(uint8_t slot)
     return true;
 }
 
+bool smp_group_img_mgmt::start_image_slot_info(QList<slot_info_t> *images)
+{
+    smp_message *tmp_message = new smp_message();
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_IMG, COMMAND_SLOT_INFO);
+
+    //			    qDebug() << message;
+    //			    qDebug() << "hash is " << this->upload_hash;
+    tmp_message->end_message();
+
+    mode = MODE_SLOT_INFO;
+    host_slots = images;
+
+    processor->send(tmp_message, smp_timeout, smp_retries, true);
+
+    return true;
+}
+
 QString smp_group_img_mgmt::mode_to_string(uint8_t mode)
 {
     switch (mode)
@@ -1119,6 +1366,8 @@ QString smp_group_img_mgmt::mode_to_string(uint8_t mode)
             return "Set image state";
         case MODE_ERASE_IMAGE:
             return "Erase image";
+        case MODE_SLOT_INFO:
+            return "Slot info";
         default:
             return "Invalid";
     }
@@ -1134,6 +1383,8 @@ QString smp_group_img_mgmt::command_to_string(uint8_t command)
             return "Image state";
         case COMMAND_ERASE:
             return "Erase image";
+        case COMMAND_SLOT_INFO:
+            return "Slot info";
         default:
             return "Invalid";
     }

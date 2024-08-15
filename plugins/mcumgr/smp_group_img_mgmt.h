@@ -52,6 +52,17 @@ struct image_state_t {
     QStandardItem *item;
 };
 
+struct slot_info_t {
+    uint32_t slot;
+    uint32_t image;
+    union {
+        int32_t rc;
+        uint32_t size;
+    };
+    bool rc_present;
+    bool size_present;
+};
+
 enum img_mgmt_upload_match : uint8_t {
     MATCH_NOT_PRESENT = 0,
     MATCH_FAILED,
@@ -79,6 +90,7 @@ public:
     bool start_image_set(QByteArray *hash, bool confirm, QList<image_state_t> *images);
     bool start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash);
     bool start_image_erase(uint8_t slot);
+    bool start_image_slot_info(QList<slot_info_t> *images);
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
 
@@ -90,6 +102,7 @@ private:
     bool extract_hash(QByteArray *file_data, QByteArray *hash);
     bool parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match);
     bool parse_state_response(QCborStreamReader &reader, QString array_name);
+    //bool parse_slot_info_response(QCborStreamReader &reader, QList<slot_info_t> *images);
     void file_upload(QByteArray *message);
     QString mode_to_string(uint8_t mode);
     QString command_to_string(uint8_t command);
@@ -105,6 +118,7 @@ private:
     bool upgrade_only;
     uint8_t upload_repeated_parts;
     QList<image_state_t> *host_images;
+    QList<slot_info_t> *host_slots;
 };
 
 #endif // SMP_GROUP_IMG_MGMT_H
