@@ -238,9 +238,9 @@ void smp_group_shell_mgmt::cancel()
 bool smp_group_shell_mgmt::start_execute(QStringList *arguments, int32_t *ret)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SHELL, COMMAND_EXECUTE);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SHELL, COMMAND_EXECUTE, 1);
     tmp_message->writer()->append("argv");
-    tmp_message->writer()->startArray();
+    tmp_message->writer()->startArray(arguments->length());
 
     uint8_t i = 0;
     while (i < arguments->length())

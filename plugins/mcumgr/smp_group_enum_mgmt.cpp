@@ -623,7 +623,7 @@ void smp_group_enum_mgmt::cancel()
 bool smp_group_enum_mgmt::start_enum_count(uint16_t *count)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_COUNT);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_COUNT, 0);
     tmp_message->end_message();
 
     mode = MODE_COUNT;
@@ -640,7 +640,7 @@ bool smp_group_enum_mgmt::start_enum_count(uint16_t *count)
 bool smp_group_enum_mgmt::start_enum_list(QList<uint16_t> *groups)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_LIST);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_LIST, 0);
     tmp_message->end_message();
 
     mode = MODE_LIST;
@@ -683,7 +683,7 @@ bool smp_group_enum_mgmt::start_enum_single(uint16_t index, uint16_t *id, bool *
 bool smp_group_enum_mgmt::start_enum_details(QList<enum_details_t> *groups, enum_fields_present_t *fields_present)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_DETAILS);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_DETAILS, 0);
     tmp_message->end_message();
 
     mode = MODE_DETAILS;

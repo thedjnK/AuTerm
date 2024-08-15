@@ -969,7 +969,7 @@ log_error() << "Going in circles...";
         }
 
         smp_message *tmp_message = new smp_message();
-        tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, COMMAND_UPLOAD);
+        tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, COMMAND_UPLOAD, 2 + (this->file_upload_area == 0 ? ((this->upload_image != 0 ? 1 : 0) + 2 + (this->upgrade_only == true ? 1 : 0)): 0));
 
         if (this->file_upload_area == 0)
         {
@@ -1231,7 +1231,7 @@ bool smp_group_img_mgmt::start_image_get(QList<image_state_t> *images)
     host_images->clear();
 
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_IMG, COMMAND_STATE);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_IMG, COMMAND_STATE, 0);
     tmp_message->end_message();
 
     mode = MODE_LIST_IMAGES;
@@ -1248,7 +1248,7 @@ bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm, QList<i
     host_images = images;
 
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, COMMAND_STATE);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, COMMAND_STATE, (confirm == true ? 2 : 1));
 
     tmp_message->writer()->append("hash");
     tmp_message->writer()->append(*hash);
@@ -1320,7 +1320,7 @@ bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, 
 bool smp_group_img_mgmt::start_image_erase(uint8_t slot)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, COMMAND_ERASE);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_IMG, COMMAND_ERASE, 1);
 
     tmp_message->writer()->append("slot");
     tmp_message->writer()->append(slot);
@@ -1338,7 +1338,7 @@ bool smp_group_img_mgmt::start_image_erase(uint8_t slot)
 bool smp_group_img_mgmt::start_image_slot_info(QList<slot_info_t> *images)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_IMG, COMMAND_SLOT_INFO);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_IMG, COMMAND_SLOT_INFO, 0);
 
     //			    qDebug() << message;
     //			    qDebug() << "hash is " << this->upload_hash;

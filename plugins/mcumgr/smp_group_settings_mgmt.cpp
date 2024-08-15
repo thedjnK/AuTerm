@@ -311,7 +311,7 @@ void smp_group_settings_mgmt::cancel()
 bool smp_group_settings_mgmt::start_read(QString name, uint32_t max_length, QByteArray *value)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_READ_WRITE);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_READ_WRITE, (max_length > 0 ? 2 : 1));
     tmp_message->writer()->append("name");
     tmp_message->writer()->append(name);
 
@@ -336,7 +336,7 @@ bool smp_group_settings_mgmt::start_read(QString name, uint32_t max_length, QByt
 bool smp_group_settings_mgmt::start_write(QString name, QByteArray value)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_READ_WRITE);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_READ_WRITE, 2);
     tmp_message->writer()->append("name");
     tmp_message->writer()->append(name);
     tmp_message->writer()->append("val");
@@ -355,7 +355,7 @@ bool smp_group_settings_mgmt::start_write(QString name, QByteArray value)
 bool smp_group_settings_mgmt::start_delete(QString name)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_DELETE);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_DELETE, 1);
     tmp_message->writer()->append("name");
     tmp_message->writer()->append(name);
     tmp_message->end_message();
@@ -372,7 +372,7 @@ bool smp_group_settings_mgmt::start_delete(QString name)
 bool smp_group_settings_mgmt::start_commit(void)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_COMMIT);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_COMMIT, 0);
     tmp_message->end_message();
 
     mode = MODE_COMMIT;
@@ -387,7 +387,7 @@ bool smp_group_settings_mgmt::start_commit(void)
 bool smp_group_settings_mgmt::start_load(void)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_LOAD_SAVE);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_LOAD_SAVE, 0);
     tmp_message->end_message();
 
     mode = MODE_LOAD;
@@ -402,7 +402,7 @@ bool smp_group_settings_mgmt::start_load(void)
 bool smp_group_settings_mgmt::start_save(void)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_LOAD_SAVE);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_SETTINGS, COMMAND_LOAD_SAVE, 0);
     tmp_message->end_message();
 
     mode = MODE_SAVE;

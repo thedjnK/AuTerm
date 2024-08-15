@@ -845,7 +845,7 @@ void smp_group_fs_mgmt::cancel()
 void smp_group_fs_mgmt::upload_chunk()
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_FS, COMMAND_UPLOAD_DOWNLOAD);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_FS, COMMAND_UPLOAD_DOWNLOAD, (file_upload_area == 0 ? 4 : 3));
 
     if (local_file.pos() != file_upload_area)
     {
@@ -876,7 +876,7 @@ void smp_group_fs_mgmt::upload_chunk()
 void smp_group_fs_mgmt::download_chunk()
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_UPLOAD_DOWNLOAD);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_UPLOAD_DOWNLOAD, 2);
 
 /*    if (local_file.pos() != file_upload_area)
     {
@@ -942,7 +942,7 @@ bool smp_group_fs_mgmt::start_download(QString file_name, QString destination_na
 bool smp_group_fs_mgmt::start_status(QString file_name, uint32_t *file_size)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_STATUS);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_STATUS, 1);
     tmp_message->writer()->append("name");
     tmp_message->writer()->append(file_name);
     tmp_message->end_message();
@@ -959,7 +959,7 @@ bool smp_group_fs_mgmt::start_status(QString file_name, uint32_t *file_size)
 bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_checksum, QByteArray *result, uint32_t *file_size)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_HASH_CHECKSUM);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_HASH_CHECKSUM, 2);
     tmp_message->writer()->append("name");
     tmp_message->writer()->append(file_name);
     tmp_message->writer()->append("type");
@@ -980,7 +980,7 @@ bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_chec
 bool smp_group_fs_mgmt::start_supported_hashes_checksums(QList<hash_checksum_t> *hash_checksum_list)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_SUPPORTED_HASHES_CHECKSUMS);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_SUPPORTED_HASHES_CHECKSUMS, 0);
     tmp_message->end_message();
 
     mode = MODE_SUPPORTED_HASHES_CHECKSUMS;
@@ -994,7 +994,7 @@ bool smp_group_fs_mgmt::start_supported_hashes_checksums(QList<hash_checksum_t> 
 bool smp_group_fs_mgmt::start_file_close()
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_FS, COMMAND_FILE_CLOSE);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_FS, COMMAND_FILE_CLOSE, 0);
     tmp_message->end_message();
 
     mode = MODE_FILE_CLOSE;

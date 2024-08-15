@@ -59,6 +59,7 @@ class smp_message
 public:
     smp_message();
     void start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id);
+    void start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id, uint16_t map_length);
     //~smp_mesage();
     void append(const QByteArray data);
     void append(const QByteArray *data);

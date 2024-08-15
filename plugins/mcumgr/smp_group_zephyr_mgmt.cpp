@@ -137,7 +137,7 @@ void smp_group_zephyr_mgmt::cancel()
 bool smp_group_zephyr_mgmt::start_storage_erase(void)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_ZEPHYR, COMMAND_STORAGE_ERASE);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_ZEPHYR, COMMAND_STORAGE_ERASE, 0);
     tmp_message->end_message();
 
     mode = MODE_STORAGE_ERASE;

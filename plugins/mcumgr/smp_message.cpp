@@ -53,6 +53,28 @@ void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, ui
     this->header_added = true;
 }
 
+void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id, uint16_t map_length)
+{
+    this->buffer.append((char)((version == 1 ? SMP_VERSION_2_HEADER : SMP_VERSION_1_HEADER) | op));  /* Read | Write (0x00 | 0x02) */
+    this->buffer.append((char)0x00);  /* Flags */
+    this->buffer.append((char)0x00);  /* Length A */
+    this->buffer.append((char)0x00);  /* Length B */
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+    this->buffer.append((char)(group >> 8));  /* Group A */
+    this->buffer.append((char)group);  /* Group B */
+#else
+    this->buffer.append((char)group);  /* Group A */
+    this->buffer.append((char)(group >> 8));  /* Group B */
+#endif
+    this->buffer.append((char)0x00);  /* Sequence */
+    this->buffer.append((char)id);   /* Message ID */
+
+    cbor_writer.device()->seek(this->buffer.length());
+    cbor_writer.startMap(map_length);
+
+    this->header_added = true;
+}
+
 /*smp_message::~smp_message()
 {
 

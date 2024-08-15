@@ -335,7 +335,7 @@ void smp_group_stat_mgmt::cancel()
 bool smp_group_stat_mgmt::start_group_data(QString name, QList<stat_value_t> *stats)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_STATS, COMMAND_GROUP_DATA);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_STATS, COMMAND_GROUP_DATA, 1);
     tmp_message->writer()->append("name");
     tmp_message->writer()->append(name);
     tmp_message->end_message();
@@ -353,7 +353,7 @@ bool smp_group_stat_mgmt::start_group_data(QString name, QList<stat_value_t> *st
 bool smp_group_stat_mgmt::start_list_groups(QStringList *groups)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_STATS, COMMAND_LIST_GROUPS);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_STATS, COMMAND_LIST_GROUPS, 0);
     tmp_message->end_message();
 
     mode = MODE_LIST_GROUPS;

@@ -969,7 +969,7 @@ void smp_group_os_mgmt::cancel()
 bool smp_group_os_mgmt::start_echo(QString data)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_ECHO);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_ECHO, 1);
     tmp_message->writer()->append("d");
     tmp_message->writer()->append(data);
     tmp_message->end_message();
@@ -986,7 +986,7 @@ bool smp_group_os_mgmt::start_echo(QString data)
 bool smp_group_os_mgmt::start_task_stats(QList<task_list_t> *tasks)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_TASK_STATS);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_TASK_STATS, 0);
     tmp_message->end_message();
 
     task_list = tasks;
@@ -1003,7 +1003,7 @@ bool smp_group_os_mgmt::start_task_stats(QList<task_list_t> *tasks)
 bool smp_group_os_mgmt::start_memory_pool(QList<memory_pool_t> *memory)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_MEMORY_POOL);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_MEMORY_POOL, 0);
     tmp_message->end_message();
 
     memory_list = memory;
@@ -1020,7 +1020,8 @@ bool smp_group_os_mgmt::start_memory_pool(QList<memory_pool_t> *memory)
 bool smp_group_os_mgmt::start_reset(bool force)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_RESET);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_RESET, (force == true ? 1 : 0));
+
     if (force == true)
     {
         tmp_message->writer()->append("force");
@@ -1040,7 +1041,7 @@ bool smp_group_os_mgmt::start_reset(bool force)
 bool smp_group_os_mgmt::start_mcumgr_parameters()
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_MCUMGR_PARAMETERS);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_MCUMGR_PARAMETERS, 0);
     tmp_message->end_message();
 
     mode = MODE_MCUMGR_PARAMETERS;
@@ -1055,7 +1056,7 @@ bool smp_group_os_mgmt::start_mcumgr_parameters()
 bool smp_group_os_mgmt::start_os_application_info(QString format)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_OS_APPLICATION_INFO);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_OS_APPLICATION_INFO, (format.isEmpty() == false ? 1 : 0));
 
     if (format.isEmpty() == false)
     {
@@ -1077,7 +1078,7 @@ bool smp_group_os_mgmt::start_os_application_info(QString format)
 bool smp_group_os_mgmt::start_date_time_get(QDateTime *date_time)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_DATE_TIME);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_DATE_TIME, 0);
     tmp_message->end_message();
 
     mode = MODE_DATE_TIME_GET;
@@ -1093,7 +1094,7 @@ bool smp_group_os_mgmt::start_date_time_get(QDateTime *date_time)
 bool smp_group_os_mgmt::start_date_time_set(QDateTime date_time)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_DATE_TIME);
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_DATE_TIME, 1);
     tmp_message->writer()->append("datetime");
     tmp_message->writer()->append(date_time.toString(Qt::ISODate));
     tmp_message->end_message();
@@ -1110,7 +1111,7 @@ bool smp_group_os_mgmt::start_date_time_set(QDateTime date_time)
 bool smp_group_os_mgmt::start_bootloader_info(QString query, QVariant *response)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_BOOTLOADER_INFO);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_BOOTLOADER_INFO, (query.isEmpty() == false ? 1 : 0));
 
     if (query.isEmpty() == false)
     {
