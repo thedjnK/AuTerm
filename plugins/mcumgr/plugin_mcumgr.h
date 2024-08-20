@@ -478,8 +478,8 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_3;
+    QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_2;
 ///AUTOGEN_END_OBJECTS
 

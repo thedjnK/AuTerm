@@ -147,7 +147,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     tabWidget_2 = new QTabWidget(tab);
     tabWidget_2->setObjectName("tabWidget_2");
-    tabWidget_2->setTabPosition(QTabWidget::West);
+    tabWidget_2->setTabPosition(QTabWidget::TabPosition::West);
     tab_IMG = new QWidget();
     tab_IMG->setObjectName("tab_IMG");
     gridLayout_3 = new QGridLayout(tab_IMG);
@@ -282,8 +282,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line = new QFrame(tab_IMG_Images);
     line->setObjectName("line");
-    line->setFrameShape(QFrame::VLine);
-    line->setFrameShadow(QFrame::Sunken);
+    line->setFrameShape(QFrame::Shape::VLine);
+    line->setFrameShadow(QFrame::Shadow::Sunken);
 
     horizontalLayout_6->addWidget(line);
 
@@ -293,7 +293,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_6->addWidget(check_IMG_Confirm);
 
-    horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+    horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_6->addItem(horizontalSpacer_5);
 
@@ -310,7 +310,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_10->addWidget(label_14, 0, 0, 1, 1);
 
-    horizontalSpacer_9 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+    horizontalSpacer_9 = new QSpacerItem(235, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     gridLayout_10->addItem(horizontalSpacer_9, 0, 2, 1, 1);
 
@@ -584,11 +584,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
     table_OS_Tasks->setHorizontalHeaderItem(7, __qtablewidgetitem7);
     table_OS_Tasks->setObjectName("table_OS_Tasks");
-    table_OS_Tasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_OS_Tasks->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     table_OS_Tasks->setProperty("showDropIndicator", QVariant(false));
     table_OS_Tasks->setDragDropOverwriteMode(false);
     table_OS_Tasks->setAlternatingRowColors(true);
-    table_OS_Tasks->setSelectionMode(QAbstractItemView::NoSelection);
+    table_OS_Tasks->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
     table_OS_Tasks->setSortingEnabled(true);
     table_OS_Tasks->setCornerButtonEnabled(false);
 
@@ -611,11 +611,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
     table_OS_Memory->setHorizontalHeaderItem(3, __qtablewidgetitem11);
     table_OS_Memory->setObjectName("table_OS_Memory");
-    table_OS_Memory->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_OS_Memory->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     table_OS_Memory->setProperty("showDropIndicator", QVariant(false));
     table_OS_Memory->setDragDropOverwriteMode(false);
     table_OS_Memory->setAlternatingRowColors(true);
-    table_OS_Memory->setSelectionMode(QAbstractItemView::NoSelection);
+    table_OS_Memory->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
     table_OS_Memory->setSortingEnabled(true);
     table_OS_Memory->setCornerButtonEnabled(false);
 
@@ -694,9 +694,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_os_datetime_date_time->setAccelerated(true);
     edit_os_datetime_date_time->setProperty("showGroupSeparator", QVariant(true));
     edit_os_datetime_date_time->setMinimumDate(QDate(1970, 1, 1));
-    edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::YearSection);
+    edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::Section::YearSection);
     edit_os_datetime_date_time->setCalendarPopup(true);
-    edit_os_datetime_date_time->setTimeSpec(Qt::LocalTime);
+    edit_os_datetime_date_time->setTimeSpec(Qt::TimeSpec::LocalTime);
 
     gridLayout_18->addWidget(edit_os_datetime_date_time, 0, 1, 1, 1);
 
@@ -765,7 +765,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_OS_Bootloader->setObjectName("tab_OS_Bootloader");
     formLayout_2 = new QFormLayout(tab_OS_Bootloader);
     formLayout_2->setObjectName("formLayout_2");
-    formLayout_2->setFormAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+    formLayout_2->setFormAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
     formLayout_2->setHorizontalSpacing(2);
     formLayout_2->setVerticalSpacing(2);
     formLayout_2->setContentsMargins(6, 6, 6, 6);
@@ -867,7 +867,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
     table_STAT_Values->setHorizontalHeaderItem(1, __qtablewidgetitem13);
     table_STAT_Values->setObjectName("table_STAT_Values");
-    table_STAT_Values->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_STAT_Values->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     table_STAT_Values->setProperty("showDropIndicator", QVariant(false));
     table_STAT_Values->setDragDropOverwriteMode(false);
     table_STAT_Values->setAlternatingRowColors(true);
@@ -1147,8 +1147,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     line_2 = new QFrame(tab_Settings);
     line_2->setObjectName("line_2");
     line_2->setLineWidth(1);
-    line_2->setFrameShape(QFrame::VLine);
-    line_2->setFrameShadow(QFrame::Sunken);
+    line_2->setFrameShape(QFrame::Shape::VLine);
+    line_2->setFrameShadow(QFrame::Shadow::Sunken);
 
     gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
 
@@ -1271,8 +1271,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line_3 = new QFrame(tab_Enum);
     line_3->setObjectName("line_3");
-    line_3->setFrameShape(QFrame::VLine);
-    line_3->setFrameShadow(QFrame::Sunken);
+    line_3->setFrameShape(QFrame::Shape::VLine);
+    line_3->setFrameShadow(QFrame::Shadow::Sunken);
 
     horizontalLayout_23->addWidget(line_3);
 
@@ -1313,7 +1313,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *__qtablewidgetitem16 = new QTableWidgetItem();
     table_Enum_List_Details->setHorizontalHeaderItem(2, __qtablewidgetitem16);
     table_Enum_List_Details->setObjectName("table_Enum_List_Details");
-    table_Enum_List_Details->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table_Enum_List_Details->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
     table_Enum_List_Details->setDragDropOverwriteMode(false);
     table_Enum_List_Details->setAlternatingRowColors(true);
     table_Enum_List_Details->setSortingEnabled(true);
@@ -1354,14 +1354,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_2->setObjectName("tab_2");
     verticalLayoutWidget = new QWidget(tab_2);
     verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-    verticalLayoutWidget->setGeometry(QRect(210, 120, 229, 196));
+    verticalLayoutWidget->setGeometry(QRect(2, 2, 229, 182));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(2);
     verticalLayout->setObjectName("verticalLayout");
-    verticalLayout->setContentsMargins(6, 6, 8, 6);
+    verticalLayout->setContentsMargins(4, 4, 10, 4);
     formLayout = new QFormLayout();
     formLayout->setObjectName("formLayout");
-    formLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    formLayout->setFieldGrowthPolicy(QFormLayout::FieldGrowthPolicy::ExpandingFieldsGrow);
     formLayout->setHorizontalSpacing(2);
     formLayout->setVerticalSpacing(2);
     label_7 = new QLabel(verticalLayoutWidget);
