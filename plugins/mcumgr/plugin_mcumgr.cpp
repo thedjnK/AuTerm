@@ -50,6 +50,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 #endif
 
     //Initialise SMP-related objects
+    log_json = new smp_json(this);
     processor = new smp_processor(this);
     smp_groups.fs_mgmt = new smp_group_fs_mgmt(processor);
     smp_groups.img_mgmt = new smp_group_img_mgmt(processor);
@@ -60,6 +61,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.zephyr_mgmt = new smp_group_zephyr_mgmt(processor);
     smp_groups.enum_mgmt = new smp_group_enum_mgmt(processor);
     error_lookup_form = new error_lookup(parent_window, &smp_groups);
+
+    processor->set_json(log_json);
+    connect(log_json, SIGNAL(log(bool,QString*)), this, SLOT(custom_log(bool,QString*)));
 
 #ifndef SKIPPLUGIN_LOGGER
     logger = new debug_logger(this);
@@ -282,8 +286,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line = new QFrame(tab_IMG_Images);
     line->setObjectName("line");
-    line->setFrameShape(QFrame::Shape::VLine);
-    line->setFrameShadow(QFrame::Shadow::Sunken);
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Sunken);
 
     horizontalLayout_6->addWidget(line);
 
@@ -1147,8 +1151,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     line_2 = new QFrame(tab_Settings);
     line_2->setObjectName("line_2");
     line_2->setLineWidth(1);
-    line_2->setFrameShape(QFrame::Shape::VLine);
-    line_2->setFrameShadow(QFrame::Shadow::Sunken);
+    line_2->setFrameShape(QFrame::VLine);
+    line_2->setFrameShadow(QFrame::Sunken);
 
     gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
 
@@ -1271,8 +1275,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line_3 = new QFrame(tab_Enum);
     line_3->setObjectName("line_3");
-    line_3->setFrameShape(QFrame::Shape::VLine);
-    line_3->setFrameShadow(QFrame::Shadow::Sunken);
+    line_3->setFrameShape(QFrame::VLine);
+    line_3->setFrameShadow(QFrame::Sunken);
 
     horizontalLayout_23->addWidget(line_3);
 
@@ -1346,6 +1350,252 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout_3->addLayout(horizontalLayout_20);
 
     tabWidget_2->addTab(tab_Enum, QString());
+    tab_custom = new QWidget();
+    tab_custom->setObjectName("tab_custom");
+    verticalLayout_5 = new QVBoxLayout(tab_custom);
+    verticalLayout_5->setSpacing(2);
+    verticalLayout_5->setObjectName("verticalLayout_5");
+    verticalLayout_5->setContentsMargins(6, 6, 6, 6);
+    formLayout_3 = new QFormLayout();
+    formLayout_3->setObjectName("formLayout_3");
+    formLayout_3->setHorizontalSpacing(2);
+    formLayout_3->setVerticalSpacing(2);
+    label_38 = new QLabel(tab_custom);
+    label_38->setObjectName("label_38");
+
+    formLayout_3->setWidget(0, QFormLayout::LabelRole, label_38);
+
+    horizontalLayout_26 = new QHBoxLayout();
+    horizontalLayout_26->setSpacing(2);
+    horizontalLayout_26->setObjectName("horizontalLayout_26");
+    radio_custom_custom = new QRadioButton(tab_custom);
+    buttonGroup_4 = new QButtonGroup(tab_custom);
+    buttonGroup_4->setObjectName("buttonGroup_4");
+    buttonGroup_4->addButton(radio_custom_custom);
+    radio_custom_custom->setObjectName("radio_custom_custom");
+    radio_custom_custom->setChecked(true);
+
+    horizontalLayout_26->addWidget(radio_custom_custom);
+
+    radio_custom_logging = new QRadioButton(tab_custom);
+    buttonGroup_4->addButton(radio_custom_logging);
+    radio_custom_logging->setObjectName("radio_custom_logging");
+
+    horizontalLayout_26->addWidget(radio_custom_logging);
+
+    line_7 = new QFrame(tab_custom);
+    line_7->setObjectName("line_7");
+    line_7->setFrameShape(QFrame::VLine);
+    line_7->setFrameShadow(QFrame::Sunken);
+
+    horizontalLayout_26->addWidget(line_7);
+
+    label_39 = new QLabel(tab_custom);
+    label_39->setObjectName("label_39");
+
+    horizontalLayout_26->addWidget(label_39);
+
+    radio_custom_json = new QRadioButton(tab_custom);
+    buttonGroup_5 = new QButtonGroup(tab_custom);
+    buttonGroup_5->setObjectName("buttonGroup_5");
+    buttonGroup_5->addButton(radio_custom_json);
+    radio_custom_json->setObjectName("radio_custom_json");
+    radio_custom_json->setChecked(true);
+
+    horizontalLayout_26->addWidget(radio_custom_json);
+
+    radio_custom_yaml = new QRadioButton(tab_custom);
+    buttonGroup_5->addButton(radio_custom_yaml);
+    radio_custom_yaml->setObjectName("radio_custom_yaml");
+    radio_custom_yaml->setEnabled(false);
+
+    horizontalLayout_26->addWidget(radio_custom_yaml);
+
+    radio_custom_cbor = new QRadioButton(tab_custom);
+    buttonGroup_5->addButton(radio_custom_cbor);
+    radio_custom_cbor->setObjectName("radio_custom_cbor");
+
+    horizontalLayout_26->addWidget(radio_custom_cbor);
+
+    horizontalSpacer_26 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_26->addItem(horizontalSpacer_26);
+
+
+    formLayout_3->setLayout(0, QFormLayout::FieldRole, horizontalLayout_26);
+
+    label_40 = new QLabel(tab_custom);
+    label_40->setObjectName("label_40");
+
+    formLayout_3->setWidget(1, QFormLayout::LabelRole, label_40);
+
+    horizontalLayout_28 = new QHBoxLayout();
+    horizontalLayout_28->setObjectName("horizontalLayout_28");
+    radio_custom_read = new QRadioButton(tab_custom);
+    buttonGroup_6 = new QButtonGroup(tab_custom);
+    buttonGroup_6->setObjectName("buttonGroup_6");
+    buttonGroup_6->addButton(radio_custom_read);
+    radio_custom_read->setObjectName("radio_custom_read");
+    radio_custom_read->setChecked(true);
+
+    horizontalLayout_28->addWidget(radio_custom_read);
+
+    radio_custom_write = new QRadioButton(tab_custom);
+    buttonGroup_6->addButton(radio_custom_write);
+    radio_custom_write->setObjectName("radio_custom_write");
+
+    horizontalLayout_28->addWidget(radio_custom_write);
+
+    line_5 = new QFrame(tab_custom);
+    line_5->setObjectName("line_5");
+    line_5->setFrameShape(QFrame::VLine);
+    line_5->setFrameShadow(QFrame::Sunken);
+
+    horizontalLayout_28->addWidget(line_5);
+
+    label_411 = new QLabel(tab_custom);
+    label_411->setObjectName("label_411");
+
+    horizontalLayout_28->addWidget(label_411);
+
+    edit_custom_group = new QSpinBox(tab_custom);
+    edit_custom_group->setObjectName("edit_custom_group");
+    edit_custom_group->setMinimumSize(QSize(60, 0));
+    edit_custom_group->setMaximumSize(QSize(16777215, 16777215));
+    edit_custom_group->setMaximum(65535);
+
+    horizontalLayout_28->addWidget(edit_custom_group);
+
+    line_6 = new QFrame(tab_custom);
+    line_6->setObjectName("line_6");
+    line_6->setFrameShape(QFrame::VLine);
+    line_6->setFrameShadow(QFrame::Sunken);
+
+    horizontalLayout_28->addWidget(line_6);
+
+    label_42 = new QLabel(tab_custom);
+    label_42->setObjectName("label_42");
+
+    horizontalLayout_28->addWidget(label_42);
+
+    edit_custom_command = new QSpinBox(tab_custom);
+    edit_custom_command->setObjectName("edit_custom_command");
+    edit_custom_command->setMinimumSize(QSize(50, 0));
+    edit_custom_command->setMaximum(255);
+
+    horizontalLayout_28->addWidget(edit_custom_command);
+
+    horizontalSpacer_28 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_28->addItem(horizontalSpacer_28);
+
+
+    formLayout_3->setLayout(1, QFormLayout::FieldRole, horizontalLayout_28);
+
+    label_35 = new QLabel(tab_custom);
+    label_35->setObjectName("label_35");
+
+    formLayout_3->setWidget(2, QFormLayout::LabelRole, label_35);
+
+    edit_custom_send = new QPlainTextEdit(tab_custom);
+    edit_custom_send->setObjectName("edit_custom_send");
+    edit_custom_send->setUndoRedoEnabled(false);
+    edit_custom_send->setReadOnly(true);
+
+    formLayout_3->setWidget(2, QFormLayout::FieldRole, edit_custom_send);
+
+    label_36 = new QLabel(tab_custom);
+    label_36->setObjectName("label_36");
+
+    formLayout_3->setWidget(3, QFormLayout::LabelRole, label_36);
+
+    edit_custom_receive = new QPlainTextEdit(tab_custom);
+    edit_custom_receive->setObjectName("edit_custom_receive");
+    edit_custom_receive->setUndoRedoEnabled(false);
+    edit_custom_receive->setReadOnly(true);
+
+    formLayout_3->setWidget(3, QFormLayout::FieldRole, edit_custom_receive);
+
+    label_37 = new QLabel(tab_custom);
+    label_37->setObjectName("label_37");
+
+    formLayout_3->setWidget(4, QFormLayout::LabelRole, label_37);
+
+    horizontalLayout_25 = new QHBoxLayout();
+    horizontalLayout_25->setSpacing(2);
+    horizontalLayout_25->setObjectName("horizontalLayout_25");
+    edit_custom_indent = new QSpinBox(tab_custom);
+    edit_custom_indent->setObjectName("edit_custom_indent");
+    edit_custom_indent->setMinimumSize(QSize(40, 0));
+    edit_custom_indent->setMinimum(1);
+    edit_custom_indent->setMaximum(16);
+    edit_custom_indent->setValue(4);
+
+    horizontalLayout_25->addWidget(edit_custom_indent);
+
+    line_4 = new QFrame(tab_custom);
+    line_4->setObjectName("line_4");
+    line_4->setFrameShape(QFrame::VLine);
+    line_4->setFrameShadow(QFrame::Sunken);
+
+    horizontalLayout_25->addWidget(line_4);
+
+    btn_custom_copy_send = new QPushButton(tab_custom);
+    btn_custom_copy_send->setObjectName("btn_custom_copy_send");
+
+    horizontalLayout_25->addWidget(btn_custom_copy_send);
+
+    btn_custom_copy_output = new QPushButton(tab_custom);
+    btn_custom_copy_output->setObjectName("btn_custom_copy_output");
+
+    horizontalLayout_25->addWidget(btn_custom_copy_output);
+
+    btn_custom_copy_both = new QPushButton(tab_custom);
+    btn_custom_copy_both->setObjectName("btn_custom_copy_both");
+
+    horizontalLayout_25->addWidget(btn_custom_copy_both);
+
+    btn_custom_clear = new QPushButton(tab_custom);
+    btn_custom_clear->setObjectName("btn_custom_clear");
+
+    horizontalLayout_25->addWidget(btn_custom_clear);
+
+    horizontalSpacer_25 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_25->addItem(horizontalSpacer_25);
+
+
+    formLayout_3->setLayout(4, QFormLayout::FieldRole, horizontalLayout_25);
+
+
+    verticalLayout_5->addLayout(formLayout_3);
+
+    lbl_enum_status_3 = new QLabel(tab_custom);
+    lbl_enum_status_3->setObjectName("lbl_enum_status_3");
+
+    verticalLayout_5->addWidget(lbl_enum_status_3);
+
+    horizontalLayout_24 = new QHBoxLayout();
+    horizontalLayout_24->setSpacing(2);
+    horizontalLayout_24->setObjectName("horizontalLayout_24");
+    horizontalSpacer_23 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_24->addItem(horizontalSpacer_23);
+
+    btn_custom_go = new QPushButton(tab_custom);
+    btn_custom_go->setObjectName("btn_custom_go");
+    btn_custom_go->setEnabled(false);
+
+    horizontalLayout_24->addWidget(btn_custom_go);
+
+    horizontalSpacer_24 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_24->addItem(horizontalSpacer_24);
+
+
+    verticalLayout_5->addLayout(horizontalLayout_24);
+
+    tabWidget_2->addTab(tab_custom, QString());
 
     verticalLayout_2->addWidget(tabWidget_2);
 
@@ -1435,6 +1685,121 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 //    gridLayout->addWidget(tabWidget, 0, 0, 1, 1);
 
+//    QWidget::setTabOrder(tabWidget, edit_MTU);
+    QWidget::setTabOrder(edit_MTU, check_V2_Protocol);
+    QWidget::setTabOrder(check_V2_Protocol, radio_transport_uart);
+    QWidget::setTabOrder(radio_transport_uart, radio_transport_udp);
+    QWidget::setTabOrder(radio_transport_udp, radio_transport_bluetooth);
+    QWidget::setTabOrder(radio_transport_bluetooth, btn_transport_connect);
+    QWidget::setTabOrder(btn_transport_connect, tabWidget_2);
+    QWidget::setTabOrder(tabWidget_2, tabWidget_3);
+    QWidget::setTabOrder(tabWidget_3, edit_IMG_Local);
+    QWidget::setTabOrder(edit_IMG_Local, btn_IMG_Local);
+    QWidget::setTabOrder(btn_IMG_Local, edit_IMG_Image);
+    QWidget::setTabOrder(edit_IMG_Image, radio_IMG_No_Action);
+    QWidget::setTabOrder(radio_IMG_No_Action, radio_IMG_Test);
+    QWidget::setTabOrder(radio_IMG_Test, radio_IMG_Confirm);
+    QWidget::setTabOrder(radio_IMG_Confirm, check_IMG_Reset);
+    QWidget::setTabOrder(check_IMG_Reset, colview_IMG_Images);
+    QWidget::setTabOrder(colview_IMG_Images, edit_IMG_Preview_Hash);
+    QWidget::setTabOrder(edit_IMG_Preview_Hash, edit_IMG_Preview_Version);
+    QWidget::setTabOrder(edit_IMG_Preview_Version, check_IMG_Preview_Active);
+    QWidget::setTabOrder(check_IMG_Preview_Active, check_IMG_Preview_Bootable);
+    QWidget::setTabOrder(check_IMG_Preview_Bootable, check_IMG_Preview_Confirmed);
+    QWidget::setTabOrder(check_IMG_Preview_Confirmed, check_IMG_Preview_Pending);
+    QWidget::setTabOrder(check_IMG_Preview_Pending, check_IMG_Preview_Permanent);
+    QWidget::setTabOrder(check_IMG_Preview_Permanent, btn_IMG_Preview_Copy);
+    QWidget::setTabOrder(btn_IMG_Preview_Copy, radio_IMG_Get);
+    QWidget::setTabOrder(radio_IMG_Get, radio_IMG_Set);
+    QWidget::setTabOrder(radio_IMG_Set, radio_img_images_erase);
+    QWidget::setTabOrder(radio_img_images_erase, check_IMG_Confirm);
+    QWidget::setTabOrder(check_IMG_Confirm, edit_IMG_Erase_Slot);
+    QWidget::setTabOrder(edit_IMG_Erase_Slot, tree_IMG_Slot_Info);
+    QWidget::setTabOrder(tree_IMG_Slot_Info, btn_IMG_Go);
+    QWidget::setTabOrder(btn_IMG_Go, edit_FS_Local);
+    QWidget::setTabOrder(edit_FS_Local, btn_FS_Local);
+    QWidget::setTabOrder(btn_FS_Local, edit_FS_Remote);
+    QWidget::setTabOrder(edit_FS_Remote, combo_FS_type);
+    QWidget::setTabOrder(combo_FS_type, edit_FS_Result);
+    QWidget::setTabOrder(edit_FS_Result, edit_FS_Size);
+    QWidget::setTabOrder(edit_FS_Size, radio_FS_Upload);
+    QWidget::setTabOrder(radio_FS_Upload, radio_FS_Download);
+    QWidget::setTabOrder(radio_FS_Download, radio_FS_Size);
+    QWidget::setTabOrder(radio_FS_Size, radio_FS_HashChecksum);
+    QWidget::setTabOrder(radio_FS_HashChecksum, radio_FS_Hash_Checksum_Types);
+    QWidget::setTabOrder(radio_FS_Hash_Checksum_Types, btn_FS_Go);
+    QWidget::setTabOrder(btn_FS_Go, selector_OS);
+    QWidget::setTabOrder(selector_OS, edit_OS_Echo_Input);
+    QWidget::setTabOrder(edit_OS_Echo_Input, edit_OS_Echo_Output);
+    QWidget::setTabOrder(edit_OS_Echo_Output, table_OS_Tasks);
+    QWidget::setTabOrder(table_OS_Tasks, table_OS_Memory);
+    QWidget::setTabOrder(table_OS_Memory, check_OS_Force_Reboot);
+    QWidget::setTabOrder(check_OS_Force_Reboot, edit_os_datetime_date_time);
+    QWidget::setTabOrder(edit_os_datetime_date_time, combo_os_datetime_timezone);
+    QWidget::setTabOrder(combo_os_datetime_timezone, check_os_datetime_use_pc_date_time);
+    QWidget::setTabOrder(check_os_datetime_use_pc_date_time, radio_os_datetime_get);
+    QWidget::setTabOrder(radio_os_datetime_get, radio_os_datetime_set);
+    QWidget::setTabOrder(radio_os_datetime_set, edit_OS_UName);
+    QWidget::setTabOrder(edit_OS_UName, radio_OS_Buffer_Info);
+    QWidget::setTabOrder(radio_OS_Buffer_Info, radio_OS_uname);
+    QWidget::setTabOrder(radio_OS_uname, edit_OS_Info_Output);
+    QWidget::setTabOrder(edit_OS_Info_Output, edit_os_bootloader_query);
+    QWidget::setTabOrder(edit_os_bootloader_query, edit_os_bootloader_response);
+    QWidget::setTabOrder(edit_os_bootloader_response, btn_OS_Go);
+    QWidget::setTabOrder(btn_OS_Go, combo_STAT_Group);
+    QWidget::setTabOrder(combo_STAT_Group, table_STAT_Values);
+    QWidget::setTabOrder(table_STAT_Values, radio_STAT_List);
+    QWidget::setTabOrder(radio_STAT_List, radio_STAT_Fetch);
+    QWidget::setTabOrder(radio_STAT_Fetch, btn_STAT_Go);
+    QWidget::setTabOrder(btn_STAT_Go, edit_SHELL_Output);
+    QWidget::setTabOrder(edit_SHELL_Output, check_shell_vt100_decoding);
+    QWidget::setTabOrder(check_shell_vt100_decoding, check_shel_unescape_strings);
+    QWidget::setTabOrder(check_shel_unescape_strings, btn_SHELL_Clear);
+    QWidget::setTabOrder(btn_SHELL_Clear, btn_SHELL_Copy);
+    QWidget::setTabOrder(btn_SHELL_Copy, edit_settings_key);
+    QWidget::setTabOrder(edit_settings_key, edit_settings_value);
+    QWidget::setTabOrder(edit_settings_value, radio_settings_read);
+    QWidget::setTabOrder(radio_settings_read, radio_settings_write);
+    QWidget::setTabOrder(radio_settings_write, radio_settings_delete);
+    QWidget::setTabOrder(radio_settings_delete, radio_settings_commit);
+    QWidget::setTabOrder(radio_settings_commit, radio_settings_load);
+    QWidget::setTabOrder(radio_settings_load, radio_settings_save);
+    QWidget::setTabOrder(radio_settings_save, radio_settings_none);
+    QWidget::setTabOrder(radio_settings_none, radio_settings_text);
+    QWidget::setTabOrder(radio_settings_text, radio_settings_decimal);
+    QWidget::setTabOrder(radio_settings_decimal, check_settings_big_endian);
+    QWidget::setTabOrder(check_settings_big_endian, check_settings_signed_decimal_value);
+    QWidget::setTabOrder(check_settings_signed_decimal_value, edit_settings_decoded);
+    QWidget::setTabOrder(edit_settings_decoded, btn_settings_go);
+    QWidget::setTabOrder(btn_settings_go, tabWidget_4);
+    QWidget::setTabOrder(tabWidget_4, btn_zephyr_go);
+    QWidget::setTabOrder(btn_zephyr_go, radio_Enum_Count);
+    QWidget::setTabOrder(radio_Enum_Count, radio_Enum_List);
+    QWidget::setTabOrder(radio_Enum_List, radio_Enum_Single);
+    QWidget::setTabOrder(radio_Enum_Single, radio_Enum_Details);
+    QWidget::setTabOrder(radio_Enum_Details, edit_Enum_Count);
+    QWidget::setTabOrder(edit_Enum_Count, edit_Enum_Index);
+    QWidget::setTabOrder(edit_Enum_Index, edit_Enum_Group_ID);
+    QWidget::setTabOrder(edit_Enum_Group_ID, edit_Enum_Group_Additional);
+    QWidget::setTabOrder(edit_Enum_Group_Additional, table_Enum_List_Details);
+    QWidget::setTabOrder(table_Enum_List_Details, btn_enum_go);
+    QWidget::setTabOrder(btn_enum_go, radio_custom_custom);
+    QWidget::setTabOrder(radio_custom_custom, radio_custom_logging);
+    QWidget::setTabOrder(radio_custom_logging, radio_custom_json);
+    QWidget::setTabOrder(radio_custom_json, radio_custom_yaml);
+    QWidget::setTabOrder(radio_custom_yaml, radio_custom_cbor);
+    QWidget::setTabOrder(radio_custom_cbor, radio_custom_read);
+    QWidget::setTabOrder(radio_custom_read, radio_custom_write);
+    QWidget::setTabOrder(radio_custom_write, edit_custom_group);
+    QWidget::setTabOrder(edit_custom_group, edit_custom_command);
+    QWidget::setTabOrder(edit_custom_command, edit_custom_send);
+    QWidget::setTabOrder(edit_custom_send, edit_custom_receive);
+    QWidget::setTabOrder(edit_custom_receive, edit_custom_indent);
+    QWidget::setTabOrder(edit_custom_indent, btn_custom_copy_send);
+    QWidget::setTabOrder(btn_custom_copy_send, btn_custom_copy_output);
+    QWidget::setTabOrder(btn_custom_copy_output, btn_custom_copy_both);
+    QWidget::setTabOrder(btn_custom_copy_both, btn_custom_clear);
+    QWidget::setTabOrder(btn_custom_clear, btn_custom_go);
 
 //    retranslateUi(Form);
 
@@ -1600,6 +1965,28 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     lbl_enum_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_enum_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Enum), QCoreApplication::translate("Form", "Enum", nullptr));
+    label_38->setText(QCoreApplication::translate("Form", "Mode:", nullptr));
+    radio_custom_custom->setText(QCoreApplication::translate("Form", "Custom command", nullptr));
+    radio_custom_logging->setText(QCoreApplication::translate("Form", "Logging", nullptr));
+    label_39->setText(QCoreApplication::translate("Form", "Type:", nullptr));
+    radio_custom_json->setText(QCoreApplication::translate("Form", "JSON", nullptr));
+    radio_custom_yaml->setText(QCoreApplication::translate("Form", "YAML", nullptr));
+    radio_custom_cbor->setText(QCoreApplication::translate("Form", "CBOR", nullptr));
+    label_40->setText(QCoreApplication::translate("Form", "Operation:", nullptr));
+    radio_custom_read->setText(QCoreApplication::translate("Form", "Read", nullptr));
+    radio_custom_write->setText(QCoreApplication::translate("Form", "Write", nullptr));
+    label_411->setText(QCoreApplication::translate("Form", "Group:", nullptr));
+    label_42->setText(QCoreApplication::translate("Form", "Command:", nullptr));
+    label_35->setText(QCoreApplication::translate("Form", "Sent:", nullptr));
+    label_36->setText(QCoreApplication::translate("Form", "Received:", nullptr));
+    label_37->setText(QCoreApplication::translate("Form", "Indent:", nullptr));
+    btn_custom_copy_send->setText(QCoreApplication::translate("Form", "Copy sent", nullptr));
+    btn_custom_copy_output->setText(QCoreApplication::translate("Form", "Copy received", nullptr));
+    btn_custom_copy_both->setText(QCoreApplication::translate("Form", "Copy both", nullptr));
+    btn_custom_clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
+    lbl_enum_status_3->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    btn_custom_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_custom), QCoreApplication::translate("Form", "Custom", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
@@ -1705,6 +2092,16 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_os_datetime_get, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_datetime_get_toggled(bool)));
     connect(radio_os_datetime_set, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_datetime_set_toggled(bool)));
     connect(btn_enum_go, SIGNAL(clicked()), this, SLOT(on_btn_enum_go_clicked()));
+    connect(radio_custom_custom, SIGNAL(toggled(bool)), this, SLOT(on_radio_custom_custom_toggled(bool)));
+    connect(radio_custom_logging, SIGNAL(toggled(bool)), this, SLOT(on_radio_custom_logging_toggled(bool)));
+    connect(radio_custom_json, SIGNAL(toggled(bool)), this, SLOT(on_radio_custom_json_toggled(bool)));
+    connect(radio_custom_yaml, SIGNAL(toggled(bool)), this, SLOT(on_radio_custom_yaml_toggled(bool)));
+    connect(radio_custom_cbor, SIGNAL(toggled(bool)), this, SLOT(on_radio_custom_cbor_toggled(bool)));
+    connect(btn_custom_copy_send, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_send_clicked()));
+    connect(btn_custom_copy_output, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_output_clicked()));
+    connect(btn_custom_copy_both, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_both_clicked()));
+    connect(btn_custom_clear, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_clicked()));
+    connect(edit_custom_indent, SIGNAL(valueChanged(int)), this, SLOT(on_edit_custom_indent_valueChanged(int)));
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -1793,6 +2190,7 @@ plugin_mcumgr::~plugin_mcumgr()
 
     disconnect(this, SLOT(status(uint8_t,group_status,QString)));
     disconnect(this, SLOT(progress(uint8_t,uint8_t)));
+    disconnect(this, SIGNAL(custom_log(bool,QString*)));
 
     //Form signals
     disconnect(this, SLOT(on_btn_FS_Local_clicked()));
@@ -1840,6 +2238,17 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_check_os_datetime_use_pc_date_time_toggled(bool)));
     disconnect(this, SLOT(on_radio_os_datetime_get_toggled(bool)));
     disconnect(this, SLOT(on_radio_os_datetime_set_toggled(bool)));
+    disconnect(this, SLOT(on_btn_enum_go_clicked()));
+    disconnect(this, SLOT(on_radio_custom_custom_toggled(bool)));
+    disconnect(this, SLOT(on_radio_custom_logging_toggled(bool)));
+    disconnect(this, SLOT(on_radio_custom_json_toggled(bool)));
+    disconnect(this, SLOT(on_radio_custom_yaml_toggled(bool)));
+    disconnect(this, SLOT(on_radio_custom_cbor_toggled(bool)));
+    disconnect(this, SLOT(on_btn_custom_copy_send_clicked()));
+    disconnect(this, SLOT(on_btn_custom_copy_output_clicked()));
+    disconnect(this, SLOT(on_btn_custom_copy_both_clicked()));
+    disconnect(this, SLOT(on_btn_custom_clear_clicked()));
+    disconnect(this, SLOT(on_edit_custom_indent_valueChanged(int)));
 
     //Clean up GUI
     delete tab_2;
@@ -1862,6 +2271,7 @@ plugin_mcumgr::~plugin_mcumgr()
     delete smp_groups.img_mgmt;
     delete smp_groups.fs_mgmt;
     delete processor;
+    delete log_json;
     delete uart_transport;
 
 #ifndef SKIPPLUGIN_LOGGER
@@ -4013,4 +4423,101 @@ void plugin_mcumgr::on_btn_enum_go_clicked()
     {
         relase_transport();
     }
+}
+
+void plugin_mcumgr::on_radio_custom_custom_toggled(bool checked)
+{
+    if (!checked)
+    {
+        return;
+    }
+
+    radio_custom_read->setEnabled(true);
+    radio_custom_write->setEnabled(true);
+    edit_custom_group->setReadOnly(false);
+    edit_custom_command->setReadOnly(false);
+    edit_custom_send->setReadOnly(false);
+//    btn_custom_go->setEnabled(true);
+
+    processor->set_message_logging(false);
+}
+
+void plugin_mcumgr::on_radio_custom_logging_toggled(bool checked)
+{
+    if (!checked)
+    {
+        return;
+    }
+
+    radio_custom_read->setEnabled(false);
+    radio_custom_write->setEnabled(false);
+    edit_custom_group->setReadOnly(true);
+    edit_custom_command->setReadOnly(true);
+    edit_custom_send->setReadOnly(true);
+//    btn_custom_go->setEnabled(false);
+
+    processor->set_message_logging(true);
+}
+
+void plugin_mcumgr::custom_log(bool sent, QString *data)
+{
+    QPlainTextEdit *target = (sent == true ? edit_custom_send : edit_custom_receive);
+
+    target->appendPlainText(*data);
+}
+
+void plugin_mcumgr::on_radio_custom_json_toggled(bool checked)
+{
+    if (!checked)
+    {
+        return;
+    }
+
+    log_json->set_mode(SMP_LOGGING_MODE_JSON);
+}
+
+void plugin_mcumgr::on_radio_custom_yaml_toggled(bool checked)
+{
+    if (!checked)
+    {
+        return;
+    }
+
+    log_json->set_mode(SMP_LOGGING_MODE_YAML);
+}
+
+void plugin_mcumgr::on_radio_custom_cbor_toggled(bool checked)
+{
+    if (!checked)
+    {
+        return;
+    }
+
+    log_json->set_mode(SMP_LOGGING_MODE_CBOR);
+}
+
+void plugin_mcumgr::on_btn_custom_copy_send_clicked()
+{
+    QApplication::clipboard()->setText(edit_custom_send->toPlainText());
+}
+
+void plugin_mcumgr::on_btn_custom_copy_output_clicked()
+{
+    QApplication::clipboard()->setText(edit_custom_receive->toPlainText());
+}
+
+void plugin_mcumgr::on_btn_custom_copy_both_clicked()
+{
+    QApplication::clipboard()->setText(QString(edit_custom_send->toPlainText()).append("\n").append(edit_custom_receive->toPlainText()));
+}
+
+void plugin_mcumgr::on_btn_custom_clear_clicked()
+{
+    edit_custom_send->clear();
+    edit_custom_receive->clear();
+}
+
+void plugin_mcumgr::on_edit_custom_indent_valueChanged(int value)
+{
+    log_json->set_indent(value);
 }

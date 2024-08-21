@@ -27,6 +27,7 @@
 #include "smp_message.h"
 #include "smp_uart.h"
 #include "debug_logger.h"
+#include "smp_json.h"
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -56,6 +57,8 @@ public:
     void unregister_handler(uint16_t group);
     void set_transport(smp_transport *transport_object);
     uint16_t max_message_data_size(uint16_t mtu);
+    void set_json(smp_json *json);
+    void set_message_logging(bool enabled);
 
 private:
     void cleanup();
@@ -76,6 +79,8 @@ private:
     uint8_t repeat_times;
     bool busy;
     QList<smp_group_match_t> group_handlers;
+    smp_json *json_object;
+    bool message_logging;
 
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>529</width>
-    <height>390</height>
+    <width>533</width>
+    <height>404</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -2363,6 +2363,410 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="tab_custom">
+          <attribute name="title">
+           <string>Custom</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <layout class="QFormLayout" name="formLayout_3">
+             <property name="horizontalSpacing">
+              <number>2</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>2</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_38">
+               <property name="text">
+                <string>Mode:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_26">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <item>
+                <widget class="QRadioButton" name="radio_custom_custom">
+                 <property name="text">
+                  <string>Custom command</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_4</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_custom_logging">
+                 <property name="text">
+                  <string>Logging</string>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_4</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line_7">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_39">
+                 <property name="text">
+                  <string>Type:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_custom_json">
+                 <property name="text">
+                  <string>JSON</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_5</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_custom_yaml">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>YAML</string>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_5</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_custom_cbor">
+                 <property name="text">
+                  <string>CBOR</string>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_5</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_26">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_40">
+               <property name="text">
+                <string>Operation:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_28">
+               <item>
+                <widget class="QRadioButton" name="radio_custom_read">
+                 <property name="text">
+                  <string>Read</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_6</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_custom_write">
+                 <property name="text">
+                  <string>Write</string>
+                 </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroup_6</string>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line_5">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_41">
+                 <property name="text">
+                  <string>Group:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="edit_custom_group">
+                 <property name="minimumSize">
+                  <size>
+                   <width>60</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="maximum">
+                  <number>65535</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line_6">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_42">
+                 <property name="text">
+                  <string>Command:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="edit_custom_command">
+                 <property name="minimumSize">
+                  <size>
+                   <width>50</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximum">
+                  <number>255</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_28">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_35">
+               <property name="text">
+                <string>Sent:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QPlainTextEdit" name="edit_custom_send">
+               <property name="undoRedoEnabled">
+                <bool>false</bool>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_36">
+               <property name="text">
+                <string>Received:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QPlainTextEdit" name="edit_custom_receive">
+               <property name="undoRedoEnabled">
+                <bool>false</bool>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_37">
+               <property name="text">
+                <string>Indent:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_25">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <item>
+                <widget class="QSpinBox" name="edit_custom_indent">
+                 <property name="minimumSize">
+                  <size>
+                   <width>40</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>16</number>
+                 </property>
+                 <property name="value">
+                  <number>4</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="Line" name="line_4">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_custom_copy_send">
+                 <property name="text">
+                  <string>Copy sent</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_custom_copy_output">
+                 <property name="text">
+                  <string>Copy received</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_custom_copy_both">
+                 <property name="text">
+                  <string>Copy both</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_custom_clear">
+                 <property name="text">
+                  <string>Clear</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_25">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="lbl_enum_status_3">
+             <property name="text">
+              <string>[Status]</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_24">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_23">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_custom_go">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>Go</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_24">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -2519,11 +2923,132 @@
    <header>AutScrollEdit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>edit_MTU</tabstop>
+  <tabstop>check_V2_Protocol</tabstop>
+  <tabstop>radio_transport_uart</tabstop>
+  <tabstop>radio_transport_udp</tabstop>
+  <tabstop>radio_transport_bluetooth</tabstop>
+  <tabstop>btn_transport_connect</tabstop>
+  <tabstop>tabWidget_2</tabstop>
+  <tabstop>tabWidget_3</tabstop>
+  <tabstop>edit_IMG_Local</tabstop>
+  <tabstop>btn_IMG_Local</tabstop>
+  <tabstop>edit_IMG_Image</tabstop>
+  <tabstop>radio_IMG_No_Action</tabstop>
+  <tabstop>radio_IMG_Test</tabstop>
+  <tabstop>radio_IMG_Confirm</tabstop>
+  <tabstop>check_IMG_Reset</tabstop>
+  <tabstop>colview_IMG_Images</tabstop>
+  <tabstop>edit_IMG_Preview_Hash</tabstop>
+  <tabstop>edit_IMG_Preview_Version</tabstop>
+  <tabstop>check_IMG_Preview_Active</tabstop>
+  <tabstop>check_IMG_Preview_Bootable</tabstop>
+  <tabstop>check_IMG_Preview_Confirmed</tabstop>
+  <tabstop>check_IMG_Preview_Pending</tabstop>
+  <tabstop>check_IMG_Preview_Permanent</tabstop>
+  <tabstop>btn_IMG_Preview_Copy</tabstop>
+  <tabstop>radio_IMG_Get</tabstop>
+  <tabstop>radio_IMG_Set</tabstop>
+  <tabstop>radio_img_images_erase</tabstop>
+  <tabstop>check_IMG_Confirm</tabstop>
+  <tabstop>edit_IMG_Erase_Slot</tabstop>
+  <tabstop>tree_IMG_Slot_Info</tabstop>
+  <tabstop>btn_IMG_Go</tabstop>
+  <tabstop>edit_FS_Local</tabstop>
+  <tabstop>btn_FS_Local</tabstop>
+  <tabstop>edit_FS_Remote</tabstop>
+  <tabstop>combo_FS_type</tabstop>
+  <tabstop>edit_FS_Result</tabstop>
+  <tabstop>edit_FS_Size</tabstop>
+  <tabstop>radio_FS_Upload</tabstop>
+  <tabstop>radio_FS_Download</tabstop>
+  <tabstop>radio_FS_Size</tabstop>
+  <tabstop>radio_FS_HashChecksum</tabstop>
+  <tabstop>radio_FS_Hash_Checksum_Types</tabstop>
+  <tabstop>btn_FS_Go</tabstop>
+  <tabstop>selector_OS</tabstop>
+  <tabstop>edit_OS_Echo_Input</tabstop>
+  <tabstop>edit_OS_Echo_Output</tabstop>
+  <tabstop>table_OS_Tasks</tabstop>
+  <tabstop>table_OS_Memory</tabstop>
+  <tabstop>check_OS_Force_Reboot</tabstop>
+  <tabstop>edit_os_datetime_date_time</tabstop>
+  <tabstop>combo_os_datetime_timezone</tabstop>
+  <tabstop>check_os_datetime_use_pc_date_time</tabstop>
+  <tabstop>radio_os_datetime_get</tabstop>
+  <tabstop>radio_os_datetime_set</tabstop>
+  <tabstop>edit_OS_UName</tabstop>
+  <tabstop>radio_OS_Buffer_Info</tabstop>
+  <tabstop>radio_OS_uname</tabstop>
+  <tabstop>edit_OS_Info_Output</tabstop>
+  <tabstop>edit_os_bootloader_query</tabstop>
+  <tabstop>edit_os_bootloader_response</tabstop>
+  <tabstop>btn_OS_Go</tabstop>
+  <tabstop>combo_STAT_Group</tabstop>
+  <tabstop>table_STAT_Values</tabstop>
+  <tabstop>radio_STAT_List</tabstop>
+  <tabstop>radio_STAT_Fetch</tabstop>
+  <tabstop>btn_STAT_Go</tabstop>
+  <tabstop>edit_SHELL_Output</tabstop>
+  <tabstop>check_shell_vt100_decoding</tabstop>
+  <tabstop>check_shel_unescape_strings</tabstop>
+  <tabstop>btn_SHELL_Clear</tabstop>
+  <tabstop>btn_SHELL_Copy</tabstop>
+  <tabstop>edit_settings_key</tabstop>
+  <tabstop>edit_settings_value</tabstop>
+  <tabstop>radio_settings_read</tabstop>
+  <tabstop>radio_settings_write</tabstop>
+  <tabstop>radio_settings_delete</tabstop>
+  <tabstop>radio_settings_commit</tabstop>
+  <tabstop>radio_settings_load</tabstop>
+  <tabstop>radio_settings_save</tabstop>
+  <tabstop>radio_settings_none</tabstop>
+  <tabstop>radio_settings_text</tabstop>
+  <tabstop>radio_settings_decimal</tabstop>
+  <tabstop>check_settings_big_endian</tabstop>
+  <tabstop>check_settings_signed_decimal_value</tabstop>
+  <tabstop>edit_settings_decoded</tabstop>
+  <tabstop>btn_settings_go</tabstop>
+  <tabstop>tabWidget_4</tabstop>
+  <tabstop>btn_zephyr_go</tabstop>
+  <tabstop>radio_Enum_Count</tabstop>
+  <tabstop>radio_Enum_List</tabstop>
+  <tabstop>radio_Enum_Single</tabstop>
+  <tabstop>radio_Enum_Details</tabstop>
+  <tabstop>edit_Enum_Count</tabstop>
+  <tabstop>edit_Enum_Index</tabstop>
+  <tabstop>edit_Enum_Group_ID</tabstop>
+  <tabstop>edit_Enum_Group_Additional</tabstop>
+  <tabstop>table_Enum_List_Details</tabstop>
+  <tabstop>btn_enum_go</tabstop>
+  <tabstop>radio_custom_custom</tabstop>
+  <tabstop>radio_custom_logging</tabstop>
+  <tabstop>radio_custom_json</tabstop>
+  <tabstop>radio_custom_yaml</tabstop>
+  <tabstop>radio_custom_cbor</tabstop>
+  <tabstop>radio_custom_read</tabstop>
+  <tabstop>radio_custom_write</tabstop>
+  <tabstop>edit_custom_group</tabstop>
+  <tabstop>edit_custom_command</tabstop>
+  <tabstop>edit_custom_send</tabstop>
+  <tabstop>edit_custom_receive</tabstop>
+  <tabstop>edit_custom_indent</tabstop>
+  <tabstop>btn_custom_copy_send</tabstop>
+  <tabstop>btn_custom_copy_output</tabstop>
+  <tabstop>btn_custom_copy_both</tabstop>
+  <tabstop>btn_custom_clear</tabstop>
+  <tabstop>btn_custom_go</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_6"/>
+  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

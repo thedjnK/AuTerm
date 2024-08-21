@@ -33,6 +33,8 @@ smp_processor::smp_processor(QObject *parent)
     last_message_header = nullptr;
     repeat_times = 0;
     busy = false;
+    json_object = nullptr;
+    message_logging = false;
 
     connect(&repeat_timer, SIGNAL(timeout()), this, SLOT(message_timeout()));
     repeat_timer.setSingleShot(true);
@@ -81,6 +83,11 @@ bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repe
     transport->send(last_message);
     repeat_timer.start();
     ++sequence;
+
+    if (json_object != nullptr && message_logging == true)
+    {
+        json_object->append_data(true, message);
+    }
 
     return true;
 }
@@ -293,6 +300,11 @@ void smp_processor::message_received(smp_message *response)
             //No error, good response
             group_handlers[i].handler->receive_ok(version, op, group, command, response->contents());
         }
+
+        if (json_object != nullptr && message_logging == true)
+        {
+            json_object->append_data(false, response);
+        }
     }
 }
 
@@ -404,4 +416,14 @@ void smp_processor::set_transport(smp_transport *transport_object)
 uint16_t smp_processor::max_message_data_size(uint16_t mtu)
 {
     return transport->max_message_data_size(mtu);
+}
+
+void smp_processor::set_json(smp_json *json)
+{
+    json_object = json;
+}
+
+void smp_processor::set_message_logging(bool enabled)
+{
+    message_logging = enabled;
 }

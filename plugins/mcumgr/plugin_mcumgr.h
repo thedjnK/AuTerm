@@ -47,6 +47,7 @@
 #include "smp_group_array.h"
 #include "error_lookup.h"
 #include "debug_logger.h"
+#include "smp_json.h"
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
 #include "smp_udp.h"
@@ -173,6 +174,8 @@ private slots:
 
     void enter_pressed();
 
+    void custom_log(bool sent, QString *data);
+
     //Form slots
     void on_btn_FS_Local_clicked();
     void on_btn_FS_Go_clicked();
@@ -219,6 +222,16 @@ private slots:
     void on_radio_os_datetime_get_toggled(bool checked);
     void on_radio_os_datetime_set_toggled(bool checked);
     void on_btn_enum_go_clicked();
+    void on_radio_custom_custom_toggled(bool checked);
+    void on_radio_custom_logging_toggled(bool checked);
+    void on_radio_custom_json_toggled(bool checked);
+    void on_radio_custom_yaml_toggled(bool checked);
+    void on_radio_custom_cbor_toggled(bool checked);
+    void on_btn_custom_copy_send_clicked();
+    void on_btn_custom_copy_output_clicked();
+    void on_btn_custom_copy_both_clicked();
+    void on_btn_custom_clear_clicked();
+    void on_edit_custom_indent_valueChanged(int value);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -462,6 +475,48 @@ private:
     QSpacerItem *horizontalSpacer_16;
     QPushButton *btn_enum_go;
     QSpacerItem *horizontalSpacer_21;
+    QWidget *tab_custom;
+    QVBoxLayout *verticalLayout_5;
+    QFormLayout *formLayout_3;
+    QLabel *label_38;
+    QHBoxLayout *horizontalLayout_26;
+    QRadioButton *radio_custom_custom;
+    QRadioButton *radio_custom_logging;
+    QFrame *line_7;
+    QLabel *label_39;
+    QRadioButton *radio_custom_json;
+    QRadioButton *radio_custom_yaml;
+    QRadioButton *radio_custom_cbor;
+    QSpacerItem *horizontalSpacer_26;
+    QLabel *label_40;
+    QHBoxLayout *horizontalLayout_28;
+    QRadioButton *radio_custom_read;
+    QRadioButton *radio_custom_write;
+    QFrame *line_5;
+    QLabel *label_411;
+    QSpinBox *edit_custom_group;
+    QFrame *line_6;
+    QLabel *label_42;
+    QSpinBox *edit_custom_command;
+    QSpacerItem *horizontalSpacer_28;
+    QLabel *label_35;
+    QPlainTextEdit *edit_custom_send;
+    QLabel *label_36;
+    QPlainTextEdit *edit_custom_receive;
+    QLabel *label_37;
+    QHBoxLayout *horizontalLayout_25;
+    QSpinBox *edit_custom_indent;
+    QFrame *line_4;
+    QPushButton *btn_custom_copy_send;
+    QPushButton *btn_custom_copy_output;
+    QPushButton *btn_custom_copy_both;
+    QPushButton *btn_custom_clear;
+    QSpacerItem *horizontalSpacer_25;
+    QLabel *lbl_enum_status_3;
+    QHBoxLayout *horizontalLayout_24;
+    QSpacerItem *horizontalSpacer_23;
+    QPushButton *btn_custom_go;
+    QSpacerItem *horizontalSpacer_24;
     QWidget *tab_2;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
@@ -478,8 +533,11 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup_3;
     QButtonGroup *buttonGroup;
+    QButtonGroup *buttonGroup_3;
+    QButtonGroup *buttonGroup_6;
+    QButtonGroup *buttonGroup_5;
+    QButtonGroup *buttonGroup_4;
     QButtonGroup *buttonGroup_2;
 ///AUTOGEN_END_OBJECTS
 
@@ -526,6 +584,7 @@ private:
 #endif
     bool uart_transport_locked;
     QDateTime rtc_time_date_response;
+    smp_json *log_json;
 };
 
 #endif // PLUGIN_MCUMGR_H

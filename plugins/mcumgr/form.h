@@ -58,6 +58,16 @@ private slots:
     void on_radio_os_rtc_get_toggled(bool checked);
     void on_radio_os_rtc_set_toggled(bool checked);
     void on_btn_enum_go_clicked();
+    void on_radio_custom_custom_toggled(bool checked);
+    void on_radio_custom_logging_toggled(bool checked);
+    void on_radio_custom_json_toggled(bool checked);
+    void on_radio_custom_yaml_toggled(bool checked);
+    void on_radio_custom_cbor_toggled(bool checked);
+    void on_btn_custom_copy_send_clicked();
+    void on_btn_custom_copy_output_clicked();
+    void on_btn_custom_copy_both_clicked();
+    void on_btn_custom_clear_clicked();
+    void on_edit_custom_indent_valueChanged(int arg1);
 
 private:
     Ui::Form *ui;
