@@ -1,3 +1,25 @@
+/******************************************************************************
+** Copyright (C) 2024 Jamie M.
+**
+** Project: AuTerm
+**
+** Module:  smp_json.cpp
+**
+** Notes:
+**
+** License: This program is free software: you can redistribute it and/or
+**          modify it under the terms of the GNU General Public License as
+**          published by the Free Software Foundation, version 3.
+**
+**          This program is distributed in the hope that it will be useful,
+**          but WITHOUT ANY WARRANTY; without even the implied warranty of
+**          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**          GNU General Public License for more details.
+**
+**          You should have received a copy of the GNU General Public License
+**          along with this program.  If not, see http://www.gnu.org/licenses/
+**
+*******************************************************************************/
 #include "smp_json.h"
 
 smp_json::smp_json(QObject *parent)
@@ -278,11 +300,23 @@ bool smp_json::parse_message_json(QCborStreamReader &reader, QString *output, ui
             {
                 output->append(QString(" ").repeated(indent).append("],\n"));
                 finalarrayelement = true;
+
+                //Set outputs to false if this is present, this is because it will be removed by the parent loop if it's the last element
+                if (outputs != nullptr)
+                {
+                    *outputs = false;
+                }
             }
             else
             {
                 output->append(QString(" ").repeated(indent).append("},\n"));
                 finalarrayelement = true;
+
+                //Set outputs to false if this is present, this is because it will be removed by the parent loop if it's the last element
+                if (outputs != nullptr)
+                {
+                    *outputs = false;
+                }
             }
 
             if (!key.isEmpty())
@@ -319,7 +353,7 @@ bool smp_json::parse_message_json(QCborStreamReader &reader, QString *output, ui
     return true;
 }
 
-bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, uint16_t indent, bool *outputs, bool list)
+bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, uint16_t indent, bool *outputs, bool list, bool first_entry)
 {
     //    qDebug() << reader.lastError() << reader.hasNext();
 
@@ -341,14 +375,15 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
         {
         case QCborStreamReader::UnsignedInteger:
         {
-/*            if (list)
+            if (list || first_entry)
             {
-                output->append(QString(" ").repeated(indent).append("\"").append(QString::number(reader.toUnsignedInteger())).append(",\n"));
+                output->append(QString(" ").repeated(indent - 2).append("- \"").append(QString::number(reader.toUnsignedInteger())).append("\n"));
+                first_entry = false;
             }
             else
-            {*/
-                output->append(QString::number(reader.toUnsignedInteger()).append("\n"));
-            //}
+            {
+                output->append(QString(" ").append(QString::number(reader.toUnsignedInteger())).append("\n"));
+            }
 
             if (outputs != nullptr)
             {
@@ -360,14 +395,15 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
         }
         case QCborStreamReader::NegativeInteger:
         {
-            /*if (list)
+            if (list || first_entry)
             {
-                output->append(QString(" ").repeated(indent).append("\"").append(QString::number((int)reader.toNegativeInteger())).append(",\n"));
+                output->append(QString(" ").repeated(indent - 2).append("- \"").append(QString::number((int)reader.toNegativeInteger())).append("\n"));
+                first_entry = false;
             }
             else
-            {*/
-                output->append(QString::number((int)reader.toNegativeInteger()).append("\n"));
-            //}
+            {
+                output->append(QString(" ").append(QString::number((int)reader.toNegativeInteger())).append("\n"));
+            }
 
             if (outputs != nullptr)
             {
@@ -381,14 +417,15 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
         {
             QCborSimpleType data = reader.toSimpleType();
 
-            /*if (list)
+            if (list || first_entry)
             {
-                output->append(QString(" ").repeated(indent).append("\"").append(data == QCborSimpleType::False ? "false" : (data == QCborSimpleType::True ? "true" : "null")).append(",\n"));
+                output->append(QString(" ").repeated(indent - 2).append("- \"").append(data == QCborSimpleType::False ? "false" : (data == QCborSimpleType::True ? "true" : "null")).append("\n"));
+                first_entry = false;
             }
             else
-            {*/
-                output->append((data == QCborSimpleType::False ? QString("false") : (data == QCborSimpleType::True ? QString("true") : QString(""))).append("\n"));
-            //}
+            {
+                output->append(QString(" ").append((data == QCborSimpleType::False ? QString("false") : (data == QCborSimpleType::True ? QString("true") : QString("")))).append("\n"));
+            }
 
             if (outputs != nullptr)
             {
@@ -400,14 +437,15 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
         }
         case QCborStreamReader::Float16:
         {
-            /*if (list)
+            if (list || first_entry)
             {
-                output->append(QString(" ").repeated(indent).append("\"").append(QString::number((double)reader.toFloat16())).append(",\n"));
+                output->append(QString(" ").repeated(indent - 2).append("- \"").append(QString::number((double)reader.toFloat16())).append("\n"));
+                first_entry = false;
             }
             else
-            {*/
-                output->append(QString::number((double)reader.toFloat16()).append("\n"));
-            //}
+            {
+                output->append(QString(" ").append(QString::number((double)reader.toFloat16())).append("\n"));
+            }
 
             if (outputs != nullptr)
             {
@@ -419,14 +457,15 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
         }
         case QCborStreamReader::Float:
         {
-            /*if (list)
+            if (list || first_entry)
             {
-                output->append(QString(" ").repeated(indent).append("\"").append(QString::number(reader.toFloat())).append(",\n"));
+                output->append(QString(" ").repeated(indent - 2).append("- \"").append(QString::number(reader.toFloat())).append("\n"));
+                first_entry = false;
             }
             else
-            {*/
-                output->append(QString::number(reader.toFloat()).append("\n"));
-            //}
+            {
+                output->append(QString(" ").append(QString::number(reader.toFloat())).append("\n"));
+            }
 
             if (outputs != nullptr)
             {
@@ -438,14 +477,15 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
         }
         case QCborStreamReader::Double:
         {
-            /*if (list)
+            if (list || first_entry)
             {
-                output->append(QString(" ").repeated(indent).append("\"").append(QString::number(reader.toDouble())).append(",\n"));
+                output->append(QString(" ").repeated(indent - 2).append("- \"").append(QString::number(reader.toDouble())).append("\n"));
+                first_entry = false;
             }
             else
-            {*/
-                output->append(QString::number(reader.toDouble()).append("\n"));
-            //}
+            {
+                output->append(QString(" ").append(QString::number(reader.toDouble())).append("\n"));
+            }
 
             if (outputs != nullptr)
             {
@@ -473,14 +513,15 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
             }
             else
             {
-                /*if (list)
+                if (list || first_entry)
                 {
-                    output->append(QString(" ").repeated(indent).append("\"0x").append(data.toHex()).append("\"").append(",\n"));
+                    output->append(QString(" ").repeated(indent - 2).append("- \"0x").append(data.toHex()).append("\"").append("\n"));
+                    first_entry = false;
                 }
                 else
-                {*/
-                    output->append(QString("\"0x").append(data.toHex()).append("\"").append("\n"));
-                //}
+                {
+                    output->append(QString(" ").append("\"0x").append(data.toHex()).append("\"").append("\n"));
+                }
 
                 if (outputs != nullptr)
                 {
@@ -511,10 +552,10 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
                 if (key.isEmpty() && list == false)
                 {
                     key = data;
-                    if (list == true && indent > 1)
+                    if (first_entry)
                     {
-                        output->append(QString("-").append(QString(" ").repeated(indent - 1)).append("").append(data).append(":"));
-                        list = false;
+                        output->append(QString(" ").repeated(indent - 2).append("- ").append(data).append(":"));
+                        first_entry = false;
                     }
                     else
                     {
@@ -525,14 +566,17 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
                 }
                 else
                 {
-                    //data = data.replace("\r", "\\r").replace("\n", "\\n");
-                    /*if (list)
+                    //TODO: proper newline handling with |- style output
+                    data = data.replace("\r", "\\r").replace("\n", "\\n");
+                    if (list || first_entry)
                     {
+                        output->append(QString(" ").repeated(indent - 2).append("- ").append(data).append("\n"));
+                        first_entry = false;
                     }
                     else
-                    {*/
-                        output->append(QString(data).append("\n"));
-                    //}
+                    {
+                        output->append(QString(" ").append(data).append("\n"));
+                    }
 
                     if (outputs != nullptr)
                     {
@@ -554,9 +598,12 @@ bool smp_json::parse_message_yaml(QCborStreamReader &reader, QString *output, ui
             {
                 bool has_outputs = false;
 
-                output->append(QString("\n"));
+                if (!key.isEmpty())
+                {
+                    output->append(QString("\n"));
+                }
 
-                parse_message_yaml(reader, output, (output == nullptr ? 0 : (indent + indent_spaces)), &has_outputs, (array_map_type == QCborStreamReader::Array || (array_map_type == QCborStreamReader::Map && list == true)));
+                parse_message_yaml(reader, output, (outputs == nullptr ? 0 : (indent + indent_spaces)), &has_outputs, (array_map_type == QCborStreamReader::Array), (list == true && array_map_type == QCborStreamReader::Map ? true : false));
             }
 
             if (reader.lastError() == QCborError::NoError)
@@ -604,7 +651,7 @@ void smp_json::append_data(bool sent, smp_message *message)
     else if (output_mode == SMP_LOGGING_MODE_YAML)
     {
         QCborStreamReader reader(message->contents());
-        (void)parse_message_yaml(reader, &output_data, 0, nullptr, false);
+        (void)parse_message_yaml(reader, &output_data, 0, nullptr, false, false);
     }
     else if (output_mode == SMP_LOGGING_MODE_CBOR)
     {

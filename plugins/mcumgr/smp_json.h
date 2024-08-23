@@ -1,3 +1,25 @@
+/******************************************************************************
+** Copyright (C) 2024 Jamie M.
+**
+** Project: AuTerm
+**
+** Module:  smp_json.h
+**
+** Notes:
+**
+** License: This program is free software: you can redistribute it and/or
+**          modify it under the terms of the GNU General Public License as
+**          published by the Free Software Foundation, version 3.
+**
+**          This program is distributed in the hope that it will be useful,
+**          but WITHOUT ANY WARRANTY; without even the implied warranty of
+**          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**          GNU General Public License for more details.
+**
+**          You should have received a copy of the GNU General Public License
+**          along with this program.  If not, see http://www.gnu.org/licenses/
+**
+*******************************************************************************/
 #ifndef SMP_JSON_H
 #define SMP_JSON_H
 
@@ -31,7 +53,7 @@ signals:
 
 private:
     bool parse_message_json(QCborStreamReader &reader, QString *output, uint16_t indent, bool *outputs, bool list);
-    bool parse_message_yaml(QCborStreamReader &reader, QString *output, uint16_t indent, bool *outputs, bool list);
+    bool parse_message_yaml(QCborStreamReader &reader, QString *output, uint16_t indent, bool *outputs, bool list, bool first_entry);
 
     uint16_t indent_spaces;
     enum smp_logging_mode_t output_mode;
