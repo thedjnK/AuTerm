@@ -657,12 +657,12 @@ bool smp_group_enum_mgmt::start_enum_list(QList<uint16_t> *groups)
 bool smp_group_enum_mgmt::start_enum_single(uint16_t index, uint16_t *id, bool *end)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_SINGLE);
+    tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_ENUM, COMMAND_SINGLE, (index > 0 ? 1 : 0));
 
     if (index > 0)
     {
         tmp_message->writer()->append("index");
-        tmp_message->writer()->append(index);
+        tmp_message->writer()->append((uint32_t)index);
     }
 
     tmp_message->end_message();
