@@ -1,5 +1,5 @@
 AuTerm uses the Qt framework version 5, which is licensed under the GPLv3 (not including later versions).
-AuTerm uses and may be linked statically to various other libraries including Xau, XCB, expat, fontconfig, zlib, bz2, harfbuzz, freetype, udev, dbus, icu, unicode, UPX. The licenses for these libraries are provided below:
+AuTerm uses and may be linked statically to various other libraries including Xau, XCB, expat, fontconfig, zlib, bz2, harfbuzz, freetype, udev, dbus, icu, unicode. The licenses for these libraries are provided below:
 
 
 
@@ -335,15 +335,3 @@ Except as contained in this notice, the name of a copyright holder
 shall not be used in advertising or otherwise to promote the sale,
 use or other dealings in these Data Files or Software without prior
 written authorization of the copyright holder.
-
-
-
-UPX:
-
-Copyright (C) 1996-2013 Markus Franz Xaver Johannes Oberhumer
-Copyright (C) 1996-2013 László Molnár
-Copyright (C) 2000-2013 John F. Reiser
-
-All Rights Reserved. This program may be used freely, and you are welcome to redistribute and/or modify it under certain conditions.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the UPX License Agreement for more details: http://upx.sourceforge.net/upx-license.html
