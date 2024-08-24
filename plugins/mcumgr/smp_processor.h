@@ -33,6 +33,14 @@
 #include <QElapsedTimer>
 #include <QCborStreamReader>
 
+enum custom_message_callback_t {
+    CUSTOM_MESSAGE_CALLBACK_OK,
+    CUSTOM_MESSAGE_CALLBACK_ERROR,
+    CUSTOM_MESSAGE_CALLBACK_TIMEOUT,
+
+    CUSTOM_MESSAGE_CALLBACK_COUNT
+};
+
 //Forward declaration due to reverse dependency
 class smp_group;
 
@@ -59,6 +67,7 @@ public:
     uint16_t max_message_data_size(uint16_t mtu);
     void set_json(smp_json *json);
     void set_message_logging(bool enabled);
+    void set_custom_message(bool enabled);
 
 private:
     void cleanup();
@@ -67,6 +76,9 @@ private:
 public slots:
     void message_timeout();
     void message_received(smp_message *message);
+
+signals:
+    void custom_message_callback(enum custom_message_callback_t type, smp_error_t *data);
 
 private:
     uint8_t sequence;
@@ -81,6 +93,7 @@ private:
     QList<smp_group_match_t> group_handlers;
     smp_json *json_object;
     bool message_logging;
+    bool custom_message;
 
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;

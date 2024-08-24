@@ -260,7 +260,7 @@ void Form::on_btn_custom_copy_send_clicked()
 
 }
 
-void Form::on_btn_custom_copy_output_clicked()
+void Form::on_btn_custom_copy_receive_clicked()
 {
 
 }
@@ -279,3 +279,9 @@ void Form::on_edit_custom_indent_valueChanged(int arg1)
 {
 
 }
+
+void Form::on_btn_custom_go_clicked()
+{
+
+}
+

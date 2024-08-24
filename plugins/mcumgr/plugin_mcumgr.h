@@ -134,6 +134,8 @@ enum mcumgr_action_t {
     ACTION_ENUM_LIST,
     ACTION_ENUM_SINGLE,
     ACTION_ENUM_DETAILS,
+
+    ACTION_CUSTOM,
 };
 
 class plugin_mcumgr : public QObject, AutPlugin
@@ -175,6 +177,7 @@ private slots:
     void enter_pressed();
 
     void custom_log(bool sent, QString *data);
+    void custom_message_callback(enum custom_message_callback_t type, smp_error_t *data);
 
     //Form slots
     void on_btn_FS_Local_clicked();
@@ -228,10 +231,11 @@ private slots:
     void on_radio_custom_yaml_toggled(bool checked);
     void on_radio_custom_cbor_toggled(bool checked);
     void on_btn_custom_copy_send_clicked();
-    void on_btn_custom_copy_output_clicked();
+    void on_btn_custom_copy_receive_clicked();
     void on_btn_custom_copy_both_clicked();
     void on_btn_custom_clear_clicked();
     void on_edit_custom_indent_valueChanged(int value);
+    void on_btn_custom_go_clicked();
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -508,11 +512,11 @@ private:
     QSpinBox *edit_custom_indent;
     QFrame *line_4;
     QPushButton *btn_custom_copy_send;
-    QPushButton *btn_custom_copy_output;
+    QPushButton *btn_custom_copy_receive;
     QPushButton *btn_custom_copy_both;
     QPushButton *btn_custom_clear;
     QSpacerItem *horizontalSpacer_25;
-    QLabel *lbl_enum_status_3;
+    QLabel *lbl_custom_status;
     QHBoxLayout *horizontalLayout_24;
     QSpacerItem *horizontalSpacer_23;
     QPushButton *btn_custom_go;

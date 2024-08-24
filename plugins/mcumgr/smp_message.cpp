@@ -33,27 +33,17 @@ smp_message::smp_message()
 
 void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id)
 {
-    this->buffer.append((char)((version == 1 ? SMP_VERSION_2_HEADER : SMP_VERSION_1_HEADER) | op));  /* Read | Write (0x00 | 0x02) */
-    this->buffer.append((char)0x00);  /* Flags */
-    this->buffer.append((char)0x00);  /* Length A */
-    this->buffer.append((char)0x00);  /* Length B */
-#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-    this->buffer.append((char)(group >> 8));  /* Group A */
-    this->buffer.append((char)group);  /* Group B */
-#else
-    this->buffer.append((char)group);  /* Group A */
-    this->buffer.append((char)(group >> 8));  /* Group B */
-#endif
-    this->buffer.append((char)0x00);  /* Sequence */
-    this->buffer.append((char)id);   /* Message ID */
-
-    cbor_writer.device()->seek(this->buffer.length());
+    start_message_no_start_map(op, version, group, id);
     cbor_writer.startMap();
-
-    this->header_added = true;
 }
 
 void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id, uint16_t map_length)
+{
+    start_message_no_start_map(op, version, group, id);
+    cbor_writer.startMap(map_length);
+}
+
+void smp_message::start_message_no_start_map(smp_op_t op, uint8_t version, uint16_t group, uint8_t id)
 {
     this->buffer.append((char)((version == 1 ? SMP_VERSION_2_HEADER : SMP_VERSION_1_HEADER) | op));  /* Read | Write (0x00 | 0x02) */
     this->buffer.append((char)0x00);  /* Flags */
@@ -70,7 +60,6 @@ void smp_message::start_message(smp_op_t op, uint8_t version, uint16_t group, ui
     this->buffer.append((char)id);   /* Message ID */
 
     cbor_writer.device()->seek(this->buffer.length());
-    cbor_writer.startMap(map_length);
 
     this->header_added = true;
 }
@@ -218,7 +207,41 @@ void smp_message::end_message()
     {
         cbor_writer.endMap();
 
-        uint16_t data_size = (uint16_t)(this->buffer.length() - sizeof(sizeof(smp_hdr)));
+        uint16_t data_size = (uint16_t)(this->buffer.length() - sizeof(smp_hdr));
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+        this->buffer[2] = (uint8_t)(data_size >> 8);
+        this->buffer[3] = (uint8_t)data_size;
+#else
+        this->buffer[2] = (uint8_t)data_size;
+        this->buffer[3] = (uint8_t)(data_size >> 8);
+#endif
+    }
+}
+
+void smp_message::end_custom_message(QByteArray data)
+{
+    if (this->header_added == true)
+    {
+        cbor_writer.endMap();
+        this->buffer.truncate(sizeof(smp_hdr));
+        this->buffer.append(data);
+
+        uint16_t data_size = (uint16_t)(this->buffer.length() - sizeof(smp_hdr));
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+        this->buffer[2] = (uint8_t)(data_size >> 8);
+        this->buffer[3] = (uint8_t)data_size;
+#else
+        this->buffer[2] = (uint8_t)data_size;
+        this->buffer[3] = (uint8_t)(data_size >> 8);
+#endif
+    }
+}
+
+void smp_message::end_message_no_end_map()
+{
+    if (this->header_added == true)
+    {
+        uint16_t data_size = (uint16_t)(this->buffer.length() - sizeof(smp_hdr));
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
         this->buffer[2] = (uint8_t)(data_size >> 8);
         this->buffer[3] = (uint8_t)data_size;

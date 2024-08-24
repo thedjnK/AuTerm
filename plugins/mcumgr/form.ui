@@ -2456,7 +2456,7 @@
                <item>
                 <widget class="QRadioButton" name="radio_custom_yaml">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="text">
                   <string>YAML</string>
@@ -2601,7 +2601,7 @@
              <item row="2" column="0">
               <widget class="QLabel" name="label_35">
                <property name="text">
-                <string>Sent:</string>
+                <string>Send:</string>
                </property>
               </widget>
              </item>
@@ -2618,7 +2618,7 @@
              <item row="3" column="0">
               <widget class="QLabel" name="label_36">
                <property name="text">
-                <string>Received:</string>
+                <string>Receive:</string>
                </property>
               </widget>
              </item>
@@ -2673,14 +2673,14 @@
                <item>
                 <widget class="QPushButton" name="btn_custom_copy_send">
                  <property name="text">
-                  <string>Copy sent</string>
+                  <string>Copy send</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="btn_custom_copy_output">
+                <widget class="QPushButton" name="btn_custom_copy_receive">
                  <property name="text">
-                  <string>Copy received</string>
+                  <string>Copy receive</string>
                  </property>
                 </widget>
                </item>
@@ -2716,7 +2716,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QLabel" name="lbl_enum_status_3">
+            <widget class="QLabel" name="lbl_custom_status">
              <property name="text">
               <string>[Status]</string>
              </property>
@@ -2743,7 +2743,7 @@
              <item>
               <widget class="QPushButton" name="btn_custom_go">
                <property name="enabled">
-                <bool>false</bool>
+                <bool>true</bool>
                </property>
                <property name="text">
                 <string>Go</string>
@@ -3036,7 +3036,7 @@
   <tabstop>edit_custom_receive</tabstop>
   <tabstop>edit_custom_indent</tabstop>
   <tabstop>btn_custom_copy_send</tabstop>
-  <tabstop>btn_custom_copy_output</tabstop>
+  <tabstop>btn_custom_copy_receive</tabstop>
   <tabstop>btn_custom_copy_both</tabstop>
   <tabstop>btn_custom_clear</tabstop>
   <tabstop>btn_custom_go</tabstop>

@@ -64,10 +64,11 @@ private slots:
     void on_radio_custom_yaml_toggled(bool checked);
     void on_radio_custom_cbor_toggled(bool checked);
     void on_btn_custom_copy_send_clicked();
-    void on_btn_custom_copy_output_clicked();
+    void on_btn_custom_copy_receive_clicked();
     void on_btn_custom_copy_both_clicked();
     void on_btn_custom_clear_clicked();
     void on_edit_custom_indent_valueChanged(int arg1);
+    void on_btn_custom_go_clicked();
 
 private:
     Ui::Form *ui;

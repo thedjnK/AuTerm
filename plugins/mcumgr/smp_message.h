@@ -60,6 +60,7 @@ public:
     smp_message();
     void start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id);
     void start_message(smp_op_t op, uint8_t version, uint16_t group, uint8_t id, uint16_t map_length);
+    void start_message_no_start_map(smp_op_t op, uint8_t version, uint16_t group, uint8_t id);
     //~smp_mesage();
     void append(const QByteArray data);
     void append(const QByteArray *data);
@@ -75,6 +76,8 @@ public:
     QByteArray contents(void);
     static smp_op_t response_op(smp_op_t op);
     void end_message();
+    void end_custom_message(QByteArray data);
+    void end_message_no_end_map();
     QCborStreamWriter *writer();
 
 private:

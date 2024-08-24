@@ -35,6 +35,7 @@ smp_processor::smp_processor(QObject *parent)
     busy = false;
     json_object = nullptr;
     message_logging = false;
+    custom_message = false;
 
     connect(&repeat_timer, SIGNAL(timeout()), this, SLOT(message_timeout()));
     repeat_timer.setSingleShot(true);
@@ -154,35 +155,44 @@ void smp_processor::message_timeout()
         group = ((group & 0xff) << 8) | ((group & 0xff00) >> 8);
 #endif
 
-        //Search for the handler for this group
-        while (i < group_handlers.length())
+        if (!custom_message)
         {
-            if (group_handlers[i].group == group)
+            //Search for the handler for this group
+            while (i < group_handlers.length())
             {
-                break;
+                if (group_handlers[i].group == group)
+                {
+                    break;
+                }
+
+                ++i;
             }
 
-            ++i;
-        }
+            if (i == group_handlers.length())
+            {
+                //There is no registered handler for this group
+                log_error() << "No registered handler for group " << group << ", cannot send timeout message.";
+                cleanup();
+            }
+            else
+            {
+                //Keep message pointer valid but cleanup so callback can send a message
+                smp_message *backup_message = last_message;
+                last_message = nullptr;
+                last_message_header = nullptr;
 
-        if (i == group_handlers.length())
-        {
-            //There is no registered handler for this group
-            log_error() << "No registered handler for group " << group << ", cannot send timeout message.";
-            cleanup();
+                cleanup();
+                group_handlers[i].handler->timeout(backup_message);
+
+                //Delete backup pointer
+                delete backup_message;
+            }
         }
         else
         {
-            //Keep message pointer valid but cleanup so callback can send a message
-            smp_message *backup_message = last_message;
-            last_message = nullptr;
-            last_message_header = nullptr;
+            emit custom_message_callback(CUSTOM_MESSAGE_CALLBACK_TIMEOUT, nullptr);
 
-            cleanup();
-            group_handlers[i].handler->timeout(backup_message);
-
-            //Delete backup pointer
-            delete backup_message;
+            custom_message = false;
         }
 
         return;
@@ -257,23 +267,26 @@ void smp_processor::message_received(smp_message *response)
         group = ((group & 0xff) << 8) | ((group & 0xff00) >> 8);
 #endif
 
-        //Search for the handler for this group
-        while (i < group_handlers.length())
+        if (!custom_message)
         {
-            if (group_handlers[i].group == group)
+            //Search for the handler for this group
+            while (i < group_handlers.length())
             {
-                break;
+                if (group_handlers[i].group == group)
+                {
+                    break;
+                }
+
+                ++i;
             }
 
-            ++i;
-        }
-
-        if (i == group_handlers.length())
-        {
-            //There is no registered handler for this group, clean up
-            log_error() << "No registered handler for group " << group << ", dropping response.";
-            this->cleanup();
-            return;
+            if (i == group_handlers.length())
+            {
+                //There is no registered handler for this group, clean up
+                log_error() << "No registered handler for group " << group << ", dropping response.";
+                this->cleanup();
+                return;
+            }
         }
 
         QCborStreamReader cbor_reader(response->contents());
@@ -290,22 +303,38 @@ void smp_processor::message_received(smp_message *response)
         //Clean up before triggering callback
         this->cleanup();
 
-        if (error.type != SMP_ERROR_NONE)
+        if (!custom_message)
         {
-            //Received either "rc" (legacy/SMP version 1) error or "err" error (SMP version 2)
-            group_handlers[i].handler->receive_error(version, op, group, command, error);
+            if (error.type != SMP_ERROR_NONE)
+            {
+                //Received either "rc" (legacy/SMP version 1) error or "err" error (SMP version 2)
+                group_handlers[i].handler->receive_error(version, op, group, command, error);
+            }
+            else
+            {
+                //No error, good response
+                group_handlers[i].handler->receive_ok(version, op, group, command, response->contents());
+            }
         }
         else
         {
-            //No error, good response
-            group_handlers[i].handler->receive_ok(version, op, group, command, response->contents());
+            if (error.type != SMP_ERROR_NONE)
+            {
+                emit custom_message_callback(CUSTOM_MESSAGE_CALLBACK_ERROR, &error);
+            }
+            else
+            {
+                emit custom_message_callback(CUSTOM_MESSAGE_CALLBACK_OK, nullptr);
+            }
         }
 
-        if (json_object != nullptr && message_logging == true)
+        if (json_object != nullptr && (message_logging || custom_message))
         {
             json_object->append_data(false, response);
         }
     }
+
+    custom_message = false;
 }
 
 bool smp_processor::decode_message(QCborStreamReader &reader, uint8_t version, uint16_t level, QString *parent, smp_error_t *error)
@@ -426,4 +455,9 @@ void smp_processor::set_json(smp_json *json)
 void smp_processor::set_message_logging(bool enabled)
 {
     message_logging = enabled;
+}
+
+void smp_processor::set_custom_message(bool enabled)
+{
+    custom_message = enabled;
 }

@@ -26,6 +26,8 @@
 #include <QRegularExpression>
 #include <QClipboard>
 #include <QTimeZone>
+#include <QJsonDocument>
+#include <QJsonArray>
 #include "plugin_mcumgr.h"
 
 const uint8_t retries = 3;
@@ -1407,7 +1409,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_custom_yaml = new QRadioButton(tab_custom);
     buttonGroup_5->addButton(radio_custom_yaml);
     radio_custom_yaml->setObjectName("radio_custom_yaml");
-    radio_custom_yaml->setEnabled(false);
+    radio_custom_yaml->setEnabled(true);
 
     horizontalLayout_26->addWidget(radio_custom_yaml);
 
@@ -1545,10 +1547,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_25->addWidget(btn_custom_copy_send);
 
-    btn_custom_copy_output = new QPushButton(tab_custom);
-    btn_custom_copy_output->setObjectName("btn_custom_copy_output");
+    btn_custom_copy_receive = new QPushButton(tab_custom);
+    btn_custom_copy_receive->setObjectName("btn_custom_copy_receive");
 
-    horizontalLayout_25->addWidget(btn_custom_copy_output);
+    horizontalLayout_25->addWidget(btn_custom_copy_receive);
 
     btn_custom_copy_both = new QPushButton(tab_custom);
     btn_custom_copy_both->setObjectName("btn_custom_copy_both");
@@ -1570,10 +1572,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     verticalLayout_5->addLayout(formLayout_3);
 
-    lbl_enum_status_3 = new QLabel(tab_custom);
-    lbl_enum_status_3->setObjectName("lbl_enum_status_3");
+    lbl_custom_status = new QLabel(tab_custom);
+    lbl_custom_status->setObjectName("lbl_custom_status");
 
-    verticalLayout_5->addWidget(lbl_enum_status_3);
+    verticalLayout_5->addWidget(lbl_custom_status);
 
     horizontalLayout_24 = new QHBoxLayout();
     horizontalLayout_24->setSpacing(2);
@@ -1584,7 +1586,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     btn_custom_go = new QPushButton(tab_custom);
     btn_custom_go->setObjectName("btn_custom_go");
-    btn_custom_go->setEnabled(false);
+    btn_custom_go->setEnabled(true);
 
     horizontalLayout_24->addWidget(btn_custom_go);
 
@@ -1796,8 +1798,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(edit_custom_send, edit_custom_receive);
     QWidget::setTabOrder(edit_custom_receive, edit_custom_indent);
     QWidget::setTabOrder(edit_custom_indent, btn_custom_copy_send);
-    QWidget::setTabOrder(btn_custom_copy_send, btn_custom_copy_output);
-    QWidget::setTabOrder(btn_custom_copy_output, btn_custom_copy_both);
+    QWidget::setTabOrder(btn_custom_copy_send, btn_custom_copy_receive);
+    QWidget::setTabOrder(btn_custom_copy_receive, btn_custom_copy_both);
     QWidget::setTabOrder(btn_custom_copy_both, btn_custom_clear);
     QWidget::setTabOrder(btn_custom_clear, btn_custom_go);
 
@@ -1977,14 +1979,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_custom_write->setText(QCoreApplication::translate("Form", "Write", nullptr));
     label_411->setText(QCoreApplication::translate("Form", "Group:", nullptr));
     label_42->setText(QCoreApplication::translate("Form", "Command:", nullptr));
-    label_35->setText(QCoreApplication::translate("Form", "Sent:", nullptr));
-    label_36->setText(QCoreApplication::translate("Form", "Received:", nullptr));
+    label_35->setText(QCoreApplication::translate("Form", "Send:", nullptr));
+    label_36->setText(QCoreApplication::translate("Form", "Receive:", nullptr));
     label_37->setText(QCoreApplication::translate("Form", "Indent:", nullptr));
-    btn_custom_copy_send->setText(QCoreApplication::translate("Form", "Copy sent", nullptr));
-    btn_custom_copy_output->setText(QCoreApplication::translate("Form", "Copy received", nullptr));
+    btn_custom_copy_send->setText(QCoreApplication::translate("Form", "Copy send", nullptr));
+    btn_custom_copy_receive->setText(QCoreApplication::translate("Form", "Copy receive", nullptr));
     btn_custom_copy_both->setText(QCoreApplication::translate("Form", "Copy both", nullptr));
     btn_custom_clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
-    lbl_enum_status_3->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    lbl_custom_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_custom_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_custom), QCoreApplication::translate("Form", "Custom", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
@@ -2044,6 +2046,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(smp_groups.enum_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.enum_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 
+    connect(processor, SIGNAL(custom_message_callback(custom_message_callback_t,smp_error_t*)), this, SLOT(custom_message_callback(custom_message_callback_t,smp_error_t*)));
+
     //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
     connect(btn_FS_Go, SIGNAL(clicked()), this, SLOT(on_btn_FS_Go_clicked()));
@@ -2098,10 +2102,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_custom_yaml, SIGNAL(toggled(bool)), this, SLOT(on_radio_custom_yaml_toggled(bool)));
     connect(radio_custom_cbor, SIGNAL(toggled(bool)), this, SLOT(on_radio_custom_cbor_toggled(bool)));
     connect(btn_custom_copy_send, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_send_clicked()));
-    connect(btn_custom_copy_output, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_output_clicked()));
+    connect(btn_custom_copy_receive, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_receive_clicked()));
     connect(btn_custom_copy_both, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_both_clicked()));
     connect(btn_custom_clear, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_clicked()));
     connect(edit_custom_indent, SIGNAL(valueChanged(int)), this, SLOT(on_edit_custom_indent_valueChanged(int)));
+    connect(btn_custom_go, SIGNAL(clicked()), this, SLOT(on_btn_custom_go_clicked()));
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -2192,6 +2197,8 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(progress(uint8_t,uint8_t)));
     disconnect(this, SIGNAL(custom_log(bool,QString*)));
 
+    disconnect(this, SLOT(custom_message_callback(custom_message_callback_t,smp_error_t*)));
+
     //Form signals
     disconnect(this, SLOT(on_btn_FS_Local_clicked()));
     disconnect(this, SLOT(on_btn_FS_Go_clicked()));
@@ -2245,10 +2252,11 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_radio_custom_yaml_toggled(bool)));
     disconnect(this, SLOT(on_radio_custom_cbor_toggled(bool)));
     disconnect(this, SLOT(on_btn_custom_copy_send_clicked()));
-    disconnect(this, SLOT(on_btn_custom_copy_output_clicked()));
+    disconnect(this, SLOT(on_btn_custom_copy_receive_clicked()));
     disconnect(this, SLOT(on_btn_custom_copy_both_clicked()));
     disconnect(this, SLOT(on_btn_custom_clear_clicked()));
     disconnect(this, SLOT(on_edit_custom_indent_valueChanged(int)));
+    disconnect(this, SLOT(on_btn_custom_go_clicked()));
 
     //Clean up GUI
     delete tab_2;
@@ -4437,7 +4445,7 @@ void plugin_mcumgr::on_radio_custom_custom_toggled(bool checked)
     edit_custom_group->setReadOnly(false);
     edit_custom_command->setReadOnly(false);
     edit_custom_send->setReadOnly(false);
-//    btn_custom_go->setEnabled(true);
+    btn_custom_go->setEnabled(true);
 
     processor->set_message_logging(false);
 }
@@ -4454,7 +4462,7 @@ void plugin_mcumgr::on_radio_custom_logging_toggled(bool checked)
     edit_custom_group->setReadOnly(true);
     edit_custom_command->setReadOnly(true);
     edit_custom_send->setReadOnly(true);
-//    btn_custom_go->setEnabled(false);
+    btn_custom_go->setEnabled(false);
 
     processor->set_message_logging(true);
 }
@@ -4501,7 +4509,7 @@ void plugin_mcumgr::on_btn_custom_copy_send_clicked()
     QApplication::clipboard()->setText(edit_custom_send->toPlainText());
 }
 
-void plugin_mcumgr::on_btn_custom_copy_output_clicked()
+void plugin_mcumgr::on_btn_custom_copy_receive_clicked()
 {
     QApplication::clipboard()->setText(edit_custom_receive->toPlainText());
 }
@@ -4520,4 +4528,107 @@ void plugin_mcumgr::on_btn_custom_clear_clicked()
 void plugin_mcumgr::on_edit_custom_indent_valueChanged(int value)
 {
     log_json->set_indent(value);
+}
+
+void plugin_mcumgr::on_btn_custom_go_clicked()
+{
+    smp_message *tmp_message;
+    QJsonDocument *json_document = nullptr;
+
+    //Check message validity
+    if (radio_custom_json->isChecked())
+    {
+        QJsonParseError json_error;
+
+        json_document = new QJsonDocument();
+        *json_document = QJsonDocument::fromJson(edit_custom_send->toPlainText().toUtf8(), &json_error);
+
+        if (json_document->isNull())
+        {
+            lbl_custom_status->setText(QString("Error parsing JSON: ").append(json_error.errorString()));
+            delete(json_document);
+            return;
+        }
+    }
+    else if (radio_custom_yaml->isChecked())
+    {
+        lbl_custom_status->setText("YAML input parsing is currently not supported");
+        return;
+    }
+    else if (radio_custom_cbor->isChecked())
+    {
+        QString string_check = edit_custom_send->toPlainText();
+        uint16_t i = 0;
+        uint16_t l = string_check.length();
+
+        while (i < l)
+        {
+            if (!((string_check.at(i) >= 'a' && string_check.at(i) <= 'f') || (string_check.at(i) >= 'A' && string_check.at(i) <= 'F') || (string_check.at(i) >= '0' && string_check.at(i) <= '9')))
+            {
+                lbl_custom_status->setText(QString("Invalid hex character at position ").append(QString::number(i + 1)));
+                return;
+            }
+
+            ++i;
+        }
+    }
+
+    if (claim_transport(lbl_custom_status) == false)
+    {
+        if (json_document != nullptr)
+        {
+            delete(json_document);
+        }
+
+        return;
+    }
+
+    mode = ACTION_CUSTOM;
+    processor->set_transport(active_transport());
+
+    lbl_custom_status->setText("Custom...");
+
+    tmp_message = new smp_message();
+    tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), edit_custom_group->value(), edit_custom_command->value()/*, 0*/);
+
+    if (radio_custom_json->isChecked())
+    {
+        QCborMap cbor_map = QCborMap::fromJsonObject(json_document->object());
+
+        cbor_map.toCborValue().toCbor(*tmp_message->writer());
+
+        delete(json_document);
+
+        tmp_message->end_message_no_end_map();
+    }
+    else if (radio_custom_yaml->isChecked())
+    {
+        //TODO
+    }
+    else if (radio_custom_cbor->isChecked())
+    {
+        tmp_message->end_custom_message(QByteArray::fromHex(edit_custom_send->toPlainText().toUtf8()));
+    }
+
+    processor->set_custom_message(true);
+    processor->send(tmp_message, timeout_ms, retries, true);
+}
+
+void plugin_mcumgr::custom_message_callback(enum custom_message_callback_t type, smp_error_t *data)
+{
+    mode = ACTION_IDLE;
+    relase_transport();
+
+    if (type == CUSTOM_MESSAGE_CALLBACK_OK)
+    {
+        lbl_custom_status->setText("Finished");
+    }
+    else if (type == CUSTOM_MESSAGE_CALLBACK_ERROR)
+    {
+        lbl_custom_status->setText(smp_error::error_lookup_string(data));
+    }
+    else if (type == CUSTOM_MESSAGE_CALLBACK_TIMEOUT)
+    {
+        lbl_custom_status->setText("Command timed out");
+    }
 }
