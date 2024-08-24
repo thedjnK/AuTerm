@@ -148,6 +148,8 @@ void AutEscape::strip_vt100_formatting(QByteArray *data, int32_t offset)
     strip_vt100_non_formatting(data, offset);
 }
 
+//=============================================================================
+//=============================================================================
 void AutEscape::strip_vt100_non_formatting(QByteArray *data, int32_t offset)
 {
     uint8_t i = 0;
