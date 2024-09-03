@@ -63,10 +63,16 @@ void smp_uart::serial_read(QByteArray *rec_data)
             //Start
             //Check this header
             SMPBuffer.clear();
+            QByteArray mid = SerialData.mid((pos + 2), (posA - pos - 2));
+            if (mid.endsWith('\r'))
+            {
+                mid.chop(1);
+            }
+
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-            SMPBuffer = QByteArray::fromBase64(SerialData.mid((pos + 2), (posA - pos - 2)), QByteArray::AbortOnBase64DecodingErrors);
+            SMPBuffer = QByteArray::fromBase64(mid, QByteArray::AbortOnBase64DecodingErrors);
 #else
-            SMPBuffer = QByteArray::fromBase64(SerialData.mid((pos + 2), (posA - pos - 2)));
+            SMPBuffer = QByteArray::fromBase64(mid);
 #endif
 
             if (SMPBuffer.length() == 0)
@@ -118,10 +124,15 @@ void smp_uart::serial_read(QByteArray *rec_data)
             //Continuation
             //Check this header
             SMPBuffer.clear();
+            QByteArray mid = SerialData.mid((pos_other + 2), (posA_other - pos_other - 2));
+            if (mid.endsWith('\r'))
+            {
+                mid.chop(1);
+            }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-            SMPBuffer = QByteArray::fromBase64(SerialData.mid((pos_other + 2), (posA_other - pos_other - 2)), QByteArray::AbortOnBase64DecodingErrors);
+            SMPBuffer = QByteArray::fromBase64(mid, QByteArray::AbortOnBase64DecodingErrors);
 #else
-            SMPBuffer = QByteArray::fromBase64(SerialData.mid((pos_other + 2), (posA_other - pos_other - 2)));
+            SMPBuffer = QByteArray::fromBase64(mid);
 #endif
 
             if (SMPBuffer.length() == 0)
