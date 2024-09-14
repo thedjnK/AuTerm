@@ -14,7 +14,7 @@ Test release on Windows:
 
 ## About
 
-AuTerm is a cross-platform terminal utility, designed for communicating with embedded devices and systems (with a primary focus on Zephyr devices, but supports any device be it embedded or not), created in Qt 5 (and supporting Qt 6).
+AuTerm is a cross-platform terminal utility, designed for communicating with embedded devices and systems (with a primary focus on Zephyr devices, but supports any device be it embedded or not), created in Qt 6 (and supporting Qt 5, though Qt 6 is recommended).
 
 ## Downloading
 
@@ -22,7 +22,7 @@ Source code and pre-release test builds are provided.
 
 ## Setup
 
-### Windows:
+### Windows
 
 **Note:** Only 64-bit x86_64 Windows builds are officially provided, 32-bit x86 builds can be built from source.
 
@@ -30,7 +30,10 @@ Download and open the 7zip file, extract the files to a folder on your computer 
 
 The Visual Studio 2022 runtime files are required which are available on the [Microsoft site](https://aka.ms/vs/17/release/vc_redist.x64.exe).
 
-### Linux:
+### Linux
+
+
+#### x86
 
 **Note:** Only 64-bit x86_64 Linux builds are officially provided, 32-bit x86 and ARM builds can be built from source.
 
@@ -44,13 +47,17 @@ Where '\~/' is the location of where you want it extracted to, '\~/' will extrac
 
 Before running, you may need to install some additional libraries, please see https://github.com/LairdCP/UwTerminalX/wiki/Installing for further details. You may also be required to add a udev rule to grant non-root users access to USB devices, please see https://github.com/LairdCP/UwTerminalX/wiki/Granting-non-root-USB-device-access-(Linux) for details.
 
-### Mac:
+#### ARM
 
-Mac versions must be built from source using Qt 5.x or 6.x.
+ARM versions must be built from source using Qt 6.x. Pre-compiled release versions may be provided in the future if requested (please open an issue if this is something you would like).
+
+### Mac
+
+Mac versions must be built from source using Qt 6.x. Pre-compiled release versions are not planned due to requirement of a Mac for building on, and requirement of a physical Mac for testing on.
 
 ## Help and contributing
 
-Users are welcome to open issues and submit pull requests to have features merged. PRs should target the `develop` branch.
+Users are welcome to open issues and submit pull requests to have features merged. PRs on github should target the `main` branch, PRs on the internal git server should target the `develop` branch.
 
 ## Speed/Throughput testing
 
