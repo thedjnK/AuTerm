@@ -36,11 +36,9 @@ CONFIG += install_ok  # Do not cargo-cult this!
 
 # Common build location
 CONFIG(release, debug|release) {
-    macx: DESTDIR = ../../release/AuTerm.app/Frameworks
-    else: DESTDIR = ../../release
+    DESTDIR = ../../release
 } else {
-    macx: DESTDIR = ../../debug/AuTerm.app/Frameworks
-    else: DESTDIR = ../../debug
+    DESTDIR = ../../debug
 }
 
 # Do not prefix with lib for non-static builds

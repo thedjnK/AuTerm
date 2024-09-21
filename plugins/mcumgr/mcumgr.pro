@@ -72,11 +72,9 @@ CONFIG += install_ok  # Do not cargo-cult this!
 
 # Common build location
 CONFIG(release, debug|release) {
-    macx: DESTDIR = ../../release/AuTerm.app/Frameworks
-    else: DESTDIR = ../../release
+    DESTDIR = ../../release
 } else {
-    macx: DESTDIR = ../../debug/AuTerm.app/Frameworks
-    else: DESTDIR = ../../debug
+    DESTDIR = ../../debug
 
 
     # The following form is only used for creating the GUI in Qt Creator, it is

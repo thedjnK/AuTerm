@@ -1,6 +1,9 @@
 # AuTerm global include qmake project settings
 # By default all components are built for Github AuTerm releases
 
+# Build for x86_64 and arm64 on mac
+QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
+
 # Uncomment to exclude building automation form
 #DEFINES += "SKIPAUTOMATIONFORM"
 

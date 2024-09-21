@@ -94,11 +94,11 @@ CONFIG(release, debug|release) {
                 DEFINES += "STATICPLUGIN_MCUMGR"
 
 		win32: LIBS += -L$$DESTDIR -lplugin_mcumgr
-		else:unix: LIBS += -L$$DESTDIR -lplugin_mcumgr
+		else: LIBS += -L$$DESTDIR -lplugin_mcumgr
 
 		win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
 		else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_mcumgr.lib
-		else:unix: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
+		else: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
             }
         }
 
@@ -107,11 +107,11 @@ CONFIG(release, debug|release) {
 		DEFINES += "STATICPLUGIN_LOGGER"
 
 		win32: LIBS += -L$$DESTDIR -lplugin_logger
-		else:unix: LIBS += -L$$DESTDIR -lplugin_logger
+		else: LIBS += -L$$DESTDIR -lplugin_logger
 
 		win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
 		else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_logger.lib
-		else:unix: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
+		else: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
 	    }
 	}
     }
