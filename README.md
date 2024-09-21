@@ -35,7 +35,7 @@ The Visual Studio 2022 runtime files are required which are available on the [Mi
 
 #### x86
 
-**Note:** Only 64-bit x86_64 Linux builds are officially provided, 32-bit x86 and ARM builds can be built from source.
+**Note:** Only 64-bit x86_64 Linux builds are officially provided, 32-bit x86 builds can be built from source.
 
 Download the tar file and extract it's contents to a location on your computer, this can be done using a graphical utility or from the command line using:
 
@@ -53,7 +53,13 @@ ARM versions must be built from source using Qt 6.x. Pre-compiled release versio
 
 ### Mac
 
-Mac versions must be built from source using Qt 6.x. Pre-compiled release versions are not planned due to requirement of a Mac for building on, and requirement of a physical Mac for testing on.
+**Note:** No support for this build/os is provided, no hardware is available for testing, it is built on github CI only. Use at own risk.
+
+Download the tar file and extract it's contents to a location on your computer, this can be done using a graphical utility or from the command line using:
+
+	tar xf AuTerm_<version>.tar.gz -C ~/
+
+Where '\~/' is the location of where you want it extracted to, '\~/' will extract to the home directory of your local user account). To launch AuTerm, either double click on the executable and click the 'run' button (if asked). It is possible that gatekeeper might prevent running of it until system security settings are changed.
 
 ## Help and contributing
 
