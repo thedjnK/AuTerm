@@ -83,6 +83,9 @@
 #include <QSslSocket>
 #endif
 #endif
+#ifndef SKIPSERIALDETECT
+#include "AutSerialDetect.h"
+#endif
 
 /******************************************************************************/
 // Defines
@@ -121,6 +124,7 @@ const quint32 DefaultAutoTrimDBufferSize        = 256;
 const quint16 DefaultScrollbackBufferSize       = 32;    //(Unlisted option)
 const bool DefaultSaveSize                      = false;
 const bool DefaultOnlineUpdateCheck             = true;
+const bool DefaultReconnectAfterDisconnect      = false;
 //Constants for URLs
 const QString URLLinuxNonRootSetup = "https://github.com/LairdCP/AuTerm/wiki/Granting-non-root-USB-device-access-(Linux)";
 const qint8 FilenameIndexScripting              = 0;
@@ -363,6 +367,10 @@ private slots:
     void on_check_trim_toggled(bool checked);
     void on_spin_trim_threshold_editingFinished();
     void on_spin_trim_size_editingFinished();
+#ifndef SKIPSERIALDETECT
+    void serial_port_reconnected(QString port);
+    void on_check_reconnect_after_disconnect_toggled(bool checked);
+#endif
 
 #ifndef SKIPPLUGINS
     void on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *);
@@ -574,6 +582,11 @@ private:
     QList<plugins> plugin_list;
 #endif
     bool display_update_pending; //True if a display update is pending (for the tab to be switched to the terminal view)
+#ifndef SKIPSERIALDETECT
+    AutSerialDetect *serial_detect;
+    bool serial_detect_waiting;
+    bool serial_close_dialog_open;
+#endif
 
 protected:
     void dragEnterEvent(QDragEnterEvent *dragEvent);

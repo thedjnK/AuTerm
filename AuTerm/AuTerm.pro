@@ -36,22 +36,22 @@ RESOURCES += \
 # Automation form
 !contains(DEFINES, SKIPAUTOMATIONFORM) {
     SOURCES += \
-    AutAutomation.cpp
+	AutAutomation.cpp
     HEADERS += \
-    AutAutomation.h
+	AutAutomation.h
     FORMS += \
-    AutAutomation.ui
+	AutAutomation.ui
 }
 
 # Scripting form
 !contains(DEFINES, SKIPSCRIPTINGFORM) {
     SOURCES += LrdCodeEditor.cpp \
-    LrdHighlighter.cpp \
-    UwxScripting.cpp
+	LrdHighlighter.cpp \
+	UwxScripting.cpp
 
     HEADERS += LrdCodeEditor.h \
-    LrdHighlighter.h \
-    UwxScripting.h
+	LrdHighlighter.h \
+	UwxScripting.h
 
     FORMS += UwxScripting.ui
 }
@@ -59,11 +59,21 @@ RESOURCES += \
 # Error code form
 !contains(DEFINES, SKIPERRORCODEFORM) {
     SOURCES += \
-    AutErrorCode.cpp
+	AutErrorCode.cpp
     HEADERS += \
-    AutErrorCode.h
+	AutErrorCode.h
     FORMS += \
-    AutErrorCode.ui
+	AutErrorCode.ui
+}
+
+# Serial detection object
+!contains(DEFINES, SKIPSERIALDETECT) {
+    SOURCES += \
+	AutSerialDetect.cpp
+    HEADERS += \
+	AutSerialDetect.h
+
+    win32: LIBS += -luser32
 }
 
 # Windows application version information

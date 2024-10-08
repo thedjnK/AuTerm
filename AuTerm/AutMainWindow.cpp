@@ -585,6 +585,22 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         on_radio_vt100_decode_toggled(true);
     }
 
+#ifndef SKIPSERIALDETECT
+    serial_detect = nullptr;
+    serial_detect_waiting = false;
+    serial_close_dialog_open = false;
+
+    ui->check_reconnect_after_disconnect->setChecked(gpTermSettings->value("ReconnectAfterDisconnect", DefaultReconnectAfterDisconnect).toBool());
+
+    if (ui->check_reconnect_after_disconnect->isChecked())
+    {
+        serial_detect = new AutSerialDetect(this);
+        connect(serial_detect, SIGNAL(port_reconnected(QString)), this, SLOT(serial_port_reconnected(QString)));
+    }
+#else
+    ui->check_reconnect_after_disconnect->deleteLater();
+#endif
+
     //Check command line
     QStringList slArgs = QCoreApplication::arguments();
     unsigned char chi = 1;
@@ -1089,6 +1105,18 @@ AutMainWindow::~AutMainWindow()
         delete plugin_list.at(i).plugin_loader;
 #endif
         ++i;
+    }
+#endif
+
+#ifndef SKIPSERIALDETECT
+    if (serial_detect != nullptr)
+    {
+        if (serial_detect_waiting == true)
+        {
+            serial_detect->stop();
+        }
+        disconnect(this, SLOT(serial_port_reconnected(QString)));
+        delete serial_detect;
     }
 #endif
 
@@ -2080,6 +2108,17 @@ AutMainWindow::OpenDevice(
             on_btn_Cancel_clicked();
         }
 
+#ifndef SKIPSERIALDETECT
+        if (serial_detect_waiting == true)
+        {
+            //Only triggered here when user connects to a different serial device than the one waiting for reconnect
+            serial_close_dialog_open = false;
+            serial_detect_waiting = false;
+            serial_detect->stop();
+            ui->btn_Cancel->setEnabled(false);
+        }
+#endif
+
         //Close serial port
         if (gspSerialPort.isOpen() == true)
         {
@@ -2398,6 +2437,17 @@ AutMainWindow::SerialError(
         if (gspSerialPort.isOpen() == true)
         {
             //Close active connection
+#ifndef SKIPSERIALDETECT
+            if (ui->check_reconnect_after_disconnect->isChecked() && serial_detect != nullptr)
+            {
+                //Start watching for this serial port to reappear and automatically re-connect to it
+                serial_detect->start(gspSerialPort.portName());
+                serial_detect_waiting = true;
+                serial_close_dialog_open = true;
+                ui->btn_Cancel->setEnabled(true);
+                ui->statusBar->showMessage(QString("Waiting for ").append(gspSerialPort.portName()).append(" to reappear..."));
+            }
+#endif
             gspSerialPort.close();
             port_closed = true;
         }
@@ -2469,8 +2519,15 @@ AutMainWindow::SerialError(
         gbTermBusy = false;
         gchTermMode = 0;
 
-        //Disable cancel button
-        ui->btn_Cancel->setEnabled(false);
+#ifndef SKIPSERIALDETECT
+        if (serial_detect_waiting == false)
+        {
+#endif
+            //Disable cancel button
+            ui->btn_Cancel->setEnabled(false);
+#ifndef SKIPSERIALDETECT
+        }
+#endif
 
         //Disable active checkboxes
         ui->check_Break->setEnabled(false);
@@ -2486,8 +2543,15 @@ AutMainWindow::SerialError(
         //Disable text entry
         ui->text_TermEditData->setReadOnly(true);
 
-        //Change status message
-        ui->statusBar->showMessage("");
+#ifndef SKIPSERIALDETECT
+        if (serial_detect_waiting == false)
+        {
+#endif
+            //Change status message
+            ui->statusBar->showMessage("");
+#ifndef SKIPSERIALDETECT
+        }
+#endif
 
         //Change button text
         ui->btn_TermClose->setText("&Open Port");
@@ -2715,6 +2779,16 @@ AutMainWindow::on_btn_Cancel_clicked(
         }
     }
 
+#ifndef SKIPSERIALDETECT
+    if (serial_detect_waiting == true)
+    {
+        serial_detect->stop();
+        serial_detect_waiting = false;
+        serial_close_dialog_open = false;
+        ui->statusBar->clearMessage();
+    }
+#endif
+
     //Disable button
     ui->btn_Cancel->setEnabled(false);
 }
@@ -2870,6 +2944,10 @@ AutMainWindow::on_btn_Github_clicked(
         QString strMessage = tr("An error occured whilst attempting to open a web browser, please ensure you have a web browser installed and configured. URL: https://github.com/thedjnK/AuTerm");
         gpmErrorForm->SetMessage(&strMessage);
         gpmErrorForm->show();
+
+#ifndef SKIPSERIALDETECT
+        serial_close_dialog_open = false;
+#endif
     }
 }
 
@@ -2899,6 +2977,10 @@ AutMainWindow::replyFinished(
             gpmErrorForm->SetMessage(&strMessage);
             gpmErrorForm->show();
             ui->statusBar->showMessage("Network request error");
+
+#ifndef SKIPSERIALDETECT
+            serial_close_dialog_open = false;
+#endif
 
             if (gchTermMode == mode_check_for_update)
             {
@@ -2938,6 +3020,11 @@ AutMainWindow::replyFinished(
                 gpmErrorForm->SetMessage(&string_response);
                 gpmErrorForm->show();
                 ui->statusBar->showMessage("Unknown server response");
+
+#ifndef SKIPSERIALDETECT
+                serial_close_dialog_open = false;
+#endif
+
             }
             else
             {
@@ -2982,6 +3069,10 @@ AutMainWindow::sslErrors(
 
     gpmErrorForm->SetMessage(&string_response);
     gpmErrorForm->show();
+
+#ifndef SKIPSERIALDETECT
+    serial_close_dialog_open = false;
+#endif
 }
 #endif
 #endif
@@ -3263,6 +3354,10 @@ AutMainWindow::on_btn_Help_clicked(
     QString strMessage = "Command line options are:-\r\n\r\nPORT=n\r\n    Windows: COM[1..255] specifies a TTY device\r\n    GNU/Linux: /dev/tty[device] specifies a TTY device\r\n    Mac: /dev/[device] specifies a TTY device\r\n\r\nBAUD=n\r\n    [1200..5000000] (limited to 115200 for traditional UARTs)\r\n\r\nSTOP=n\r\n    [1..2]\r\n\r\nDATA=n\r\n    [7..8]\r\n\r\nPAR=n\r\n    [0=None; 1=Odd; 2=Even]\r\n\r\nFLOW=n\r\n    [0=None; 1=Cts/Rts; 2=Xon/Xoff]\r\n\r\nENDCHR=n\r\n    [line termination character :: 0=\\r, 1=\\n, 2=\\r\\n]\r\n\r\nNOCONNECT\r\n    Do not connect to device on startup\r\n\r\nLOCALECHO=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLINEMODE=n\r\n    [0=Disabled; 1=Enabled]\r\n\r\nLOG\r\n    Write screen activity to new file '<appname>.log' (Cannot be used with LOG+, LOG+ will take priority)\r\n\r\nLOG+\r\n    Append screen activity to file '<appname>.log' (Cannot be used with LOG, LOG+ will take priority)\r\n\r\nLOG=filename\r\n    File to write the log data to this file (supply extension)\r\n\r\nSHOWCRLF\r\n    When displaying a TX or RX text on screen, show \\t,\\r,\\n as well\r\n\r\nAUTOMATION\r\n    Will initialise and open the automation form\r\n\r\nAUTOMATIONFILE=filename\r\n    Provided that the file exists, it will be loaded into the automation form.\r\n\r\nSCRIPTING\r\n    Will initialise and open the scripting form\r\n\r\nSCRIPTFILE=filename\r\n    Provided that the file exists, it will be opened in the scripting form (SCRIPTING must be provided before this argument)\r\n\r\nSCRIPTACTION=n\r\n    [1=Run script after serial port has been opened] (SCRIPTING and SCRIPTFILE must be provided before this argument)\r\n\r\nTITLE=title\r\n    Will append to the window title (and system tray icon tooltip) the provided text\r\n\r\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\r\n\r\nCharacter escape codes: These are supported in the Automation, Scripting and Speed Test features and allow non-printable ASCII characters to be used. The format of character escape codes is \\HH whereby H represents a hex character (0-9 and A-F), additionally \\r, \\n and \\t can be used to represent a carriage return, new line and tab character individually.\r\nThis function is enabled/disabled in the Automation and Speed Test features by checking the 'Un-escape strings' checkbox to enable it. It cannot be disabled for the Scripting functionality.\r\nFor example: \\00 can be used to represent a null character and \\4C can be used to represent an 'L' ASCII character.\r\n\r\nAdapted from UwTerminalX code, copyright © Laird Connectivity 2015-2022\r\nCopyright © Jamie M. 2023\r\nFor updates and source code licensed under GPLv3, check https://github.com/thedjnK/AuTerm or the 'Update' tab.\r\n\r\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.\r\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\r\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/";
     gpmErrorForm->SetMessage(&strMessage);
     gpmErrorForm->show();
+
+#ifndef SKIPSERIALDETECT
+    serial_close_dialog_open = false;
+#endif
 }
 
 //=============================================================================
@@ -3315,6 +3410,10 @@ AutMainWindow::on_btn_Licenses_clicked(
 "OpenSSL:\r\n\r\nCopyright (c) 1998-2016 The OpenSSL Project.  All rights reserved.\r\n\r\nRedistribution and use in source and binary forms, with or without\r\nmodification, are permitted provided that the following conditions\r\nare met:\r\n\r\n1. Redistributions of source code must retain the above copyright\r\n   notice, this list of conditions and the following disclaimer. \r\n\r\n2. Redistributions in binary form must reproduce the above copyright\r\n   notice, this list of conditions and the following disclaimer in\r\n   the documentation and/or other materials provided with the\r\n   distribution.\r\n\r\n3. All advertising materials mentioning features or use of this\r\n   software must display the following acknowledgment:\r\n   'This product includes software developed by the OpenSSL Project\r\n   for use in the OpenSSL Toolkit. (http://www.openssl.org/)'\r\n\r\n4. The names 'OpenSSL Toolkit' and 'OpenSSL Project' must not be used to\r\n   endorse or promote products derived from this software without\r\n   prior written permission. For written permission, please contact\r\n   openssl-core@openssl.org.\r\n\r\n5. Products derived from this software may not be called 'OpenSSL'\r\n   nor may 'OpenSSL' appear in their names without prior written\r\n   permission of the OpenSSL Project.\r\n\r\n6. Redistributions of any form whatsoever must retain the following\r\n   acknowledgment:\r\n   'This product includes software developed by the OpenSSL Project\r\n   for use in the OpenSSL Toolkit (http://www.openssl.org/)'\r\n\r\nTHIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY\r\nEXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\r\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\r\nPURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR\r\nITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\r\nSPECIAL, EXEMPLARY, OR").append(" CONSEQUENTIAL DAMAGES (INCLUDING, BUT\r\nNOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\r\nLOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\r\nHOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,\r\nSTRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\r\nARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED\r\nOF THE POSSIBILITY OF SUCH DAMAGE.\r\n====================================================================\r\n\r\nThis product includes cryptographic software written by Eric Young\r\n(eay@cryptsoft.com).  This product includes software written by Tim\r\nHudson (tjh@cryptsoft.com).\r\n\r\n\r\n Original SSLeay License\r\n -----------------------\r\n\r\nCopyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)\r\nAll rights reserved.\r\n\r\nThis package is an SSL implementation written\r\nby Eric Young (eay@cryptsoft.com).\r\nThe implementation was written so as to conform with Netscapes SSL.\r\n\r\nThis library is free for commercial and non-commercial use as long as\r\nthe following conditions are aheared to.  The following conditions\r\napply to all code found in this distribution, be it the RC4, RSA,\r\nlhash, DES, etc., code; not just the SSL code.  The SSL documentation\r\nincluded with this distribution is covered by the same copyright terms\r\nexcept that the holder is Tim Hudson (tjh@cryptsoft.com).\r\n\r\nCopyright remains Eric Young's, and as such any Copyright notices in\r\nthe code are not to be removed.\r\nIf this package is used in a product, Eric Young should be given attribution\r\nas the author of the parts of the library used.\r\nThis can be in the form of a textual message at program startup or\r\nin documentation (online or textual) provided with the package.\r\n\r\nRedistribution and use in source and binary forms, with or without\r\nmodification, are permitted provided that the following conditions\r\nare met:\r\n1. Redistributions of source code must retain the copyright\r\n   notice, this list of conditions and the following disclaimer.\r\n2. Redistributions in binary form must reproduce the above copyright\r\n   notice, this list of conditions and the following disclaimer in the\r\n   documentation and/or other materials provided with the distribution.\r\n3. All advertising materials mentioning features or use of this software\r\n   must display the following acknowledgement:\r\n   'This product includes cryptographic software written by\r\n    Eric Young (eay@cryptsoft.com)'\r\n   The word 'cryptographic' can be left out if the rouines from the library\r\n   being used are not cryptographic related :-).\r\n4. If you include any Windows specific code (or a derivative thereof) from \r\n   the apps directory (application code) you must include an acknowledgement:\r\n   'This product includes software written by Tim Hudson (tjh@cryptsoft.com)'\r\n\r\nTHIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND\r\nANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\r\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\r\nARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE\r\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\r\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS\r\nOR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\r\nHOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\r\nLIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY\r\nOUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF\r\nSUCH DAMAGE.\r\n\r\nThe licence and distribution terms for any publically available version or\r\nderivative of this code cannot be changed.  i.e. this code cannot simply be\r\ncopied and put under another distribution licence\r\n[including the GNU Public Licence.]");
     gpmErrorForm->SetMessage(&strMessage);
     gpmErrorForm->show();
+
+#ifndef SKIPSERIALDETECT
+    serial_close_dialog_open = false;
+#endif
 }
 
 //=============================================================================
@@ -5103,6 +5202,10 @@ AutMainWindow::on_btn_Plugin_Abort_clicked(
     if (ui->list_Plugin_Plugins->currentRow() >= 0)
     {
         gpmErrorForm->show_message(plugin_list.at(ui->list_Plugin_Plugins->currentRow()).plugin->plugin_about());
+
+#ifndef SKIPSERIALDETECT
+        serial_close_dialog_open = false;
+#endif
     }
 }
 
@@ -5115,6 +5218,10 @@ AutMainWindow::on_btn_Plugin_Config_clicked(
     if (ui->list_Plugin_Plugins->currentRow() >= 0 && plugin_list.at(ui->list_Plugin_Plugins->currentRow()).plugin->plugin_configuration() == false)
     {
         gpmErrorForm->show_message("This plugin does not have any configuration.");
+
+#ifndef SKIPSERIALDETECT
+        serial_close_dialog_open = false;
+#endif
     }
 }
 
@@ -5507,6 +5614,55 @@ void AutMainWindow::update_display_trimming()
         ui->text_TermEditData->set_trim_settings(0, 0);
     }
 }
+
+#ifndef SKIPSERIALDETECT
+void AutMainWindow::serial_port_reconnected(QString port)
+{
+    //If the last message shown was the serial close dialog, close it upon reconnect
+    if (serial_close_dialog_open == true)
+    {
+        if (gpmErrorForm->isVisible())
+        {
+            gpmErrorForm->close();
+        }
+        serial_close_dialog_open = false;
+    }
+    serial_detect_waiting = false;
+    ui->btn_Cancel->setEnabled(false);
+    ui->combo_COM->setCurrentText(port);
+    on_combo_COM_currentIndexChanged(0);
+    OpenDevice();
+}
+
+void AutMainWindow::on_check_reconnect_after_disconnect_toggled(bool checked)
+{
+    if (gbAppStarted == true)
+    {
+        gpTermSettings->setValue("ReconnectAfterDisconnect", checked);
+
+        if (checked == true && serial_detect == nullptr)
+        {
+            serial_detect = new AutSerialDetect(this);
+            connect(serial_detect, SIGNAL(port_reconnected(QString)), this, SLOT(serial_port_reconnected(QString)));
+        }
+        else if (checked == false && serial_detect != nullptr)
+        {
+            //Clean up active state (if waiting) and disable cancel button, then free up memory
+            if (serial_detect_waiting == true)
+            {
+                serial_detect->stop();
+                serial_detect_waiting = false;
+                serial_close_dialog_open = false;
+                ui->btn_Cancel->setEnabled(false);
+            }
+
+            disconnect(this, SLOT(serial_port_reconnected(QString)));
+            delete serial_detect;
+            serial_detect = nullptr;
+        }
+    }
+}
+#endif
 
 /******************************************************************************/
 // END OF FILE
