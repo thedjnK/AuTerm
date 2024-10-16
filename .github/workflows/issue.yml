@@ -1,18 +1,19 @@
 name: Issue assignment
 
 on:
-    issues:
-        types: [opened]
+  issues:
+    types: [opened]
 
 jobs:
-    auto-assign:
-        runs-on: ubuntu-latest
-        permissions:
-            issues: write
-        steps:
-            - name: 'Auto-assign issue'
-              uses: pozil/auto-assign-issue@v2
-              with:
-                  repo-token: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
-                  assignees: thedjnK
-                  allowSelfAssign: true
+  auto-assign:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    if: github.repository == 'thedjnK/AuTerm'
+    steps:
+      - name: 'Auto-assign issue'
+        uses: pozil/auto-assign-issue@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          assignees: thedjnK
+          allowSelfAssign: true
