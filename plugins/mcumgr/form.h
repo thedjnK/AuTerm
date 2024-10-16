@@ -2,6 +2,7 @@
 #define FORM_H
 
 #include <QWidget>
+#include <QTreeWidgetItem>
 
 namespace Ui {
 class Form;
@@ -69,6 +70,7 @@ private slots:
     void on_btn_custom_clear_clicked();
     void on_edit_custom_indent_valueChanged(int arg1);
     void on_btn_custom_go_clicked();
+    void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
     Ui::Form *ui;

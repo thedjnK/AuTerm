@@ -632,28 +632,11 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
     return (reader.lastError() ? false : true);
 }
 
-#if 0
-bool smp_group_img_mgmt::parse_slot_info_response(QCborStreamReader &reader, QList<slot_info_t> *images)
+bool smp_group_img_mgmt::parse_slot_info_response(QCborStreamReader &reader, QList<slot_info_t> *images, struct slot_info_t *image_data, struct slot_info_slots_t *slot_data)
 {
-    //TODO
-    QString array_name_dupe = array_name;
     QString key = "";
     bool keyset = true;
-
-    image_state_buffer.image = 0;
-    image_state_buffer.image_set = false;
-    image_state_buffer.slot_list.clear();
-    image_state_buffer.item = nullptr;
-    slot_state_buffer.slot = 0;
-    slot_state_buffer.version.clear();
-    slot_state_buffer.hash.clear();
-    slot_state_buffer.bootable = false;
-    slot_state_buffer.pending = false;
-    slot_state_buffer.confirmed = false;
-    slot_state_buffer.active = false;
-    slot_state_buffer.permanent = false;
-    slot_state_buffer.splitstatus = false;
-    slot_state_buffer.item = nullptr;
+    bool entered_map = false;
 
     while (!reader.lastError() && reader.hasNext())
     {
@@ -668,76 +651,52 @@ bool smp_group_img_mgmt::parse_slot_info_response(QCborStreamReader &reader, QLi
         //	    qDebug() << "Type: " << reader.type();
         switch (reader.type())
         {
-        case QCborStreamReader::SimpleType:
+        case QCborStreamReader::UnsignedInteger:
         {
-            bool *index = NULL;
-            if (key == "bootable")
+            uint32_t *index = NULL;
+            bool *variable_found = NULL;
+
+            if (slot_data != nullptr)
             {
-                index = &slot_state_buffer.bootable;
+                if (key == "slot")
+                {
+                    index = &slot_data->slot;
+                }
+                else if (key == "size")
+                {
+                    index = &slot_data->size;
+                    variable_found = &slot_data->size_present;
+                }
+                else if (key == "upload_image_id")
+                {
+                    index = &slot_data->upload_image_id;
+                    variable_found = &slot_data->upload_image_id_present;
+                }
             }
-            else if (key == "pending")
+            else if (image_data != nullptr)
             {
-                index = &slot_state_buffer.pending;
-            }
-            else if (key == "confirmed")
-            {
-                index = &slot_state_buffer.confirmed;
-            }
-            else if (key == "active")
-            {
-                index = &slot_state_buffer.active;
-            }
-            else if (key == "permanent")
-            {
-                index = &slot_state_buffer.permanent;
-            }
-            else if (key == "splitStatus")
-            {
-                index = &slot_state_buffer.splitstatus;
+                if (key == "image")
+                {
+                    index = &image_data->image;
+                }
+                else if (key == "max_image_size")
+                {
+                    index = &image_data->max_image_size;
+                    variable_found = &image_data->max_image_size_present;
+                }
             }
 
             if (index != NULL)
             {
-                *index = reader.toBool();
+                *index = reader.toUnsignedInteger();
+
+                if (variable_found != NULL)
+                {
+                    *variable_found = true;
+                }
             }
 
             reader.next();
-            break;
-        }
-
-        case QCborStreamReader::UnsignedInteger:
-        case QCborStreamReader::NegativeInteger:
-        {
-            //	handleFixedWidth(reader);
-            if (key == "image")
-            {
-                image_state_buffer.image = reader.toUnsignedInteger();
-                image_state_buffer.image_set = true;
-            }
-            else if (key == "slot")
-            {
-                slot_state_buffer.slot = reader.toUnsignedInteger();
-            }
-
-            reader.next();
-            break;
-        }
-
-        case QCborStreamReader::ByteArray:
-        {
-            QByteArray data;
-            auto r = reader.readByteArray();
-            while (r.status == QCborStreamReader::Ok)
-            {
-                data.append(r.data);
-                r = reader.readByteArray();
-            }
-
-            if (key == "hash")
-            {
-                slot_state_buffer.hash = data;
-            }
-
             break;
         }
 
@@ -763,77 +722,80 @@ bool smp_group_img_mgmt::parse_slot_info_response(QCborStreamReader &reader, QLi
                     key = data;
                     keyset = true;
                 }
-                else if (key == "version")
-                {
-                    slot_state_buffer.version = data.toUtf8();
-                }
+            }
+
+            break;
+        }
+
+        case QCborStreamReader::Map:
+        {
+            if (slot_data == nullptr && image_data == nullptr && entered_map == false)
+            {
+                reader.enterContainer();
+                entered_map = true;
+            }
+            else
+            {
+                reader.next();
             }
 
             break;
         }
 
         case QCborStreamReader::Array:
-        case QCborStreamReader::Map:
         {
-            if (reader.type() == QCborStreamReader::Array)
+            if (slot_data == nullptr || image_data == nullptr)
             {
-                array_name_dupe = key;
-            }
+                reader.enterContainer();
 
-            reader.enterContainer();
-
-            while (reader.lastError() == QCborError::NoError && reader.hasNext())
-            {
-                log_debug() << "container/map";
-                parse_state_response(reader, array_name_dupe);
-            }
-
-            if (reader.lastError() == QCborError::NoError)
-            {
-                log_debug() << "leave";
-                reader.leaveContainer();
-
-                if (array_name == "images")
+                while (reader.lastError() == QCborError::NoError && reader.hasNext() && reader.type() == QCborStreamReader::Map)
                 {
-                    image_state_t *image_state_ptr = nullptr;
-
-                    if (host_images != nullptr && host_images->length() > 0)
+                    if (image_data == nullptr && key == "images")
                     {
-                        uint8_t i = 0;
-                        while (i < host_images->length())
-                        {
-                            if (host_images->at(i).image_set == image_state_buffer.image_set && (image_state_buffer.image_set == false || host_images->at(i).image == image_state_buffer.image))
-                            {
-                                image_state_ptr = &((*host_images)[i]);
-                                break;
-                            }
+                        //Parsing images
+                        struct slot_info_t current_image_data;
 
-                            ++i;
-                        }
+                        current_image_data.image = 0;
+                        current_image_data.max_image_size = 0;
+                        current_image_data.max_image_size_present = false;
+                        current_image_data.slot_data.clear();
+
+                        reader.enterContainer();
+                        //log_debug() << "container/map";
+                        parse_slot_info_response(reader, NULL, &current_image_data, NULL);
+                        reader.leaveContainer();
+
+                        images->append(current_image_data);
                     }
-
-                    if (host_images != nullptr && image_state_ptr == nullptr)
+                    else if (slot_data == nullptr && key == "slots")
                     {
-                        if (image_state_buffer.image_set == true)
-                        {
-                            image_state_buffer.item = new QStandardItem(QString("Image ").append(QString::number(image_state_buffer.image)));
-                        }
-                        else
-                        {
-                            image_state_buffer.item = new QStandardItem("Images");
-                        }
+                        //Parsing slots
+                        struct slot_info_slots_t current_slot_data;
 
-                        host_images->append(image_state_buffer);
-                        image_state_ptr = &host_images->last();
-                    }
+                        current_slot_data.slot = 0;
+                        current_slot_data.size = 0;
+                        current_slot_data.size_present = false;
+                        current_slot_data.upload_image_id = 0;
+                        current_slot_data.upload_image_id_present = false;
 
-                    if (image_state_ptr != nullptr)
-                    {
-                        slot_state_buffer.item = new QStandardItem(QString("Slot ").append(QString::number(slot_state_buffer.slot)));
-                        image_state_ptr->slot_list.append(slot_state_buffer);
-                        image_state_ptr->item->appendRow(slot_state_buffer.item);
+                        reader.enterContainer();
+                        //log_debug() << "container/map";
+                        parse_slot_info_response(reader, NULL, NULL, &current_slot_data);
+                        reader.leaveContainer();
+
+                        image_data->slot_data.append(current_slot_data);
                     }
                 }
+
+                if (reader.lastError() == QCborError::NoError)
+                {
+                    log_debug() << "leave";
+                    reader.leaveContainer();
+                }
+            }
+            else
+            {
+                reader.next();
             }
             break;
         }
@@ -845,9 +807,13 @@ bool smp_group_img_mgmt::parse_slot_info_response(QCborStreamReader &reader, QLi
         }
     }
 
+    if (entered_map == true)
+    {
+        reader.leaveContainer();
+    }
+
     return (reader.lastError() ? false : true);
 }
-#endif
 
 void smp_group_img_mgmt::file_upload(QByteArray *message)
 {
@@ -1113,6 +1079,8 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
         else if (mode == MODE_SLOT_INFO && command == COMMAND_SLOT_INFO)
         {
             //Response to slot info
+            QCborStreamReader cbor_reader(data);
+            bool good = parse_slot_info_response(cbor_reader, host_slots, NULL, NULL);
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
             mode = MODE_IDLE;
         }
@@ -1346,6 +1314,7 @@ bool smp_group_img_mgmt::start_image_slot_info(QList<slot_info_t> *images)
 
     mode = MODE_SLOT_INFO;
     host_slots = images;
+    host_slots->clear();
 
     processor->send(tmp_message, smp_timeout, smp_retries, true);
 

@@ -236,6 +236,7 @@ private slots:
     void on_btn_custom_clear_clicked();
     void on_edit_custom_indent_valueChanged(int value);
     void on_btn_custom_go_clicked();
+    void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -245,6 +246,7 @@ private:
     void flip_endian(uint8_t *data, uint8_t size);
     bool update_settings_display();
     void show_transport_open_status();
+    void size_abbreviation(uint32_t size, QString *output);
 
     //Form items
 ///AUTOGEN_START_OBJECTS
@@ -300,6 +302,7 @@ private:
     QSpinBox *edit_IMG_Erase_Slot;
     QSpacerItem *verticalSpacer_2;
     QWidget *tab_IMG_Slots;
+    QVBoxLayout *verticalLayout_6;
     QTreeWidget *tree_IMG_Slot_Info;
     QHBoxLayout *horizontalLayout_3;
     QSpacerItem *horizontalSpacer_3;
@@ -537,12 +540,12 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
+    QButtonGroup *buttonGroup_5;
+    QButtonGroup *buttonGroup_2;
     QButtonGroup *buttonGroup;
+    QButtonGroup *buttonGroup_4;
     QButtonGroup *buttonGroup_3;
     QButtonGroup *buttonGroup_6;
-    QButtonGroup *buttonGroup_5;
-    QButtonGroup *buttonGroup_4;
-    QButtonGroup *buttonGroup_2;
 ///AUTOGEN_END_OBJECTS
 
     //
@@ -568,6 +571,7 @@ private:
     bool enum_single_end;
     QList<enum_details_t> enum_details;
     enum_fields_present_t enum_details_present_fields;
+    QList<slot_info_t> img_slot_details;
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     class smp_udp *udp_transport;

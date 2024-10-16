@@ -34,6 +34,12 @@ const uint8_t retries = 3;
 const uint16_t timeout_ms = 3000;
 const uint16_t timeout_erase_ms = 14000;
 
+enum tree_img_slot_info_columns {
+    TREE_IMG_SLOT_INFO_COLUMN_IMAGE_SLOT,
+    TREE_IMG_SLOT_INFO_COLUMN_SIZE,
+    TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID,
+};
+
 static QMainWindow *parent_window;
 
 void plugin_mcumgr::setup(QMainWindow *main_window)
@@ -288,8 +294,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line = new QFrame(tab_IMG_Images);
     line->setObjectName("line");
-    line->setFrameShape(QFrame::VLine);
-    line->setFrameShadow(QFrame::Sunken);
+    line->setFrameShape(QFrame::Shape::VLine);
+    line->setFrameShadow(QFrame::Shadow::Sunken);
 
     horizontalLayout_6->addWidget(line);
 
@@ -334,12 +340,23 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_3->addTab(tab_IMG_Erase, QString());
     tab_IMG_Slots = new QWidget();
     tab_IMG_Slots->setObjectName("tab_IMG_Slots");
+    verticalLayout_6 = new QVBoxLayout(tab_IMG_Slots);
+    verticalLayout_6->setSpacing(2);
+    verticalLayout_6->setObjectName("verticalLayout_6");
+    verticalLayout_6->setContentsMargins(6, 6, 6, 6);
     tree_IMG_Slot_Info = new QTreeWidget(tab_IMG_Slots);
     QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-    __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
+    __qtreewidgetitem->setText(0, QString::fromUtf8("Images/Slots"));
     tree_IMG_Slot_Info->setHeaderItem(__qtreewidgetitem);
     tree_IMG_Slot_Info->setObjectName("tree_IMG_Slot_Info");
-    tree_IMG_Slot_Info->setGeometry(QRect(10, 10, 256, 161));
+    tree_IMG_Slot_Info->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    tree_IMG_Slot_Info->setItemsExpandable(true);
+    tree_IMG_Slot_Info->setSortingEnabled(true);
+    tree_IMG_Slot_Info->setHeaderHidden(false);
+    tree_IMG_Slot_Info->header()->setVisible(true);
+
+    verticalLayout_6->addWidget(tree_IMG_Slot_Info);
+
     tabWidget_3->addTab(tab_IMG_Slots, QString());
 
     gridLayout_3->addWidget(tabWidget_3, 0, 0, 1, 1);
@@ -1153,8 +1170,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     line_2 = new QFrame(tab_Settings);
     line_2->setObjectName("line_2");
     line_2->setLineWidth(1);
-    line_2->setFrameShape(QFrame::VLine);
-    line_2->setFrameShadow(QFrame::Sunken);
+    line_2->setFrameShape(QFrame::Shape::VLine);
+    line_2->setFrameShadow(QFrame::Shadow::Sunken);
 
     gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
 
@@ -1277,8 +1294,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line_3 = new QFrame(tab_Enum);
     line_3->setObjectName("line_3");
-    line_3->setFrameShape(QFrame::VLine);
-    line_3->setFrameShadow(QFrame::Sunken);
+    line_3->setFrameShape(QFrame::Shape::VLine);
+    line_3->setFrameShadow(QFrame::Shadow::Sunken);
 
     horizontalLayout_23->addWidget(line_3);
 
@@ -1387,8 +1404,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line_7 = new QFrame(tab_custom);
     line_7->setObjectName("line_7");
-    line_7->setFrameShape(QFrame::VLine);
-    line_7->setFrameShadow(QFrame::Sunken);
+    line_7->setFrameShape(QFrame::Shape::VLine);
+    line_7->setFrameShadow(QFrame::Shadow::Sunken);
 
     horizontalLayout_26->addWidget(line_7);
 
@@ -1450,8 +1467,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line_5 = new QFrame(tab_custom);
     line_5->setObjectName("line_5");
-    line_5->setFrameShape(QFrame::VLine);
-    line_5->setFrameShadow(QFrame::Sunken);
+    line_5->setFrameShape(QFrame::Shape::VLine);
+    line_5->setFrameShadow(QFrame::Shadow::Sunken);
 
     horizontalLayout_28->addWidget(line_5);
 
@@ -1470,8 +1487,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line_6 = new QFrame(tab_custom);
     line_6->setObjectName("line_6");
-    line_6->setFrameShape(QFrame::VLine);
-    line_6->setFrameShadow(QFrame::Sunken);
+    line_6->setFrameShape(QFrame::Shape::VLine);
+    line_6->setFrameShadow(QFrame::Shadow::Sunken);
 
     horizontalLayout_28->addWidget(line_6);
 
@@ -1537,8 +1554,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     line_4 = new QFrame(tab_custom);
     line_4->setObjectName("line_4");
-    line_4->setFrameShape(QFrame::VLine);
-    line_4->setFrameShadow(QFrame::Sunken);
+    line_4->setFrameShape(QFrame::Shape::VLine);
+    line_4->setFrameShadow(QFrame::Shadow::Sunken);
 
     horizontalLayout_25->addWidget(line_4);
 
@@ -1839,6 +1856,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
+    QTreeWidgetItem *___qtreewidgetitem = tree_IMG_Slot_Info->headerItem();
+    ___qtreewidgetitem->setText(2, QCoreApplication::translate("Form", "Upload ID", nullptr));
+    ___qtreewidgetitem->setText(1, QCoreApplication::translate("Form", "Size", nullptr));
     tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Slots), QCoreApplication::translate("Form", "Slots", nullptr));
     btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
@@ -1970,7 +1990,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_38->setText(QCoreApplication::translate("Form", "Mode:", nullptr));
     radio_custom_custom->setText(QCoreApplication::translate("Form", "Custom command", nullptr));
     radio_custom_logging->setText(QCoreApplication::translate("Form", "Logging", nullptr));
-    label_39->setText(QCoreApplication::translate("Form", "Type:", nullptr));
+    label_39->setText(QCoreApplication::translate("Form", "Type: ", nullptr));
     radio_custom_json->setText(QCoreApplication::translate("Form", "JSON", nullptr));
     radio_custom_yaml->setText(QCoreApplication::translate("Form", "YAML", nullptr));
     radio_custom_cbor->setText(QCoreApplication::translate("Form", "CBOR", nullptr));
@@ -2006,7 +2026,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     //Signals
     connect(this, SIGNAL(plugin_set_status(bool,bool,bool*)), parent_window, SLOT(plugin_set_status(bool,bool,bool*)));
-    connect(this, SIGNAL(plugin_add_open_close_button(QPushButton*)), this, SLOT(plugin_add_open_close_button(QPushButton*)));
+    connect(this, SIGNAL(plugin_add_open_close_button(QPushButton*)), parent_window, SLOT(plugin_add_open_close_button(QPushButton*)));
     connect(this, SIGNAL(plugin_to_hex(QByteArray*)), parent_window, SLOT(plugin_to_hex(QByteArray*)));
     connect(this, SIGNAL(plugin_serial_open_close(uint8_t)), parent_window, SLOT(plugin_serial_open_close(uint8_t)));
 
@@ -2107,6 +2127,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_custom_clear, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_clicked()));
     connect(edit_custom_indent, SIGNAL(valueChanged(int)), this, SLOT(on_edit_custom_indent_valueChanged(int)));
     connect(btn_custom_go, SIGNAL(clicked()), this, SLOT(on_btn_custom_go_clicked()));
+    connect(tree_IMG_Slot_Info, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -2257,6 +2278,7 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_btn_custom_clear_clicked()));
     disconnect(this, SLOT(on_edit_custom_indent_valueChanged(int)));
     disconnect(this, SLOT(on_btn_custom_go_clicked()));
+    disconnect(this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
 
     //Clean up GUI
     delete tab_2;
@@ -2799,7 +2821,7 @@ finished:
         mode = ACTION_IMG_IMAGE_SLOT_INFO;
         processor->set_transport(active_transport());
         smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
-        started = smp_groups.img_mgmt->start_image_slot_info(nullptr);
+        started = smp_groups.img_mgmt->start_image_slot_info(&img_slot_details);
 
         if (started == true)
         {
@@ -3181,6 +3203,61 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 {
                     colview_IMG_Images->previewWidget()->hide();
                 }
+            }
+            else if (user_data == ACTION_IMG_IMAGE_SLOT_INFO)
+            {
+                uint16_t i = 0;
+
+                tree_IMG_Slot_Info->clear();
+
+                while (i < img_slot_details.length())
+                {
+                    uint16_t l = 0;
+                    QStringList list_item_text;
+                    QTreeWidgetItem *row_image;
+                    QString field_size;
+
+                    list_item_text << QString("Image ").append(QString::number(img_slot_details.at(i).image));
+
+                    if (img_slot_details.at(i).max_image_size_present == true)
+                    {
+                        size_abbreviation(img_slot_details.at(i).max_image_size, &field_size);
+                        list_item_text << field_size;
+                    }
+
+                    row_image = new QTreeWidgetItem((QTreeWidget *)nullptr, list_item_text);
+
+                    while (l < img_slot_details.at(i).slot_data.length())
+                    {
+                        QTreeWidgetItem *row_slot;
+
+                        list_item_text.clear();
+                        list_item_text << QString("Slot ").append(QString::number(img_slot_details.at(i).slot_data.at(l).slot));
+
+                        if (img_slot_details.at(i).slot_data.at(l).size_present)
+                        {
+                            field_size.clear();
+                            size_abbreviation(img_slot_details.at(i).slot_data.at(l).size, &field_size);
+                            list_item_text << field_size;
+                        }
+
+                        if (img_slot_details.at(i).slot_data.at(l).upload_image_id_present)
+                        {
+                            list_item_text << QString::number(img_slot_details.at(i).slot_data.at(l).upload_image_id);
+                        }
+
+                        row_slot = new QTreeWidgetItem(row_image, list_item_text);
+
+                        ++l;
+                    }
+
+                    tree_IMG_Slot_Info->addTopLevelItem(row_image);
+
+                    ++i;
+                }
+
+                //Expand all entries
+                tree_IMG_Slot_Info->expandAll();
             }
         }
         else if (status == STATUS_UNSUPPORTED)
@@ -4630,5 +4707,29 @@ void plugin_mcumgr::custom_message_callback(enum custom_message_callback_t type,
     else if (type == CUSTOM_MESSAGE_CALLBACK_TIMEOUT)
     {
         lbl_custom_status->setText("Command timed out");
+    }
+}
+
+void plugin_mcumgr::size_abbreviation(uint32_t size, QString *output)
+{
+    const QStringList list_abbreviations = { "B", "KiB", "MiB", "GiB", "TiB" };
+    float converted_size = size;
+    uint8_t abbreviation_index = 0;
+
+    while (converted_size >= 1024 && abbreviation_index < list_abbreviations.size())
+    {
+        converted_size /= 1024.0;
+        ++abbreviation_index;
+    }
+
+    output->append(QString::number(converted_size, 'g', 3).append(list_abbreviations.at(abbreviation_index)));
+}
+
+
+void plugin_mcumgr::on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int)
+{
+    if (!item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).isEmpty())
+    {
+        edit_IMG_Image->setValue(item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).toUInt());
     }
 }

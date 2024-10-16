@@ -52,15 +52,19 @@ struct image_state_t {
     QStandardItem *item;
 };
 
-struct slot_info_t {
+struct slot_info_slots_t {
     uint32_t slot;
-    uint32_t image;
-    union {
-        int32_t rc;
-        uint32_t size;
-    };
-    bool rc_present;
+    uint32_t upload_image_id;
+    uint32_t size;
+    bool upload_image_id_present;
     bool size_present;
+};
+
+struct slot_info_t {
+    uint32_t image;
+    QList<slot_info_slots_t> slot_data;
+    uint32_t max_image_size;
+    bool max_image_size_present;
 };
 
 enum img_mgmt_upload_match : uint8_t {
@@ -102,7 +106,7 @@ private:
     bool extract_hash(QByteArray *file_data, QByteArray *hash);
     bool parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match);
     bool parse_state_response(QCborStreamReader &reader, QString array_name);
-    //bool parse_slot_info_response(QCborStreamReader &reader, QList<slot_info_t> *images);
+    bool parse_slot_info_response(QCborStreamReader &reader, QList<slot_info_t> *images, struct slot_info_t *image_data, struct slot_info_slots_t *slot_data);
     void file_upload(QByteArray *message);
     QString mode_to_string(uint8_t mode);
     QString command_to_string(uint8_t command);

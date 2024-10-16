@@ -285,3 +285,7 @@ void Form::on_btn_custom_go_clicked()
 
 }
 
+void Form::on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+
+}
