@@ -1720,7 +1720,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(radio_IMG_Test, radio_IMG_Confirm);
     QWidget::setTabOrder(radio_IMG_Confirm, check_IMG_Reset);
     QWidget::setTabOrder(check_IMG_Reset, colview_IMG_Images);
-    QWidget::setTabOrder(colview_IMG_Images, edit_IMG_Preview_Hash);
+//    QWidget::setTabOrder(colview_IMG_Images, edit_IMG_Preview_Hash);
     QWidget::setTabOrder(edit_IMG_Preview_Hash, edit_IMG_Preview_Version);
     QWidget::setTabOrder(edit_IMG_Preview_Version, check_IMG_Preview_Active);
     QWidget::setTabOrder(check_IMG_Preview_Active, check_IMG_Preview_Bootable);
@@ -1728,7 +1728,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(check_IMG_Preview_Confirmed, check_IMG_Preview_Pending);
     QWidget::setTabOrder(check_IMG_Preview_Pending, check_IMG_Preview_Permanent);
     QWidget::setTabOrder(check_IMG_Preview_Permanent, btn_IMG_Preview_Copy);
-    QWidget::setTabOrder(btn_IMG_Preview_Copy, radio_IMG_Get);
+//    QWidget::setTabOrder(btn_IMG_Preview_Copy, radio_IMG_Get);
     QWidget::setTabOrder(radio_IMG_Get, radio_IMG_Set);
     QWidget::setTabOrder(radio_IMG_Set, radio_img_images_erase);
     QWidget::setTabOrder(radio_img_images_erase, check_IMG_Confirm);

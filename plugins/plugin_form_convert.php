@@ -33,6 +33,8 @@ $Replacement2 = array(
 	array('tabWidget->addTab(tab_2, QString());', '//', 1),
 	array('tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("Form", "Page", nullptr));', '//', 1),
 	array('QWidget::setTabOrder(tabWidget,', '//', 1),
+	array('QWidget::setTabOrder(colview_IMG_Images,', '//', 1),
+	array('QWidget::setTabOrder(btn_IMG_Preview_Copy,', '//', 1),
 	array('buttonGroup_2 = new QButtonGroup(Form);', 'buttonGroup_2 = new QButtonGroup(tab_Settings);', 0),
 	array('buttonGroup = new QButtonGroup(Form);', 'buttonGroup = new QButtonGroup(tab_Settings);', 0),
 	array('buttonGroup_3 = new QButtonGroup(Form);', 'buttonGroup_3 = new QButtonGroup(tab);', 0),
