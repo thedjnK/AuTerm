@@ -3,14 +3,14 @@
  <class>PopupMessage</class>
  <widget class="QDialog" name="PopupMessage">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::WindowModality::ApplicationModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>540</width>
-    <height>260</height>
+    <width>440</width>
+    <height>220</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,13 +21,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>540</width>
-    <height>260</height>
+    <width>400</width>
+    <height>220</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>540</width>
+    <width>520</width>
     <height>260</height>
    </size>
   </property>
@@ -66,7 +66,7 @@
        <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -89,7 +89,7 @@
        <item>
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
