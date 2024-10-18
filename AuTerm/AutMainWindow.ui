@@ -3508,17 +3508,17 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_15">
             <property name="text">
-             <string>AuTerm's functionality can be expanded through the use of plugins. Plugins should be placed in the same folder as the utility to be loaded.</string>
+             <string>AuTerm's functionality can be expanded through the use of plugins.</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QListWidget" name="list_Plugin_Plugins"/>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout">
             <property name="spacing">
              <number>2</number>
@@ -3538,6 +3538,16 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_plugins_non_static">
+            <property name="text">
+             <string>This is a non-static build of AuTerm, plugins should be placed in the same folder as the utility to be loaded.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

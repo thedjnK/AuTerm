@@ -191,11 +191,13 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     ui->tab_SpeedTest->deleteLater();
 #endif
 
-#ifdef SKIPPLUGINS
+#if defined(SKIPPLUGINS)
     ui->list_Plugin_Plugins->deleteLater();
     ui->btn_Plugin_Config->deleteLater();
     ui->btn_Plugin_Abort->deleteLater();
     ui->tab_Plugins->deleteLater();
+#elif defined(QT_STATIC)
+    ui->label_plugins_non_static->deleteLater();
 #endif
 
 #ifdef TARGET_OS_MAC
