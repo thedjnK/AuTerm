@@ -1,9 +1,10 @@
 /******************************************************************************
-** Copyright (C) 2015-2017 Laird
+** Copyright (C) 2016-2017 Laird
+** Copyright (C) 2024 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: UwxPopup.h
+** Module: AutHighlighter.h
 **
 ** Notes:
 **
@@ -20,45 +21,47 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef UWXPOPUPMESSAGE_H
-#define UWXPOPUPMESSAGE_H
+#ifndef AUTHIGHLIGHTER_H
+#define AUTHIGHLIGHTER_H
 
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include <QDialog>
+#include <QSyntaxHighlighter>
+#include <QTextCharFormat>
+#include <QRegularExpression>
 
 /******************************************************************************/
 // Forward declaration of Class, Struct & Unions
 /******************************************************************************/
-namespace Ui
-{
-    class PopupMessage;
-}
+QT_BEGIN_NAMESPACE
+class QTextDocument;
+QT_END_NAMESPACE
 
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class PopupMessage : public QDialog
+class AutHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 
 public:
-    explicit PopupMessage(QWidget *parent = 0);
-    ~PopupMessage();
-    void SetMessage(QString *strMsg);
+    AutHighlighter(QTextDocument *parent = 0);
 
-private slots:
-    void on_btn_Close_clicked();
-
-public slots:
-    void show_message(QString str_message);
+protected:
+    void
+    highlightBlock(const QString &text) Q_DECL_OVERRIDE;
 
 private:
-    Ui::PopupMessage *ui;
+    QRegularExpression OutPattern; //Matches sending data lines
+    QRegularExpression InPattern; //Matches receiving data lines
+    QRegularExpression WaitPattern; //Matches time waiting lines
+    QRegularExpression CommentPattern; //Matches comment lines
+    QTextCharFormat LineFormat; //Format for valid lines
+    QTextCharFormat CommentFormat; //Format for comment lines
 };
 
-#endif // UWXPOPUPMESSAGE_H
+#endif // AUTHIGHLIGHTER_H
 
 /******************************************************************************/
 // END OF FILE

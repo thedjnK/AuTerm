@@ -61,8 +61,8 @@
 #include <cmath>
 #include <QStandardPaths>
 #include "AutScrollEdit.h"
-#include "UwxPopup.h"
-#include "LrdLogger.h"
+#include "AutPopup.h"
+#include "AutLogger.h"
 #ifndef SKIPAUTOMATIONFORM
 #include "AutAutomation.h"
 #endif
@@ -70,7 +70,7 @@
 #include "AutErrorCode.h"
 #endif
 #ifndef SKIPSCRIPTINGFORM
-#include "UwxScripting.h"
+#include "AutScripting.h"
 #endif
 #include "AutEscape.h"
 #ifndef SKIPPLUGINS
@@ -403,7 +403,7 @@ private:
 //    QPixmap *gpUw32Pixmap; //Pixmap holder for UwTerminal 32x32 icon
     QPixmap *gpUw16Pixmap; //Pixmap holder for UwTerminal 16x16 icon
     QTimer *gpSignalTimer; //Handle for a timer to update COM port signals
-    LrdLogger *gpMainLog; //Handle to the main log file (if enabled/used)
+    AutLogger *gpMainLog; //Handle to the main log file (if enabled/used)
     bool gbMainLogEnabled; //True if opened successfully (and enabled)
     QMenu *gpMenu; //Main menu
     QMenu *gpSMenu4; //Submenu 4
@@ -444,7 +444,7 @@ private:
     AutErrorCode *gecErrorCodeForm; //Error code lookup form
 #endif
 #ifndef SKIPSCRIPTINGFORM
-    UwxScripting *gusScriptingForm; //Scripting form
+    AutScripting *gusScriptingForm; //Scripting form
     bool gbScriptingRunning; //True if a script is running
 #endif
     bool gbSpeedTestRunning; //True if speed test is running

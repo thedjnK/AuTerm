@@ -1,8 +1,4 @@
 /******************************************************************************
-** Copyright (C) 2016-2018 Laird
-**
-** Project: AuTerm
-**
 ** Copyright (C) 2016-2017 Laird
 ** Copyright (C) 2023 Jamie M.
 **
@@ -109,7 +105,7 @@ private slots:
 private:
     Ui::AutErrorCode *ui;
     QCompleter *mcmpErrors; //Handle for error completer object for combo box
-    QSettings *mpErrorMessages; //Handle for error values object (owned by UwxMainWindow)
+    QSettings *mpErrorMessages; //Handle for error values object (owned by AutMainWindow)
     QStatusBar *msbStatusBar; //Pointer to error code status bar
 };
 

@@ -4,7 +4,7 @@
 **
 ** Project: AuTerm
 **
-** Module: UwxPopup.h
+** Module: AutAutomation.h
 **
 ** Notes:
 **
@@ -28,7 +28,7 @@
 // Include Files
 /******************************************************************************/
 #include <QDialog>
-#include "UwxPopup.h"
+#include "AutPopup.h"
 #include <QFileDialog>
 #include <QFile>
 #include <QStatusBar>

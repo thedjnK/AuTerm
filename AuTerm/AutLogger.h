@@ -1,9 +1,10 @@
 /******************************************************************************
 ** Copyright (C) 2015-2018 Laird
+** Copyright (C) 2024 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: LrdLogger.h
+** Module: AutLogger.h
 **
 ** Notes:
 **
@@ -20,8 +21,8 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef LRDLOGGER_H
-#define LRDLOGGER_H
+#ifndef AUTLOGGER_H
+#define AUTLOGGER_H
 
 /******************************************************************************/
 // Include Files
@@ -41,12 +42,12 @@ const qint8 LOG_NOT_OPEN         = 3; //Log file not open
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class LrdLogger : public QWidget
+class AutLogger : public QWidget
 {
     Q_OBJECT
 public:
-    explicit LrdLogger(QWidget *parent = 0);
-    ~LrdLogger();
+    explicit AutLogger(QWidget *parent = 0);
+    ~AutLogger();
     unsigned char OpenLogFile(QString strFilename);
     void CloseLogFile();
     unsigned char WriteLogData(QString strData);
@@ -62,7 +63,7 @@ private:
     QDataStream *mpStreamOut; //Contains the handle to the data steam
 };
 
-#endif // LRDLOGGER_H
+#endif // AUTLOGGER_H
 
 /******************************************************************************/
 // END OF FILE

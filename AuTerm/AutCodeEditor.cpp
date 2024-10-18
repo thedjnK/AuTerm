@@ -3,7 +3,7 @@
 **
 ** Project: AuTerm
 **
-** Module: LrdCodeEditor.cpp
+** Module: AutCodeEditor.cpp
 **
 ** Notes:
 **
@@ -24,12 +24,12 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "LrdCodeEditor.h"
+#include "AutCodeEditor.h"
 
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-LrdCodeEditor::LrdCodeEditor(QWidget *parent) : QPlainTextEdit(parent)
+AutCodeEditor::AutCodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     //Create indication area widget
     mwidIndicationArea = new LineNumberArea(this);
@@ -51,7 +51,7 @@ LrdCodeEditor::LrdCodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     mbLineFail = false;
 }
 
-LrdCodeEditor::~LrdCodeEditor()
+AutCodeEditor::~AutCodeEditor()
 {
     //Disconnect all signals
     disconnect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
@@ -61,7 +61,7 @@ LrdCodeEditor::~LrdCodeEditor()
     delete mwidIndicationArea;
 }
 
-void LrdCodeEditor::updateLineNumberArea(const QRect &rectArea, int intdy)
+void AutCodeEditor::updateLineNumberArea(const QRect &rectArea, int intdy)
 {
     if (intdy)
     {
@@ -73,7 +73,7 @@ void LrdCodeEditor::updateLineNumberArea(const QRect &rectArea, int intdy)
     }
 }
 
-void LrdCodeEditor::resizeEvent(QResizeEvent *e)
+void AutCodeEditor::resizeEvent(QResizeEvent *e)
 {
     //Runs when code editor has been resized
     QPlainTextEdit::resizeEvent(e);
@@ -81,7 +81,7 @@ void LrdCodeEditor::resizeEvent(QResizeEvent *e)
     mwidIndicationArea->setGeometry(QRect(rectContents.left(), rectContents.top(), IndicationAreaWidth, rectContents.height()));
 }
 
-void LrdCodeEditor::highlightCurrentLine()
+void AutCodeEditor::highlightCurrentLine()
 {
     //Highlights current line
     QList<QTextEdit::ExtraSelection> extraSelections;
@@ -102,7 +102,7 @@ void LrdCodeEditor::highlightCurrentLine()
     setExtraSelections(extraSelections);
 }
 
-void LrdCodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
+void AutCodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     //Paint the invalid/execution lines in
     QPainter pntPainter(mwidIndicationArea);
@@ -156,7 +156,7 @@ void LrdCodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     }
 }
 
-void LrdCodeEditor::keyPressEvent(QKeyEvent *e)
+void AutCodeEditor::keyPressEvent(QKeyEvent *e)
 {
     //Key has been presses
     if (e->key() == Qt::Key_Return && e->modifiers() == Qt::ShiftModifier)
@@ -169,27 +169,27 @@ void LrdCodeEditor::keyPressEvent(QKeyEvent *e)
     QPlainTextEdit::keyPressEvent(e);
 }
 
-void LrdCodeEditor::ClearBadLines()
+void AutCodeEditor::ClearBadLines()
 {
     //Clears list of invalid lines
     mlistInvLines.clear();
     mbLineFail = false;
 }
 
-void LrdCodeEditor::AddBadLine(unsigned int uintLineNumber)
+void AutCodeEditor::AddBadLine(unsigned int uintLineNumber)
 {
     //Marks a line as being invalid
     mlistInvLines.append(uintLineNumber);
 }
 
-void LrdCodeEditor::SetExecutionLine(int intLineNumber)
+void AutCodeEditor::SetExecutionLine(int intLineNumber)
 {
     //Sets the current line that is being executed and repaints the object
     mintCLine = intLineNumber;
     this->repaint();
 }
 
-void LrdCodeEditor::SetExecutionLineStatus(bool bStatus)
+void AutCodeEditor::SetExecutionLineStatus(bool bStatus)
 {
     //Sets the status of the execution line colouring
     mbLineFail = bStatus;

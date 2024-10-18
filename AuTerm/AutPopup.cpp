@@ -1,9 +1,10 @@
 /******************************************************************************
-** Copyright (C) 2016-2017 Laird
+** Copyright (C) 2015-2017 Laird
+** Copyright (C) 2024 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: LrdHighlighter.h
+** Module: AutPopup.cpp
 **
 ** Notes:
 **
@@ -20,47 +21,49 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef LRDHIGHLIGHTER_H
-#define LRDHIGHLIGHTER_H
 
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include <QSyntaxHighlighter>
-#include <QTextCharFormat>
-#include <QRegularExpression>
+#include "AutPopup.h"
+#include "ui_AutPopup.h"
 
 /******************************************************************************/
-// Forward declaration of Class, Struct & Unions
+// Local Functions or Private Members
 /******************************************************************************/
-QT_BEGIN_NAMESPACE
-class QTextDocument;
-QT_END_NAMESPACE
-
-/******************************************************************************/
-// Class definitions
-/******************************************************************************/
-class LrdHighlighter : public QSyntaxHighlighter
+PopupMessage::PopupMessage(QWidget *parent):QDialog(parent), ui(new Ui::PopupMessage)
 {
-    Q_OBJECT
+    //Setup window to be a dialog
+    this->setWindowFlags((Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint));
+    ui->setupUi(this);
 
-public:
-    LrdHighlighter(QTextDocument *parent = 0);
+    //Change terminal font to a monospaced font
+    QFont fntTmpFnt = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    ui->text_Message->setFont(fntTmpFnt);
+}
 
-protected:
-    void
-    highlightBlock(const QString &text) Q_DECL_OVERRIDE;
+PopupMessage::~PopupMessage()
+{
+    delete ui;
+}
 
-private:
-    QRegularExpression OutPattern; //Matches sending data lines
-    QRegularExpression InPattern; //Matches receiving data lines
-    QRegularExpression WaitPattern; //Matches time waiting lines
-    QRegularExpression CommentPattern; //Matches comment lines
-    QTextCharFormat LineFormat; //Format for valid lines
-    QTextCharFormat CommentFormat; //Format for comment lines
-};
+void PopupMessage::on_btn_Close_clicked()
+{
+    //Close button clicked, close popup.
+    this->close();
+}
 
-#endif // LRDHIGHLIGHTER_H
+void PopupMessage::SetMessage(QString *strMsg)
+{
+    //Update popup message
+    ui->text_Message->setPlainText(*strMsg);
+}
+
+void PopupMessage::show_message(QString str_message)
+{
+    ui->text_Message->setPlainText(str_message);
+    this->show();
+}
 
 /******************************************************************************/
 // END OF FILE

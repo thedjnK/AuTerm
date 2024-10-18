@@ -4,7 +4,7 @@
 **
 ** Project: AuTerm
 **
-** Module: UwxScripting.h
+** Module: AutScripting.h
 **
 ** Notes:
 **
@@ -21,8 +21,8 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef UWXSCRIPTING_H
-#define UWXSCRIPTING_H
+#ifndef AUTSCRIPTING_H
+#define AUTSCRIPTING_H
 
 /******************************************************************************/
 // Include Files
@@ -30,14 +30,14 @@
 #include <QDialog>
 #include <QFileDialog>
 #include <QFile>
-#include "LrdHighlighter.h"
+#include "AutHighlighter.h"
 #include <QSerialPort>
 #include <QTimer>
 #include <QFontDialog>
 #include <QTextStream>
 #include <QDate>
 #include <QTime>
-#include "UwxPopup.h"
+#include "AutPopup.h"
 #include <QStatusBar>
 #include <QElapsedTimer>
 #include <QMenu>
@@ -79,19 +79,19 @@ const qint8   ScriptingReasonTermBusy      = 2;    //Return code if terminal is 
 /******************************************************************************/
 namespace Ui
 {
-    class UwxScripting;
+    class AutScripting;
 }
 
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class UwxScripting : public QDialog
+class AutScripting : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit UwxScripting(QWidget *parent = 0);
-    ~UwxScripting();
+    explicit AutScripting(QWidget *parent = 0);
+    ~AutScripting();
     void SetPopupHandle(PopupMessage *pmNewHandle);
     void SetAuTermVersion(const QString strVersion);
     void SerialPortStatus(bool PortStatus);
@@ -123,9 +123,9 @@ private slots:
     void on_btn_Clear_clicked();
 
 private:
-    Ui::UwxScripting *ui;
+    Ui::AutScripting *ui;
     PopupMessage *mFormAuto; //Holds handle of error message dialogue
-    LrdHighlighter *mhlHighlighter; //Handle for text highlighter
+    AutHighlighter *mhlHighlighter; //Handle for text highlighter
     int mintCLine; //Current line number
     QTimer mtmrPauseTimer; //Timer used for wait commands
     QTextBlock mtbExecutionBlock; //Holds the current execution block from the editor
@@ -154,7 +154,7 @@ signals:
     void UpdateScriptLastDirectory(const QString *strDirectory);
 };
 
-#endif // UWXSCRIPTING_H
+#endif // AUTSCRIPTING_H
 
 /******************************************************************************/
 // END OF FILE

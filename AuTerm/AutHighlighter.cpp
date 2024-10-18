@@ -1,9 +1,10 @@
 /******************************************************************************
 ** Copyright (C) 2016-2017 Laird
+** Copyright (C) 2024 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: LrdHighlighter.cpp
+** Module: AutHighlighter.cpp
 **
 ** Notes:
 **
@@ -24,12 +25,12 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "LrdHighlighter.h"
+#include "AutHighlighter.h"
 
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-LrdHighlighter::LrdHighlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
+AutHighlighter::AutHighlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
     //Setup patterns
     OutPattern.setPattern("^\\<");
@@ -58,7 +59,7 @@ LrdHighlighter::LrdHighlighter(QTextDocument *parent) : QSyntaxHighlighter(paren
     CommentFormat.setForeground(Qt::darkGreen);
 }
 
-void LrdHighlighter::highlightBlock(const QString &text)
+void AutHighlighter::highlightBlock(const QString &text)
 {
     QRegularExpressionMatchIterator nextmatch;
     QString texta = QString(text).replace(QChar(0x2028), "\n");

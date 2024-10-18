@@ -1,9 +1,10 @@
 /******************************************************************************
 ** Copyright (C) 2015-2017 Laird
+** Copyright (C) 2024 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: UwxPopup.cpp
+** Module: AutPopup.h
 **
 ** Notes:
 **
@@ -20,49 +21,45 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
+#ifndef UWXPOPUPMESSAGE_H
+#define UWXPOPUPMESSAGE_H
 
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "UwxPopup.h"
-#include "ui_UwxPopup.h"
+#include <QDialog>
 
 /******************************************************************************/
-// Local Functions or Private Members
+// Forward declaration of Class, Struct & Unions
 /******************************************************************************/
-PopupMessage::PopupMessage(QWidget *parent):QDialog(parent), ui(new Ui::PopupMessage)
+namespace Ui
 {
-    //Setup window to be a dialog
-    this->setWindowFlags((Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint));
-    ui->setupUi(this);
-
-    //Change terminal font to a monospaced font
-    QFont fntTmpFnt = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    ui->text_Message->setFont(fntTmpFnt);
+    class PopupMessage;
 }
 
-PopupMessage::~PopupMessage()
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
+class PopupMessage : public QDialog
 {
-    delete ui;
-}
+    Q_OBJECT
 
-void PopupMessage::on_btn_Close_clicked()
-{
-    //Close button clicked, close popup.
-    this->close();
-}
+public:
+    explicit PopupMessage(QWidget *parent = 0);
+    ~PopupMessage();
+    void SetMessage(QString *strMsg);
 
-void PopupMessage::SetMessage(QString *strMsg)
-{
-    //Update popup message
-    ui->text_Message->setPlainText(*strMsg);
-}
+private slots:
+    void on_btn_Close_clicked();
 
-void PopupMessage::show_message(QString str_message)
-{
-    ui->text_Message->setPlainText(str_message);
-    this->show();
-}
+public slots:
+    void show_message(QString str_message);
+
+private:
+    Ui::PopupMessage *ui;
+};
+
+#endif // UWXPOPUPMESSAGE_H
 
 /******************************************************************************/
 // END OF FILE

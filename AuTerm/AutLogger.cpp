@@ -1,9 +1,10 @@
 /******************************************************************************
 ** Copyright (C) 2015-2017 Laird
+** Copyright (C) 2024 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module: LrdLogger.cpp
+** Module: AutLogger.cpp
 **
 ** Notes:
 **
@@ -24,18 +25,18 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "LrdLogger.h"
+#include "AutLogger.h"
 
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-LrdLogger::LrdLogger(QWidget *parent) : QWidget(parent)
+AutLogger::AutLogger(QWidget *parent) : QWidget(parent)
 {
     //Initial values
     mbLogOpen = false;
 }
 
-LrdLogger::~LrdLogger()
+AutLogger::~AutLogger()
 {
     if (mbLogOpen == true)
     {
@@ -47,7 +48,7 @@ LrdLogger::~LrdLogger()
     }
 }
 
-unsigned char LrdLogger::OpenLogFile(QString strFilename)
+unsigned char AutLogger::OpenLogFile(QString strFilename)
 {
     //Opens the log file specified
     bool bNewFile = QFile::exists(strFilename);
@@ -81,7 +82,7 @@ unsigned char LrdLogger::OpenLogFile(QString strFilename)
     }
 }
 
-void LrdLogger::CloseLogFile()
+void AutLogger::CloseLogFile()
 {
     //Closes the log file
     if (mbLogOpen == true)
@@ -93,7 +94,7 @@ void LrdLogger::CloseLogFile()
     }
 }
 
-unsigned char LrdLogger::WriteLogData(QString strData)
+unsigned char AutLogger::WriteLogData(QString strData)
 {
     //Writes a line to the log file
     if (mbLogOpen == true)
@@ -109,7 +110,7 @@ unsigned char LrdLogger::WriteLogData(QString strData)
     }
 }
 
-unsigned char LrdLogger::WriteRawLogData(QByteArray baData)
+unsigned char AutLogger::WriteRawLogData(QByteArray baData)
 {
     //Writes raw data to the log file
     if (mbLogOpen == true)
@@ -125,7 +126,7 @@ unsigned char LrdLogger::WriteRawLogData(QByteArray baData)
     }
 }
 
-unsigned short LrdLogger::GetLogSize()
+unsigned short AutLogger::GetLogSize()
 {
     //Returns the size of the log
     if (mbLogOpen == true)
@@ -140,7 +141,7 @@ unsigned short LrdLogger::GetLogSize()
     }
 }
 
-void LrdLogger::ClearLog()
+void AutLogger::ClearLog()
 {
     //Clears out the log
     if (mbLogOpen == true)
@@ -154,7 +155,7 @@ void LrdLogger::ClearLog()
     }
 }
 
-QString LrdLogger::GetLogName()
+QString AutLogger::GetLogName()
 {
     if (mpLogFile->isOpen() == true)
     {
@@ -168,7 +169,7 @@ QString LrdLogger::GetLogName()
     }
 }
 
-bool LrdLogger::IsLogOpen()
+bool AutLogger::IsLogOpen()
 {
     //Returns true if log is open
     return mbLogOpen;

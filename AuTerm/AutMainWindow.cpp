@@ -281,7 +281,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     LoadSettings();
 
     //Create logging handle
-    gpMainLog = new LrdLogger();
+    gpMainLog = new AutLogger();
 
     //Move to 'Config' tab
     ui->selector_Tab->setCurrentIndex(ui->selector_Tab->indexOf(ui->tab_Config));
@@ -787,7 +787,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
             if (gusScriptingForm == 0)
             {
                 //Initialise scripting form
-                gusScriptingForm = new UwxScripting(this);
+                gusScriptingForm = new AutScripting(this);
 
                 //Populate window handles for automation object
                 gusScriptingForm->SetPopupHandle(gpmErrorForm);
@@ -1687,7 +1687,7 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
         if (gusScriptingForm == 0)
         {
             //Initialise scripting form
-            gusScriptingForm = new UwxScripting(this);
+            gusScriptingForm = new AutScripting(this);
 
             //Populate window handles for automation object
             gusScriptingForm->SetPopupHandle(gpmErrorForm);

@@ -13,22 +13,22 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     AutEscape.cpp \
+    AutLogger.cpp \
     AutMainWindow.cpp \
     AutPlugin.cpp \
-    AutScrollEdit.cpp \
-    UwxPopup.cpp \
-    LrdLogger.cpp
+    AutPopup.cpp \
+    AutScrollEdit.cpp
 
 HEADERS  += \
     AutEscape.h \
+    AutLogger.h \
     AutMainWindow.h \
+    AutPopup.h \
     AutScrollEdit.h \
-    UwxPopup.h \
-    LrdLogger.h \
 
 FORMS    += \
     AutMainWindow.ui \
-    UwxPopup.ui
+    AutPopup.ui
 
 RESOURCES += \
     AuTermImages.qrc
@@ -45,15 +45,18 @@ RESOURCES += \
 
 # Scripting form
 !contains(DEFINES, SKIPSCRIPTINGFORM) {
-    SOURCES += LrdCodeEditor.cpp \
-	LrdHighlighter.cpp \
-	UwxScripting.cpp
+    SOURCES += \
+	AutCodeEditor.cpp \
+	AutHighlighter.cpp \
+	AutScripting.cpp
 
-    HEADERS += LrdCodeEditor.h \
-	LrdHighlighter.h \
-	UwxScripting.h
+    HEADERS += \
+	AutCodeEditor.h \
+	AutHighlighter.h \
+	AutScripting.h
 
-    FORMS += UwxScripting.ui
+    FORMS += \
+    AutScripting.ui
 }
 
 # Error code form

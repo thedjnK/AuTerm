@@ -3,7 +3,7 @@
 **
 ** Project: AuTerm
 **
-** Module: LrdCodeEditor.h
+** Module: AutCodeEditor.h
 **
 ** Notes:
 **
@@ -20,8 +20,8 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef LRDCODEEDITOR_H
-#define LRDCODEEDITOR_H
+#ifndef AUTCODEEDITOR_H
+#define AUTCODEEDITOR_H
 
 /******************************************************************************/
 // Include Files
@@ -49,13 +49,13 @@ class LineNumberArea;
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class LrdCodeEditor : public QPlainTextEdit
+class AutCodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
 
 public:
-    LrdCodeEditor(QWidget *parent = 0);
-    ~LrdCodeEditor();
+    AutCodeEditor(QWidget *parent = 0);
+    ~AutCodeEditor();
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     void ClearBadLines();
     void AddBadLine(unsigned int LineNumber);
@@ -80,7 +80,7 @@ private:
 class LineNumberArea : public QWidget
 {
 public:
-    LineNumberArea(LrdCodeEditor *ceNewEditor) : QWidget(ceNewEditor)
+    LineNumberArea(AutCodeEditor *ceNewEditor) : QWidget(ceNewEditor)
     {
         mceEditor = ceNewEditor;
     }
@@ -97,10 +97,10 @@ protected:
     }
 
 private:
-    LrdCodeEditor *mceEditor; //Handle for code editor
+    AutCodeEditor *mceEditor; //Handle for code editor
 };
 
-#endif // LRDCODEEDITOR_H
+#endif // AUTCODEEDITOR_H
 
 /******************************************************************************/
 // END OF FILE

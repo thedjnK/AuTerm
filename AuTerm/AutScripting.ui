@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UwxScripting</class>
- <widget class="QDialog" name="UwxScripting">
+ <class>AutScripting</class>
+ <widget class="QDialog" name="AutScripting">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -254,7 +254,7 @@
        </layout>
       </item>
       <item>
-       <widget class="LrdCodeEditor" name="edit_Script"/>
+       <widget class="AutCodeEditor" name="edit_Script"/>
       </item>
      </layout>
     </widget>
@@ -441,9 +441,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>LrdCodeEditor</class>
+   <class>AutCodeEditor</class>
    <extends>QPlainTextEdit</extends>
-   <header>LrdCodeEditor.h</header>
+   <header>AutCodeEditor.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
