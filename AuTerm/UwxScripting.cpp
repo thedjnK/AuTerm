@@ -104,10 +104,7 @@ UwxScripting::UwxScripting(QWidget *parent) : QDialog(parent), ui(new Ui::UwxScr
     connect(qaKeyShortcuts[4], SIGNAL(activated()), this, SLOT(on_btn_Run_clicked()));
 }
 
-//=============================================================================
-//=============================================================================
-UwxScripting::~UwxScripting(
-    )
+UwxScripting::~UwxScripting()
 {
     //On dialogue deletion
     disconnect(&mtmrPauseTimer, SIGNAL(timeout()), this, SLOT(AdvanceLine()));
@@ -130,22 +127,13 @@ UwxScripting::~UwxScripting(
     delete ui;
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SetPopupHandle(
-    PopupMessage *pmNewHandle
-    )
+void UwxScripting::SetPopupHandle(PopupMessage *pmNewHandle)
 {
     //Sets the Popup Message handle
     mFormAuto = pmNewHandle;
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::ChangeFont(
-    )
+void UwxScripting::ChangeFont()
 {
     //Change font
     bool bTmpBool;
@@ -159,11 +147,7 @@ UwxScripting::ChangeFont(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::on_btn_Load_clicked(
-    )
+void UwxScripting::on_btn_Load_clicked()
 {
     //Load buffer from file
     QString strLoadFile = QFileDialog::getOpenFileName(this, tr("Open File"), strLastScriptFile, "Text files (*.txt)");
@@ -177,11 +161,7 @@ UwxScripting::on_btn_Load_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::on_btn_Save_clicked(
-    )
+void UwxScripting::on_btn_Save_clicked()
 {
     //Save buffer contents
     QString strSaveFile = QFileDialog::getSaveFileName(this, tr("Save File"), "", "Text files (*.txt)");
@@ -214,11 +194,7 @@ UwxScripting::on_btn_Save_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-bool
-UwxScripting::on_btn_Compile_clicked(
-    )
+bool UwxScripting::on_btn_Compile_clicked()
 {
     //Compile script
     ui->edit_Script->ClearBadLines();
@@ -284,11 +260,7 @@ UwxScripting::on_btn_Compile_clicked(
     return bFailed;
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::on_btn_Run_clicked(
-    )
+void UwxScripting::on_btn_Run_clicked()
 {
     //Run script
     if (mbSerialStatus == true && on_btn_Compile_clicked() == false)
@@ -301,12 +273,7 @@ UwxScripting::on_btn_Run_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SerialPortStatus(
-    bool bPortStatus
-    )
+void UwxScripting::SerialPortStatus(bool bPortStatus)
 {
     //Serial port has been opened or closed
     mbSerialStatus = bPortStatus;
@@ -329,12 +296,7 @@ UwxScripting::SerialPortStatus(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SerialPortError(
-    QSerialPort::SerialPortError SPE
-    )
+void UwxScripting::SerialPortError(QSerialPort::SerialPortError SPE)
 {
     //Serial port has an error
     if (SPE != QSerialPort::NoError)
@@ -348,12 +310,7 @@ UwxScripting::SerialPortError(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SerialPortData(
-    const QByteArray *Data
-    )
+void UwxScripting::SerialPortData(const QByteArray *Data)
 {
     //Serial port data received
     if (mbIsRunning == true)
@@ -368,11 +325,7 @@ UwxScripting::SerialPortData(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::on_btn_Stop_clicked(
-    )
+void UwxScripting::on_btn_Stop_clicked()
 {
     //Stop execution
     if (mbIsRunning == true)
@@ -432,11 +385,7 @@ UwxScripting::on_btn_Stop_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::AdvanceLine(
-    )
+void UwxScripting::AdvanceLine()
 {
     //Executes the next script line
     if (mtmrUpdateTimer.isActive() && ucLastAct != ScriptingActionDataIn)
@@ -604,11 +553,7 @@ UwxScripting::AdvanceLine(
     emit ScriptFinished();
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::on_btn_Help_clicked(
-    )
+void UwxScripting::on_btn_Help_clicked()
 {
     //Display help
     QString strMessage = "AuTerm Scripting: This is a simple scripting language for sending/receiving data and waiting for specific periods of time. Each line must begin directly with a valid command and the parameter for that command. Commands are:\r\n    >  Send data out\r\n    <  Wait to receive data\r\n    ~  Wait for a period (in ms)\r\n    // A null-operation comment (used for describing the code)\r\n\r\nValid commands will be highlighed in red and comments in green. Use the check button (yellow warning icon) to check for syntax errors in a script before running it.\r\n\r\nTo the left side of the editor are individual line colours which will change to indicate the following:\r\n    Red:   Syntax error with line (compile failed)\r\n    Green: Currently executing line\r\n    Black: Script execution failed on this line";
@@ -616,22 +561,13 @@ UwxScripting::on_btn_Help_clicked(
     mFormAuto->show();
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SetAuTermVersion(
-    const QString strVersion
-    )
+void UwxScripting::SetAuTermVersion(const QString strVersion)
 {
     //Update version string
     mstrAuTermVersion = strVersion;
 }
 
-//=============================================================================
-//=============================================================================
-bool
-UwxScripting::CheckRecvMatchBuffers(
-    )
+bool UwxScripting::CheckRecvMatchBuffers()
 {
     //Check if the receive buffer contains the match data
     if (mbaRecvData.length() >= mbaMatchData.length())
@@ -652,12 +588,7 @@ UwxScripting::CheckRecvMatchBuffers(
     return false;
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SerialPortWritten(
-    int iWritten
-    )
+void UwxScripting::SerialPortWritten(int iWritten)
 {
     //Serial bytes have been written
     if (mbIsRunning == true && ui->check_WaitForWrite->isChecked() == true)
@@ -677,12 +608,7 @@ UwxScripting::SerialPortWritten(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::on_btn_Pause_toggled(
-    bool
-    )
+void UwxScripting::on_btn_Pause_toggled(bool)
 {
     //Pause status has been changed
     if (mbIsRunning == true && !ui->btn_Pause->isChecked())
@@ -730,11 +656,7 @@ UwxScripting::on_btn_Pause_toggled(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::UpdateStatusBar(
-    )
+void UwxScripting::UpdateStatusBar()
 {
     //Updates status bar with current action
     ui->progress_Complete->setValue((mintCLine-1)*100/mnScriptLines);
@@ -784,12 +706,7 @@ UwxScripting::UpdateStatusBar(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::closeEvent(
-    QCloseEvent *ceClose
-    )
+void UwxScripting::closeEvent(QCloseEvent *ceClose)
 {
     if (mbIsRunning == true)
     {
@@ -803,22 +720,13 @@ UwxScripting::closeEvent(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::on_btn_Options_clicked(
-    )
+void UwxScripting::on_btn_Options_clicked()
 {
     //Show options menu
     gpOptionsMenu->popup(QCursor::pos());
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::MenuSelected(
-    QAction *qaAction
-    )
+void UwxScripting::MenuSelected(QAction *qaAction)
 {
     //Menu item selected
     int intItem = qaAction->data().toInt();
@@ -829,11 +737,7 @@ UwxScripting::MenuSelected(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::on_btn_Clear_clicked(
-    )
+void UwxScripting::on_btn_Clear_clicked()
 {
     //Clears the editor
     if (mbIsRunning == false)
@@ -855,12 +759,7 @@ UwxScripting::on_btn_Clear_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SetButtonStatus(
-    bool bStatus
-    )
+void UwxScripting::SetButtonStatus(bool bStatus)
 {
     //Change status of inputs
     ui->edit_Script->setReadOnly(!bStatus);
@@ -876,11 +775,7 @@ UwxScripting::SetButtonStatus(
     ui->btn_Options->setEnabled(bStatus);
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::reject(
-    )
+void UwxScripting::reject()
 {
     //Do not allow the dialog to be closed by pressing escape if a script is running
     if (mbIsRunning == false)
@@ -890,23 +785,13 @@ UwxScripting::reject(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SetEditorFocus(
-    )
+void UwxScripting::SetEditorFocus()
 {
     //Set input focus to the editor
     ui->edit_Script->setFocus();
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::ScriptStartResult(
-    bool bStatus,
-    unsigned char ucReason
-    )
+void UwxScripting::ScriptStartResult(bool bStatus, unsigned char ucReason)
 {
     //Result from main window if script execution can begin
     if (bStatus == true)
@@ -940,12 +825,7 @@ UwxScripting::ScriptStartResult(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::LoadScriptFile(
-    const QString *strFilename
-    )
+void UwxScripting::LoadScriptFile(const QString *strFilename)
 {
     //Load file contents
     ui->edit_Script->clear();
@@ -965,12 +845,7 @@ UwxScripting::LoadScriptFile(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-UwxScripting::SetScriptLastDirectory(
-    const QString *strDirectory
-    )
+void UwxScripting::SetScriptLastDirectory(const QString *strDirectory)
 {
     //Sets the last opened directory
     strLastScriptFile = *strDirectory;

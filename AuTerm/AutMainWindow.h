@@ -219,11 +219,8 @@ class AutMainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit AutMainWindow(
-        QWidget *parent = 0
-        );
-    ~AutMainWindow(
-        );
+    explicit AutMainWindow(QWidget *parent = 0);
+    ~AutMainWindow();
 
 public slots:
     void SerialRead();
@@ -313,53 +310,19 @@ private slots:
     void on_combo_SpeedDataDisplay_currentIndexChanged(int);
     void update_displayText();
 #endif
-    void
-    ScriptingFileSelected(
-        const QString *strFilepath
-        );
-    void
-    on_check_EnableTerminalSizeSaving_stateChanged(
-        int
-        );
-    void
-    resizeEvent(
-        QResizeEvent *
-        );
-    void
-    on_edit_Title_textEdited(
-        const QString &
-        );
+    void ScriptingFileSelected(const QString *strFilepath);
+    void on_check_EnableTerminalSizeSaving_stateChanged(int);
+    void resizeEvent(QResizeEvent *);
+    void on_edit_Title_textEdited(const QString &);
 #ifndef SKIPPLUGINS
-    void
-    on_btn_Plugin_Abort_clicked(
-        );
-    void
-    on_btn_Plugin_Config_clicked(
-        );
-    void
-    plugin_set_status(
-        bool busy,
-        bool hide_terminal_output,
-        bool *accepted
-        );
-    void
-    find_plugin(
-        QString name,
-        plugin_data *plugin
-        );
+    void on_btn_Plugin_Abort_clicked();
+    void on_btn_Plugin_Config_clicked();
+    void plugin_set_status(bool busy, bool hide_terminal_output, bool *accepted);
+    void find_plugin(QString name, plugin_data *plugin);
 #endif
-    void
-    on_radio_vt100_ignore_toggled(
-        bool checked
-        );
-    void
-    on_radio_vt100_strip_toggled(
-        bool checked
-        );
-    void
-    on_radio_vt100_decode_toggled(
-        bool checked
-        );
+    void on_radio_vt100_ignore_toggled(bool checked);
+    void on_radio_vt100_strip_toggled(bool checked);
+    void on_radio_vt100_decode_toggled(bool checked);
 #ifndef SKIPONLINE
     void on_check_enable_online_version_check_toggled(bool checked);
 #endif
@@ -384,97 +347,39 @@ signals:
     void plugin_serial_closed();
 
 public slots:
-    void
-    plugin_serial_transmit(
-        QByteArray *data
-        );
-    void
-    plugin_add_open_close_button(
-        QPushButton *button
-        );
-    void
-    plugin_serial_open_close(
-        uint8_t mode
-        );
-    void
-    plugin_serial_is_open(
-        bool *open
-        );
-    void
-    plugin_to_hex(
-        QByteArray *data
-        );
+    void plugin_serial_transmit(QByteArray *data);
+    void plugin_add_open_close_button(QPushButton *button);
+    void plugin_serial_open_close(uint8_t mode);
+    void plugin_serial_is_open(bool *open);
+    void plugin_to_hex(QByteArray *data);
     void plugin_save_setting(QString name, QVariant data);
     void plugin_load_setting(QString name, QVariant *data, bool *found);
 #endif
 
 private:
     Ui::AutMainWindow *ui;
-    void
-    RefreshSerialDevices(
-        );
-    void
-    UpdateImages(
-        );
-    void
-    DoLineEnd(
-        );
-    void
-    SerialStatus(
-        bool bType
-        );
-    void
-    OpenDevice(
-        bool from_plugin = false
-        );
-    void
-    LookupErrorCode(
-        unsigned int intErrorCode
-        );
-    void
-    FinishStream(
-        bool bType
-        );
-    void
-    LoadSettings(
-        );
-    void
-    UpdateSettings(
-        int intMajor,
-        int intMinor,
-        QChar qcDelta
-        );
+    void RefreshSerialDevices();
+    void UpdateImages();
+    void DoLineEnd();
+    void SerialStatus(bool bType);
+    void OpenDevice(bool from_plugin = false);
+    void LookupErrorCode(unsigned int intErrorCode);
+    void FinishStream(bool bType);
+    void LoadSettings();
+    void UpdateSettings(int intMajor, int intMinor, QChar qcDelta);
 #ifndef SKIPSPEEDTEST
-    void
-    SendSpeedTestData(
-        int intMaxLength
-        );
-    void
-    SpeedTestBytesWritten(
-        qint64 intByteCount
-        );
-    void
-    SpeedTestReceive(
-        );
-    void
-    OutputSpeedTestAvgStats(
-        qint64 lngElapsed
-        );
+    void SendSpeedTestData(int intMaxLength);
+    void SpeedTestBytesWritten(qint64 intByteCount);
+    void SpeedTestReceive();
+    void OutputSpeedTestAvgStats(qint64 lngElapsed);
 #endif
-    void
-    SetLoopBackMode(
-        bool bNewMode
-        );
+    void SetLoopBackMode(bool bNewMode);
 #ifndef SKIPONLINE
-    void
-    AuTermUpdateCheck(
-        );
+    void AuTermUpdateCheck();
     bool is_newer(const QString *new_version, const QString *current_version);
 #endif
     void
-    UpdateCustomisation(
-        bool bDefault
-    );
+    UpdateCustomisation(bool bDefault);
     void update_buffer(QByteArray data, bool apply_formatting);
     void update_buffer(QByteArray *data, bool apply_formatting);
     void update_display_trimming();

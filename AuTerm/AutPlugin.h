@@ -42,13 +42,9 @@ public:
 
 signals:
     void show_message_box(QString str_message);
-//#ifdef INCLUDE_SERIALPORT
     void serial_transmit(QByteArray *data);
-//#endif
     void plugin_set_status(bool busy, bool hide_terminal_output);
-//#ifdef INCLUDE_UI
     void plugin_add_open_close_button(QPushButton *button);
-//#endif
     void plugin_to_hex(QByteArray *data);
     void find_plugin(QString name, struct plugin_data *plugin);
 };
@@ -75,26 +71,11 @@ signals:
     void plugin_serial_closed();
 
 public slots:
-    void
-    plugin_serial_transmit(
-        QByteArray *data
-        );
-    void
-    plugin_add_open_close_button(
-        QPushButton *button
-        );
-    void
-    plugin_serial_open_close(
-        uint8_t mode
-        );
-    void
-    plugin_serial_is_open(
-        bool *open
-        );
-    void
-    plugin_to_hex(
-        QByteArray *data
-        );
+    void plugin_serial_transmit(QByteArray *data);
+    void plugin_add_open_close_button(QPushButton *button);
+    void plugin_serial_open_close(uint8_t mode);
+    void plugin_serial_is_open(bool *open);
+    void plugin_to_hex(QByteArray *data);
     void plugin_save_setting(QString name, QVariant data);
     void plugin_load_setting(QString name, QVariant *data, bool *found);
 };

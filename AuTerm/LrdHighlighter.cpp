@@ -58,12 +58,7 @@ LrdHighlighter::LrdHighlighter(QTextDocument *parent) : QSyntaxHighlighter(paren
     CommentFormat.setForeground(Qt::darkGreen);
 }
 
-//=============================================================================
-//=============================================================================
-void
-LrdHighlighter::highlightBlock(
-    const QString &text
-    )
+void LrdHighlighter::highlightBlock(const QString &text)
 {
     QRegularExpressionMatchIterator nextmatch;
     QString texta = QString(text).replace(QChar(0x2028), "\n");

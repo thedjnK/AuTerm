@@ -90,108 +90,37 @@ class UwxScripting : public QDialog
     Q_OBJECT
 
 public:
-    explicit UwxScripting(
-        QWidget *parent = 0
-        );
-    ~UwxScripting(
-        );
-    void
-    SetPopupHandle(
-        PopupMessage *pmNewHandle
-        );
-    void
-    SetAuTermVersion(
-        const QString strVersion
-        );
-    void
-    SerialPortStatus(
-        bool PortStatus
-        );
-    void
-    SerialPortError(
-        QSerialPort::SerialPortError SPE
-        );
-    void
-    SerialPortData(
-        const QByteArray *Data
-        );
-    void
-    SerialPortWritten(
-        int iWritten
-        );
-    void
-    closeEvent(
-        QCloseEvent *ceClose
-        );
-    void
-    SetButtonStatus(
-        bool bStatus
-        );
-    void
-    reject(
-        );
-    void
-    SetEditorFocus(
-        );
-    void
-    ScriptStartResult(
-        bool bStatus,
-        unsigned char ucReason
-        );
-    void
-    LoadScriptFile(
-        const QString *strFilename
-        );
-    void
-    SetScriptLastDirectory(
-        const QString *strDirectory
-        );
+    explicit UwxScripting(QWidget *parent = 0);
+    ~UwxScripting();
+    void SetPopupHandle(PopupMessage *pmNewHandle);
+    void SetAuTermVersion(const QString strVersion);
+    void SerialPortStatus(bool PortStatus);
+    void SerialPortError(QSerialPort::SerialPortError SPE);
+    void SerialPortData(const QByteArray *Data);
+    void SerialPortWritten(int iWritten);
+    void closeEvent(QCloseEvent *ceClose);
+    void SetButtonStatus(bool bStatus);
+    void reject();
+    void SetEditorFocus();
+    void ScriptStartResult(bool bStatus, unsigned char ucReason);
+    void LoadScriptFile(const QString *strFilename);
+    void SetScriptLastDirectory(const QString *strDirectory);
 
 private slots:
-    void
-    ChangeFont(
-        );
-    void
-    on_btn_Load_clicked(
-        );
-    void
-    on_btn_Save_clicked(
-        );
-    bool
-    on_btn_Compile_clicked(
-        );
-    void
-    on_btn_Run_clicked(
-        );
-    void
-    on_btn_Stop_clicked(
-        );
-    void
-    AdvanceLine(
-        );
-    void
-    on_btn_Help_clicked(
-        );
-    bool
-    CheckRecvMatchBuffers(
-        );
-    void
-    on_btn_Pause_toggled(
-        bool
-        );
-    void
-    UpdateStatusBar(
-        );
-    void
-    on_btn_Options_clicked(
-        );
-    void
-    MenuSelected(
-        QAction *qaAction
-        );
-    void
-    on_btn_Clear_clicked(
-        );
+    void ChangeFont();
+    void on_btn_Load_clicked();
+    void on_btn_Save_clicked();
+    bool on_btn_Compile_clicked();
+    void on_btn_Run_clicked();
+    void on_btn_Stop_clicked();
+    void AdvanceLine();
+    void on_btn_Help_clicked();
+    bool CheckRecvMatchBuffers();
+    void on_btn_Pause_toggled(bool);
+    void UpdateStatusBar();
+    void on_btn_Options_clicked();
+    void MenuSelected(QAction *qaAction);
+    void on_btn_Clear_clicked();
 
 private:
     Ui::UwxScripting *ui;
@@ -219,18 +148,10 @@ private:
     QString strLastScriptFile; //The last file/directory which was used in the file open dialogue
 
 signals:
-    void ScriptFinished(
-        );
-    void ScriptStartRequest(
-        );
-    void SendData(
-        QByteArray baDataString,
-        bool bEscapeString,
-        bool bFromScripting
-        );
-    void UpdateScriptLastDirectory(
-        const QString *strDirectory
-        );
+    void ScriptFinished();
+    void ScriptStartRequest();
+    void SendData(QByteArray baDataString, bool bEscapeString, bool bFromScripting);
+    void UpdateScriptLastDirectory(const QString *strDirectory);
 };
 
 #endif // UWXSCRIPTING_H

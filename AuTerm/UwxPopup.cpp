@@ -41,29 +41,18 @@ PopupMessage::PopupMessage(QWidget *parent):QDialog(parent), ui(new Ui::PopupMes
     ui->text_Message->setFont(fntTmpFnt);
 }
 
-//=============================================================================
-//=============================================================================
-PopupMessage::~PopupMessage(
-    )
+PopupMessage::~PopupMessage()
 {
     delete ui;
 }
 
-//=============================================================================
-//=============================================================================
-void
-PopupMessage::on_btn_Close_clicked(
-    )
+void PopupMessage::on_btn_Close_clicked()
 {
     //Close button clicked, close popup.
     this->close();
 }
 
-//=============================================================================
-//=============================================================================
-void PopupMessage::SetMessage(
-    QString *strMsg
-    )
+void PopupMessage::SetMessage(QString *strMsg)
 {
     //Update popup message
     ui->text_Message->setPlainText(*strMsg);

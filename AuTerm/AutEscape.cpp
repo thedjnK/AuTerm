@@ -48,9 +48,6 @@ static QRegularExpression vt100_shift_regex("\\x1b\\[([0-9]+)C");
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-
-//=============================================================================
-//=============================================================================
 void AutEscape::do_setup(void)
 {
     int8_t i = (sizeof(vt100_non_colour_regex) / sizeof(vt100_non_colour_regex[0])) - 1;
@@ -64,8 +61,6 @@ void AutEscape::do_setup(void)
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutEscape::escape_characters(QByteArray *data)
 {
     //Escapes character sequences
@@ -125,8 +120,6 @@ void AutEscape::escape_characters(QByteArray *data)
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutEscape::strip_vt100_formatting(QByteArray *data, int32_t offset)
 {
     QRegularExpressionMatch regex_match = vt100_colour_regex.match(*data, offset);
@@ -148,8 +141,6 @@ void AutEscape::strip_vt100_formatting(QByteArray *data, int32_t offset)
     strip_vt100_non_formatting(data, offset);
 }
 
-//=============================================================================
-//=============================================================================
 void AutEscape::strip_vt100_non_formatting(QByteArray *data, int32_t offset)
 {
     uint8_t i = 0;
@@ -169,8 +160,6 @@ void AutEscape::strip_vt100_non_formatting(QByteArray *data, int32_t offset)
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutEscape::replace_unprintable(QByteArray *data, bool include_1b)
 {
     int32_t i = data->length() - 1;
@@ -192,8 +181,6 @@ void AutEscape::replace_unprintable(QByteArray *data, bool include_1b)
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutEscape::to_hex(QByteArray *data)
 {
     int32_t i = data->length() - 1;

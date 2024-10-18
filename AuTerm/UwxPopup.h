@@ -44,20 +44,12 @@ class PopupMessage : public QDialog
     Q_OBJECT
 
 public:
-    explicit PopupMessage(
-        QWidget *parent = 0
-        );
-    ~PopupMessage(
-        );
-    void
-    SetMessage(
-        QString *strMsg
-        );
+    explicit PopupMessage(QWidget *parent = 0);
+    ~PopupMessage();
+    void SetMessage(QString *strMsg);
 
 private slots:
-    void
-    on_btn_Close_clicked(
-        );
+    void on_btn_Close_clicked();
 
 public slots:
     void show_message(QString str_message);

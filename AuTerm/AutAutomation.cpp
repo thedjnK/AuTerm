@@ -64,10 +64,7 @@ AutAutomation::AutAutomation(QWidget *parent) : QDialog(parent), ui(new Ui::AutA
     on_check_OnTop_stateChanged(0);
 }
 
-//=============================================================================
-//=============================================================================
-AutAutomation::~AutAutomation(
-    )
+AutAutomation::~AutAutomation()
 {
     //On dialogue deletion
     disconnect(ui->edit_Line1, SIGNAL(returnPressed()));
@@ -83,22 +80,13 @@ AutAutomation::~AutAutomation(
     delete ui;
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::SetPopupHandle(
-    PopupMessage *pmNewHandle
-    )
+void AutAutomation::SetPopupHandle(PopupMessage *pmNewHandle)
 {
     //Sets the Popup Message handle
     mFormAuto = pmNewHandle;
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Load_clicked(
-    )
+void AutAutomation::on_btn_Load_clicked()
 {
     //Load button clicked
     QString strLoadFile;
@@ -110,11 +98,7 @@ AutAutomation::on_btn_Load_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Save_clicked(
-    )
+void AutAutomation::on_btn_Save_clicked()
 {
     //Save button clicked
     QString strSaveFile;
@@ -159,22 +143,14 @@ AutAutomation::on_btn_Save_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Top_clicked(
-    )
+void AutAutomation::on_btn_Top_clicked()
 {
     //Top button clicked
     mchItemPosition = 0;
     LoadTextData();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Up_clicked(
-    )
+void AutAutomation::on_btn_Up_clicked()
 {
     //Up button clicked
     if (QGuiApplication::keyboardModifiers() & Qt::ShiftModifier)
@@ -202,11 +178,7 @@ AutAutomation::on_btn_Up_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Down_clicked(
-    )
+void AutAutomation::on_btn_Down_clicked()
 {
     //Down button clicked
     if (QGuiApplication::keyboardModifiers() & Qt::ShiftModifier)
@@ -234,132 +206,81 @@ AutAutomation::on_btn_Down_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Bottom_clicked(
-    )
+void AutAutomation::on_btn_Bottom_clicked()
 {
     //Bottom button clicked
     mchItemPosition = nAutoItemAllow - nAutoItemsOnScreen;
     LoadTextData();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Close_clicked(
-    )
+void AutAutomation::on_btn_Close_clicked()
 {
     //Close button clicked
     this->close();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send1_clicked(
-    )
+void AutAutomation::on_btn_Send1_clicked()
 {
     //Send button #1 pressed
     emit SendData(ui->edit_Line1->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send2_clicked(
-    )
+void AutAutomation::on_btn_Send2_clicked()
 {
     //Send button #2 pressed
     emit SendData(ui->edit_Line2->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send3_clicked(
-    )
+void AutAutomation::on_btn_Send3_clicked()
 {
     //Send button #3 pressed
     emit SendData(ui->edit_Line3->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send4_clicked(
-    )
+void AutAutomation::on_btn_Send4_clicked()
 {
     //Send button #4 pressed
     emit SendData(ui->edit_Line4->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send5_clicked(
-    )
+void AutAutomation::on_btn_Send5_clicked()
 {
     //Send button #5 pressed
     emit SendData(ui->edit_Line5->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send6_clicked(
-    )
+void AutAutomation::on_btn_Send6_clicked()
 {
     //Send button #6 pressed
     emit SendData(ui->edit_Line6->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send7_clicked(
-    )
+void AutAutomation::on_btn_Send7_clicked()
 {
     //Send button #7 pressed
     emit SendData(ui->edit_Line7->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send8_clicked(
-    )
+
+void AutAutomation::on_btn_Send8_clicked()
 {
     //Send button #8 pressed
     emit SendData(ui->edit_Line8->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send9_clicked(
-    )
+void AutAutomation::on_btn_Send9_clicked()
 {
     //Send button #9 pressed
     emit SendData(ui->edit_Line9->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Send10_clicked(
-    )
+void AutAutomation::on_btn_Send10_clicked()
 {
     //Send button #10 pressed
     emit SendData(ui->edit_Line10->text().toUtf8(), ui->check_Unescape->isChecked(), false);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::LoadTextData(
-    )
+void AutAutomation::LoadTextData()
 {
     //Loads the text boxes with the data in the array
     ui->edit_Line1->setText(mstrAutoItemArray[mchItemPosition]);
@@ -375,12 +296,7 @@ AutAutomation::LoadTextData(
     ArrayPositionUpdate();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::ConnectionChange(
-    bool bEnabled
-    )
+void AutAutomation::ConnectionChange(bool bEnabled)
 {
     //Enable or disable interactivity of the window
     ui->btn_Send1->setEnabled(bEnabled);
@@ -395,111 +311,67 @@ AutAutomation::ConnectionChange(
     ui->btn_Send10->setEnabled(bEnabled);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line1_editingFinished(
-    )
+void AutAutomation::on_edit_Line1_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[mchItemPosition] = ui->edit_Line1->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line2_editingFinished(
-    )
+void AutAutomation::on_edit_Line2_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+1)] = ui->edit_Line2->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line3_editingFinished(
-    )
+void AutAutomation::on_edit_Line3_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+2)] = ui->edit_Line3->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line4_editingFinished(
-    )
+void AutAutomation::on_edit_Line4_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+3)] = ui->edit_Line4->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line5_editingFinished(
-    )
+void AutAutomation::on_edit_Line5_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+4)] = ui->edit_Line5->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line6_editingFinished(
-    )
+void AutAutomation::on_edit_Line6_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+5)] = ui->edit_Line6->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line7_editingFinished(
-    )
+void AutAutomation::on_edit_Line7_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+6)] = ui->edit_Line7->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line8_editingFinished(
-    )
+void AutAutomation::on_edit_Line8_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+7)] = ui->edit_Line8->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line9_editingFinished(
-    )
+void AutAutomation::on_edit_Line9_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+8)] = ui->edit_Line9->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_edit_Line10_editingFinished(
-    )
+void AutAutomation::on_edit_Line10_editingFinished()
 {
     //Update array with new text
     mstrAutoItemArray[(mchItemPosition+9)] = ui->edit_Line10->text();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::ArrayHighest(
-    )
+void AutAutomation::ArrayHighest()
 {
     //Gets the highest position for a valid entry in the array
     unsigned char i = 0;
@@ -514,21 +386,13 @@ AutAutomation::ArrayHighest(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::ArrayPositionUpdate(
-    )
+void AutAutomation::ArrayPositionUpdate()
 {
     //Updates the label to show the current array position
     ui->label_Position->setText(QString('(').append(QString::number(mchItemPosition)).append('/').append(QString::number(nAutoItemAllow - nAutoItemsOnScreen)).append(')'));
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::EnterPressed(
-    )
+void AutAutomation::EnterPressed()
 {
     //Enter has been pressed with a line edit selected
     if (ui->edit_Line1->hasFocus())
@@ -569,11 +433,7 @@ AutAutomation::EnterPressed(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_btn_Clear_clicked(
-    )
+void AutAutomation::on_btn_Clear_clicked()
 {
     //Clears the array and all edit boxes and resets back to default
     unsigned char i = 0;
@@ -599,12 +459,7 @@ AutAutomation::on_btn_Clear_clicked(
     ArrayPositionUpdate();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::on_check_OnTop_stateChanged(
-    int
-    )
+void AutAutomation::on_check_OnTop_stateChanged(int)
 {
     //Always on-top state changed
     bool bReShow = this->isVisible();
@@ -619,22 +474,13 @@ AutAutomation::on_check_OnTop_stateChanged(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::SetFirstLineFocus(
-    )
+void AutAutomation::SetFirstLineFocus()
 {
     //Sets the focus to the first line edit
     ui->edit_Line1->setFocus();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::LoadFile(
-    QString strLoadFile
-    )
+void AutAutomation::LoadFile(QString strLoadFile)
 {
     QFile file(strLoadFile);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -680,12 +526,7 @@ AutAutomation::LoadFile(
     LoadTextData();
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutAutomation::wheelEvent(
-    QWheelEvent *event
-    )
+void AutAutomation::wheelEvent(QWheelEvent *event)
 {
     if (event->angleDelta().y())
     {

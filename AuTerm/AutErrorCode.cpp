@@ -53,8 +53,6 @@ AutErrorCode::AutErrorCode(QWidget *parent) : QDialog(parent), ui(new Ui::AutErr
     this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
 }
 
-//=============================================================================
-//=============================================================================
 AutErrorCode::~AutErrorCode()
 {
     //Clear up
@@ -68,12 +66,7 @@ AutErrorCode::~AutErrorCode()
     delete ui;
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutErrorCode::on_combo_Code_currentTextChanged(
-    QString strComboText
-    )
+void AutErrorCode::on_combo_Code_currentTextChanged(QString strComboText)
 {
     //Error code entered into combo box
     bool valid = true;
@@ -124,12 +117,7 @@ AutErrorCode::on_combo_Code_currentTextChanged(
     ui->edit_Result->setCursorPosition(0);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutErrorCode::on_list_Codes_currentRowChanged(
-    int iListRow
-    )
+void AutErrorCode::on_list_Codes_currentRowChanged(int iListRow)
 {
     //Selection in full error list object changed
     if (iListRow >= 0)
@@ -146,12 +134,7 @@ AutErrorCode::on_list_Codes_currentRowChanged(
     ui->edit_Result->setCursorPosition(0);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutErrorCode::SetErrorObject(
-    QSettings *pErrorMessages
-    )
+void AutErrorCode::SetErrorObject(QSettings *pErrorMessages)
 {
     //Update the error code objects
     if (mcmpErrors != 0)
@@ -216,12 +199,7 @@ AutErrorCode::SetErrorObject(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutErrorCode::on_list_Search_currentRowChanged(
-    int iSearchRow
-    )
+void AutErrorCode::on_list_Search_currentRowChanged(int iSearchRow)
 {
     //Search list object row selection changed
     if (iSearchRow >= 0)
@@ -238,12 +216,7 @@ AutErrorCode::on_list_Search_currentRowChanged(
     ui->edit_Result->setCursorPosition(0);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutErrorCode::SetObjectStatus(
-    bool bStatus
-    )
+void AutErrorCode::SetObjectStatus(bool bStatus)
 {
     //Enable or disable the form items
     ui->btn_order->setEnabled(bStatus);
@@ -255,12 +228,7 @@ AutErrorCode::SetObjectStatus(
     ui->btn_Copy->setEnabled(bStatus);
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutErrorCode::on_selector_Tab_currentChanged(
-    int iTabIndex
-    )
+void AutErrorCode::on_selector_Tab_currentChanged(int iTabIndex)
 {
     //Tab has been changed
     if (iTabIndex == ErrorCodeLookupTab)
@@ -280,11 +248,7 @@ AutErrorCode::on_selector_Tab_currentChanged(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-AutErrorCode::on_btn_Copy_clicked(
-    )
+void AutErrorCode::on_btn_Copy_clicked()
 {
     //Copy button clicked
     if (!ui->edit_Result->text().isEmpty())
@@ -294,8 +258,6 @@ AutErrorCode::on_btn_Copy_clicked(
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutErrorCode::on_edit_Search_textChanged(const QString &arg1)
 {
     //Search for error
@@ -328,8 +290,6 @@ void AutErrorCode::on_edit_Search_textChanged(const QString &arg1)
     ui->list_Search->sortItems(ui->btn_order->arrowType() == Qt::UpArrow ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
 
-//=============================================================================
-//=============================================================================
 void AutErrorCode::on_btn_order_clicked()
 {
     if (ui->btn_order->arrowType() == Qt::UpArrow)
@@ -347,8 +307,6 @@ void AutErrorCode::on_btn_order_clicked()
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutErrorCode::display_error(QString error)
 {
     ui->combo_Code->setCurrentText(error);

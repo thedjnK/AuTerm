@@ -45,15 +45,11 @@ class LrdHighlighter : public QSyntaxHighlighter
     Q_OBJECT
 
 public:
-    LrdHighlighter(
-        QTextDocument *parent = 0
-        );
+    LrdHighlighter(QTextDocument *parent = 0);
 
 protected:
     void
-    highlightBlock(
-        const QString &text
-        ) Q_DECL_OVERRIDE;
+    highlightBlock(const QString &text) Q_DECL_OVERRIDE;
 
 private:
     QRegularExpression OutPattern; //Matches sending data lines

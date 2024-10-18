@@ -32,24 +32,17 @@
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-
-//=============================================================================
-//=============================================================================
 AutSerialDetect::AutSerialDetect(QObject *parent): QObject{parent}
 {
     QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
 }
 
-//=============================================================================
-//=============================================================================
 AutSerialDetect::~AutSerialDetect()
 {
     QAbstractEventDispatcher::instance()->removeNativeEventFilter(this);
     stop();
 }
 
-//=============================================================================
-//=============================================================================
 void AutSerialDetect::start(QString port)
 {
 #ifdef _WIN32
@@ -67,8 +60,6 @@ void AutSerialDetect::start(QString port)
     port_set = true;
 }
 
-//=============================================================================
-//=============================================================================
 void AutSerialDetect::stop()
 {
     if (port_set == false)
@@ -86,8 +77,6 @@ void AutSerialDetect::stop()
     watch_port.clear();
 }
 
-//=============================================================================
-//=============================================================================
 bool AutSerialDetect::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
 #ifdef _WIN32
@@ -97,13 +86,10 @@ bool AutSerialDetect::nativeEventFilter(const QByteArray &eventType, void *messa
 
     if (type == WM_DEVICECHANGE && param == DBT_DEVICEARRIVAL)
     {
-        //DEV_BROADCAST_HDR *hdr = static_cast<DEV_BROADCAST_HDR *>(msg->lParam);
         DEV_BROADCAST_HDR *hdr = (DEV_BROADCAST_HDR *)msg->lParam;
 
         if (hdr->dbch_devicetype == DBT_DEVTYP_PORT)
         {
-            //DEV_BROADCAST_PORT_A *port_hdr = (DEV_BROADCAST_PORT_A *)msg->lParam;
-
             foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
             {
                 if (info.portName() == watch_port)

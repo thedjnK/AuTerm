@@ -70,8 +70,6 @@ AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     AutEscape::do_setup();
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *format)
 {
     const QColor *tmp_col;
@@ -255,13 +253,12 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
     }
 }
 
-//=============================================================================
-// Searches for VT100 format codes and extracts them, removing the original
-// formatting codes and adding the formatting codes to a list. Returns true if
-// full input buffer was process, returns false if it could not be fully
-// checked due to insufficient data, in which case `checked_pos` will be
-// updated with the length of the data (after removals) that has been checked
-//=============================================================================
+/* Searches for VT100 format codes and extracts them, removing the original
+ * formatting codes and adding the formatting codes to a list. Returns true if
+ * full input buffer was process, returns false if it could not be fully
+ * checked due to insufficient data, in which case `checked_pos` will be
+ * updated with the length of the data (after removals) that has been checked
+ */
 bool AutScrollEdit::vt100_process(QString *buffer, QList<vt100_format_code> *formats, int32_t *checked_pos)
 {
     int32_t start = 0;
@@ -390,8 +387,6 @@ bool AutScrollEdit::vt100_process(QString *buffer, QList<vt100_format_code> *for
     return true;
 }
 
-//=============================================================================
-//=============================================================================
 AutScrollEdit::~AutScrollEdit()
 {
     //Destructor
@@ -399,8 +394,6 @@ AutScrollEdit::~AutScrollEdit()
     nItemArraySize = 0;
 }
 
-//=============================================================================
-//=============================================================================
 bool AutScrollEdit::setup_scrollback(quint16 nLines)
 {
     //Sets up the scrollback array
@@ -409,8 +402,6 @@ bool AutScrollEdit::setup_scrollback(quint16 nLines)
     return (mstrItemArray != NULL);
 }
 
-//=============================================================================
-//=============================================================================
 bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
 {
     if (target == this->verticalScrollBar())
@@ -748,8 +739,6 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
     return QObject::eventFilter(target, event);
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::set_line_mode(bool bNewLineMode)
 {
     //Enables or disables line mode
@@ -757,8 +746,6 @@ void AutScrollEdit::set_line_mode(bool bNewLineMode)
     this->update_display();
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::add_display_data(display_buffer_list *buffers)
 {
     //Adds data to the display buffer
@@ -817,8 +804,6 @@ void AutScrollEdit::add_display_data(display_buffer_list *buffers)
     this->update_display();
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::add_dat_in_text(QByteArray data)
 {
     //Adds data to the DatOut buffer
@@ -827,8 +812,6 @@ void AutScrollEdit::add_dat_in_text(QByteArray data)
     this->update_display();
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::add_dat_out_text(const QString strDat)
 {
     //Adds data to the DatOut buffer
@@ -851,8 +834,6 @@ void AutScrollEdit::add_dat_out_text(const QString strDat)
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::clear_dat_in()
 {
     //Clears the DatIn buffer
@@ -869,8 +850,6 @@ void AutScrollEdit::clear_dat_in()
     this->update_display();
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::clear_dat_out()
 {
     //Clears the DatOut buffer
@@ -880,16 +859,12 @@ void AutScrollEdit::clear_dat_out()
     this->update_display();
 }
 
-//=============================================================================
-//=============================================================================
 QString *AutScrollEdit::get_dat_out()
 {
     //Returns the DatOut buffer
     return &mstrDatOut;
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::insertFromMimeData(const QMimeData *mdSrc)
 {
     if (mdSrc->hasUrls() == true)
@@ -941,8 +916,6 @@ void AutScrollEdit::insertFromMimeData(const QMimeData *mdSrc)
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::update_display()
 {
     //Updates the receive text buffer, faster
@@ -1227,8 +1200,6 @@ void AutScrollEdit::update_display()
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::update_cursor()
 {
     //Updates the text control's cursor position
@@ -1242,16 +1213,12 @@ tcTmpCur.setCharFormat(pre);
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::set_serial_open(bool SerialOpen)
 {
     //Updates the serial open variable
     mbSerialOpen = SerialOpen;
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::set_trim_settings(uint32_t threshold, uint32_t size)
 {
     trim_threshold = threshold;
@@ -1264,15 +1231,11 @@ void AutScrollEdit::set_trim_settings(uint32_t threshold, uint32_t size)
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::set_vt100_mode(vt100_mode mode)
 {
     vt100_control_mode = mode;
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::vt100_format_apply(QTextCursor *cursor, vt100_format_code *format)
 {
     bool changed = false;
@@ -1341,8 +1304,6 @@ void AutScrollEdit::vt100_format_apply(QTextCursor *cursor, vt100_format_code *f
     }
 }
 
-//=============================================================================
-//=============================================================================
 void AutScrollEdit::vt100_format_combine(vt100_format_code *original, vt100_format_code *merge)
 {
     if (merge->background_color_set == true)

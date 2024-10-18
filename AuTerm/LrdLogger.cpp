@@ -35,10 +35,7 @@ LrdLogger::LrdLogger(QWidget *parent) : QWidget(parent)
     mbLogOpen = false;
 }
 
-//=============================================================================
-//=============================================================================
-LrdLogger::~LrdLogger(
-    )
+LrdLogger::~LrdLogger()
 {
     if (mbLogOpen == true)
     {
@@ -50,12 +47,7 @@ LrdLogger::~LrdLogger(
     }
 }
 
-//=============================================================================
-//=============================================================================
-unsigned char
-LrdLogger::OpenLogFile(
-    QString strFilename
-    )
+unsigned char LrdLogger::OpenLogFile(QString strFilename)
 {
     //Opens the log file specified
     bool bNewFile = QFile::exists(strFilename);
@@ -89,11 +81,7 @@ LrdLogger::OpenLogFile(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-LrdLogger::CloseLogFile(
-    )
+void LrdLogger::CloseLogFile()
 {
     //Closes the log file
     if (mbLogOpen == true)
@@ -105,12 +93,7 @@ LrdLogger::CloseLogFile(
     }
 }
 
-//=============================================================================
-//=============================================================================
-unsigned char
-LrdLogger::WriteLogData(
-    QString strData
-    )
+unsigned char LrdLogger::WriteLogData(QString strData)
 {
     //Writes a line to the log file
     if (mbLogOpen == true)
@@ -126,12 +109,7 @@ LrdLogger::WriteLogData(
     }
 }
 
-//=============================================================================
-//=============================================================================
-unsigned char
-LrdLogger::WriteRawLogData(
-    QByteArray baData
-    )
+unsigned char LrdLogger::WriteRawLogData(QByteArray baData)
 {
     //Writes raw data to the log file
     if (mbLogOpen == true)
@@ -147,11 +125,7 @@ LrdLogger::WriteRawLogData(
     }
 }
 
-//=============================================================================
-//=============================================================================
-unsigned short
-LrdLogger::GetLogSize(
-    )
+unsigned short LrdLogger::GetLogSize()
 {
     //Returns the size of the log
     if (mbLogOpen == true)
@@ -166,11 +140,7 @@ LrdLogger::GetLogSize(
     }
 }
 
-//=============================================================================
-//=============================================================================
-void
-LrdLogger::ClearLog(
-    )
+void LrdLogger::ClearLog()
 {
     //Clears out the log
     if (mbLogOpen == true)
@@ -184,11 +154,7 @@ LrdLogger::ClearLog(
     }
 }
 
-//=============================================================================
-//=============================================================================
-QString
-LrdLogger::GetLogName(
-    )
+QString LrdLogger::GetLogName()
 {
     if (mpLogFile->isOpen() == true)
     {
@@ -202,11 +168,7 @@ LrdLogger::GetLogName(
     }
 }
 
-//=============================================================================
-//=============================================================================
-bool
-LrdLogger::IsLogOpen(
-    )
+bool LrdLogger::IsLogOpen()
 {
     //Returns true if log is open
     return mbLogOpen;

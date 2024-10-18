@@ -54,48 +54,21 @@ class LrdCodeEditor : public QPlainTextEdit
     Q_OBJECT
 
 public:
-    LrdCodeEditor(
-        QWidget *parent = 0
-        );
-    ~LrdCodeEditor(
-        );
-    void
-    lineNumberAreaPaintEvent(
-        QPaintEvent *event
-        );
-    void
-    ClearBadLines(
-        );
-    void
-    AddBadLine(
-        unsigned int LineNumber
-        );
-    void
-    SetExecutionLine(
-        int LineNumber
-        );
-    void SetExecutionLineStatus(
-        bool bStatus
-        );
+    LrdCodeEditor(QWidget *parent = 0);
+    ~LrdCodeEditor();
+    void lineNumberAreaPaintEvent(QPaintEvent *event);
+    void ClearBadLines();
+    void AddBadLine(unsigned int LineNumber);
+    void SetExecutionLine(int LineNumber);
+    void SetExecutionLineStatus(bool bStatus);
 
 protected:
-    void
-    resizeEvent(
-        QResizeEvent *event
-        ) Q_DECL_OVERRIDE;
-    void
-    keyPressEvent(
-        QKeyEvent *e
-        ) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
 
 private slots:
-    void
-    highlightCurrentLine(
-        );
-    void
-    updateLineNumberArea(
-        const QRect &, int
-        );
+    void highlightCurrentLine();
+    void updateLineNumberArea(const QRect &, int);
 
 private:
     QWidget *mwidIndicationArea;
@@ -112,17 +85,13 @@ public:
         mceEditor = ceNewEditor;
     }
 
-    QSize sizeHint(
-        ) const Q_DECL_OVERRIDE
+    QSize sizeHint() const Q_DECL_OVERRIDE
     {
         return QSize(IndicationAreaWidth, 0);
     }
 
 protected:
-    void
-    paintEvent(
-        QPaintEvent *event
-        ) Q_DECL_OVERRIDE
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE
     {
         mceEditor->lineNumberAreaPaintEvent(event);
     }
