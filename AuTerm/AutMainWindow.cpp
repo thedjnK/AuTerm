@@ -223,28 +223,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     ui->btn_Duplicate->setMinimumWidth(130);
 #endif
 
-#if 0
-#ifndef _WIN32
-    #ifdef __APPLE__
-        //Change size of text fonts for Mac
-        QFont fntTmpFnt(ui->label_PreXCompInfo->font());
-        fntTmpFnt.setPixelSize(12);
-        ui->label_PreXCompInfo->setFont(fntTmpFnt);
-        ui->label_OnlineXCompInfo->setFont(fntTmpFnt);
-        ui->label_AuTermText->setFont(fntTmpFnt);
-        ui->label_ErrorCodeText->setFont(fntTmpFnt);
-        ui->label_AppFirmwareText1->setFont(fntTmpFnt);
-        ui->label_AppFirmwareText2->setFont(fntTmpFnt);
-    #else
-        //Change size of text fonts for Linux
-        QFont fntTmpFnt(ui->label_PreXCompInfo->font());
-        fntTmpFnt.setPixelSize(11);
-        ui->label_AuTermText->setFont(fntTmpFnt);
-        ui->label_ErrorCodeText->setFont(fntTmpFnt);
-    #endif
-#endif
-#endif
-
     //Define default variable values
     gbTermBusy = false;
     gbStreamingFile = false;
