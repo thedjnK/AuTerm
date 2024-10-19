@@ -55,7 +55,7 @@
            <item>
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>Type your 4-character error code:</string>
+              <string>Error code:</string>
              </property>
             </widget>
            </item>
