@@ -29,7 +29,7 @@ smp_udp::smp_udp(QObject *parent)
     Q_UNUSED(parent);
 
     main_window = plugin_mcumgr::get_main_window();
-    udp_window = new udp_setup(nullptr);
+    udp_window = new udp_setup(main_window);
 
     socket = new QUdpSocket(this);
     socket_is_connected = false;
@@ -81,7 +81,7 @@ int smp_udp::connect(void)
         return SMP_TRANSPORT_ERROR_ALREADY_CONNECTED;
     }
 
-    udp_window->show();
+    //TODO
 
     return SMP_TRANSPORT_ERROR_OK;
 }
@@ -99,6 +99,11 @@ int smp_udp::disconnect(bool force)
     received_data.clear();
 
     return SMP_TRANSPORT_ERROR_OK;
+}
+
+void smp_udp::open_connect_dialog()
+{
+    udp_window->show();
 }
 
 int smp_udp::is_connected()

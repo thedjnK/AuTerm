@@ -24,6 +24,7 @@
 #define SMP_BLUETOOTH_H
 
 #include <QObject>
+#include "plugin_mcumgr.h"
 #include "smp_transport.h"
 #include "smp_message.h"
 
@@ -43,9 +44,10 @@ class smp_bluetooth : public smp_transport
 public:
     smp_bluetooth(QObject *parent = nullptr);
     ~smp_bluetooth();
-    int connect(void);
-    int disconnect(bool force);
-    int is_connected();
+    int connect(void) override;
+    int disconnect(bool force) override;
+    void open_connect_dialog();
+    int is_connected() override;
     int send(smp_message *message);
     void close_connect_dialog();
 

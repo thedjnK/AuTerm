@@ -30,9 +30,9 @@
 #include <QJsonArray>
 #include "plugin_mcumgr.h"
 
-const uint8_t retries = 3;
-const uint16_t timeout_ms = 3000;
-const uint16_t timeout_erase_ms = 14000;
+static const uint8_t retries = 3;
+static const uint32_t timeout_ms = 3000;
+static const uint16_t timeout_erase_ms = 14000;
 
 enum tree_img_slot_info_columns {
     TREE_IMG_SLOT_INFO_COLUMN_IMAGE_SLOT,
@@ -2194,6 +2194,15 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     table_Enum_List_Details->setColumnWidth(0, 80);
     table_Enum_List_Details->setColumnWidth(1, 300);
     table_Enum_List_Details->setColumnWidth(2, 80);
+
+    //Remove non-supported transports
+#if !defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    radio_transport_udp->deleteLater();
+#endif
+
+#if !defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    radio_transport_bluetooth->deleteLater();
+#endif
 }
 
 plugin_mcumgr::~plugin_mcumgr()
@@ -2336,6 +2345,7 @@ const QString plugin_mcumgr::plugin_about()
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
            "/Bluetooth"
 #endif
+
            " MCUmgr transport"
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP) || defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
            "s"
@@ -3799,12 +3809,7 @@ void plugin_mcumgr::on_btn_transport_connect_clicked()
     }
     else
     {
-        if (transport->is_connected() == 1)
-        {
-            transport->disconnect(true);
-        }
-
-        transport->connect();
+        transport->open_connect_dialog();
     }
 }
 
@@ -3836,17 +3841,27 @@ QMainWindow *plugin_mcumgr::get_main_window()
     return parent_window;
 }
 
+void plugin_mcumgr::close_transport_windows()
+{
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
+    if (radio_transport_udp->isChecked() == false)
+    {
+        udp_transport->close_connect_dialog();
+    }
+#endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    if (radio_transport_bluetooth->isChecked() == false)
+    {
+        bluetooth_transport->close_connect_dialog();
+    }
+#endif
+}
+
 void plugin_mcumgr::on_radio_transport_uart_toggled(bool checked)
 {
     if (checked == true)
     {
-#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-        udp_transport->close_connect_dialog();
-#endif
-#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-        bluetooth_transport->close_connect_dialog();
-#endif
-
+        close_transport_windows();
         show_transport_open_status();
     }
 }
@@ -3856,11 +3871,9 @@ void plugin_mcumgr::on_radio_transport_udp_toggled(bool checked)
 {
     if (checked == true)
     {
-#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
-        bluetooth_transport->close_connect_dialog();
-#endif
-
+        close_transport_windows();
         show_transport_open_status();
+        udp_transport->open_connect_dialog();
     }
 }
 #endif
@@ -3870,11 +3883,9 @@ void plugin_mcumgr::on_radio_transport_bluetooth_toggled(bool checked)
 {
     if (checked == true)
     {
-#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
-        udp_transport->close_connect_dialog();
-#endif
-
+        close_transport_windows();
         show_transport_open_status();
+        bluetooth_transport->open_connect_dialog();
     }
 }
 #endif
@@ -4331,21 +4342,18 @@ bool plugin_mcumgr::update_settings_display()
 void plugin_mcumgr::show_transport_open_status()
 {
     smp_transport *transport = active_transport();
-    bool open = false;
 
     if (transport == uart_transport)
     {
+        bool open = false;
+
         emit plugin_serial_is_open(&open);
+        btn_transport_connect->setText(open == true ? "Disconnect" : "Connect");
     }
     else
     {
-        if (transport->is_connected() == 1)
-        {
-            open = true;
-        }
+        btn_transport_connect->setText("Show window");
     }
-
-    btn_transport_connect->setText(open == true ? "Disconnect" : "Connect");
 }
 
 void plugin_mcumgr::enter_pressed()
@@ -4666,7 +4674,6 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
     lbl_custom_status->setText("Custom...");
 
     tmp_message = new smp_message();
-    tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), edit_custom_group->value(), edit_custom_command->value()/*, 0*/);
 
     if (radio_custom_json->isChecked())
     {
@@ -4676,6 +4683,7 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
 
         delete(json_document);
 
+        tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), edit_custom_group->value(), edit_custom_command->value());
         tmp_message->end_message_no_end_map();
     }
     else if (radio_custom_yaml->isChecked())
@@ -4684,6 +4692,7 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
     }
     else if (radio_custom_cbor->isChecked())
     {
+        tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), edit_custom_group->value(), edit_custom_command->value());
         tmp_message->end_custom_message(QByteArray::fromHex(edit_custom_send->toPlainText().toUtf8()));
     }
 

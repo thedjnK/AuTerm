@@ -37,6 +37,7 @@ public:
     ~smp_udp();
     int connect(void) override;
     int disconnect(bool force) override;
+    void open_connect_dialog();
     int is_connected() override;
     int send(smp_message *message);
     void close_connect_dialog();

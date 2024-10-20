@@ -28,6 +28,10 @@ bluetooth_setup::bluetooth_setup(QWidget *parent) :
     ui(new Ui::bluetooth_setup)
 {
     ui->setupUi(this);
+
+    //Always appear in front of AuTerm window
+    this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
+
     ui->btn_connect->setEnabled(false);
     ui->btn_disconnect->setEnabled(false);
     ui->btn_refresh->setEnabled(false);

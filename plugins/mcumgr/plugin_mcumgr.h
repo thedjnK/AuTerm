@@ -247,6 +247,7 @@ private:
     bool update_settings_display();
     void show_transport_open_status();
     void size_abbreviation(uint32_t size, QString *output);
+    void close_transport_windows();
 
     //Form items
 ///AUTOGEN_START_OBJECTS

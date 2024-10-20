@@ -28,6 +28,9 @@ udp_setup::udp_setup(QWidget *parent) :
     ui(new Ui::udp_setup)
 {
     ui->setupUi(this);
+
+    //Always appear in front of AuTerm window
+    this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
 }
 
 udp_setup::~udp_setup()

@@ -56,7 +56,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
 {
     Q_UNUSED(parent);
 
-    bluetooth_window = new bluetooth_setup(nullptr);
+    bluetooth_window = new bluetooth_setup(plugin_mcumgr::get_main_window());
 
     QObject::connect(bluetooth_window, SIGNAL(refresh_devices()), this, SLOT(form_refresh_devices()));
     QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t)), this, SLOT(form_connect_to_device(uint16_t)));
@@ -413,7 +413,7 @@ int smp_bluetooth::send(smp_message *message)
 {
     if (device_connected == false)
     {
-        return -1;
+        return SMP_TRANSPORT_ERROR_NOT_CONNECTED;
     }
 
     retry_count = 0;
@@ -433,7 +433,7 @@ int smp_bluetooth::send(smp_message *message)
         bluetooth_window->add_debug(QString("Writing ").append(QString::number(sendbuffer.length() > mtu ? mtu : sendbuffer.length())));
     }
 
-    return 0;
+    return SMP_TRANSPORT_ERROR_OK;
 }
 
 void smp_bluetooth::mcumgr_service_error(QLowEnergyService::ServiceError error)
@@ -547,17 +547,8 @@ void smp_bluetooth::form_disconnect_from_device()
 
 int smp_bluetooth::connect()
 {
-    bluetooth_window->show();
-
-    if (device_connected == false)
-    {
-        bluetooth_window->clear_devices();
-        bluetooth_device_list.clear();
-        discoveryAgent->start();
-        bluetooth_window->discovery_state(true);
-    }
-
-    return 0;
+    //TODO
+    return SMP_TRANSPORT_ERROR_UNSUPPORTED;
 }
 
 int smp_bluetooth::disconnect(bool force)
@@ -571,7 +562,20 @@ int smp_bluetooth::disconnect(bool force)
         bluetooth_window->connection_state(false);
     }
 
-    return 0;
+    return SMP_TRANSPORT_ERROR_OK;
+}
+
+void smp_bluetooth::open_connect_dialog()
+{
+    bluetooth_window->show();
+
+    if (device_connected == false)
+    {
+        bluetooth_window->clear_devices();
+        bluetooth_device_list.clear();
+        discoveryAgent->start();
+        bluetooth_window->discovery_state(true);
+    }
 }
 
 void smp_bluetooth::timeout_timer()
