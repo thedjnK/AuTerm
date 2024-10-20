@@ -21,12 +21,8 @@
 **
 *******************************************************************************/
 #include "smp_udp.h"
-#include "udp_setup.h"
 #include <QNetworkDatagram>
 #include <QInputDialog>
-
-udp_setup *udp_window;
-QMainWindow *main_window;
 
 smp_udp::smp_udp(QObject *parent)
 {

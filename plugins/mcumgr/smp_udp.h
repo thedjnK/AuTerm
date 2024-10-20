@@ -25,6 +25,7 @@
 
 #include "plugin_mcumgr.h"
 #include "smp_transport.h"
+#include "udp_setup.h"
 #include <QUdpSocket>
 
 class smp_udp : public smp_transport
@@ -63,6 +64,8 @@ signals:
 //    void receive_waiting(smp_message *message);
 
 private:
+    udp_setup *udp_window;
+    QMainWindow *main_window;
     QUdpSocket *socket;
     bool socket_is_connected;
 //    QByteArray socket_received_data;
