@@ -35,9 +35,15 @@ unix: DEFINES += "SKIPSERIALDETECT"
 # Uncomment to skip building logger plugin
 #DEFINES += "SKIPPLUGIN_LOGGER"
 
-# Uncomment to build MCUmgr plugin transports (note: UDP requires Qt network, Bluetooth requires Qt Connectivity - note: static builds need those in the base AuTerm build also)
-DEFINES += "PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH"
-DEFINES += "PLUGIN_MCUMGR_TRANSPORT_UDP"
+# Uncomment to build MCUmgr plugin transports (note: static builds need thexe extra modules in the base AuTerm build also)
+qtHaveModule(bluetooth) {
+    # Requires qtconnectivity
+    DEFINES += "PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH"
+}
+qtHaveModule(network) {
+    # Requires qtnetwork
+    DEFINES += "PLUGIN_MCUMGR_TRANSPORT_UDP"
+}
 
 contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) {
     ADDITIONAL_MODULES += "bluetooth"
