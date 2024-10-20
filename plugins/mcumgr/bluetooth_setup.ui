@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>414</width>
+    <width>333</width>
     <height>264</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>251</width>
+     <width>311</width>
      <height>192</height>
     </rect>
    </property>
@@ -84,35 +84,6 @@
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="edit_debug">
-   <property name="geometry">
-    <rect>
-     <x>263</x>
-     <y>10</y>
-     <width>141</width>
-     <height>191</height>
-    </rect>
-   </property>
-   <property name="undoRedoEnabled">
-    <bool>false</bool>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_clear">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>230</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Clear</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
@@ -124,19 +95,6 @@
    </property>
    <property name="text">
     <string>[Status]</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="check_debug_logging">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>210</y>
-     <width>131</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Debug logging</string>
    </property>
   </widget>
  </widget>

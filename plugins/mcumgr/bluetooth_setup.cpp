@@ -80,11 +80,6 @@ void bluetooth_setup::add_device(QString *data)
     ui->list_devices->addItem(*data);
 }
 
-void bluetooth_setup::add_debug(QString data)
-{
-    ui->edit_debug->appendPlainText(data);
-}
-
 void bluetooth_setup::discovery_state(bool started)
 {
     ui->btn_refresh->setEnabled(!started);
@@ -118,14 +113,4 @@ void bluetooth_setup::on_list_devices_currentRowChanged(int row)
     {
         ui->btn_connect->setEnabled(false);
     }
-}
-
-void bluetooth_setup::on_btn_clear_clicked()
-{
-    ui->edit_debug->clear();
-}
-
-void bluetooth_setup::on_check_debug_logging_stateChanged(int)
-{
-    emit debug_log_state_changed(ui->check_debug_logging->isChecked());
 }
