@@ -28,6 +28,7 @@
 // Include Files
 /******************************************************************************/
 #include <QPlainTextEdit>
+#include <QtWidgets>
 #include <QApplication>
 #include <QKeyEvent>
 #include <QString>

@@ -4935,6 +4935,30 @@ void AutMainWindow::plugin_load_setting(QString name, QVariant *data, bool *foun
 }
 #endif
 
+void AutMainWindow::plugin_get_image_pixmap(QString name, QPixmap **pixmap)
+{
+    if (name == "EmptyCircle")
+    {
+        *pixmap = gpEmptyCirclePixmap;
+    }
+    else if (name == "RedCircle")
+    {
+        *pixmap = gpRedCirclePixmap;
+    }
+    else if (name == "GreenCircle")
+    {
+        *pixmap = gpGreenCirclePixmap;
+    }
+    else if (name == "AuTerm16")
+    {
+        *pixmap = gpUw16Pixmap;
+    }
+    else
+    {
+        *pixmap = nullptr;
+    }
+}
+
 void AutMainWindow::on_radio_vt100_ignore_toggled(bool checked)
 {
     if (checked == true)
