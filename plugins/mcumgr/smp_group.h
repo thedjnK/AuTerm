@@ -66,7 +66,7 @@ public:
         error_define_lookup = error_define_lookup_function;
     }
 
-    void set_parameters(uint8_t version, uint16_t mtu, uint8_t retries, uint16_t timeout, uint8_t user_data)
+    void set_parameters(uint8_t version, uint16_t mtu, uint8_t retries, uint32_t timeout, uint8_t user_data)
     {
         smp_version = version;
         smp_mtu = mtu;
@@ -93,7 +93,7 @@ public:
 
             if (good == true)
             {
-                define->prepend(name.append("_MGMT_"));
+                define->prepend(QString(name).append("_MGMT_"));
             }
 
             return good;
@@ -139,7 +139,7 @@ protected:
     uint8_t smp_version;
     uint16_t smp_mtu;
     uint8_t smp_retries;
-    uint16_t smp_timeout;
+    uint32_t smp_timeout;
     uint8_t smp_user_data;
     smp_error_lookup error_lookup;
     smp_error_define_lookup error_define_lookup;

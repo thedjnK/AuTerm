@@ -29,6 +29,9 @@
 //#include <QAbstractSocket>
 //#include <smp_settings.h>
 
+#define DEFAULT_TRANSPORT_RETRIES 3
+#define DEFAULT_TRANSPORT_TIMEOUT_MS 3000
+
 enum {
     SMP_TRANSPORT_ERROR_OK = 0,
     SMP_TRANSPORT_ERROR_UNSUPPORTED = -1,
@@ -79,6 +82,16 @@ public:
     virtual uint16_t max_message_data_size(uint16_t mtu)
     {
         return mtu;
+    }
+
+    virtual uint8_t get_retries()
+    {
+        return DEFAULT_TRANSPORT_RETRIES;
+    }
+
+    virtual uint32_t get_timeout()
+    {
+        return DEFAULT_TRANSPORT_TIMEOUT_MS;
     }
 
 signals:

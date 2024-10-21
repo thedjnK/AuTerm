@@ -71,6 +71,7 @@ private slots:
     void on_edit_custom_indent_valueChanged(int arg1);
     void on_btn_custom_go_clicked();
     void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_btn_error_lookup_clicked();
 
 private:
     Ui::Form *ui;

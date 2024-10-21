@@ -30,8 +30,6 @@
 #include <QJsonArray>
 #include "plugin_mcumgr.h"
 
-static const uint8_t retries = 3;
-static const uint32_t timeout_ms = 3000;
 static const uint16_t timeout_erase_ms = 14000;
 
 enum tree_img_slot_info_columns {
@@ -98,8 +96,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab = new QWidget(tabWidget_orig);
     tab->setObjectName("tab");
     verticalLayout_2 = new QVBoxLayout(tab);
+    verticalLayout_2->setSpacing(2);
     verticalLayout_2->setObjectName("verticalLayout_2");
+    verticalLayout_2->setContentsMargins(6, 6, 6, 6);
     horizontalLayout_7 = new QHBoxLayout();
+    horizontalLayout_7->setSpacing(2);
     horizontalLayout_7->setObjectName("horizontalLayout_7");
     label = new QLabel(tab);
     label->setObjectName("label");
@@ -116,11 +117,25 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_7->addWidget(edit_MTU);
 
+    line_9 = new QFrame(tab);
+    line_9->setObjectName("line_9");
+    line_9->setFrameShape(QFrame::Shape::VLine);
+    line_9->setFrameShadow(QFrame::Shadow::Sunken);
+
+    horizontalLayout_7->addWidget(line_9);
+
     check_V2_Protocol = new QCheckBox(tab);
     check_V2_Protocol->setObjectName("check_V2_Protocol");
     check_V2_Protocol->setChecked(true);
 
     horizontalLayout_7->addWidget(check_V2_Protocol);
+
+    line_8 = new QFrame(tab);
+    line_8->setObjectName("line_8");
+    line_8->setFrameShape(QFrame::Shape::VLine);
+    line_8->setFrameShadow(QFrame::Shadow::Sunken);
+
+    horizontalLayout_7->addWidget(line_8);
 
     radio_transport_uart = new QRadioButton(tab);
     buttonGroup_3 = new QButtonGroup(tab);
@@ -149,6 +164,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_transport_connect->setObjectName("btn_transport_connect");
 
     horizontalLayout_7->addWidget(btn_transport_connect);
+
+    btn_error_lookup = new QPushButton(tab);
+    btn_error_lookup->setObjectName("btn_error_lookup");
+
+    horizontalLayout_7->addWidget(btn_error_lookup);
 
     horizontalSpacer_6 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
@@ -1833,11 +1853,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 ///AUTOGEN_START_TRANSLATE
 //    Form->setWindowTitle(QCoreApplication::translate("Form", "Form", nullptr));
     label->setText(QCoreApplication::translate("Form", "MTU:", nullptr));
-    check_V2_Protocol->setText(QCoreApplication::translate("Form", "v2 protocol", nullptr));
+    check_V2_Protocol->setText(QCoreApplication::translate("Form", "SMP v2", nullptr));
     radio_transport_uart->setText(QCoreApplication::translate("Form", "UART", nullptr));
     radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
     radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
+    btn_error_lookup->setText(QCoreApplication::translate("Form", "Error lookup", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
     check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
     label_9->setText(QCoreApplication::translate("Form", "Reset:", nullptr));
@@ -2128,6 +2149,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(edit_custom_indent, SIGNAL(valueChanged(int)), this, SLOT(on_edit_custom_indent_valueChanged(int)));
     connect(btn_custom_go, SIGNAL(clicked()), this, SLOT(on_btn_custom_go_clicked()));
     connect(tree_IMG_Slot_Info, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
+    connect(btn_error_lookup, SIGNAL(clicked()), this, SLOT(on_btn_error_lookup_clicked()));
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -2288,6 +2310,7 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_edit_custom_indent_valueChanged(int)));
     disconnect(this, SLOT(on_btn_custom_go_clicked()));
     disconnect(this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
+    disconnect(this, SLOT(on_btn_error_lookup_clicked()));
 
     //Clean up GUI
     delete tab_2;
@@ -2532,7 +2555,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         {
             mode = ACTION_FS_UPLOAD;
             processor->set_transport(active_transport());
-            smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.fs_mgmt);
             started = smp_groups.fs_mgmt->start_upload(edit_FS_Local->text(), edit_FS_Remote->text());
 
             if (started == true)
@@ -2555,7 +2578,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         {
             mode = ACTION_FS_DOWNLOAD;
             processor->set_transport(active_transport());
-            smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.fs_mgmt);
             started = smp_groups.fs_mgmt->start_download(edit_FS_Remote->text(), edit_FS_Local->text());
 
             if (started == true)
@@ -2574,7 +2597,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         {
             mode = ACTION_FS_STATUS;
             processor->set_transport(active_transport());
-            smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.fs_mgmt);
             started = smp_groups.fs_mgmt->start_status(edit_FS_Remote->text(), &fs_size_response);
 
             if (started == true)
@@ -2597,7 +2620,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
         {
             mode = ACTION_FS_HASH_CHECKSUM;
             processor->set_transport(active_transport());
-            smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.fs_mgmt);
             started = smp_groups.fs_mgmt->start_hash_checksum(edit_FS_Remote->text(), combo_FS_type->currentText(), &fs_hash_checksum_response, &fs_size_response);
 
             if (started == true)
@@ -2610,7 +2633,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     {
         mode = ACTION_FS_SUPPORTED_HASHES_CHECKSUMS;
         processor->set_transport(active_transport());
-        smp_groups.fs_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.fs_mgmt);
         started = smp_groups.fs_mgmt->start_supported_hashes_checksums(&supported_hash_checksum_list);
 
         if (started == true)
@@ -2728,7 +2751,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         {
             mode = ACTION_IMG_UPLOAD;
             processor->set_transport(active_transport());
-            smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.img_mgmt);
             started = smp_groups.img_mgmt->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
 
             if (started == true)
@@ -2747,7 +2770,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
             images_list.clear();
             mode = ACTION_IMG_IMAGE_LIST;
             processor->set_transport(active_transport());
-            smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.img_mgmt);
             started = smp_groups.img_mgmt->start_image_get(&images_list);
 
             if (started == true)
@@ -2788,7 +2811,7 @@ finished:
                 {
                     mode = ACTION_IMG_IMAGE_SET;
                     processor->set_transport(active_transport());
-                    smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+                    set_group_transport_settings(smp_groups.img_mgmt);
 
                     parent_row = colview_IMG_Images->currentIndex().parent().row();
                     parent_column = colview_IMG_Images->currentIndex().parent().column();
@@ -2817,7 +2840,7 @@ finished:
         //Erase
         mode = ACTION_IMG_IMAGE_ERASE;
         processor->set_transport(active_transport());
-        smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
+        set_group_transport_settings(smp_groups.img_mgmt, timeout_erase_ms);
         started = smp_groups.img_mgmt->start_image_erase(edit_IMG_Erase_Slot->value());
 
         if (started == true)
@@ -2830,7 +2853,7 @@ finished:
         //Slot info
         mode = ACTION_IMG_IMAGE_SLOT_INFO;
         processor->set_transport(active_transport());
-        smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_erase_ms, mode);
+        set_group_transport_settings(smp_groups.img_mgmt, timeout_erase_ms);
         started = smp_groups.img_mgmt->start_image_slot_info(&img_slot_details);
 
         if (started == true)
@@ -2877,7 +2900,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             edit_OS_Echo_Output->clear();
             mode = ACTION_OS_ECHO;
             processor->set_transport(active_transport());
-            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.os_mgmt);
             started = smp_groups.os_mgmt->start_echo(edit_OS_Echo_Input->toPlainText());
 
             if (started == true)
@@ -2890,7 +2913,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     {
         mode = ACTION_OS_TASK_STATS;
         processor->set_transport(active_transport());
-        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.os_mgmt);
         started = smp_groups.os_mgmt->start_task_stats(&task_list);
 
         if (started == true)
@@ -2902,7 +2925,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     {
         mode = ACTION_OS_MEMORY_POOL;
         processor->set_transport(active_transport());
-        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.os_mgmt);
         started = smp_groups.os_mgmt->start_memory_pool(&memory_list);
 
         if (started == true)
@@ -2914,7 +2937,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
     {
         mode = ACTION_OS_RESET;
         processor->set_transport(active_transport());
-        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.os_mgmt);
         started = smp_groups.os_mgmt->start_reset(check_OS_Force_Reboot->isChecked());
 
         if (started == true)
@@ -2930,7 +2953,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         {
             mode = ACTION_OS_DATETIME_GET;
 
-            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.os_mgmt);
             started = smp_groups.os_mgmt->start_date_time_get(&rtc_time_date_response);
 
             if (started == true)
@@ -2954,7 +2977,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
                 date_time.setTimeZone(QTimeZone(combo_os_datetime_timezone->currentText().toUtf8()));
             }
 
-            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.os_mgmt);
             started = smp_groups.os_mgmt->start_date_time_set(date_time);
 
             if (started == true)
@@ -2970,7 +2993,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             //uname
             mode = ACTION_OS_OS_APPLICATION_INFO;
             processor->set_transport(active_transport());
-            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.os_mgmt);
             started = smp_groups.os_mgmt->start_os_application_info(edit_OS_UName->text());
 
             if (started == true)
@@ -2983,7 +3006,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             //Buffer details
             mode = ACTION_OS_MCUMGR_BUFFER;
             processor->set_transport(active_transport());
-            smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.os_mgmt);
             started = smp_groups.os_mgmt->start_mcumgr_parameters();
 
             if (started == true)
@@ -2997,7 +3020,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         //bootloader info
         mode = ACTION_OS_BOOTLOADER_INFO;
         processor->set_transport(active_transport());
-        smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.os_mgmt);
         started = smp_groups.os_mgmt->start_bootloader_info(edit_os_bootloader_query->text(), &bootloader_info_response);
 
         if (started == true)
@@ -3026,7 +3049,7 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         //Execute stat list command
         mode = ACTION_STAT_LIST_GROUPS;
         processor->set_transport(active_transport());
-        smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.stat_mgmt);
         started = smp_groups.stat_mgmt->start_list_groups(&group_list);
 
         if (started == true)
@@ -3045,7 +3068,7 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         {
             mode = ACTION_STAT_GROUP_DATA;
             processor->set_transport(active_transport());
-            smp_groups.stat_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.stat_mgmt);
             started = smp_groups.stat_mgmt->start_group_data(combo_STAT_Group->currentText(), &stat_list);
 
             if (started == true)
@@ -3149,7 +3172,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
                     mode = ACTION_IMG_UPLOAD_SET;
                     processor->set_transport(active_transport());
-                    smp_groups.img_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+                    set_group_transport_settings(smp_groups.img_mgmt);
                     bool started = smp_groups.img_mgmt->start_image_set(&upload_hash, (radio_IMG_Confirm->isChecked() ? true : false), nullptr);
 //todo: check status
 
@@ -3165,7 +3188,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
                     mode = ACTION_OS_UPLOAD_RESET;
                     processor->set_transport(active_transport());
-                    smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+                    set_group_transport_settings(smp_groups.os_mgmt);
                     bool started = smp_groups.os_mgmt->start_reset(false);
 //todo: check status
 
@@ -3284,7 +3307,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
                     mode = ACTION_OS_UPLOAD_RESET;
                     processor->set_transport(active_transport());
-                    smp_groups.os_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+                    set_group_transport_settings(smp_groups.os_mgmt);
                     bool started = smp_groups.os_mgmt->start_reset(false);
                     //todo: check status
 
@@ -4037,7 +4060,7 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
         {
             mode = ACTION_SETTINGS_READ;
             processor->set_transport(active_transport());
-            smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.settings_mgmt);
             started = smp_groups.settings_mgmt->start_read(edit_settings_key->text(), 0, &settings_read_response);
 
             if (started == true)
@@ -4056,7 +4079,7 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
         {
             mode = ACTION_SETTINGS_WRITE;
             processor->set_transport(active_transport());
-            smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.settings_mgmt);
             //started = smp_groups.settings_mgmt->start_write(edit_settings_key->text(), edit_settings_value->text().toUtf8());
             started = smp_groups.settings_mgmt->start_write(edit_settings_key->text(), QByteArray::fromHex(edit_settings_value->text().toLatin1()));
 
@@ -4076,7 +4099,7 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
         {
             mode = ACTION_SETTINGS_DELETE;
             processor->set_transport(active_transport());
-            smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+            set_group_transport_settings(smp_groups.settings_mgmt);
             started = smp_groups.settings_mgmt->start_delete(edit_settings_key->text());
 
             if (started == true)
@@ -4089,7 +4112,7 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
     {
         mode = ACTION_SETTINGS_COMMIT;
         processor->set_transport(active_transport());
-        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.settings_mgmt);
         started = smp_groups.settings_mgmt->start_commit();
 
         if (started == true)
@@ -4101,7 +4124,7 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
     {
         mode = ACTION_SETTINGS_LOAD;
         processor->set_transport(active_transport());
-        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.settings_mgmt);
         started = smp_groups.settings_mgmt->start_load();
 
         if (started == true)
@@ -4113,7 +4136,7 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
     {
         mode = ACTION_SETTINGS_SAVE;
         processor->set_transport(active_transport());
-        smp_groups.settings_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.settings_mgmt);
         started = smp_groups.settings_mgmt->start_save();
 
         if (started == true)
@@ -4378,7 +4401,7 @@ void plugin_mcumgr::enter_pressed()
 
     mode = ACTION_SHELL_EXECUTE;
     processor->set_transport(active_transport());
-    smp_groups.shell_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+    set_group_transport_settings(smp_groups.shell_mgmt);
     started = smp_groups.shell_mgmt->start_execute(&list_arguments, &shell_rc);
 
     if (started == true)
@@ -4407,7 +4430,7 @@ void plugin_mcumgr::on_btn_zephyr_go_clicked()
     {
         mode = ACTION_ZEPHYR_STORAGE_ERASE;
         processor->set_transport(active_transport());
-        smp_groups.zephyr_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.zephyr_mgmt);
         started = smp_groups.zephyr_mgmt->start_storage_erase();
 
         if (started == true)
@@ -4464,7 +4487,7 @@ void plugin_mcumgr::on_btn_enum_go_clicked()
     {
         mode = ACTION_ENUM_COUNT;
         processor->set_transport(active_transport());
-        smp_groups.enum_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.enum_mgmt);
         started = smp_groups.enum_mgmt->start_enum_count(&enum_count);
 
         if (started == true)
@@ -4476,7 +4499,7 @@ void plugin_mcumgr::on_btn_enum_go_clicked()
     {
         mode = ACTION_ENUM_LIST;
         processor->set_transport(active_transport());
-        smp_groups.enum_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.enum_mgmt);
         started = smp_groups.enum_mgmt->start_enum_list(&enum_groups);
 
         if (started == true)
@@ -4488,7 +4511,7 @@ void plugin_mcumgr::on_btn_enum_go_clicked()
     {
         mode = ACTION_ENUM_SINGLE;
         processor->set_transport(active_transport());
-        smp_groups.enum_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.enum_mgmt);
         started = smp_groups.enum_mgmt->start_enum_single(edit_Enum_Index->value(), &enum_single_id, &enum_single_end);
 
         if (started == true)
@@ -4500,7 +4523,7 @@ void plugin_mcumgr::on_btn_enum_go_clicked()
     {
         mode = ACTION_ENUM_DETAILS;
         processor->set_transport(active_transport());
-        smp_groups.enum_mgmt->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), retries, timeout_ms, mode);
+        set_group_transport_settings(smp_groups.enum_mgmt);
         started = smp_groups.enum_mgmt->start_enum_details(&enum_details, &enum_details_present_fields);
 
         if (started == true)
@@ -4617,6 +4640,7 @@ void plugin_mcumgr::on_edit_custom_indent_valueChanged(int value)
 
 void plugin_mcumgr::on_btn_custom_go_clicked()
 {
+    smp_transport *transport = active_transport();
     smp_message *tmp_message;
     QJsonDocument *json_document = nullptr;
 
@@ -4697,7 +4721,7 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
     }
 
     processor->set_custom_message(true);
-    processor->send(tmp_message, timeout_ms, retries, true);
+    processor->send(tmp_message, transport->get_timeout(), transport->get_retries(), true);
 }
 
 void plugin_mcumgr::custom_message_callback(enum custom_message_callback_t type, smp_error_t *data)
@@ -4734,11 +4758,29 @@ void plugin_mcumgr::size_abbreviation(uint32_t size, QString *output)
     output->append(QString::number(converted_size, 'g', 3).append(list_abbreviations.at(abbreviation_index)));
 }
 
-
 void plugin_mcumgr::on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int)
 {
     if (!item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).isEmpty())
     {
         edit_IMG_Image->setValue(item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).toUInt());
     }
+}
+
+void plugin_mcumgr::set_group_transport_settings(smp_group *group)
+{
+    smp_transport *transport = active_transport();
+
+    group->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), transport->get_retries(), transport->get_timeout(), mode);
+}
+
+void plugin_mcumgr::set_group_transport_settings(smp_group *group, uint32_t timeout)
+{
+    smp_transport *transport = active_transport();
+
+    group->set_parameters((check_V2_Protocol->isChecked() ? 1 : 0), edit_MTU->value(), transport->get_retries(), (timeout >= transport->get_timeout() ? timeout : transport->get_timeout()), mode);
+}
+
+void plugin_mcumgr::on_btn_error_lookup_clicked()
+{
+    error_lookup_form->show();
 }

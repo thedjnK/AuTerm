@@ -289,3 +289,8 @@ void Form::on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int co
 {
 
 }
+
+void Form::on_btn_error_lookup_clicked()
+{
+
+}

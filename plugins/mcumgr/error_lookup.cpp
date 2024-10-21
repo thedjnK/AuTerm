@@ -16,6 +16,7 @@ error_lookup::error_lookup(QWidget *parent, smp_group_array *groups) :
     ui->combo_group->addItem(QString("%1 (Settings)").arg(SMP_GROUP_ID_SETTINGS));
     ui->combo_group->addItem(QString("%1 (FS)").arg(SMP_GROUP_ID_FS));
     ui->combo_group->addItem(QString("%1 (Shell)").arg(SMP_GROUP_ID_SHELL));
+    ui->combo_group->addItem(QString("%1 (Enum)").arg(SMP_GROUP_ID_ENUM));
     ui->combo_group->addItem(QString("%1 (Zephyr)").arg(SMP_GROUP_ID_ZEPHYR));
 }
 
@@ -26,6 +27,7 @@ error_lookup::~error_lookup()
 
 void error_lookup::on_button_lookup_clicked()
 {
+    smp_error_t error;
     bool converted;
     uint error_value;
 
@@ -33,7 +35,7 @@ void error_lookup::on_button_lookup_clicked()
 
     if (converted == false)
     {
-        ui->edit_error_description->appendPlainText("crap1");
+        ui->edit_error_description->appendPlainText("Supplied result code value is not a number.");
         return;
     }
 
@@ -43,6 +45,8 @@ void error_lookup::on_button_lookup_clicked()
         uint group_value;
         QString tmp;
         int space_position;
+        QString error_define;
+        QString error_string;
 
         //Check for a space, if found, extract value up to the first space and convert to a number
         space_position = ui->combo_group->currentText().indexOf(" ");
@@ -60,17 +64,17 @@ void error_lookup::on_button_lookup_clicked()
 
         if (converted == false)
         {
-            ui->edit_error_description->appendPlainText("crap0");
+            ui->edit_error_description->appendPlainText("Supplied group value is not a number.");
             return;
         }
 
-        smp_error_t error;
+
         error.type = SMP_ERROR_RET;
         error.group = group_value;
         error.rc = error_value;
+        error_define = smp_error::error_lookup_define(&error);
+        error_string = smp_error::error_lookup_string(&error);
 
-        QString error_define = smp_error::error_lookup_define(&error);
-        QString error_string = smp_error::error_lookup_string(&error);
         ui->edit_error_id->setText(error_define);
         ui->edit_error_description->clear();
         ui->edit_error_description->appendPlainText(error_string);
@@ -78,7 +82,6 @@ void error_lookup::on_button_lookup_clicked()
     else
     {
         //SMP error code
-        smp_error_t error;
         error.type = SMP_ERROR_RC;
         error.rc = error_value;
 

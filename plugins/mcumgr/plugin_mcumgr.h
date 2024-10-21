@@ -237,6 +237,7 @@ private slots:
     void on_edit_custom_indent_valueChanged(int value);
     void on_btn_custom_go_clicked();
     void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_btn_error_lookup_clicked();
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -248,6 +249,8 @@ private:
     void show_transport_open_status();
     void size_abbreviation(uint32_t size, QString *output);
     void close_transport_windows();
+    void set_group_transport_settings(smp_group *group);
+    void set_group_transport_settings(smp_group *group, uint32_t timeout);
 
     //Form items
 ///AUTOGEN_START_OBJECTS
@@ -258,11 +261,14 @@ private:
     QHBoxLayout *horizontalLayout_7;
     QLabel *label;
     QSpinBox *edit_MTU;
+    QFrame *line_9;
     QCheckBox *check_V2_Protocol;
+    QFrame *line_8;
     QRadioButton *radio_transport_uart;
     QRadioButton *radio_transport_udp;
     QRadioButton *radio_transport_bluetooth;
     QPushButton *btn_transport_connect;
+    QPushButton *btn_error_lookup;
     QSpacerItem *horizontalSpacer_6;
     QTabWidget *tabWidget_2;
     QWidget *tab_IMG;
@@ -541,12 +547,12 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup_5;
-    QButtonGroup *buttonGroup_2;
-    QButtonGroup *buttonGroup;
-    QButtonGroup *buttonGroup_4;
-    QButtonGroup *buttonGroup_3;
     QButtonGroup *buttonGroup_6;
+    QButtonGroup *buttonGroup;
+    QButtonGroup *buttonGroup_3;
+    QButtonGroup *buttonGroup_5;
+    QButtonGroup *buttonGroup_4;
+    QButtonGroup *buttonGroup_2;
 ///AUTOGEN_END_OBJECTS
 
     //
