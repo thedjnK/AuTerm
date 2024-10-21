@@ -883,40 +883,26 @@
                  <property name="spacing">
                   <number>2</number>
                  </property>
-                 <item row="3" column="1">
-                  <widget class="QRadioButton" name="radio_vt100_strip">
+                 <item row="1" column="1">
+                  <widget class="QRadioButton" name="radio_LLF">
                    <property name="text">
-                    <string>Strip</string>
-                   </property>
-                   <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup_2</string>
-                   </attribute>
-                  </widget>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QRadioButton" name="radio_vt100_ignore">
-                   <property name="text">
-                    <string>Ignore</string>
+                    <string>\n</string>
                    </property>
                    <property name="checked">
                     <bool>false</bool>
                    </property>
                    <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup_2</string>
+                    <string notr="true">buttonGroup</string>
                    </attribute>
                   </widget>
                  </item>
-                 <item row="0" column="0" colspan="3">
-                  <widget class="QLabel" name="label_46">
+                 <item row="1" column="0">
+                  <widget class="QRadioButton" name="radio_LCR">
                    <property name="text">
-                    <string>Line endings:</string>
+                    <string>\r</string>
                    </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <widget class="QRadioButton" name="radio_LCRLF">
-                   <property name="text">
-                    <string>\r\n</string>
+                   <property name="checked">
+                    <bool>true</bool>
                    </property>
                    <attribute name="buttonGroup">
                     <string notr="true">buttonGroup</string>
@@ -926,7 +912,7 @@
                  <item row="4" column="1" colspan="2">
                   <widget class="QLineEdit" name="edit_Title">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -954,13 +940,45 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="5" column="0" colspan="3">
-                  <widget class="QCheckBox" name="check_trim">
-                   <property name="toolTip">
-                    <string>Will limit the size of data shown in the terminal by trimming the oldest data</string>
-                   </property>
+                 <item row="3" column="0">
+                  <widget class="QRadioButton" name="radio_vt100_ignore">
                    <property name="text">
-                    <string>Trim display buffer</string>
+                    <string>Ignore</string>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup_2</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QRadioButton" name="radio_vt100_strip">
+                   <property name="text">
+                    <string>Strip</string>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup_2</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="5" column="2">
+                  <widget class="QSpinBox" name="spin_trim_size">
+                   <property name="minimumSize">
+                    <size>
+                     <width>70</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>The size (in bytes) to trim the display buffer to</string>
+                   </property>
+                   <property name="minimum">
+                    <number>256</number>
+                   </property>
+                   <property name="maximum">
+                    <number>16384</number>
                    </property>
                   </widget>
                  </item>
@@ -984,30 +1002,11 @@
                    </attribute>
                   </widget>
                  </item>
-                 <item row="1" column="1">
-                  <widget class="QRadioButton" name="radio_LLF">
+                 <item row="0" column="0" colspan="3">
+                  <widget class="QLabel" name="label_46">
                    <property name="text">
-                    <string>\n</string>
+                    <string>Line endings:</string>
                    </property>
-                   <property name="checked">
-                    <bool>false</bool>
-                   </property>
-                   <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup</string>
-                   </attribute>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QRadioButton" name="radio_LCR">
-                   <property name="text">
-                    <string>\r</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                   <attribute name="buttonGroup">
-                    <string notr="true">buttonGroup</string>
-                   </attribute>
                   </widget>
                  </item>
                  <item row="4" column="0">
@@ -1017,80 +1016,48 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="6" column="0" colspan="3">
-                  <layout class="QGridLayout" name="gridLayout_12">
-                   <property name="topMargin">
-                    <number>0</number>
+                 <item row="5" column="0" colspan="2">
+                  <widget class="QCheckBox" name="check_trim">
+                   <property name="toolTip">
+                    <string>Will limit the size of data shown in the terminal by trimming the oldest data</string>
                    </property>
-                   <property name="spacing">
-                    <number>2</number>
+                   <property name="text">
+                    <string>Trim display buffer, size:</string>
                    </property>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="label_49">
-                     <property name="text">
-                      <string>Threshold: </string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QSpinBox" name="spin_trim_size">
-                     <property name="minimumSize">
-                      <size>
-                       <width>70</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="toolTip">
-                      <string>The size (in bytes) to trim the display buffer to</string>
-                     </property>
-                     <property name="minimum">
-                      <number>256</number>
-                     </property>
-                     <property name="maximum">
-                      <number>16384</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="label_50">
-                     <property name="text">
-                      <string>Size:</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QSpinBox" name="spin_trim_threshold">
-                     <property name="toolTip">
-                      <string>The amount of data needed in the display buffer (in bytes) before trimming it</string>
-                     </property>
-                     <property name="minimum">
-                      <number>512</number>
-                     </property>
-                     <property name="maximum">
-                      <number>16384</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="2">
-                    <spacer name="horizontalSpacer">
-                     <property name="orientation">
-                      <enum>Qt::Orientation::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QRadioButton" name="radio_LCRLF">
+                   <property name="text">
+                    <string>\r\n</string>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="6" column="2">
+                  <widget class="QSpinBox" name="spin_trim_threshold">
+                   <property name="toolTip">
+                    <string>The amount of data needed in the display buffer (in bytes) before trimming it</string>
+                   </property>
+                   <property name="minimum">
+                    <number>512</number>
+                   </property>
+                   <property name="maximum">
+                    <number>16384</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="1">
+                  <widget class="QLabel" name="label_49">
+                   <property name="text">
+                    <string>Threshold: </string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -3600,7 +3567,7 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>
