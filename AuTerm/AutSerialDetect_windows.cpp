@@ -3,7 +3,7 @@
 **
 ** Project: AuTerm
 **
-** Module: AutSerialDetect.cpp
+** Module: AutSerialDetect_windows.cpp
 **
 ** Notes:
 **
@@ -24,7 +24,7 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "AutSerialDetect.h"
+#include "AutSerialDetect_windows.h"
 #include <QSerialPortInfo>
 #include <QAbstractEventDispatcher>
 #include <QWidget>
@@ -32,7 +32,7 @@
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-AutSerialDetect::AutSerialDetect(QObject *parent): QObject{parent}
+AutSerialDetect::AutSerialDetect(QObject *parent): AutSerialDetect_base{parent}
 {
     QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
 }
@@ -45,7 +45,6 @@ AutSerialDetect::~AutSerialDetect()
 
 void AutSerialDetect::start(QString port)
 {
-#ifdef _WIN32
     HWND main_window = (HWND)((QWidget *)this->parent())->winId();
     DEV_BROADCAST_DEVICEINTERFACE dev_search;
 
@@ -54,8 +53,6 @@ void AutSerialDetect::start(QString port)
     dev_search.dbcc_classguid = GUID_DEVCLASS_PORTS;
     dev_search.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
     access = RegisterDeviceNotificationA(main_window, &dev_search, DEVICE_NOTIFY_WINDOW_HANDLE);
-#endif
-
     watch_port = port;
     port_set = true;
 }
@@ -67,19 +64,14 @@ void AutSerialDetect::stop()
         return;
     }
 
-#ifdef _WIN32
     UnregisterDeviceNotification(access);
-
     access = nullptr;
-#endif
-
     port_set = false;
     watch_port.clear();
 }
 
 bool AutSerialDetect::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
-#ifdef _WIN32
     MSG *msg = static_cast<MSG *>(message);
     uint type = msg->message;
     WPARAM param = msg->wParam;
@@ -101,7 +93,6 @@ bool AutSerialDetect::nativeEventFilter(const QByteArray &eventType, void *messa
             }
         }
     }
-#endif
 
     return false;
 }

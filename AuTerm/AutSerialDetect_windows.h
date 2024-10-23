@@ -3,7 +3,7 @@
 **
 ** Project: AuTerm
 **
-** Module: AutSerialDetect.h
+** Module: AutSerialDetect_windows.h
 **
 ** Notes:
 **
@@ -20,26 +20,24 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef AUTSERIALDETECT_H
-#define AUTSERIALDETECT_H
+#ifndef AUTSERIALDETECT_WINDOWS_H
+#define AUTSERIALDETECT_WINDOWS_H
 
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
+#include "AutSerialDetect_base.h"
 #include <QObject>
 #include <QAbstractNativeEventFilter>
-
-#ifdef _WIN32
 #include <Windows.h>
 #include <WinUser.h>
 #include <Dbt.h>
 #include <devguid.h>
-#endif
 
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
-class AutSerialDetect : public QObject, public QAbstractNativeEventFilter
+class AutSerialDetect : public AutSerialDetect_base, public QAbstractNativeEventFilter
 {
     Q_OBJECT
 
@@ -50,19 +48,11 @@ public:
     void stop();
     virtual bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) Q_DECL_OVERRIDE;
 
-signals:
-    void port_reconnected(QString port);
-
 private:
-    QString watch_port;
-    bool port_set;
-
-#ifdef _WIN32
     HDEVNOTIFY access;
-#endif
 };
 
-#endif // AUTSERIALDETECT_H
+#endif // AUTSERIALDETECT_WINDOWS_H
 
 /******************************************************************************/
 // END OF FILE

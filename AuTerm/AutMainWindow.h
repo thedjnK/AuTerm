@@ -84,7 +84,7 @@
 #endif
 #endif
 #ifndef SKIPSERIALDETECT
-#include "AutSerialDetect.h"
+#include "AutSerialDetect_windows.h"
 #endif
 
 /******************************************************************************/

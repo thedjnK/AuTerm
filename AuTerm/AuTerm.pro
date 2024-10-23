@@ -24,7 +24,7 @@ HEADERS  += \
     AutLogger.h \
     AutMainWindow.h \
     AutPopup.h \
-    AutScrollEdit.h \
+    AutScrollEdit.h
 
 FORMS    += \
     AutMainWindow.ui \
@@ -72,9 +72,10 @@ RESOURCES += \
 # Serial detection object
 !contains(DEFINES, SKIPSERIALDETECT) {
     SOURCES += \
-	AutSerialDetect.cpp
+        AutSerialDetect_windows.cpp
     HEADERS += \
-	AutSerialDetect.h
+        AutSerialDetect_base.h \
+        AutSerialDetect_windows.h
 
     win32: LIBS += -luser32
 }
