@@ -84,7 +84,12 @@
 #endif
 #endif
 #ifndef SKIPSERIALDETECT
+#ifdef _WIN32
 #include "AutSerialDetect_windows.h"
+#else
+//Assume linux
+#include "AutSerialDetect_linux.h"
+#endif
 #endif
 
 /******************************************************************************/

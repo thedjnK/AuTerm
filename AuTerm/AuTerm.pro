@@ -71,13 +71,22 @@ RESOURCES += \
 
 # Serial detection object
 !contains(DEFINES, SKIPSERIALDETECT) {
-    SOURCES += \
-        AutSerialDetect_windows.cpp
     HEADERS += \
-        AutSerialDetect_base.h \
-        AutSerialDetect_windows.h
+        AutSerialDetect_base.h
 
-    win32: LIBS += -luser32
+    win32 {
+        SOURCES += \
+            AutSerialDetect_windows.cpp
+        HEADERS += \
+            AutSerialDetect_windows.h
+        LIBS += -luser32
+    } else {
+        SOURCES += \
+            AutSerialDetect_linux.cpp
+        HEADERS += \
+            AutSerialDetect_linux.h
+        LIBS += -ludev
+    }
 }
 
 # Windows application version information

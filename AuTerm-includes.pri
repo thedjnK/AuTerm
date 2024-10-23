@@ -22,9 +22,8 @@ QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 # Uncomment to skip building serial port detection object
 #DEFINES += "SKIPSERIALDETECT"
 
-# Serial port detection not currently supported on linux/mac
+# Serial port detection not currently supported on mac
 macx: DEFINES += "SKIPSERIALDETECT"
-unix: DEFINES += "SKIPSERIALDETECT"
 
 # Uncomment to disable plugin support
 #DEFINES += "SKIPPLUGINS"
