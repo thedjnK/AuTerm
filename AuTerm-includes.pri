@@ -42,12 +42,21 @@ qtHaveModule(bluetooth) {
 qtHaveModule(network) {
     # Requires qtnetwork
     DEFINES += "PLUGIN_MCUMGR_TRANSPORT_UDP"
+
+    qtHaveModule(mqtt) {
+	# Requires qtnetwork and qtmqtt
+#	DEFINES += "PLUGIN_MCUMGR_TRANSPORT_LORAWAN"
+    }
 }
 
 contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) {
     ADDITIONAL_MODULES += "bluetooth"
 }
 
-contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_UDP) {
+contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_UDP) | contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_LORAWAN) {
     ADDITIONAL_MODULES += "network"
+}
+
+contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_LORAWAN) {
+    ADDITIONAL_MODULES += "mqtt"
 }

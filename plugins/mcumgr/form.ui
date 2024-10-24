@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>544</width>
+    <width>572</width>
     <height>404</height>
    </rect>
   </property>
@@ -145,6 +145,19 @@
           <widget class="QRadioButton" name="radio_transport_bluetooth">
            <property name="text">
             <string>Bluetooth</string>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_3</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_transport_lora">
+           <property name="text">
+            <string>LoRaWAN</string>
            </property>
            <property name="autoExclusive">
             <bool>true</bool>

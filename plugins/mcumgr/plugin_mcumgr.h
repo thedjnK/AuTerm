@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2021-2023 Jamie M.
+** Copyright (C) 2021-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -55,6 +55,10 @@
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
 #include "smp_bluetooth.h"
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+#include "smp_lora.h"
 #endif
 
 //Form includes
@@ -204,6 +208,9 @@ private slots:
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     void on_radio_transport_bluetooth_toggled(bool checked);
 #endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    void on_radio_transport_lora_toggled(bool checked);
+#endif
     void on_radio_OS_Buffer_Info_toggled(bool checked);
     void on_radio_OS_uname_toggled(bool checked);
     void on_radio_IMG_Get_toggled(bool checked);
@@ -267,6 +274,7 @@ private:
     QRadioButton *radio_transport_uart;
     QRadioButton *radio_transport_udp;
     QRadioButton *radio_transport_bluetooth;
+    QRadioButton *radio_transport_lora;
     QPushButton *btn_transport_connect;
     QPushButton *btn_error_lookup;
     QSpacerItem *horizontalSpacer_6;
@@ -586,6 +594,10 @@ private:
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     class smp_bluetooth *bluetooth_transport;
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    class smp_lora *lora_transport;
 #endif
 
     QList<image_state_t> images_list;

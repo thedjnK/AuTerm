@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2021-2023 Jamie M.
+** Copyright (C) 2021-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -53,6 +53,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     bluetooth_transport = new smp_bluetooth(this);
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    lora_transport = new smp_lora(this);
 #endif
 
     //Initialise SMP-related objects
@@ -159,6 +163,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_bluetooth->setAutoExclusive(true);
 
     horizontalLayout_7->addWidget(radio_transport_bluetooth);
+
+    radio_transport_lora = new QRadioButton(tab);
+    buttonGroup_3->addButton(radio_transport_lora);
+    radio_transport_lora->setObjectName("radio_transport_lora");
+    radio_transport_lora->setAutoExclusive(true);
+
+    horizontalLayout_7->addWidget(radio_transport_lora);
 
     btn_transport_connect = new QPushButton(tab);
     btn_transport_connect->setObjectName("btn_transport_connect");
@@ -1857,6 +1868,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_uart->setText(QCoreApplication::translate("Form", "UART", nullptr));
     radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
     radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
+    radio_transport_lora->setText(QCoreApplication::translate("Form", "LoRa", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
     btn_error_lookup->setText(QCoreApplication::translate("Form", "Error lookup", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
@@ -2069,6 +2081,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(bluetooth_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
 #endif
 
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    connect(lora_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+#endif
+
     connect(smp_groups.fs_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.fs_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
     connect(smp_groups.img_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
@@ -2113,6 +2129,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 #endif
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     connect(radio_transport_bluetooth, SIGNAL(toggled(bool)), this, SLOT(on_radio_transport_bluetooth_toggled(bool)));
+#endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    connect(radio_transport_lora, SIGNAL(toggled(bool)), this, SLOT(on_radio_transport_lora_toggled(bool)));
 #endif
     connect(radio_OS_Buffer_Info, SIGNAL(toggled(bool)), this, SLOT(on_radio_OS_Buffer_Info_toggled(bool)));
     connect(radio_OS_uname, SIGNAL(toggled(bool)), this, SLOT(on_radio_OS_uname_toggled(bool)));
@@ -2190,6 +2209,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     bluetooth_transport->set_logger(logger);
 #endif
 
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    lora_transport->set_logger(logger);
+#endif
+
     smp_groups.fs_mgmt->set_logger(logger);
     smp_groups.img_mgmt->set_logger(logger);
     smp_groups.os_mgmt->set_logger(logger);
@@ -2224,6 +2247,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 #if !defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     radio_transport_bluetooth->deleteLater();
+#endif
+
+#if !defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    radio_transport_lora->deleteLater();
 #endif
 }
 
@@ -2276,6 +2303,9 @@ plugin_mcumgr::~plugin_mcumgr()
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     disconnect(this, SLOT(on_radio_transport_bluetooth_toggled(bool)));
 #endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    disconnect(this, SLOT(on_radio_transport_lora_toggled(bool)));
+#endif
     disconnect(this, SLOT(on_radio_OS_Buffer_Info_toggled(bool)));
     disconnect(this, SLOT(on_radio_OS_uname_toggled(bool)));
     disconnect(this, SLOT(on_radio_IMG_Get_toggled(bool)));
@@ -2321,6 +2351,10 @@ plugin_mcumgr::~plugin_mcumgr()
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     delete udp_transport;
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    delete lora_transport;
 #endif
 
     delete error_lookup_form;
@@ -2369,8 +2403,12 @@ const QString plugin_mcumgr::plugin_about()
            "/Bluetooth"
 #endif
 
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+           "/LoRa"
+#endif
+
            " MCUmgr transport"
-#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP) || defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP) || defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) || defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
            "s"
 #endif
            " enabled.\r\n\r\nUNFINISHED INITIAL TEST USE ONLY, NOT REPRESENTATIVE OF FINAL PRODUCT.\r\n\r\nBuilt using Qt " QT_VERSION_STR;
@@ -2412,7 +2450,7 @@ void plugin_mcumgr::serial_opened()
 
 void plugin_mcumgr::serial_closed()
 {
-#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP) || defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP) || defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) || defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
     if (active_transport() != uart_transport)
     {
         return;
@@ -3853,6 +3891,12 @@ smp_transport *plugin_mcumgr::active_transport()
         return bluetooth_transport;
     }
 #endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    else if (radio_transport_lora->isChecked() == true)
+    {
+        return lora_transport;
+    }
+#endif
     else
     {
         return uart_transport;
@@ -3876,6 +3920,12 @@ void plugin_mcumgr::close_transport_windows()
     if (radio_transport_bluetooth->isChecked() == false)
     {
         bluetooth_transport->close_connect_dialog();
+    }
+#endif
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    if (radio_transport_lora->isChecked() == false)
+    {
+        lora_transport->close_connect_dialog();
     }
 #endif
 }
@@ -3909,6 +3959,18 @@ void plugin_mcumgr::on_radio_transport_bluetooth_toggled(bool checked)
         close_transport_windows();
         show_transport_open_status();
         bluetooth_transport->open_connect_dialog();
+    }
+}
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+void plugin_mcumgr::on_radio_transport_lora_toggled(bool checked)
+{
+    if (checked == true)
+    {
+        close_transport_windows();
+        show_transport_open_status();
+        lora_transport->open_connect_dialog();
     }
 }
 #endif
@@ -4159,6 +4221,10 @@ void plugin_mcumgr::setup_finished()
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     udp_transport->setup_finished();
+#endif
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+    lora_transport->setup_finished();
 #endif
 }
 
