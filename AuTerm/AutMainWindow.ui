@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>648</width>
-    <height>431</height>
+    <width>622</width>
+    <height>412</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1055,7 +1055,7 @@
                     <string>Threshold: </string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -1067,7 +1067,7 @@
                   <string>Enable this to escape various characters (CR will show as \r, LF will show as \n and Tab will show as \t).</string>
                  </property>
                  <property name="text">
-                  <string>Escape CR/LF/Tab</string>
+                  <string>Escape \r, \n and tab</string>
                  </property>
                 </widget>
                </item>
@@ -1167,10 +1167,16 @@
             <item row="1" column="0">
              <widget class="QGroupBox" name="groupBox_6">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>0</height>
+               </size>
               </property>
               <property name="maximumSize">
                <size>
