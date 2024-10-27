@@ -57,7 +57,7 @@
 #include "smp_bluetooth.h"
 #endif
 
-#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORAWAN)
 #include "smp_lora.h"
 #endif
 
@@ -208,7 +208,7 @@ private slots:
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     void on_radio_transport_bluetooth_toggled(bool checked);
 #endif
-#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORAWAN)
     void on_radio_transport_lora_toggled(bool checked);
 #endif
     void on_radio_OS_Buffer_Info_toggled(bool checked);
@@ -596,7 +596,7 @@ private:
     class smp_bluetooth *bluetooth_transport;
 #endif
 
-#if defined(PLUGIN_MCUMGR_TRANSPORT_LORA)
+#if defined(PLUGIN_MCUMGR_TRANSPORT_LORAWAN)
     class smp_lora *lora_transport;
 #endif
 

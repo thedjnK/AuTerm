@@ -124,7 +124,7 @@ contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_UDP) {
 	udp_setup.ui
 }
 
-contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_LORA) {
+contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_LORAWAN) {
     SOURCES += \
 	lorawan_setup.cpp \
 	smp_lora.cpp
