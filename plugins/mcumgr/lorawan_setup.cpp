@@ -23,6 +23,27 @@
 #include "lorawan_setup.h"
 #include "ui_lorawan_setup.h"
 
+/******************************************************************************/
+// Constants
+/******************************************************************************/
+static const uint16_t max_history = 10;
+static const uint16_t history_tokens = 5;
+static const uint16_t history_elements = 6;
+
+enum HISTORY_ENTRY {
+    HISTORY_ENTRY_ADDRESS,
+    HISTORY_ENTRY_PORT,
+    HISTORY_ENTRY_TLS,
+    HISTORY_ENTRY_USERNAME,
+    HISTORY_ENTRY_PASSWORD,
+    HISTORY_ENTRY_TOPIC,
+
+    HISTORY_ENTRY_COUNT
+};
+
+/******************************************************************************/
+// Local Functions or Private Members
+/******************************************************************************/
 lorawan_setup::lorawan_setup(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::lorawan_setup)
@@ -56,12 +77,10 @@ void lorawan_setup::on_btn_connect_clicked()
 
     emit connect_to_service(ui->edit_address->text(), ui->edit_port->value(), ui->check_tls->isChecked(), ui->edit_username->text(), ui->edit_password->text(), ui->edit_topic->text());
 
-#if 0
     if (ui->check_save_history->isChecked() == true)
     {
         add_to_history();
     }
-#endif
 }
 
 void lorawan_setup::on_btn_close_clicked()
@@ -71,55 +90,94 @@ void lorawan_setup::on_btn_close_clicked()
 
 void lorawan_setup::on_btn_clear_history_clicked()
 {
-#if 0
     ui->combo_history->clear();
-    emit plugin_save_setting("mcumgr_lora_history", QStringList());
+    emit plugin_save_setting("mcumgr_lorawan_history", QStringList());
     ui->combo_history->addItem("");
-#endif
 }
 
 void lorawan_setup::on_check_save_history_toggled(bool checked)
 {
-#if 0
     ui->combo_history->setEnabled(checked);
     ui->btn_clear_history->setEnabled(checked);
-
-    emit plugin_save_setting("mcumgr_lora_save_history", checked);
-#endif
+    emit plugin_save_setting("mcumgr_lorawan_save_history", checked);
 }
 
 void lorawan_setup::on_combo_history_currentIndexChanged(int index)
 {
-#if 0
+    QStringList split_data;
+
     if (index == 0)
     {
+        ui->edit_address->clear();
+        ui->edit_port->setValue(8883);
+        ui->check_tls->setChecked(true);
+        ui->edit_username->clear();
+        ui->edit_password->clear();
+        ui->edit_topic->clear();
         return;
     }
 
-    QString data = ui->combo_history->itemText(index);
+    --index;
 
-    ui->edit_address->setText(data.left(data.lastIndexOf(":")));
-    ui->edit_port->setValue(data.mid((data.lastIndexOf(":") + 1), (data.length() - data.lastIndexOf(":") - 1)).toUInt());
-#endif
+    if (index >= saved_history.count())
+    {
+        log_error() << "Select LoRaWAN history entry does not exist: " << index;
+        return;
+    }
+
+    split_data = saved_history.at(index).split(':');
+    ui->edit_address->setText(split_data.at(HISTORY_ENTRY_ADDRESS));
+    ui->edit_port->setValue(split_data.at(HISTORY_ENTRY_PORT).toUInt());
+    ui->check_tls->setChecked(split_data.at(HISTORY_ENTRY_TLS).toUInt());
+    ui->edit_username->setText(split_data.at(HISTORY_ENTRY_USERNAME));
+    ui->edit_password->setText(split_data.at(HISTORY_ENTRY_PASSWORD));
+    ui->edit_topic->setText(split_data.at(HISTORY_ENTRY_TOPIC));
 }
 
 void lorawan_setup::load_settings()
 {
-#if 0
     QVariant data;
     bool found = false;
 
-    emit plugin_load_setting(QString("mcumgr_lora_save_history"), &data, &found);
+    emit plugin_load_setting(QString("mcumgr_lorawan_save_history"), &data, &found);
 
     if (found == true)
     {
         if (data.toBool() == true)
         {
-            emit plugin_load_setting("mcumgr_lora_history", &data, &found);
+            ui->check_save_history->setChecked(true);
+            emit plugin_load_setting("mcumgr_lorawan_history", &data, &found);
 
             if (found == true)
             {
-                ui->combo_history->addItems(data.toStringList());
+                QStringList display_items;
+                uint8_t i = 0;
+
+                this->saved_history = data.toStringList();
+
+                if (this->saved_history.count() > max_history)
+                {
+                    this->saved_history.remove(0, (this->saved_history.count() - max_history));
+                }
+
+                while (i < this->saved_history.length())
+                {
+                    QStringList split_item = this->saved_history.at(i).split(':');
+
+                    if (split_item.length() == history_elements)
+                    {
+                        display_items.append(split_item.at(0) % ":" % split_item.at(1));
+                    }
+                    else
+                    {
+                        this->saved_history.remove(i);
+                        --i;
+                    }
+
+                    ++i;
+                }
+
+                ui->combo_history->addItems(display_items);
             }
         }
         else
@@ -128,49 +186,82 @@ void lorawan_setup::load_settings()
             ui->combo_history->setEnabled(false);
         }
     }
-#endif
 }
 
 void lorawan_setup::add_to_history()
 {
-#if 0
-    QStringList history;
     int items = ui->combo_history->count();
-    QString data = QString("%1:%2").arg(ui->edit_address->text(), QString::number(ui->edit_port->value()));
+    uint8_t tokens = 0;
+    int last_token = 0;
+    QString full_data = ui->edit_address->text() % ":" % QString::number(ui->edit_port->value()) % ":" % QString::number(ui->check_tls->isChecked()) % ":" % ui->edit_username->text() % ":" % ui->edit_password->text() % ":" % ui->edit_topic->text();
+    QString display_data = ui->edit_address->text() % ":" % QString::number(ui->edit_port->value());
 
-    while (items > MAX_LORAWAN_HISTORY)
+    //Ensure there are no : or , elements in any fields as these are used for element delimiters and list delimiters
+    while (last_token != -1)
     {
-        --items;
+        last_token = full_data.indexOf(':', last_token);
 
-        ui->combo_history->removeItem(items);
-    }
-
-    while (items > 0)
-    {
-        if (ui->combo_history->itemText(items) == data)
+        if (last_token != -1)
         {
-            //Item already in history
-            ui->combo_history->setCurrentIndex(items);
-            return;
-        }
+            ++last_token;
+            ++tokens;
 
-        --items;
+            if (tokens > history_tokens)
+            {
+                return;
+            }
+        }
     }
 
-    ui->combo_history->insertItem(1, data);
-    ui->combo_history->setCurrentIndex(0);
+    if (tokens != history_tokens)
+    {
+        return;
+    }
 
-    items = ui->combo_history->count() - 1;
+    if (full_data.indexOf(',', last_token))
+    {
+        return;
+    }
 
     while (items > 0)
     {
-        history.append(ui->combo_history->itemText(items));
-
         --items;
+
+        if (ui->combo_history->itemText(items) == display_data)
+        {
+            //Item already in history, update saved history if setting differs by moving position
+            if (this->saved_history.at(items) != full_data)
+            {
+                ui->combo_history->removeItem(items);
+                this->saved_history.remove(items);
+                break;
+            }
+            else
+            {
+                ui->combo_history->setCurrentIndex(items);
+                return;
+            }
+        }
     }
 
-    emit plugin_save_setting("mcumgr_lora_history", history);
-#endif
+    ui->combo_history->addItem(display_data);
+    ui->combo_history->setCurrentIndex((ui->combo_history->count() - 1));
+    this->saved_history.append(full_data);
+
+    items = this->saved_history.count();
+
+    if (items > max_history)
+    {
+        this->saved_history.remove(0, (items - max_history));
+
+        while (items > max_history)
+        {
+            ui->combo_history->removeItem(1);
+            --items;
+        }
+    }
+
+    emit plugin_save_setting("mcumgr_lorawan_history", this->saved_history);
 }
 
 bool lorawan_setup::get_confirmed_downlinks()
@@ -256,3 +347,12 @@ uint32_t lorawan_setup::get_timeout()
 {
     return ui->edit_timeout->value() * 1000;
 }
+
+void lorawan_setup::set_logger(debug_logger *object)
+{
+    logger = object;
+}
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

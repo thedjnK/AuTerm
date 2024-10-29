@@ -23,16 +23,24 @@
 #ifndef LORAWAN_SETUP_H
 #define LORAWAN_SETUP_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include <QDialog>
 #include <QVariant>
+#include "debug_logger.h"
 
-#define MAX_LORAWAN_HISTORY 10
-
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
 namespace Ui
 {
     class lorawan_setup;
 }
 
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class lorawan_setup : public QDialog
 {
     Q_OBJECT
@@ -50,6 +58,9 @@ public:
     void set_connection_options_enabled(bool enabled);
     void load_pixmaps();
     void set_connection_state(bool connected);
+#ifndef SKIPPLUGIN_LOGGER
+    void set_logger(debug_logger *object);
+#endif
 
 private slots:
     void on_btn_connect_clicked();
@@ -72,6 +83,15 @@ private:
     QPixmap *red_circle;
     QPixmap *green_circle;
     bool is_connected;
+    QStringList saved_history;
+
+#ifndef SKIPPLUGIN_LOGGER
+    debug_logger *logger;
+#endif
 };
 
 #endif // LORAWAN_SETUP_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

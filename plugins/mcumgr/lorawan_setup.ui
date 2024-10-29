@@ -353,7 +353,7 @@
       <item row="0" column="0" colspan="3">
        <widget class="QComboBox" name="combo_history">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="editable">
          <bool>false</bool>
@@ -486,7 +486,10 @@
       <item row="4" column="0">
        <widget class="QCheckBox" name="check_save_history">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked, will save connection details of previous connections.&lt;/p&gt;&lt;p&gt;WARNING: All information including passwords are stored in clear-text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Save history</string>

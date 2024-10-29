@@ -203,6 +203,10 @@ void smp_lora::close_connect_dialog()
 
 void smp_lora::setup_finished()
 {
+#ifndef SKIPPLUGIN_LOGGER
+    lorawan_window->set_logger(logger);
+#endif
+
     lorawan_window->load_settings();
 }
 
