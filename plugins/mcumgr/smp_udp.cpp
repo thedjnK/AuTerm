@@ -20,10 +20,17 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
+
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "smp_udp.h"
 #include <QNetworkDatagram>
 #include <QInputDialog>
 
+/******************************************************************************/
+// Local Functions or Private Members
+/******************************************************************************/
 smp_udp::smp_udp(QObject *parent)
 {
     Q_UNUSED(parent);
@@ -37,8 +44,11 @@ smp_udp::smp_udp(QObject *parent)
     QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(socket_readyread()));
 
     QObject::connect(udp_window, SIGNAL(connect_to_device(QString,uint16_t)), this, SLOT(connect_to_device(QString,uint16_t)));
+    QObject::connect(udp_window, SIGNAL(disconnect_from_device()), this, SLOT(disconnect_from_device()));
+    QObject::connect(udp_window, SIGNAL(is_connected(bool*)), this, SLOT(is_connected(bool*)));
     QObject::connect(udp_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
     QObject::connect(udp_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
+    QObject::connect(udp_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
 }
 
 smp_udp::~smp_udp()
@@ -46,8 +56,11 @@ smp_udp::~smp_udp()
     QObject::disconnect(this, SLOT(socket_readyread()));
 
     QObject::disconnect(this, SLOT(connect_to_device(QString,uint16_t)));
+    QObject::disconnect(this, SLOT(disconnect_from_device()));
+    QObject::disconnect(this, SLOT(is_connected(bool*)));
     QObject::disconnect(udp_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
     QObject::disconnect(udp_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
+    QObject::disconnect(udp_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
 
     if (socket_is_connected == true)
     {
@@ -85,7 +98,6 @@ int smp_udp::disconnect(bool force)
 
     socket->disconnectFromHost();
     socket_is_connected = false;
-//    socket_received_data.clear();
     received_data.clear();
 
     return SMP_TRANSPORT_ERROR_OK;
@@ -93,6 +105,7 @@ int smp_udp::disconnect(bool force)
 
 void smp_udp::open_connect_dialog()
 {
+    udp_window->load_pixmaps();
     udp_window->show();
 }
 
@@ -151,5 +164,22 @@ void smp_udp::close_connect_dialog()
 
 void smp_udp::setup_finished()
 {
+#ifndef SKIPPLUGIN_LOGGER
+    udp_window->set_logger(logger);
+#endif
     udp_window->load_settings();
 }
+
+void smp_udp::disconnect_from_device()
+{
+    disconnect(false);
+}
+
+void smp_udp::is_connected(bool *connected)
+{
+    *connected = socket_is_connected;
+}
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

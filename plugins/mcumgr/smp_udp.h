@@ -23,11 +23,17 @@
 #ifndef SMP_UDP_H
 #define SMP_UDP_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "plugin_mcumgr.h"
 #include "smp_transport.h"
 #include "udp_setup.h"
 #include <QUdpSocket>
 
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class smp_udp : public smp_transport
 {
     Q_OBJECT
@@ -45,6 +51,8 @@ public:
 
 private slots:
     void connect_to_device(QString host, uint16_t port);
+    void disconnect_from_device();
+    void is_connected(bool *connected);
     void socket_readyread();
 
 private:
@@ -53,10 +61,10 @@ private:
     QUdpSocket *socket;
     bool socket_is_connected;
     smp_message received_data;
-
-//    QString setting_host;
-//    uint32_t setting_port;
-//    uint32_t setting_mtu;
 };
 
 #endif // SMP_UDP_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

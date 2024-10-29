@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -23,16 +23,24 @@
 #ifndef UDP_SETUP_H
 #define UDP_SETUP_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include <QDialog>
 #include <QVariant>
+#include "debug_logger.h"
 
-#define MAX_UDP_HISTORY 10
-
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
 namespace Ui
 {
     class udp_setup;
 }
 
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class udp_setup : public QDialog
 {
     Q_OBJECT
@@ -41,6 +49,10 @@ public:
     explicit udp_setup(QWidget *parent = nullptr);
     ~udp_setup();
     void load_settings();
+    void load_pixmaps();
+#ifndef SKIPPLUGIN_LOGGER
+    void set_logger(debug_logger *object);
+#endif
 
 private slots:
     void on_btn_connect_clicked();
@@ -51,13 +63,26 @@ private slots:
 
 signals:
     void connect_to_device(QString host, uint16_t port);
+    void disconnect_from_device();
+    void is_connected(bool *connected);
     void plugin_save_setting(QString name, QVariant data);
     void plugin_load_setting(QString name, QVariant *data, bool *found);
+    void plugin_get_image_pixmap(QString name, QPixmap **pixmap);
 
 private:
-    Ui::udp_setup *ui;
-
     void add_to_history();
+
+    Ui::udp_setup *ui;
+    QPixmap *red_circle;
+    QPixmap *green_circle;
+    QStringList saved_history;
+#ifndef SKIPPLUGIN_LOGGER
+    debug_logger *logger;
+#endif
 };
 
 #endif // UDP_SETUP_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

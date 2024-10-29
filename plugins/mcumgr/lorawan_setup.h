@@ -84,7 +84,6 @@ private:
     QPixmap *green_circle;
     bool is_connected;
     QStringList saved_history;
-
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;
 #endif

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>273</width>
-    <height>148</height>
+    <height>167</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,8 +27,22 @@
     <number>6</number>
    </property>
    <property name="spacing">
-    <number>3</number>
+    <number>2</number>
    </property>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="btn_connect">
+     <property name="text">
+      <string>&amp;Connect</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="btn_close">
+     <property name="text">
+      <string>C&amp;lose</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -107,7 +121,7 @@
          <number>2</number>
         </property>
         <property name="sizeConstraint">
-         <enum>QLayout::SetNoConstraint</enum>
+         <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
         </property>
         <item>
          <widget class="QCheckBox" name="check_save_history">
@@ -134,10 +148,10 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="0">
+      <item row="3" column="0" colspan="3">
        <spacer name="verticalSpacer">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -150,22 +164,57 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="btn_connect">
-     <property name="text">
-      <string>Connect</string>
+   <item row="1" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="topMargin">
+      <number>0</number>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btn_close">
-     <property name="text">
-      <string>Close</string>
-     </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Status:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_status_image">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_status">
+       <property name="text">
+        <string>Not connected</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>combo_history</tabstop>
+  <tabstop>edit_address</tabstop>
+  <tabstop>edit_port</tabstop>
+  <tabstop>check_save_history</tabstop>
+  <tabstop>btn_clear_history</tabstop>
+  <tabstop>btn_connect</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

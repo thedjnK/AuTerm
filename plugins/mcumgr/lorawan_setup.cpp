@@ -93,6 +93,7 @@ void lorawan_setup::on_btn_clear_history_clicked()
     ui->combo_history->clear();
     emit plugin_save_setting("mcumgr_lorawan_history", QStringList());
     ui->combo_history->addItem("");
+    this->saved_history.clear();
 }
 
 void lorawan_setup::on_check_save_history_toggled(bool checked)
@@ -106,7 +107,7 @@ void lorawan_setup::on_combo_history_currentIndexChanged(int index)
 {
     QStringList split_data;
 
-    if (index == 0)
+    if (index == 0 && ui->combo_history->count() > 1)
     {
         ui->edit_address->clear();
         ui->edit_port->setValue(8883);
@@ -116,12 +117,16 @@ void lorawan_setup::on_combo_history_currentIndexChanged(int index)
         ui->edit_topic->clear();
         return;
     }
+    else if (index <= 0)
+    {
+        return;
+    }
 
     --index;
 
     if (index >= saved_history.count())
     {
-        log_error() << "Select LoRaWAN history entry does not exist: " << index;
+        log_error() << "Selected LoRaWAN history entry does not exist: " << index;
         return;
     }
 
@@ -218,7 +223,7 @@ void lorawan_setup::add_to_history()
         return;
     }
 
-    if (full_data.indexOf(',', last_token))
+    if (full_data.indexOf(',', last_token) != -1)
     {
         return;
     }
@@ -230,10 +235,10 @@ void lorawan_setup::add_to_history()
         if (ui->combo_history->itemText(items) == display_data)
         {
             //Item already in history, update saved history if setting differs by moving position
-            if (this->saved_history.at(items) != full_data)
+            if (this->saved_history.at((items - 1)) != full_data)
             {
                 ui->combo_history->removeItem(items);
-                this->saved_history.remove(items);
+                this->saved_history.remove((items - 1));
                 break;
             }
             else
@@ -348,10 +353,12 @@ uint32_t lorawan_setup::get_timeout()
     return ui->edit_timeout->value() * 1000;
 }
 
+#ifndef SKIPPLUGIN_LOGGER
 void lorawan_setup::set_logger(debug_logger *object)
 {
     logger = object;
 }
+#endif
 
 /******************************************************************************/
 // END OF FILE
