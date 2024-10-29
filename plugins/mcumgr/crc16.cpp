@@ -3,7 +3,7 @@
 **
 ** Project: AuTerm
 **
-** Module:  crc16.h
+** Module:  crc16.cpp
 **
 ** Notes:   Taken from Zephyr source
 **

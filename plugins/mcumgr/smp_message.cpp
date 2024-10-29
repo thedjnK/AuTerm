@@ -107,7 +107,7 @@ int smp_message::data_size(void)
         return 0;
     }
 
-    return this->buffer.size() - sizeof(smp_hdr);
+    return this->buffer.size() - (int)sizeof(smp_hdr);
 }
 
 bool smp_message::is_valid(void)
@@ -125,7 +125,7 @@ bool smp_message::is_valid(void)
     data_size = ((data_size & 0xff) << 8) | ((data_size & 0xff00) >> 8);
 #endif
 
-    if (this->buffer.size() >= data_size + sizeof(smp_hdr))
+    if ((size_t)this->buffer.size() >= data_size + sizeof(smp_hdr))
     {
         return true;
     }

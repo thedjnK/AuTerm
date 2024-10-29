@@ -75,7 +75,7 @@ private:
     uint8_t mode;
     int32_t *return_ret;
     QFile local_file;
-    int32_t local_file_size;
+    uint32_t local_file_size;
     uint32_t file_upload_area;
     QElapsedTimer upload_tmr;
     QString device_file_name;

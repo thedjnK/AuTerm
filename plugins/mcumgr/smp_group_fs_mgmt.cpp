@@ -905,7 +905,7 @@ bool smp_group_fs_mgmt::start_upload(QString file_name, QString destination_name
 
     mode = MODE_UPLOAD;
     device_file_name = destination_name;
-    local_file_size = local_file.size();
+    local_file_size = (uint32_t)local_file.size();
     file_upload_area = 0;
     upload_tmr.start();
 

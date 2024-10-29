@@ -750,7 +750,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_os_datetime_date_time->setMinimumDate(QDate(1970, 1, 1));
     edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::Section::YearSection);
     edit_os_datetime_date_time->setCalendarPopup(true);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    edit_os_datetime_date_time->setTimeZone(QTimeZone::LocalTime);
+#else
     edit_os_datetime_date_time->setTimeSpec(Qt::TimeSpec::LocalTime);
+#endif
 
     gridLayout_18->addWidget(edit_os_datetime_date_time, 0, 1, 1, 1);
 
@@ -3484,45 +3488,45 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
             else if (user_data == ACTION_OS_BOOTLOADER_INFO)
             {
-                switch (bootloader_info_response.type())
+                switch (bootloader_info_response.typeId())
                 {
-                    case QVariant::Bool:
+                    case QMetaType::Bool:
                     {
                         edit_os_bootloader_response->setText(bootloader_info_response.toBool() == true ? "True" : "False");
                         break;
                     }
 
-                    case QVariant::Int:
+                    case QMetaType::Int:
                     {
                         edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toInt()));
                         break;
                     }
 
-                    case QVariant::LongLong:
+                    case QMetaType::LongLong:
                     {
                         edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toLongLong()));
                         break;
                     }
 
-                    case QVariant::UInt:
+                    case QMetaType::UInt:
                     {
                         edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toUInt()));
                         break;
                     }
 
-                    case QVariant::ULongLong:
+                    case QMetaType::ULongLong:
                     {
                         edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toULongLong()));
                         break;
                     }
 
-                    case QVariant::Double:
+                    case QMetaType::Double:
                     {
                         edit_os_bootloader_response->setText(QString::number(bootloader_info_response.toDouble()));
                         break;
                     }
 
-                    case QVariant::String:
+                    case QMetaType::QString:
                     {
                         edit_os_bootloader_response->setText(bootloader_info_response.toString());
                         break;

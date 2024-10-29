@@ -40,7 +40,7 @@ debug_logger::~debug_logger()
     }
 }
 
-qint64 debug_logger::readData(char *data, qint64 maxlen)
+qint64 debug_logger::readData(char *, qint64)
 {
     return 0;
 }
