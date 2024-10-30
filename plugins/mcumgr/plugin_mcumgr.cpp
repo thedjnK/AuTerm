@@ -56,7 +56,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_LORAWAN)
-    lora_transport = new smp_lora(this);
+    lora_transport = new smp_lorawan(this);
 #endif
 
     //Initialise SMP-related objects

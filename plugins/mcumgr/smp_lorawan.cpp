@@ -3,7 +3,7 @@
 **
 ** Project: AuTerm
 **
-** Module:  smp_lora.cpp
+** Module:  smp_lorawan.cpp
 **
 ** Notes:
 **
@@ -20,10 +20,10 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#include "smp_lora.h"
+#include "smp_lorawan.h"
 #include <QInputDialog>
 
-smp_lora::smp_lora(QObject *parent)
+smp_lorawan::smp_lorawan(QObject *parent)
 {
     Q_UNUSED(parent);
 
@@ -46,7 +46,7 @@ smp_lora::smp_lora(QObject *parent)
     QObject::connect(lorawan_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
 }
 
-smp_lora::~smp_lora()
+smp_lorawan::~smp_lorawan()
 {
     QObject::disconnect(this, SLOT(mqtt_connected()));
     QObject::disconnect(this, SLOT(mqtt_disconnected()));
@@ -84,7 +84,7 @@ smp_lora::~smp_lora()
     delete mqtt_client;
 }
 
-int smp_lora::connect(void)
+int smp_lorawan::connect(void)
 {
     if (mqtt_is_connected == true)
     {
@@ -94,7 +94,7 @@ int smp_lora::connect(void)
     return SMP_TRANSPORT_ERROR_OK;
 }
 
-int smp_lora::disconnect(bool force)
+int smp_lorawan::disconnect(bool force)
 {
     if (mqtt_is_connected == false)
     {
@@ -107,12 +107,12 @@ int smp_lora::disconnect(bool force)
     return SMP_TRANSPORT_ERROR_OK;
 }
 
-void smp_lora::open_connect_dialog()
+void smp_lorawan::open_connect_dialog()
 {
     lorawan_window->show();
 }
 
-int smp_lora::is_connected()
+int smp_lorawan::is_connected()
 {
     if (mqtt_is_connected == true)
     {
@@ -122,7 +122,7 @@ int smp_lora::is_connected()
     return 0;
 }
 
-int smp_lora::send(smp_message *message)
+int smp_lorawan::send(smp_message *message)
 {
     QJsonObject json_object;
     QJsonArray json_object_downlink_array;
@@ -171,7 +171,7 @@ int smp_lora::send(smp_message *message)
     return SMP_TRANSPORT_ERROR_OK;
 }
 
-void smp_lora::connect_to_service(QString host, uint16_t port,  bool tls, QString username, QString password, QString topic)
+void smp_lorawan::connect_to_service(QString host, uint16_t port,  bool tls, QString username, QString password, QString topic)
 {
     mqtt_client->setHostname(host);
     mqtt_client->setPort(port);
@@ -192,7 +192,7 @@ void smp_lora::connect_to_service(QString host, uint16_t port,  bool tls, QStrin
     lorawan_window->set_connection_options_enabled(false);
 }
 
-void smp_lora::close_connect_dialog()
+void smp_lorawan::close_connect_dialog()
 {
     if (lorawan_window->isVisible())
     {
@@ -200,7 +200,7 @@ void smp_lora::close_connect_dialog()
     }
 }
 
-void smp_lora::setup_finished()
+void smp_lorawan::setup_finished()
 {
 #ifndef SKIPPLUGIN_LOGGER
     lorawan_window->set_logger(logger);
@@ -210,13 +210,13 @@ void smp_lora::setup_finished()
     lorawan_window->load_pixmaps();
 }
 
-void smp_lora::mqtt_connected()
+void smp_lorawan::mqtt_connected()
 {
     log_debug() << "MQTT connected";
     mqtt_is_connected = true;
 }
 
-void smp_lora::mqtt_disconnected()
+void smp_lorawan::mqtt_disconnected()
 {
     log_debug() << "MQTT disconnected";
     mqtt_is_connected = false;
@@ -234,7 +234,7 @@ void smp_lora::mqtt_disconnected()
     lorawan_window->set_connection_options_enabled(true);
 }
 
-void smp_lora::mqtt_state_changed(QMqttClient::ClientState state)
+void smp_lorawan::mqtt_state_changed(QMqttClient::ClientState state)
 {
     switch (state)
     {
@@ -263,7 +263,7 @@ void smp_lora::mqtt_state_changed(QMqttClient::ClientState state)
     };
 }
 
-void smp_lora::mqtt_error_changed(QMqttClient::ClientError error)
+void smp_lorawan::mqtt_error_changed(QMqttClient::ClientError error)
 {
     switch (error)
     {
@@ -327,14 +327,14 @@ void smp_lora::mqtt_error_changed(QMqttClient::ClientError error)
     mqtt_client->disconnectFromHost();
 }
 
-void smp_lora::mqtt_authentication_requested(const QMqttAuthenticationProperties &)
+void smp_lorawan::mqtt_authentication_requested(const QMqttAuthenticationProperties &)
 {
     log_warning() << "MQTT authentication requested: not supported, dropping connection";
     mqtt_is_connected = false;
     mqtt_client->disconnectFromHost();
 }
 
-void smp_lora::mqtt_topic_message_received(QMqttMessage message)
+void smp_lorawan::mqtt_topic_message_received(QMqttMessage message)
 {
     QByteArray decoded_packet;
     QJsonParseError json_error;
@@ -429,7 +429,7 @@ void smp_lora::mqtt_topic_message_received(QMqttMessage message)
     }
 }
 
-void smp_lora::mqtt_topic_state_changed(QMqttSubscription::SubscriptionState state)
+void smp_lorawan::mqtt_topic_state_changed(QMqttSubscription::SubscriptionState state)
 {
     switch (state)
     {
@@ -457,7 +457,7 @@ void smp_lora::mqtt_topic_state_changed(QMqttSubscription::SubscriptionState sta
     };
 }
 
-void smp_lora::disconnect_from_service()
+void smp_lorawan::disconnect_from_service()
 {
     if (mqtt_is_connected == false)
     {
@@ -469,12 +469,12 @@ void smp_lora::disconnect_from_service()
     mqtt_client->disconnectFromHost();
 }
 
-uint8_t smp_lora::get_retries()
+uint8_t smp_lorawan::get_retries()
 {
     return lorawan_window->get_resends();
 }
 
-uint32_t smp_lora::get_timeout()
+uint32_t smp_lorawan::get_timeout()
 {
     return lorawan_window->get_timeout();
 }

@@ -3,7 +3,7 @@
 **
 ** Project: AuTerm
 **
-** Module:  smp_lora.h
+** Module:  smp_lorawan.h
 **
 ** Notes:
 **
@@ -20,8 +20,8 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef SMP_LORA_H
-#define SMP_LORA_H
+#ifndef SMP_LORAWAN_H
+#define SMP_LORAWAN_H
 
 #include "plugin_mcumgr.h"
 #include "smp_transport.h"
@@ -31,13 +31,13 @@
 #include <QtMqtt/QMqttSubscription>
 #include <QtMqtt/QMqttMessage>
 
-class smp_lora : public smp_transport
+class smp_lorawan : public smp_transport
 {
     Q_OBJECT
 
 public:
-    smp_lora(QObject *parent = nullptr);
-    ~smp_lora();
+    smp_lorawan(QObject *parent = nullptr);
+    ~smp_lorawan();
     int connect(void) override;
     int disconnect(bool force) override;
     void open_connect_dialog();
@@ -71,4 +71,4 @@ private:
     QByteArray buffered_send_data;
 };
 
-#endif // SMP_LORA_H
+#endif // SMP_LORAWAN_H

@@ -58,7 +58,7 @@
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_LORAWAN)
-#include "smp_lora.h"
+#include "smp_lorawan.h"
 #endif
 
 //Form includes
@@ -93,6 +93,9 @@
 #include "AutScrollEdit.h"
 ///AUTOGEN_END_INCLUDES
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum mcumgr_action_t {
     ACTION_IDLE,
 
@@ -597,7 +600,7 @@ private:
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_LORAWAN)
-    class smp_lora *lora_transport;
+    class smp_lorawan *lora_transport;
 #endif
 
     QList<image_state_t> images_list;

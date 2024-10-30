@@ -127,11 +127,11 @@ contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_UDP) {
 contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_LORAWAN) {
     SOURCES += \
 	lorawan_setup.cpp \
-	smp_lora.cpp
+	smp_lorawan.cpp
 
     HEADERS += \
 	lorawan_setup.h \
-	smp_lora.h
+	smp_lorawan.h
 
     FORMS += \
     lorawan_setup.ui
