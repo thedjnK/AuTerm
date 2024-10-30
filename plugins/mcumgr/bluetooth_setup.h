@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -23,13 +23,35 @@
 #ifndef BLUETOOTH_SETUP_H
 #define BLUETOOTH_SETUP_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include <QDialog>
 #include <QListWidgetItem>
+#include "debug_logger.h"
 
-namespace Ui {
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
+enum BLUETOOTH_FORCE_ADDRESS {
+    BLUETOOTH_FORCE_ADDRESS_DEFAULT,
+    BLUETOOTH_FORCE_ADDRESS_RANDOM,
+    BLUETOOTH_FORCE_ADDRESS_PUBLIC,
+
+    BLUETOOTH_FORCE_ADDRESS_COUNT
+};
+
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
+namespace Ui
+{
     class bluetooth_setup;
 }
 
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class bluetooth_setup : public QDialog
 {
     Q_OBJECT
@@ -41,23 +63,38 @@ public:
     void add_device(QString *data);
     void discovery_state(bool started);
     void connection_state(bool connected);
+    void set_status_text(QString status);
+    void load_pixmaps();
+#ifndef SKIPPLUGIN_LOGGER
+    void set_logger(debug_logger *object);
+#endif
 
 private slots:
     void on_btn_refresh_clicked();
     void on_btn_connect_clicked();
-    void on_btn_disconnect_clicked();
     void on_btn_close_clicked();
     void on_list_devices_itemDoubleClicked(QListWidgetItem *item);
     void on_list_devices_currentRowChanged(int row);
 
 signals:
     void refresh_devices();
-    void connect_to_device(uint16_t index);
+    void connect_to_device(uint16_t index, uint8_t address_type);
     void disconnect_from_device();
     void bluetooth_status(bool *scanning, bool *connecting);
+    void plugin_get_image_pixmap(QString name, QPixmap **pixmap);
 
 private:
     Ui::bluetooth_setup *ui;
+    QPixmap *red_circle;
+    QPixmap *green_circle;
+    bool connected;
+#ifndef SKIPPLUGIN_LOGGER
+    debug_logger *logger;
+#endif
 };
 
 #endif // BLUETOOTH_SETUP_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

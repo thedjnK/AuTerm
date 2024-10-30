@@ -4223,6 +4223,10 @@ void plugin_mcumgr::setup_finished()
     logger->find_logger_plugin(parent_window);
 #endif
 
+#if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
+    bluetooth_transport->setup_finished();
+#endif
+
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     udp_transport->setup_finished();
 #endif

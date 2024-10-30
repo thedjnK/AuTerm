@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2021-2023 Jamie M.
+** Copyright (C) 2021-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -24,18 +24,22 @@
 #define SMP_BLUETOOTH_H
 
 #include <QObject>
-#include "plugin_mcumgr.h"
-#include "smp_transport.h"
-#include "smp_message.h"
-
+#include <QTimer>
+#include <QListWidgetItem>
+#include <QBluetoothUuid>
+#include <QBluetoothDeviceDiscoveryAgent>
+#include <QLowEnergyController>
+#include <QLowEnergyConnectionParameters>
+#include <QLowEnergyCharacteristic>
 #include <qbluetoothaddress.h>
 #include <qbluetoothdevicediscoveryagent.h>
 #include <qbluetoothlocaldevice.h>
 #include <qbluetoothdeviceinfo.h>
 #include <qbluetoothservicediscoveryagent.h>
-#include <QLowEnergyController>
-#include <QBluetoothDeviceDiscoveryAgent>
-#include <QListWidgetItem>
+#include "plugin_mcumgr.h"
+#include "smp_transport.h"
+#include "smp_message.h"
+#include "bluetooth_setup.h"
 
 class smp_bluetooth : public smp_transport
 {
@@ -50,6 +54,7 @@ public:
     int is_connected() override;
     int send(smp_message *message);
     void close_connect_dialog();
+    void setup_finished();
 
 private slots:
     void deviceDiscovered(const QBluetoothDeviceInfo &info);
@@ -64,12 +69,16 @@ private slots:
     void mcumgr_service_error(QLowEnergyService::ServiceError error);
     void mcumgr_service_state_changed(QLowEnergyService::ServiceState nNewState);
     void errorz(QLowEnergyController::Error error);
-
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+    void mtu_updated(int mtu);
+#endif
     void timeout_timer();
+#if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
     void discover_timer_timeout();
+#endif
 
     void form_refresh_devices();
-    void form_connect_to_device(uint16_t index);
+    void form_connect_to_device(uint16_t index, uint8_t address_type);
     void form_disconnect_from_device();
     void form_bluetooth_status(bool *scanning, bool *connecting);
 //    void connection_updated(QLowEnergyConnectionParameters parameters);
@@ -80,12 +89,25 @@ signals:
 private:
     void form_min_params();
 
-//    Ui::bluetooth *ui;
+    QMainWindow *main_window;
     QBluetoothDeviceDiscoveryAgent *discoveryAgent = nullptr;
 //    DeviceInfo currentDevice;
     QLowEnergyController *controller = nullptr;
     bool device_connected;
     smp_message received_data;
+    QList<QBluetoothDeviceInfo> bluetooth_device_list;
+    QList<QBluetoothUuid> services;
+    QLowEnergyService *bluetooth_service_mcumgr;
+    QLowEnergyCharacteristic bluetooth_characteristic_transmit;
+    uint16_t mtu;
+    uint16_t mtu_max_worked;
+    QByteArray send_buffer;
+    bluetooth_setup *bluetooth_window;
+    QTimer retry_timer;
+    int retry_count;
+#if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
+    QTimer discover_timer;
+#endif
 };
 
 #endif // SMP_BLUETOOTH_H

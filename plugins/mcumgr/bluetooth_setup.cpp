@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -33,8 +33,11 @@ bluetooth_setup::bluetooth_setup(QWidget *parent) :
     this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
 
     ui->btn_connect->setEnabled(false);
-    ui->btn_disconnect->setEnabled(false);
     ui->btn_refresh->setEnabled(false);
+
+    connected = false;
+    red_circle = nullptr;
+    green_circle = nullptr;
 }
 
 bluetooth_setup::~bluetooth_setup()
@@ -49,15 +52,24 @@ void bluetooth_setup::on_btn_refresh_clicked()
 
 void bluetooth_setup::on_btn_connect_clicked()
 {
-    if (ui->list_devices->selectedItems().count() == 1)
-    {
-        emit connect_to_device(ui->list_devices->currentRow());
-    }
-}
+    bool scanning;
+    bool connecting;
 
-void bluetooth_setup::on_btn_disconnect_clicked()
-{
-    emit disconnect_from_device();
+    emit bluetooth_status(&scanning, &connecting);
+
+    if (connecting == false)
+    {
+        if (ui->list_devices->selectedItems().count() == 1)
+        {
+            ui->btn_connect->setEnabled(false);
+            ui->label_status->setText("Connecting...");
+            emit connect_to_device(ui->list_devices->currentRow(), (ui->radio_address_type_public->isChecked() ? BLUETOOTH_FORCE_ADDRESS_PUBLIC : (ui->radio_address_type_random->isChecked() ? BLUETOOTH_FORCE_ADDRESS_RANDOM : BLUETOOTH_FORCE_ADDRESS_DEFAULT)));
+        }
+    }
+    else
+    {
+        emit disconnect_from_device();
+    }
 }
 
 void bluetooth_setup::on_btn_close_clicked()
@@ -83,19 +95,35 @@ void bluetooth_setup::add_device(QString *data)
 void bluetooth_setup::discovery_state(bool started)
 {
     ui->btn_refresh->setEnabled(!started);
-
-    if (started == true)
-    {
-        ui->btn_connect->setEnabled(false);
-        ui->btn_disconnect->setEnabled(false);
-    }
 }
 
 void bluetooth_setup::connection_state(bool connected)
 {
-    ui->btn_connect->setEnabled(!connected);
-    ui->btn_disconnect->setEnabled(connected);
     ui->btn_refresh->setEnabled(!connected);
+    ui->btn_connect->setText((connected == true ? "&Disconnect" : "&Connect"));
+    this->connected = connected;
+
+    if (ui->list_devices->selectedItems().length() == 0 && connected == false)
+    {
+        ui->btn_connect->setEnabled(false);
+    }
+    else if (connected == true)
+    {
+        ui->btn_connect->setEnabled(true);
+
+        if (green_circle != nullptr)
+        {
+            ui->label_status_image->setPixmap(*green_circle);
+        }
+    }
+
+    if (connected == false)
+    {
+        if (red_circle != nullptr)
+        {
+            ui->label_status_image->setPixmap(*red_circle);
+        }
+    }
 }
 
 void bluetooth_setup::on_list_devices_currentRowChanged(int row)
@@ -107,10 +135,47 @@ void bluetooth_setup::on_list_devices_currentRowChanged(int row)
 
         emit bluetooth_status(&scanning, &connecting);
 
-        ui->btn_connect->setEnabled((connecting == false ? true : false));
+        ui->btn_connect->setEnabled(true);
+
+        if (connecting != this->connected)
+        {
+            ui->btn_connect->setText((connecting == true ? "&Disconnect" : "&Connect"));
+            this->connected = connecting;
+        }
     }
     else
     {
         ui->btn_connect->setEnabled(false);
     }
 }
+
+void bluetooth_setup::set_status_text(QString status)
+{
+    ui->label_status->setText(status);
+}
+
+void bluetooth_setup::load_pixmaps()
+{
+    if (red_circle == nullptr)
+    {
+        //Fetch pixmaps for green and red status circles
+        emit plugin_get_image_pixmap("RedCircle", &red_circle);
+        emit plugin_get_image_pixmap("GreenCircle", &green_circle);
+
+        if (red_circle != nullptr)
+        {
+            ui->label_status_image->setPixmap(*red_circle);
+        }
+    }
+}
+
+#ifndef SKIPPLUGIN_LOGGER
+void bluetooth_setup::set_logger(debug_logger *object)
+{
+    logger = object;
+}
+#endif
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/
