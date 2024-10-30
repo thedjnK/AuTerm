@@ -105,7 +105,6 @@ int smp_udp::disconnect(bool force)
 
 void smp_udp::open_connect_dialog()
 {
-    udp_window->load_pixmaps();
     udp_window->show();
 }
 
@@ -168,6 +167,7 @@ void smp_udp::setup_finished()
     udp_window->set_logger(logger);
 #endif
     udp_window->load_settings();
+    udp_window->load_pixmaps();
 }
 
 void smp_udp::disconnect_from_device()

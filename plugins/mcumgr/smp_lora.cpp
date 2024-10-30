@@ -109,7 +109,6 @@ int smp_lora::disconnect(bool force)
 
 void smp_lora::open_connect_dialog()
 {
-    lorawan_window->load_pixmaps();
     lorawan_window->show();
 }
 
@@ -208,6 +207,7 @@ void smp_lora::setup_finished()
 #endif
 
     lorawan_window->load_settings();
+    lorawan_window->load_pixmaps();
 }
 
 void smp_lora::mqtt_connected()
