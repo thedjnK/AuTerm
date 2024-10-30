@@ -33,6 +33,9 @@
 #include <QElapsedTimer>
 #include <QCborStreamReader>
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum custom_message_callback_t {
     CUSTOM_MESSAGE_CALLBACK_OK,
     CUSTOM_MESSAGE_CALLBACK_ERROR,

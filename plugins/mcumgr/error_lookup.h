@@ -5,7 +5,8 @@
 #include "smp_group_array.h"
 #include "smp_error.h"
 
-namespace Ui {
+namespace Ui
+{
     class error_lookup;
 }
 

@@ -32,6 +32,9 @@
 #define DEFAULT_TRANSPORT_RETRIES 3
 #define DEFAULT_TRANSPORT_TIMEOUT_MS 3000
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum {
     SMP_TRANSPORT_ERROR_OK = 0,
     SMP_TRANSPORT_ERROR_UNSUPPORTED = -1,

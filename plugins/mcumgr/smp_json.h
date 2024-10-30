@@ -27,6 +27,9 @@
 #include <QCborStreamReader>
 #include "smp_message.h"
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum smp_logging_mode_t {
     SMP_LOGGING_MODE_JSON,
     SMP_LOGGING_MODE_YAML,

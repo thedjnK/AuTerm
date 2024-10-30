@@ -27,6 +27,9 @@
 #include <QCborStreamWriter>
 #include "smp_error.h"
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum smp_op_t : uint8_t {
     SMP_OP_READ = 0,
     SMP_OP_READ_RESPONSE,

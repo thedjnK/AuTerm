@@ -73,6 +73,9 @@ enum img_mgmt_upload_match : uint8_t {
     MATCH_PASSED
 };
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 //Indicates the endianess of the image, if it matches the host PC or is opposite (or unknown)
 enum image_endian_t {
     ENDIAN_BIG,
