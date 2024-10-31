@@ -283,8 +283,20 @@ bool AutScrollEdit::vt100_process(QString *buffer, QList<vt100_format_code> *for
             {
                 bool found_digit = false;
                 uint32_t format = 0;
+
+                tmp_format.start = 0;
+                tmp_format.background_color = col_black;
+                tmp_format.background_color_set = false;
+                tmp_format.foreground_color = col_black;
+                tmp_format.foreground_color_set = false;
+                tmp_format.weight = FORMAT_DUAL_UNSET;
+                tmp_format.italic = FORMAT_UNSET;
+                tmp_format.underline = FORMAT_UNSET;
+                tmp_format.strikethrough = FORMAT_UNSET;
+                tmp_format.clear_formatting = false;
+                tmp_format.options = 0;
+                tmp_format.temp = FORMAT_UNSET;
                 ++pos;
-                memset(&tmp_format, 0, sizeof(tmp_format));
 
                 while (pos < l && (buffer->at(pos) == ';' || (buffer->at(pos) >= '0' && buffer->at(pos) <= '9')))
                 {
@@ -1087,13 +1099,11 @@ void AutScrollEdit::update_display()
                     vt100_format_apply(&tcTmpCur, &format[next_entry]);
                     this->setTextCursor(tcTmpCur);
                 }
-                else
-                {
-                    last_format = tcTmpCur.charFormat();
-                }
 
                 dat_in_new_len += mintPrevTextSize;
             }
+
+            last_format = tcTmpCur.charFormat();
         }
 
         if (trim_size > 0 && (uint32_t)dat_in_new_len >= trim_threshold)
