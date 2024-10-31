@@ -1,6 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -38,6 +38,9 @@
 #include <QTextDocumentFragment>
 #include <QClipboard>
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum vt100_mode {
     VT100_MODE_IGNORE = 0,
     VT100_MODE_STRIP,
@@ -57,6 +60,9 @@ enum vt100_dual_format_type {
     FORMAT_DUAL_DOUBLE,
 };
 
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
 struct vt100_format_code {
     int32_t start;
     QColor background_color;
@@ -82,30 +88,13 @@ struct display_buffer_struct {
 
 typedef QList<display_buffer_struct> display_buffer_list;
 
-//QColor col_default = QColor();
-const QColor col_black = QColor(0, 0, 0);
-const QColor col_red = QColor(255, 0, 0);
-const QColor col_green = QColor(0, 255, 0);
-const QColor col_yellow = QColor(255, 247, 0);
-const QColor col_blue = QColor(0, 0, 255);
-const QColor col_magenta = QColor(202, 31, 123);
-const QColor col_cyan = QColor(0, 183, 235);
-const QColor col_white = QColor(255, 255, 255);
-const QColor col_light_gray = QColor(211, 211, 211);
-const QColor col_dark_gray = QColor(135, 135, 135);
-const QColor col_light_red = QColor(255, 203, 203);
-const QColor col_light_green = QColor(203, 255, 203);
-const QColor col_light_yellow = QColor(255, 255, 224);
-const QColor col_light_blue = QColor(203, 203, 255);
-const QColor col_light_magenta = QColor(255, 128, 255);
-const QColor col_light_cyan = QColor(224, 225, 225);
-
 /******************************************************************************/
 // Class definitions
 /******************************************************************************/
 class AutScrollEdit : public QPlainTextEdit
 {
     Q_OBJECT
+
 public:
     explicit AutScrollEdit(QWidget *parent = 0);
     ~AutScrollEdit();
@@ -155,6 +144,7 @@ private:
     QTextCharFormat last_format; //Last format applied to dat out data
     vt100_mode vt100_control_mode; //VT100 control code mode
     bool had_dat_in_data; //True if there is current data displayed from the dat in buffer
+    QTextCharFormat default_format; //Default text format
     QTextCharFormat pre_dat_in_format_backup; //Backup of text format prior to dat in text being added
     uint32_t trim_threshold;
     uint32_t trim_size;

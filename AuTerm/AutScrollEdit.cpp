@@ -1,6 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -34,11 +34,28 @@
 // Constants
 /******************************************************************************/
 const QChar unicode_replacement_char = QChar(0xfffd);
+const QColor col_black = QColor(0, 0, 0);
+const QColor col_red = QColor(255, 0, 0);
+const QColor col_green = QColor(0, 255, 0);
+const QColor col_yellow = QColor(255, 247, 0);
+const QColor col_blue = QColor(0, 0, 255);
+const QColor col_magenta = QColor(202, 31, 123);
+const QColor col_cyan = QColor(0, 183, 235);
+const QColor col_white = QColor(255, 255, 255);
+const QColor col_light_gray = QColor(211, 211, 211);
+const QColor col_dark_gray = QColor(135, 135, 135);
+const QColor col_light_red = QColor(255, 203, 203);
+const QColor col_light_green = QColor(203, 255, 203);
+const QColor col_light_yellow = QColor(255, 255, 224);
+const QColor col_light_blue = QColor(203, 203, 255);
+const QColor col_light_magenta = QColor(255, 128, 255);
+const QColor col_light_cyan = QColor(224, 225, 225);
+//Default output buffer size to reduce mallocs (32KiB)
+const uint32_t out_buffer_size_default = 32768;
 
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-QTextCharFormat pre;
 AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
     //Enable an event filter
@@ -62,114 +79,159 @@ AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     trim_threshold = 0;
     trim_size = 0;
 
-    mstrDatIn.reserve(32768);
+    mstrDatIn.reserve(out_buffer_size_default);
 
-    pre = this->textCursor().charFormat();
-    last_format = pre;
+    default_format = this->textCursor().charFormat();
+    last_format = default_format;
 
     AutEscape::do_setup();
 }
+
+enum VT100_CODES {
+    VT100_CODE_CLEAR_FORMATTING,
+    VT100_CODE_WEIGHT_DOUBLE,
+    VT100_CODE_WEIGHT_HALF,
+    VT100_CODE_ITALIC_ENABLE,
+    VT100_CODE_UNDERLINE_ENABLE,
+    VT100_CODE_STRIKETHROUGH_ENABLE = 9,
+    VT100_CODE_WEIGHT_NORMAL = 22,
+    VT100_CODE_ITALIC_DISABLE,
+    VT100_CODE_UNDERLINE_DISABLE,
+    VT100_CODE_STRIKTHROUGH_DISABLE = 29,
+    VT100_CODE_FOREGROUND_BLACK = 30,
+    VT100_CODE_FOREGROUND_RED,
+    VT100_CODE_FOREGROUND_GREEN,
+    VT100_CODE_FOREGROUND_YELLOW,
+    VT100_CODE_FOREGROUND_BLUE,
+    VT100_CODE_FOREGROUND_MAGENTA,
+    VT100_CODE_FOREGROUND_CYAN,
+    VT100_CODE_FOREGROUND_WHITE,
+    VT100_CODE_BACKGROUND_BLACK = 40,
+    VT100_CODE_BACKGROUND_RED,
+    VT100_CODE_BACKGROUND_GREEN,
+    VT100_CODE_BACKGROUND_YELLOW,
+    VT100_CODE_BACKGROUND_BLUE,
+    VT100_CODE_BACKGROUND_MAGENTA,
+    VT100_CODE_BACKGROUND_CYAN,
+    VT100_CODE_BACKGROUND_WHITE,
+    VT100_CODE_FOREGROUND_DARK_GRAY = 90,
+    VT100_CODE_FOREGROUND_LIGHT_RED,
+    VT100_CODE_FOREGROUND_LIGHT_GREEN,
+    VT100_CODE_FOREGROUND_LIGHT_YELLOW,
+    VT100_CODE_FOREGROUND_LIGHT_BLUE,
+    VT100_CODE_FOREGROUND_LIGHT_MAGENTA,
+    VT100_CODE_FOREGROUND_LIGHT_CYAN,
+    VT100_CODE_FOREGROUND_LIGHT_GRAY,
+    VT100_CODE_BACKGROUND_DARK_GRAY = 100,
+    VT100_CODE_BACKGROUND_LIGHT_RED,
+    VT100_CODE_BACKGROUND_LIGHT_GREEN,
+    VT100_CODE_BACKGROUND_LIGHT_YELLOW,
+    VT100_CODE_BACKGROUND_LIGHT_BLUE,
+    VT100_CODE_BACKGROUND_LIGHT_MAGENTA,
+    VT100_CODE_BACKGROUND_LIGHT_CYAN,
+    VT100_CODE_BACKGROUND_LIGHT_GRAY,
+};
 
 void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *format)
 {
     const QColor *tmp_col;
 
-    if ((code >= 30 && code <= 37) || (code >= 40 && code <= 47) || (code >= 90 && code <= 97) || (code >= 100 && code <= 107))
+    if ((code >= VT100_CODE_FOREGROUND_BLACK && code <= VT100_CODE_FOREGROUND_WHITE) || (code >= VT100_CODE_BACKGROUND_BLACK && code <= VT100_CODE_BACKGROUND_WHITE) || (code >= VT100_CODE_FOREGROUND_DARK_GRAY && code <= VT100_CODE_FOREGROUND_LIGHT_GRAY) || (code >= VT100_CODE_BACKGROUND_DARK_GRAY && code <= VT100_CODE_BACKGROUND_LIGHT_GRAY))
     {
         switch (code)
         {
-            case 30:
-            case 40:
+            case VT100_CODE_FOREGROUND_BLACK:
+            case VT100_CODE_BACKGROUND_BLACK:
             {
                 tmp_col = &col_black;
                 break;
             }
-            case 31:
-            case 41:
+            case VT100_CODE_FOREGROUND_RED:
+            case VT100_CODE_BACKGROUND_RED:
             {
                 tmp_col = &col_red;
                 break;
             }
-            case 32:
-            case 42:
+            case VT100_CODE_FOREGROUND_GREEN:
+            case VT100_CODE_BACKGROUND_GREEN:
             {
                 tmp_col = &col_green;
                 break;
             }
-            case 33:
-            case 43:
+            case VT100_CODE_FOREGROUND_YELLOW:
+            case VT100_CODE_BACKGROUND_YELLOW:
             {
                 tmp_col = &col_yellow;
                 break;
             }
-            case 34:
-            case 44:
+            case VT100_CODE_FOREGROUND_BLUE:
+            case VT100_CODE_BACKGROUND_BLUE:
             {
                 tmp_col = &col_blue;
                 break;
             }
-            case 35:
-            case 45:
+            case VT100_CODE_FOREGROUND_MAGENTA:
+            case VT100_CODE_BACKGROUND_MAGENTA:
             {
                 tmp_col = &col_magenta;
                 break;
             }
-            case 36:
-            case 46:
+            case VT100_CODE_FOREGROUND_CYAN:
+            case VT100_CODE_BACKGROUND_CYAN:
             {
                 tmp_col = &col_cyan;
                 break;
             }
-            case 37:
-            case 47:
+            case VT100_CODE_FOREGROUND_WHITE:
+            case VT100_CODE_BACKGROUND_WHITE:
             {
                 tmp_col = &col_white;
                 break;
             }
-            case 90:
-            case 100:
+            case VT100_CODE_FOREGROUND_DARK_GRAY:
+            case VT100_CODE_BACKGROUND_DARK_GRAY:
             {
                 tmp_col = &col_dark_gray;
                 break;
             }
-            case 91:
-            case 101:
+            case VT100_CODE_FOREGROUND_LIGHT_RED:
+            case VT100_CODE_BACKGROUND_LIGHT_RED:
             {
                 tmp_col = &col_light_red;
                 break;
             }
-            case 92:
-            case 102:
+            case VT100_CODE_FOREGROUND_LIGHT_GREEN:
+            case VT100_CODE_BACKGROUND_LIGHT_GREEN:
             {
                 tmp_col = &col_light_green;
                 break;
             }
-            case 93:
-            case 103:
+            case VT100_CODE_FOREGROUND_LIGHT_YELLOW:
+            case VT100_CODE_BACKGROUND_LIGHT_YELLOW:
             {
                 tmp_col = &col_light_yellow;
                 break;
             }
-            case 94:
-            case 104:
+            case VT100_CODE_FOREGROUND_LIGHT_BLUE:
+            case VT100_CODE_BACKGROUND_LIGHT_BLUE:
             {
                 tmp_col = &col_light_blue;
                 break;
             }
-            case 95:
-            case 105:
+            case VT100_CODE_FOREGROUND_LIGHT_MAGENTA:
+            case VT100_CODE_BACKGROUND_LIGHT_MAGENTA:
             {
                 tmp_col = &col_light_magenta;
                 break;
             }
-            case 96:
-            case 106:
+            case VT100_CODE_FOREGROUND_LIGHT_CYAN:
+            case VT100_CODE_BACKGROUND_LIGHT_CYAN:
             {
                 tmp_col = &col_light_cyan;
                 break;
             }
-            case 97:
-            case 107:
+            case VT100_CODE_FOREGROUND_LIGHT_GRAY:
+            case VT100_CODE_BACKGROUND_LIGHT_GRAY:
             default:
             {
                 tmp_col = &col_light_gray;
@@ -177,7 +239,7 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
             }
         };
 
-        if ((code >= 30 && code <= 37) || (code >= 90 && code <= 97))
+        if ((code >= VT100_CODE_FOREGROUND_BLACK && code <= VT100_CODE_FOREGROUND_WHITE) || (code >= VT100_CODE_FOREGROUND_DARK_GRAY && code <= VT100_CODE_FOREGROUND_LIGHT_GRAY))
         {
             format->foreground_color = *tmp_col;
             format->foreground_color_set = true;
@@ -188,58 +250,62 @@ void AutScrollEdit::vt100_colour_process(uint32_t code, vt100_format_code *forma
             format->background_color_set = true;
         }
     }
-    else if ((code >= 1 && code <= 9) || (code >= 22 && code <= 29))
+    else if ((code >= VT100_CODE_WEIGHT_DOUBLE && code <= VT100_CODE_STRIKETHROUGH_ENABLE) || (code >= VT100_CODE_WEIGHT_NORMAL && code <= VT100_CODE_STRIKTHROUGH_DISABLE))
     {
         switch (code)
         {
-            case 1:
+            case VT100_CODE_WEIGHT_DOUBLE:
             {
                 format->weight = FORMAT_DUAL_DOUBLE;
                 break;
             }
-            case 2:
+            case VT100_CODE_WEIGHT_HALF:
             {
                 format->weight = FORMAT_DUAL_HALF;
                 break;
             }
-            case 3:
+            case VT100_CODE_ITALIC_ENABLE:
             {
                 format->italic = FORMAT_ENABLE;
                 break;
             }
-            case 4:
+            case VT100_CODE_UNDERLINE_ENABLE:
             {
                 format->underline = FORMAT_ENABLE;
                 break;
             }
-            case 9:
+            case VT100_CODE_STRIKETHROUGH_ENABLE:
             {
                 format->strikethrough = FORMAT_ENABLE;
                 break;
             }
-            case 22:
+            case VT100_CODE_WEIGHT_NORMAL:
             {
                 format->weight = FORMAT_DUAL_DISABLE;
                 break;
             }
-            case 23:
+            case VT100_CODE_ITALIC_DISABLE:
             {
                 format->italic = FORMAT_DISABLE;
                 break;
             }
-            case 24:
+            case VT100_CODE_UNDERLINE_DISABLE:
             {
                 format->underline = FORMAT_DISABLE;
                 break;
             }
-            case 29:
+            case VT100_CODE_STRIKTHROUGH_DISABLE:
             {
                 format->strikethrough = FORMAT_DISABLE;
                 break;
             }
+            default:
+            {
+                break;
+            }
         };
     }
-    else if (code == 0)
+    else if (code == VT100_CODE_CLEAR_FORMATTING)
     {
         format->clear_formatting = true;
     }
@@ -366,6 +432,7 @@ bool AutScrollEdit::vt100_process(QString *buffer, QList<vt100_format_code> *for
                     if (found_digit == true)
                     {
                         int32_t changes = (pos - start + 1) - format;
+
                         buffer->replace(start, (pos - start + 1), QString(" ").repeated(format));
                         l -= changes;
                         start -= changes;
@@ -533,6 +600,7 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
                     if (mintCurPos > 0)
                     {
                             quint32 intSpacePos = mintCurPos - 1;
+
                             bool found_non_space = false;
                             while (intSpacePos > 0)
                             {
@@ -648,6 +716,7 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
                 {
                     //Delete word
                     qint32 intSpacePos = mintCurPos;
+
                     while (intSpacePos < mstrDatOut.length())
                     {
                         ++intSpacePos;
@@ -852,7 +921,7 @@ void AutScrollEdit::clear_dat_in()
     mstrDatIn.clear();
     mintPrevTextSize = 0;
     dat_in_new_len = 0;
-    last_format = pre;
+    last_format = default_format;
 
     this->clear();
     dat_out_updated = true;
@@ -883,6 +952,7 @@ void AutScrollEdit::insertFromMimeData(const QMimeData *mdSrc)
     {
         //A file has been dropped
         QList<QUrl> urls = mdSrc->urls();
+
         if (urls.isEmpty())
         {
             //No files
@@ -920,6 +990,7 @@ void AutScrollEdit::insertFromMimeData(const QMimeData *mdSrc)
             //Character mode
             QString strTmpStr = mdSrc->text();
             QChar qcTmpQC;
+
             foreach (qcTmpQC, strTmpStr)
             {
                 emit key_pressed(0, qcTmpQC);
@@ -942,6 +1013,8 @@ void AutScrollEdit::update_display()
         unsigned int uiCurrentSize = 0;
         uint32_t removed_size = 0;
         int32_t cannot_parse_bytes = 0;
+        int32_t i;
+        unsigned int Pos;
 
         if (this->textCursor().anchor() != this->textCursor().position())
         {
@@ -964,8 +1037,6 @@ void AutScrollEdit::update_display()
         }
 
         //Slider not held down, update
-        unsigned int Pos;
-
         if (this->verticalScrollBar()->sliderPosition() == this->verticalScrollBar()->maximum())
         {
             //Scroll to bottom
@@ -991,7 +1062,8 @@ void AutScrollEdit::update_display()
 //TODO: deal with partial VT100 escape codes
 
         //Replace unprintable characters with escape codes
-        int32_t i = mstrDatIn.length() - 1;
+        i = mstrDatIn.length() - 1;
+
         while (i >= 0)
         {
             uint8_t current = (uint8_t)mstrDatIn.at(i);
@@ -1037,36 +1109,34 @@ void AutScrollEdit::update_display()
             if (append_data.length() > 0)
             {
                 dat_in_new_len = append_data.length();
-                int32_t i = 0;
+                int32_t l = 0;
+                int32_t next_entry = -1;
+                int32_t next_entry_pos_check = 0;
+                bool first = true;
 
                 tcTmpCur = this->textCursor();
-                int32_t next_entry = -1;
 
                 if (format.length() > 0 && format[0].start == 0)
                 {
                     next_entry = 0;
                 }
 
-                bool first = true;
-
-                int32_t aa = 0;
-
-                while (i < dat_in_new_len)
+                while (l < dat_in_new_len)
                 {
                     int32_t next = dat_in_new_len;
 
-                    while (aa < format.length())
+                    while (next_entry_pos_check < format.length())
                     {
-                        if (i < format[aa].start)
+                        if (l < format[next_entry_pos_check].start)
                         {
-                            next = format[aa].start;
+                            next = format[next_entry_pos_check].start;
                             break;
                         }
 
-                        ++aa;
+                        ++next_entry_pos_check;
                     }
 
-                    tcTmpCur.setPosition(mintPrevTextSize + i);
+                    tcTmpCur.setPosition(mintPrevTextSize + l);
 
                     if (first == true)
                     {
@@ -1076,8 +1146,9 @@ void AutScrollEdit::update_display()
                         }
                         else
                         {
-                            tcTmpCur.setCharFormat(pre);
+                            tcTmpCur.setCharFormat(default_format);
                         }
+
                         first = false;
                     }
 
@@ -1087,9 +1158,9 @@ void AutScrollEdit::update_display()
                     }
 
                     this->setTextCursor(tcTmpCur);
-                    tcTmpCur.insertText(append_data.mid(i, (next - i)));
-                    i = next;
-                    next_entry = aa;
+                    tcTmpCur.insertText(append_data.mid(l, (next - l)));
+                    l = next;
+                    next_entry = next_entry_pos_check;
                 }
 
                 //Reset style if final character was for style
@@ -1126,7 +1197,7 @@ void AutScrollEdit::update_display()
             tcTmpCur.setPosition(dat_in_new_len);
             tcTmpCur.movePosition(QTextCursor::End, QTextCursor::KeepAnchor, 1);
 
-            tcTmpCur.setCharFormat(pre);
+            tcTmpCur.setCharFormat(default_format);
             this->setTextCursor(tcTmpCur);
             tcTmpCur.insertText(mstrDatOut);
 
@@ -1217,8 +1288,9 @@ void AutScrollEdit::update_cursor()
     {
         //Local echo mode and line mode are enabled so move the cursor
         QTextCursor tcTmpCur = this->textCursor();
+
         tcTmpCur.setPosition(mintPrevTextSize + mintCurPos);
-tcTmpCur.setCharFormat(pre);
+        tcTmpCur.setCharFormat(default_format);
         this->setTextCursor(tcTmpCur);
     }
 }
@@ -1253,13 +1325,13 @@ void AutScrollEdit::vt100_format_apply(QTextCursor *cursor, vt100_format_code *f
 
     if (format->clear_formatting == true)
     {
-        new_format = pre;
+        new_format = default_format;
         changed = true;
     }
     else if (format->temp == FORMAT_ENABLE)
     {
         pre_dat_in_format_backup = cursor->charFormat();
-        new_format = pre;
+        new_format = default_format;
         changed = true;
     }
     else if (format->temp == FORMAT_DISABLE)
