@@ -17,3 +17,9 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: thedjnK
           allowSelfAssign: true
+      - run: gh issue edit "$NUMBER" --add-label "$LABELS"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          LABELS: triage
