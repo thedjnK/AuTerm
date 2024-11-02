@@ -36,24 +36,24 @@ RESOURCES += \
 # Automation form
 !contains(DEFINES, SKIPAUTOMATIONFORM) {
     SOURCES += \
-	AutAutomation.cpp
+        AutAutomation.cpp
     HEADERS += \
-	AutAutomation.h
+        AutAutomation.h
     FORMS += \
-	AutAutomation.ui
+        AutAutomation.ui
 }
 
 # Scripting form
 !contains(DEFINES, SKIPSCRIPTINGFORM) {
     SOURCES += \
-	AutCodeEditor.cpp \
-	AutHighlighter.cpp \
-	AutScripting.cpp
+        AutCodeEditor.cpp \
+        AutHighlighter.cpp \
+        AutScripting.cpp
 
     HEADERS += \
-	AutCodeEditor.h \
-	AutHighlighter.h \
-	AutScripting.h
+        AutCodeEditor.h \
+        AutHighlighter.h \
+        AutScripting.h
 
     FORMS += \
     AutScripting.ui
@@ -62,11 +62,11 @@ RESOURCES += \
 # Error code form
 !contains(DEFINES, SKIPERRORCODEFORM) {
     SOURCES += \
-	AutErrorCode.cpp
+        AutErrorCode.cpp
     HEADERS += \
-	AutErrorCode.h
+        AutErrorCode.h
     FORMS += \
-	AutErrorCode.ui
+        AutErrorCode.ui
 }
 
 # Serial detection object
@@ -110,32 +110,47 @@ CONFIG(release, debug|release) {
     HEADERS += AutPlugin.h
 
     contains(CONFIG, static) {
-	QT += $$ADDITIONAL_MODULES
+        QT += $$ADDITIONAL_MODULES
 
         !contains(DEFINES, SKIPPLUGIN_MCUMGR) {
             exists(../plugins/mcumgr) {
                 DEFINES += "STATICPLUGIN_MCUMGR"
 
-		win32: LIBS += -L$$DESTDIR -lplugin_mcumgr
-		else: LIBS += -L$$DESTDIR -lplugin_mcumgr
+                win32: LIBS += -L$$DESTDIR -lplugin_mcumgr
+                else: LIBS += -L$$DESTDIR -lplugin_mcumgr
 
-		win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
-		else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_mcumgr.lib
-		else: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
+                win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
+                else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_mcumgr.lib
+                else: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
             }
         }
 
-	!contains(DEFINES, SKIPPLUGIN_LOGGER) {
-	    exists(../plugins/logger) {
-		DEFINES += "STATICPLUGIN_LOGGER"
+        !contains(DEFINES, SKIPPLUGIN_LOGGER) {
+            exists(../plugins/logger) {
+                DEFINES += "STATICPLUGIN_LOGGER"
 
-		win32: LIBS += -L$$DESTDIR -lplugin_logger
-		else: LIBS += -L$$DESTDIR -lplugin_logger
+                win32: LIBS += -L$$DESTDIR -lplugin_logger
+                else: LIBS += -L$$DESTDIR -lplugin_logger
 
-		win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
-		else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_logger.lib
-		else: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
-	    }
-	}
+                win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
+                else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_logger.lib
+                else: PRE_TARGETDEPS += $$DESTDIR/libplugin_logger.a
+            }
+        }
+
+        !contains(DEFINES, SKIPPLUGINS_TRANSPORT) {
+            !contains(DEFINES, SKIPPLUGIN_TRANSPORT_ECHO) {
+                exists(../plugins/nus_transport) {
+                    DEFINES += "STATICPLUGIN_TRANSPORT_ECHO"
+
+                    win32: LIBS += -L$$DESTDIR -lplugin_echo_transport
+                    else: LIBS += -L$$DESTDIR -lplugin_echo_transport
+
+                    win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_echo_transport.a
+                    else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_echo_transport.lib
+                    else: PRE_TARGETDEPS += $$DESTDIR/libplugin_echo_transport.a
+                }
+            }
+        }
     }
 }

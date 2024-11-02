@@ -134,16 +134,21 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 if (plugin.plugin->plugin_type() == AutPlugin::Transport)
                 {
                     QObject *plugin_object;
+                    QWidget *plugin_tab = new QWidget();
 
                     plugin_transport = (AutTransportPlugin *)plugin.plugin;
+                    plugin_tab->setObjectName("tab_" % static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString());
+                    ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
                     plugin_transport_in_use = true;
-                    qDebug() << "found transport plugin";
+                    qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
                     plugin_object = plugin_transport->plugin_object();
 
                     connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
                     //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
                     connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
                     connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+
+                    plugin_transport->transport_setup(plugin_tab);
                 }
 #endif
             }
@@ -192,16 +197,21 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 if (plugin.plugin->plugin_type() == AutPlugin::Transport)
                 {
                     QObject *plugin_object;
+                    QWidget *plugin_tab = new QWidget();
 
                     plugin_transport = (AutTransportPlugin *)plugin.plugin;
+                    plugin_tab->setObjectName("tab_" % static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString());
+                    ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
                     plugin_transport_in_use = true;
-                    qDebug() << "found transport plugin";
+                    qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
                     plugin_object = plugin_transport->plugin_object();
 
                     connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
                     //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
                     connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
                     connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+
+                    plugin_transport->transport_setup(plugin_tab);
                 }
 #endif
             }

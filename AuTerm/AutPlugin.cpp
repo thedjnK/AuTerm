@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -33,5 +33,10 @@ Q_IMPORT_PLUGIN(plugin_mcumgr)
 #ifdef STATICPLUGIN_LOGGER
 //logger plugin
 Q_IMPORT_PLUGIN(plugin_logger)
+#endif
+
+#ifdef STATICPLUGIN_TRANSPORT_ECHO
+//Dummy echo transport plugin
+Q_IMPORT_PLUGIN(plugin_echo_transport)
 #endif
 #endif

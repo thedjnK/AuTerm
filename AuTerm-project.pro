@@ -14,9 +14,18 @@ SUBDIRS += \
     }
 
     !contains(DEFINES, SKIPPLUGIN_LOGGER) {
-	SUBDIRS += \
-	    plugins/logger
+        SUBDIRS += \
+            plugins/logger
 
-	AuTerm.depends += plugins/logger
+        AuTerm.depends += plugins/logger
+    }
+
+    !contains(DEFINES, SKIPPLUGINS_TRANSPORT) {
+        !contains(DEFINES, SKIPPLUGIN_TRANSPORT_ECHO) {
+            SUBDIRS += \
+                plugins/echo_transport
+
+            AuTerm.depends += plugins/echo_transport
+        }
     }
 }

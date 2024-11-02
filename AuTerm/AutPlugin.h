@@ -48,7 +48,10 @@ public:
         Transport,
     };
 
-    virtual QWidget *GetWidget() = 0;
+    virtual QWidget *GetWidget()
+    {
+        return nullptr;
+    }
     virtual void setup(QMainWindow *main_window) = 0;
     virtual const QString plugin_about() = 0;
     virtual bool plugin_configuration() = 0;
@@ -81,6 +84,7 @@ public:
         TwoStop = QSerialPort::TwoStop
     };
 
+    virtual void transport_setup(QWidget *tab) = 0;
     virtual bool open(QIODeviceBase::OpenMode mode) = 0;
     virtual void close() = 0;
     virtual bool isOpen() const = 0;
@@ -93,15 +97,33 @@ public:
     virtual QByteArray read(qint64 maxlen) = 0;
     virtual QByteArray readAll() = 0;
     virtual bool clear(QSerialPort::Directions directions = QSerialPort::AllDirections) = 0;
-    virtual bool setBreakEnabled(bool set = true) = 0;
-    virtual bool setRequestToSend(bool set) = 0;
-    virtual bool setDataTerminalReady(bool set) = 0;
+    virtual bool setBreakEnabled(bool set = true)
+    {
+        return false;
+    }
+    virtual bool setRequestToSend(bool set)
+    {
+        return false;
+    }
+    virtual bool setDataTerminalReady(bool set)
+    {
+        return false;
+    }
     virtual QSerialPort::PinoutSignals pinoutSignals() = 0;
     virtual QString to_error_string(int error) = 0;
     virtual QString transport_name() const = 0;
-    virtual bool supports_break() const = 0;
-    virtual bool supports_request_to_send() const = 0;
-    virtual bool supports_data_terminal_ready() const = 0;
+    virtual bool supports_break()
+    {
+        return false;
+    }
+    virtual bool supports_request_to_send()
+    {
+        return false;
+    }
+    virtual bool supports_data_terminal_ready()
+    {
+        return false;
+    }
 
 signals:
     void readyRead();
