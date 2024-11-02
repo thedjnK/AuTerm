@@ -23,15 +23,31 @@
 #ifndef AUTPLUGIN_H
 #define AUTPLUGIN_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QPushButton>
 
+/******************************************************************************/
+// Defines
+/******************************************************************************/
 #define AuTermPluginInterface_iid "org.AuTerm.PluginInterface"
 
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class AutPlugin
 {
 public:
+    enum PluginType
+    {
+        Unknown,
+        Feature,
+        Transport,
+    };
+
     virtual QWidget *GetWidget() = 0;
     virtual void setup(QMainWindow *main_window) = 0;
     virtual const QString plugin_about() = 0;
@@ -39,6 +55,8 @@ public:
     virtual void setup_finished()
     {
     }
+    virtual PluginType plugin_type() = 0;
+    virtual QObject *plugin_object() = 0;
 
 signals:
     void show_message_box(QString str_message);
@@ -50,6 +68,49 @@ signals:
 };
 
 Q_DECLARE_INTERFACE(AutPlugin, AuTermPluginInterface_iid)
+
+//Transport plugin class, can be used for an alternative shell transport instead of UART
+class AutTransportPlugin : public AutPlugin
+{
+public:
+    enum StopBits
+    {
+        NoStop = 0,
+        OneStop = QSerialPort::OneStop,
+        OneAndHalfStop = QSerialPort::OneAndHalfStop,
+        TwoStop = QSerialPort::TwoStop
+    };
+
+    virtual bool open(QIODeviceBase::OpenMode mode) = 0;
+    virtual void close() = 0;
+    virtual bool isOpen() const = 0;
+    virtual QSerialPort::DataBits dataBits() const = 0;
+    virtual StopBits stopBits() const = 0;
+    virtual QSerialPort::Parity parity() const = 0;
+    virtual qint64 write(const QByteArray &data) = 0;
+    virtual qint64 bytesAvailable() const = 0;
+    virtual QByteArray peek(qint64 maxlen) = 0;
+    virtual QByteArray read(qint64 maxlen) = 0;
+    virtual QByteArray readAll() = 0;
+    virtual bool clear(QSerialPort::Directions directions = QSerialPort::AllDirections) = 0;
+    virtual bool setBreakEnabled(bool set = true) = 0;
+    virtual bool setRequestToSend(bool set) = 0;
+    virtual bool setDataTerminalReady(bool set) = 0;
+    virtual QSerialPort::PinoutSignals pinoutSignals() = 0;
+    virtual QString to_error_string(int error) = 0;
+    virtual QString transport_name() const = 0;
+    virtual bool supports_break() const = 0;
+    virtual bool supports_request_to_send() const = 0;
+    virtual bool supports_data_terminal_ready() const = 0;
+
+signals:
+    void readyRead();
+    void errorOccurred(int error);
+    void bytesWritten(qint64 bytes);
+    void aboutToClose();
+};
+
+Q_DECLARE_INTERFACE(AutTransportPlugin, AuTermPluginInterface_iid)
 
 //Struct which holds plugin data when a plugin requests details on another plugin
 struct plugin_data {
@@ -71,6 +132,8 @@ signals:
     void plugin_serial_closed();
 
 public slots:
+    void plugin_set_status(bool busy, bool hide_terminal_output, bool *accepted);
+    void find_plugin(QString name, plugin_data *plugin);
     void plugin_serial_transmit(QByteArray *data);
     void plugin_add_open_close_button(QPushButton *button);
     void plugin_serial_open_close(uint8_t mode);
@@ -83,3 +146,7 @@ public slots:
 #endif
 
 #endif // AUTPLUGIN_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

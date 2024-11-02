@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -20,6 +20,10 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
+
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include <QApplication>
 #include <QClipboard>
 #include <QMessageBox>
@@ -27,6 +31,9 @@
 #include "plugin_logger.h"
 #include "ui_plugin_logger.h"
 
+/******************************************************************************/
+// Local Functions or Private Members
+/******************************************************************************/
 plugin_logger::plugin_logger(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::plugin_logger)
@@ -199,3 +206,17 @@ void plugin_logger::set_enabled(bool enabled)
         this->hide();
     }
 }
+
+AutPlugin::PluginType plugin_logger::plugin_type()
+{
+    return AutPlugin::Feature;
+}
+
+QObject *plugin_logger::plugin_object()
+{
+    return this;
+}
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

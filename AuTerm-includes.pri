@@ -34,18 +34,26 @@ macx: DEFINES += "SKIPSERIALDETECT"
 # Uncomment to skip building logger plugin
 #DEFINES += "SKIPPLUGIN_LOGGER"
 
-# Uncomment to build MCUmgr plugin transports (note: static builds need thexe extra modules in the base AuTerm build also)
-qtHaveModule(bluetooth) {
-    # Requires qtconnectivity
-    DEFINES += "PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH"
-}
-qtHaveModule(network) {
-    # Requires qtnetwork
-    DEFINES += "PLUGIN_MCUMGR_TRANSPORT_UDP"
+# Uncomment to disable transport plugin support (will be disabled if plugin support is disabled)
+#DEFINES += "SKIPPLUGINS_TRANSPORT"
 
-    qtHaveModule(mqtt) {
-	# Requires qtnetwork and qtmqtt
-#	DEFINES += "PLUGIN_MCUMGR_TRANSPORT_LORAWAN"
+# Uncomment to build MCUmgr plugin transports (note: static builds need these extra modules in the base AuTerm build also)
+!contains(DEFINES, SKIPPLUGINS) {
+    !contains(DEFINES, SKIPPLUGIN_MCUMGR) {
+	qtHaveModule(bluetooth) {
+	    # Requires qtconnectivity
+	    DEFINES += "PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH"
+	}
+
+	qtHaveModule(network) {
+	    # Requires qtnetwork
+	    DEFINES += "PLUGIN_MCUMGR_TRANSPORT_UDP"
+
+	    qtHaveModule(mqtt) {
+		# Requires qtnetwork and qtmqtt
+		DEFINES += "PLUGIN_MCUMGR_TRANSPORT_LORAWAN"
+	    }
+	}
     }
 }
 

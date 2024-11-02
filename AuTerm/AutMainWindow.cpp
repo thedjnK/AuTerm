@@ -72,12 +72,40 @@
     #endif
 #endif
 
+#ifdef SKIPPLUGINS_TRANSPORT
+#define transport_open gspSerialPort.open
+#define transport_close gspSerialPort.close
+#define transport_isOpen gspSerialPort.isOpen
+#define transport_dataBits gspSerialPort.dataBits
+#define transport_stopBits gspSerialPort.stopBits
+#define transport_parity gspSerialPort.parity
+#define transport_write gspSerialPort.write
+#define transport_bytesAvailable gspSerialPort.bytesAvailable
+#define transport_peek gspSerialPort.peek
+#define transport_read gspSerialPort.read
+#define transport_readAll gspSerialPort.readAll
+#define transport_clear gspSerialPort.clear
+#define transport_setBreakEnabled gspSerialPort.setBreakEnabled
+#define transport_setRequestToSend gspSerialPort.setRequestToSend
+#define transport_setDataTerminalReady gspSerialPort.setDataTerminalReady
+#define transport_pinoutSignals gspSerialPort.pinoutSignals
+//#define transport_error_to_error_string gspSerialPort.error_to_error_string
+#define transport_name() "Serial port"
+#define transport_supports_break() true
+#define transport_supports_request_to_send() true
+#define transport_supports_data_terminal_ready() true
+#endif
+
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
 AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::AutMainWindow)
 {
     int32_t i = 0;
+
+#ifndef SKIPPLUGINS_TRANSPORT
+    plugin_transport_in_use = false;
+#endif
 
     //Setup the GUI
     ui->setupUi(this);
@@ -101,6 +129,23 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 plugin_list.append(plugin);
 
                 ui->list_Plugin_Plugins->addItem(QString(static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(static_plugins.at(i).metaData().value("MetaData").toObject().value("Version").toString()));
+
+#ifndef SKIPPLUGINS_TRANSPORT
+                if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                {
+                    QObject *plugin_object;
+
+                    plugin_transport = (AutTransportPlugin *)plugin.plugin;
+                    plugin_transport_in_use = true;
+                    qDebug() << "found transport plugin";
+                    plugin_object = plugin_transport->plugin_object();
+
+                    connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
+                    //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
+                    connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
+                    connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+                }
+#endif
             }
         }
 
@@ -142,6 +187,23 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 plugin_list.append(plugin);
 
                 ui->list_Plugin_Plugins->addItem(QString(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Version").toString()));
+
+#ifndef SKIPPLUGINS_TRANSPORT
+                if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                {
+                    QObject *plugin_object;
+
+                    plugin_transport = (AutTransportPlugin *)plugin.plugin;
+                    plugin_transport_in_use = true;
+                    qDebug() << "found transport plugin";
+                    plugin_object = plugin_transport->plugin_object();
+
+                    connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
+                    //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
+                    connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
+                    connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+                }
+#endif
             }
             else
             {
@@ -746,7 +808,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 guaAutomationForm->SetPopupHandle(gpmErrorForm);
 
                 //Update automation form with connection status
-                guaAutomationForm->ConnectionChange(gspSerialPort.isOpen());
+                guaAutomationForm->ConnectionChange(transport_isOpen());
 
                 //Connect signals
                 connect(guaAutomationForm, SIGNAL(SendData(QByteArray,bool,bool)), this, SLOT(MessagePass(QByteArray,bool,bool)));
@@ -770,7 +832,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 guaAutomationForm->SetPopupHandle(gpmErrorForm);
 
                 //Update automation form with connection status
-                guaAutomationForm->ConnectionChange(gspSerialPort.isOpen());
+                guaAutomationForm->ConnectionChange(transport_isOpen());
 
                 //Connect signals
                 connect(guaAutomationForm, SIGNAL(SendData(QByteArray,bool,bool)), this, SLOT(MessagePass(QByteArray,bool,bool)));
@@ -804,7 +866,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                 connect(gusScriptingForm, SIGNAL(ScriptFinished()), this, SLOT(ScriptFinished()));
                 connect(gusScriptingForm, SIGNAL(UpdateScriptLastDirectory(const QString*)), this, SLOT(ScriptingFileSelected(const QString*)));
 
-                if (gspSerialPort.isOpen())
+                if (transport_isOpen())
                 {
                     //Tell the form that the serial port is open
                     gusScriptingForm->SerialPortStatus(true);
@@ -983,10 +1045,10 @@ AutMainWindow::~AutMainWindow()
     }
 #endif
 
-    if (gspSerialPort.isOpen() == true)
+    if (transport_isOpen() == true)
     {
         //Close serial connection before quitting
-        gspSerialPort.close();
+        transport_close();
         gpSignalTimer->stop();
 #ifndef SKIPPLUGINS
         emit plugin_serial_closed();
@@ -1163,7 +1225,7 @@ void AutMainWindow::on_btn_Connect_clicked()
 
 void AutMainWindow::on_btn_TermClose_clicked(bool from_plugin)
 {
-    if (gspSerialPort.isOpen() == false)
+    if (transport_isOpen() == false)
     {
         //Open connection
         OpenDevice(from_plugin);
@@ -1238,10 +1300,10 @@ void AutMainWindow::on_btn_TermClose_clicked(bool from_plugin)
 #endif
 
         //Close the serial port
-        if (gspSerialPort.isOpen() == true)
+        if (transport_isOpen() == true)
         {
-            gspSerialPort.clear();
-            gspSerialPort.close();
+            transport_clear();
+            transport_close();
 
 #ifndef SKIPPLUGINS
             emit plugin_serial_closed();
@@ -1416,7 +1478,7 @@ void AutMainWindow::SerialRead()
         return;
     }
 #endif
-    QByteArray baOrigData = gspSerialPort.readAll();
+    QByteArray baOrigData = transport_readAll();
 //    qDebug() << "Received: " << baOrigData;
 
 
@@ -1461,7 +1523,7 @@ void AutMainWindow::SerialRead()
             if (gbLoopbackMode == true)
             {
                 //Loopback enabled, send this data back
-                gspSerialPort.write(baOrigData);
+                transport_write(baOrigData);
                 gintQueuedTXBytes += baOrigData.length();
                 gpMainLog->WriteRawLogData(baOrigData);
                 update_buffer(&baDispData, false);
@@ -1520,7 +1582,7 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
     else if (intItem == MenuActionStreamFile && gbTermBusy == false && gbSpeedTestRunning == false)
     {
         //Stream out a file
-        if (gspSerialPort.isOpen() == true && gbLoopbackMode == false && gbTermBusy == false)
+        if (transport_isOpen() == true && gbLoopbackMode == false && gbTermBusy == false)
         {
             //Not currently busy
             QString strFilename = QFileDialog::getOpenFileName(this, tr("Open File To Stream"), gstrLastFilename[FilenameIndexOthers], tr("Text Files (*.txt);;All Files (*.*)"));
@@ -1559,7 +1621,7 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
 
                 //Reads out each block
                 QByteArray baFileData = gpStreamFileHandle->read(FileReadBlock);
-                gspSerialPort.write(baFileData);
+                transport_write(baFileData);
                 gintQueuedTXBytes += baFileData.size();
                 gintStreamBytesRead = baFileData.length();
                 gpMainLog->WriteLogData(QString(baFileData).append("\n"));
@@ -1669,7 +1731,7 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
             guaAutomationForm->SetPopupHandle(gpmErrorForm);
 
             //Update automation form with connection status
-            guaAutomationForm->ConnectionChange(gspSerialPort.isOpen());
+            guaAutomationForm->ConnectionChange(transport_isOpen());
 
             //Connect signals
             connect(guaAutomationForm, SIGNAL(SendData(QByteArray,bool,bool)), this, SLOT(MessagePass(QByteArray,bool,bool)));
@@ -1704,7 +1766,7 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
             connect(gusScriptingForm, SIGNAL(ScriptFinished()), this, SLOT(ScriptFinished()));
             connect(gusScriptingForm, SIGNAL(UpdateScriptLastDirectory(const QString*)), this, SLOT(ScriptingFileSelected(const QString*)));
 
-            if (gspSerialPort.isOpen())
+            if (transport_isOpen())
             {
                 //Tell the form that the serial port is open
                 gusScriptingForm->SerialPortStatus(true);
@@ -1773,14 +1835,14 @@ void AutMainWindow::balloontriggered(QAction* qaAction)
 void AutMainWindow::enter_pressed()
 {
     //Enter pressed in line mode
-    if (gspSerialPort.isOpen())
+    if (transport_isOpen())
     {
         if (gbTermBusy == false)
         {
             if (gbLoopbackMode == false)
             {
                 QByteArray baTmpBA = ui->text_TermEditData->get_dat_out()->replace("\r", "\n").replace("\n", (ui->radio_LCR->isChecked() ? "\r" : ui->radio_LLF->isChecked() ? "\n" : ui->radio_LCRLF->isChecked() ? "\r\n" : "")).toUtf8();
-                gspSerialPort.write(baTmpBA);
+                transport_write(baTmpBA);
                 gintQueuedTXBytes += baTmpBA.size();
 
                 //Add to log
@@ -1815,7 +1877,7 @@ void AutMainWindow::enter_pressed()
 void AutMainWindow::UpdateImages()
 {
     //Updates images to reflect status
-    if (gspSerialPort.isOpen() == true)
+    if (transport_isOpen() == true)
     {
         //Port open
         SerialStatus(true);
@@ -1838,7 +1900,7 @@ void AutMainWindow::UpdateImages()
 void AutMainWindow::key_pressed(int nKey, QChar chrKeyValue)
 {
     //Key pressed, send it out
-    if (gspSerialPort.isOpen())
+    if (transport_isOpen())
     {
         if (gbTermBusy == false && gbLoopbackMode == false)
         {
@@ -1864,7 +1926,7 @@ void AutMainWindow::key_pressed(int nKey, QChar chrKeyValue)
             else
             {
                 //Not return
-                gspSerialPort.write(baTmpBA);
+                transport_write(baTmpBA);
                 gintQueuedTXBytes += baTmpBA.size();
             }
 
@@ -1897,11 +1959,11 @@ void AutMainWindow::key_pressed(int nKey, QChar chrKeyValue)
 void AutMainWindow::vt100_send(QByteArray code)
 {
     //Key pressed, send it out
-    if (gspSerialPort.isOpen())
+    if (transport_isOpen())
     {
         if (gbTermBusy == false && gbLoopbackMode == false)
         {
-            gspSerialPort.write(code);
+            transport_write(code);
             gintQueuedTXBytes += code.size();
         }
         else if (gbLoopbackMode == true)
@@ -1918,19 +1980,19 @@ void AutMainWindow::DoLineEnd()
     if (ui->radio_LLF->isChecked())
     {
         //LF (\n) *nix style
-        gspSerialPort.write("\n");
+        transport_write("\n");
         gintQueuedTXBytes += 1;
     }
     else if (ui->radio_LCR->isChecked())
     {
         //CR (\r)
-        gspSerialPort.write("\r");
+        transport_write("\r");
         gintQueuedTXBytes += 1;
     }
     else if (ui->radio_LCRLF->isChecked())
     {
         //CR LF (\r\n) windows style
-        gspSerialPort.write("\r\n");
+        transport_write("\r\n");
         gintQueuedTXBytes += 2;
     }
     return;
@@ -1938,9 +2000,10 @@ void AutMainWindow::DoLineEnd()
 
 void AutMainWindow::SerialStatus(bool bType)
 {
-    if (gspSerialPort.isOpen() == true)
+    if (transport_isOpen() == true)
     {
-        unsigned int intSignals = gspSerialPort.pinoutSignals();
+        unsigned int intSignals = transport_pinoutSignals();
+
         if ((((intSignals & QSerialPort::ClearToSendSignal) == QSerialPort::ClearToSendSignal ? 1 : 0) != gbCTSStatus || bType == true))
         {
             //CTS changed
@@ -1998,7 +2061,9 @@ void AutMainWindow::SerialStatusSlot()
 void AutMainWindow::OpenDevice(bool from_plugin)
 {
     //Function to open serial port
-    if (gspSerialPort.isOpen() == true)
+    bool port_opened = false;
+
+    if (transport_isOpen() == true)
     {
         //Serial port is already open - cancel any pending operations
         if (gbTermBusy == true)
@@ -2019,10 +2084,10 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 #endif
 
         //Close serial port
-        if (gspSerialPort.isOpen() == true)
+        if (transport_isOpen() == true)
         {
-            gspSerialPort.clear();
-            gspSerialPort.close();
+            transport_clear();
+            transport_close();
 
 #ifndef SKIPPLUGINS
             emit plugin_serial_closed();
@@ -2055,48 +2120,97 @@ void AutMainWindow::OpenDevice(bool from_plugin)
         gtmrPortOpened.invalidate();
     }
 
-    if (ui->combo_COM->currentText().length() > 0)
+#ifndef SKIPPLUGINS_TRANSPORT
+    if (plugin_transport_in_use == false)
+#endif
     {
-        //Port selected: setup serial port
-        gspSerialPort.setPortName(ui->combo_COM->currentText());
-        gspSerialPort.setBaudRate(ui->combo_Baud->currentText().toInt());
-        gspSerialPort.setDataBits((QSerialPort::DataBits)ui->combo_Data->currentText().toInt());
-        gspSerialPort.setStopBits((QSerialPort::StopBits)ui->combo_Stop->currentText().toInt());
+        if (ui->combo_COM->currentText().length() > 0)
+        {
+            //Port selected: setup serial port
+            gspSerialPort.setPortName(ui->combo_COM->currentText());
+            gspSerialPort.setBaudRate(ui->combo_Baud->currentText().toInt());
+            gspSerialPort.setDataBits((QSerialPort::DataBits)ui->combo_Data->currentText().toInt());
+            gspSerialPort.setStopBits((QSerialPort::StopBits)ui->combo_Stop->currentText().toInt());
 
-        //Parity
-        gspSerialPort.setParity((ui->combo_Parity->currentIndex() == 1 ? QSerialPort::OddParity : (ui->combo_Parity->currentIndex() == 2 ? QSerialPort::EvenParity : QSerialPort::NoParity)));
+            //Parity
+            gspSerialPort.setParity((ui->combo_Parity->currentIndex() == 1 ? QSerialPort::OddParity : (ui->combo_Parity->currentIndex() == 2 ? QSerialPort::EvenParity : QSerialPort::NoParity)));
 
-        //Flow control
-        gspSerialPort.setFlowControl((ui->combo_Handshake->currentIndex() == 1 ? QSerialPort::HardwareControl : (ui->combo_Handshake->currentIndex() == 2 ? QSerialPort::SoftwareControl : QSerialPort::NoFlowControl)));
+            //Flow control
+            gspSerialPort.setFlowControl((ui->combo_Handshake->currentIndex() == 1 ? QSerialPort::HardwareControl : (ui->combo_Handshake->currentIndex() == 2 ? QSerialPort::SoftwareControl : QSerialPort::NoFlowControl)));
 
-        if (gspSerialPort.open(QIODevice::ReadWrite))
+            if (gspSerialPort.open(QIODevice::ReadWrite))
+            {
+                //Successful
+                port_opened = true;
+
+                //Update tooltip of system tray
+                if (gbSysTrayEnabled == true)
+                {
+                    gpSysTray->setToolTip(QString("AuTerm v").append(UwVersion).append(" (").append(ui->combo_COM->currentText()).append(")"));
+                }
+
+                //Flow control
+                if (ui->combo_Handshake->currentIndex() == 1)
+                {
+                    //Hardware handshaking
+                    ui->check_RTS->setEnabled(false);
+#ifndef SKIPSPEEDTEST
+                    ui->check_SpeedRTS->setEnabled(false);
+#endif
+                }
+                else
+                {
+                    //Not hardware handshaking - RTS
+                    ui->check_RTS->setEnabled(true);
+#ifndef SKIPSPEEDTEST
+                    ui->check_SpeedRTS->setEnabled(true);
+#endif
+                    gspSerialPort.setRequestToSend(ui->check_RTS->isChecked());
+                }
+            }
+            else
+            {
+                //Error whilst opening
+                ui->statusBar->showMessage("Error: ");
+                ui->statusBar->showMessage(ui->statusBar->currentMessage().append(gspSerialPort.errorString()));
+
+                QString strMessage = tr("Error whilst attempting to open the serial device: ").append(gspSerialPort.errorString()).append("\n\nIf the serial port is open in another application, please close the other application")
+#if !defined(_WIN32) && !defined( __APPLE__)
+                                         .append(", please also ensure you have been granted permission to the serial device in /dev/")
+#endif
+                                         .append((ui->combo_Baud->currentText().toULong() > 115200 ? ", please also ensure that your serial device supports baud rates greater than 115200 (normal COM ports do not have support for these baud rates)" : ""))
+                                         .append(" and try again.");
+                gpmErrorForm->SetMessage(&strMessage);
+                gpmErrorForm->show();
+                ui->text_TermEditData->set_serial_open(false);
+            }
+        }
+        else
+        {
+            //No serial port selected
+            QString strMessage = tr("No serial port was selected, please select a serial port and try again.\r\nIf you see no serial ports listed, ensure your device is connected to your computer and you have the appropriate drivers installed.");
+            gpmErrorForm->SetMessage(&strMessage);
+            gpmErrorForm->show();
+        }
+    }
+#ifndef SKIPPLUGINS_TRANSPORT
+    else
+    {
+        if (plugin_transport->open(QIODevice::ReadWrite))
         {
             //Successful
-            ui->statusBar->showMessage(QString("[").append(ui->combo_COM->currentText()).append(":").append(ui->combo_Baud->currentText()).append(",").append((ui->combo_Parity->currentIndex() == 0 ? "N" : ui->combo_Parity->currentIndex() == 1 ? "O" : ui->combo_Parity->currentIndex() == 2 ? "E" : "")).append(",").append(ui->combo_Data->currentText()).append(",").append(ui->combo_Stop->currentText()).append(",").append((ui->combo_Handshake->currentIndex() == 0 ? "N" : ui->combo_Handshake->currentIndex() == 1 ? "H" : ui->combo_Handshake->currentIndex() == 2 ? "S" : "")).append("]{").append((ui->radio_LCR->isChecked() ? "\\r" : (ui->radio_LLF->isChecked() ? "\\n" : (ui->radio_LCRLF->isChecked() ? "\\r\\n" : "")))).append("}"));
-            ui->label_TermConn->setText(ui->statusBar->currentMessage());
-#ifndef SKIPSPEEDTEST
-            ui->label_SpeedConn->setText(ui->statusBar->currentMessage());
-#endif
+            port_opened = true;
 
             //Update tooltip of system tray
             if (gbSysTrayEnabled == true)
             {
+//TODO
                 gpSysTray->setToolTip(QString("AuTerm v").append(UwVersion).append(" (").append(ui->combo_COM->currentText()).append(")"));
             }
 
-            //Switch to Terminal tab if not on terminal or speed testing tab
-            if (from_plugin == false && ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_Term) && ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_SpeedTest))
-            {
-                ui->selector_Tab->setCurrentIndex(ui->selector_Tab->indexOf(ui->tab_Term));
-            }
-
-            //Disable read-only mode
-            ui->text_TermEditData->setReadOnly(false);
-
-            //DTR
-            gspSerialPort.setDataTerminalReady(ui->check_DTR->isChecked());
-
+//TODO
             //Flow control
+#if 0
             if (ui->combo_Handshake->currentIndex() == 1)
             {
                 //Hardware handshaking
@@ -2114,112 +2228,11 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 #endif
                 gspSerialPort.setRequestToSend(ui->check_RTS->isChecked());
             }
-
-            //Break
-            gspSerialPort.setBreakEnabled(ui->check_Break->isChecked());
-
-            //Enable checkboxes
-            ui->check_Break->setEnabled(true);
-            ui->check_DTR->setEnabled(true);
+#endif
+            ui->check_RTS->setEnabled(false);
 #ifndef SKIPSPEEDTEST
-            ui->check_SpeedDTR->setEnabled(true);
+            ui->check_SpeedRTS->setEnabled(false);
 #endif
-            ui->check_Echo->setEnabled(true);
-            ui->check_Line->setEnabled(true);
-
-            //Update button text
-            ui->btn_TermClose->setText("C&lose Port");
-#ifndef SKIPSPEEDTEST
-            ui->btn_SpeedClose->setText("C&lose Port");
-#endif
-
-#ifndef SKIPPLUGINS
-            uint8_t i = 0;
-            while (i < list_plugin_open_close_buttons.length())
-            {
-                list_plugin_open_close_buttons[i]->setText("C&lose Port");
-                ++i;
-            }
-#endif
-
-            //Signal checking
-            SerialStatus(1);
-
-            //Enable timer
-            gpSignalTimer->start(gpTermSettings->value("SerialSignalCheckInterval", DefaultSerialSignalCheckInterval).toUInt());
-
-#ifndef SKIPAUTOMATIONFORM
-            //Notify automation form
-            if (guaAutomationForm != 0)
-            {
-                guaAutomationForm->ConnectionChange(true);
-            }
-#endif
-
-            //Notify scroll edit
-            ui->text_TermEditData->set_serial_open(true);
-
-            //Set focus to input text edit
-            ui->text_TermEditData->setFocus();
-
-            //Disable log options
-            ui->edit_LogFile->setEnabled(false);
-            ui->check_LogEnable->setEnabled(false);
-            ui->check_LogAppend->setEnabled(false);
-            ui->btn_LogFileSelect->setEnabled(false);
-
-#ifndef SKIPSPEEDTEST
-            //Enable speed testing
-            ui->btn_SpeedStartStop->setEnabled(true);
-#endif
-
-            //Clear last received date/time
-            ui->label_LastRx->setText("N/A");
-
-            //Open log file
-            if (ui->check_LogEnable->isChecked() == true)
-            {
-                //Logging is enabled
-#ifdef TARGET_OS_MAC
-                if (gpMainLog->OpenLogFile(QString((ui->edit_LogFile->text().left(1) == "/" || ui->edit_LogFile->text().left(1) == "\\") ? "" : QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(ui->edit_LogFile->text())) == LOG_OK)
-#else
-                if (gpMainLog->OpenLogFile(ui->edit_LogFile->text()) == LOG_OK)
-#endif
-                {
-                    //Log opened
-                    if (ui->check_LogAppend->isChecked() == false)
-                    {
-                        //Clear the log file
-                        gpMainLog->ClearLog();
-                    }
-                    gpMainLog->WriteLogData(tr("-").repeated(31));
-                    gpMainLog->WriteLogData(tr("\n Log opened ").append(QDate::currentDate().toString("dd/MM/yyyy")).append(" @ ").append(QTime::currentTime().toString("hh:mm")).append(" \n"));
-                    gpMainLog->WriteLogData(tr(" AuTerm ").append(UwVersion).append(" \n"));
-                    gpMainLog->WriteLogData(QString(" Port: ").append(ui->combo_COM->currentText()).append("\n"));
-                    gpMainLog->WriteLogData(tr("-").repeated(31).append("\n\n"));
-                    gbMainLogEnabled = true;
-                }
-                else
-                {
-                    //Log not writeable
-                    QString strMessage = tr("Error whilst opening log.\nPlease ensure you have access to the log file ").append(ui->edit_LogFile->text()).append(" and have enough free space on your hard drive.");
-                    gpmErrorForm->SetMessage(&strMessage);
-                    gpmErrorForm->show();
-                }
-            }
-
-            //Allow file drops for uploads
-            setAcceptDrops(true);
-
-#ifndef SKIPSCRIPTINGFORM
-            if (gusScriptingForm != 0)
-            {
-                gusScriptingForm->SerialPortStatus(true);
-            }
-#endif
-
-            gtmrPortOpened.start();
-            gintLastSerialTimeUpdate = 0;
         }
         else
         {
@@ -2229,34 +2242,198 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 
             QString strMessage = tr("Error whilst attempting to open the serial device: ").append(gspSerialPort.errorString()).append("\n\nIf the serial port is open in another application, please close the other application")
 #if !defined(_WIN32) && !defined( __APPLE__)
-            .append(", please also ensure you have been granted permission to the serial device in /dev/")
+                                     .append(", please also ensure you have been granted permission to the serial device in /dev/")
 #endif
-            .append((ui->combo_Baud->currentText().toULong() > 115200 ? ", please also ensure that your serial device supports baud rates greater than 115200 (normal COM ports do not have support for these baud rates)" : ""))
-            .append(" and try again.");
+                                     .append((ui->combo_Baud->currentText().toULong() > 115200 ? ", please also ensure that your serial device supports baud rates greater than 115200 (normal COM ports do not have support for these baud rates)" : ""))
+                                     .append(" and try again.");
             gpmErrorForm->SetMessage(&strMessage);
             gpmErrorForm->show();
             ui->text_TermEditData->set_serial_open(false);
         }
     }
-    else
+#endif
+
+    if (port_opened == true)
     {
-        //No serial port selected
-        QString strMessage = tr("No serial port was selected, please select a serial port and try again.\r\nIf you see no serial ports listed, ensure your device is connected to your computer and you have the appropriate drivers installed.");
-        gpmErrorForm->SetMessage(&strMessage);
-        gpmErrorForm->show();
+        ui->statusBar->showMessage(QString("[").append(ui->combo_COM->currentText()).append(":").append(ui->combo_Baud->currentText()).append(",").append((ui->combo_Parity->currentIndex() == 0 ? "N" : ui->combo_Parity->currentIndex() == 1 ? "O" : ui->combo_Parity->currentIndex() == 2 ? "E" : "")).append(",").append(ui->combo_Data->currentText()).append(",").append(ui->combo_Stop->currentText()).append(",").append((ui->combo_Handshake->currentIndex() == 0 ? "N" : ui->combo_Handshake->currentIndex() == 1 ? "H" : ui->combo_Handshake->currentIndex() == 2 ? "S" : "")).append("]{").append((ui->radio_LCR->isChecked() ? "\\r" : (ui->radio_LLF->isChecked() ? "\\n" : (ui->radio_LCRLF->isChecked() ? "\\r\\n" : "")))).append("}"));
+        ui->label_TermConn->setText(ui->statusBar->currentMessage());
+#ifndef SKIPSPEEDTEST
+        ui->label_SpeedConn->setText(ui->statusBar->currentMessage());
+#endif
+
+        //Switch to Terminal tab if not on terminal or speed testing tab
+        if (from_plugin == false && ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_Term) && ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_SpeedTest))
+        {
+            ui->selector_Tab->setCurrentIndex(ui->selector_Tab->indexOf(ui->tab_Term));
+        }
+
+        //Disable read-only mode
+        ui->text_TermEditData->setReadOnly(false);
+
+        //DTR
+        if (transport_supports_data_terminal_ready() == true)
+        {
+            ui->check_DTR->setEnabled(true);
+#ifndef SKIPSPEEDTEST
+            ui->check_SpeedDTR->setEnabled(true);
+#endif
+            transport_setDataTerminalReady(ui->check_DTR->isChecked());
+        }
+        else
+        {
+            ui->check_DTR->setEnabled(false);
+#ifndef SKIPSPEEDTEST
+            ui->check_SpeedDTR->setEnabled(true);
+#endif
+        }
+
+#if 0
+        //Flow control
+        if (ui->combo_Handshake->currentIndex() == 1)
+        {
+            //Hardware handshaking
+            ui->check_RTS->setEnabled(false);
+#ifndef SKIPSPEEDTEST
+            ui->check_SpeedRTS->setEnabled(false);
+#endif
+        }
+        else
+        {
+            //Not hardware handshaking - RTS
+            ui->check_RTS->setEnabled(true);
+#ifndef SKIPSPEEDTEST
+            ui->check_SpeedRTS->setEnabled(true);
+#endif
+            gspSerialPort.setRequestToSend(ui->check_RTS->isChecked());
+        }
+#endif
+
+        //Break
+        if (transport_supports_break() == true)
+        {
+            ui->check_Break->setEnabled(true);
+            transport_setBreakEnabled(ui->check_Break->isChecked());
+        }
+        else
+        {
+            ui->check_Break->setEnabled(false);
+        }
+
+        //Enable checkboxes
+//        ui->check_Break->setEnabled(true);
+//        ui->check_DTR->setEnabled(true);
+//#ifndef SKIPSPEEDTEST
+//        ui->check_SpeedDTR->setEnabled(true);
+//#endif
+        ui->check_Echo->setEnabled(true);
+        ui->check_Line->setEnabled(true);
+
+        //Update button text
+        ui->btn_TermClose->setText("C&lose Port");
+#ifndef SKIPSPEEDTEST
+        ui->btn_SpeedClose->setText("C&lose Port");
+#endif
+
+#ifndef SKIPPLUGINS
+        uint8_t i = 0;
+        while (i < list_plugin_open_close_buttons.length())
+        {
+            list_plugin_open_close_buttons[i]->setText("C&lose Port");
+            ++i;
+        }
+#endif
+
+        //Signal checking
+        SerialStatus(1);
+
+        //Enable timer
+        gpSignalTimer->start(gpTermSettings->value("SerialSignalCheckInterval", DefaultSerialSignalCheckInterval).toUInt());
+
+#ifndef SKIPAUTOMATIONFORM
+        //Notify automation form
+        if (guaAutomationForm != 0)
+        {
+            guaAutomationForm->ConnectionChange(true);
+        }
+#endif
+
+        //Notify scroll edit
+        ui->text_TermEditData->set_serial_open(true);
+
+        //Set focus to input text edit
+        ui->text_TermEditData->setFocus();
+
+        //Disable log options
+        ui->edit_LogFile->setEnabled(false);
+        ui->check_LogEnable->setEnabled(false);
+        ui->check_LogAppend->setEnabled(false);
+        ui->btn_LogFileSelect->setEnabled(false);
+
+#ifndef SKIPSPEEDTEST
+        //Enable speed testing
+        ui->btn_SpeedStartStop->setEnabled(true);
+#endif
+
+        //Clear last received date/time
+        ui->label_LastRx->setText("N/A");
+
+        //Open log file
+        if (ui->check_LogEnable->isChecked() == true)
+        {
+            //Logging is enabled
+#ifdef TARGET_OS_MAC
+            if (gpMainLog->OpenLogFile(QString((ui->edit_LogFile->text().left(1) == "/" || ui->edit_LogFile->text().left(1) == "\\") ? "" : QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).append("/").append(ui->edit_LogFile->text())) == LOG_OK)
+#else
+            if (gpMainLog->OpenLogFile(ui->edit_LogFile->text()) == LOG_OK)
+#endif
+            {
+                //Log opened
+                if (ui->check_LogAppend->isChecked() == false)
+                {
+                    //Clear the log file
+                    gpMainLog->ClearLog();
+                }
+                gpMainLog->WriteLogData(tr("-").repeated(31));
+                gpMainLog->WriteLogData(tr("\n Log opened ").append(QDate::currentDate().toString("dd/MM/yyyy")).append(" @ ").append(QTime::currentTime().toString("hh:mm")).append(" \n"));
+                gpMainLog->WriteLogData(tr(" AuTerm ").append(UwVersion).append(" \n"));
+                gpMainLog->WriteLogData(QString(" Port: ").append(ui->combo_COM->currentText()).append("\n"));
+                gpMainLog->WriteLogData(tr("-").repeated(31).append("\n\n"));
+                gbMainLogEnabled = true;
+            }
+            else
+            {
+                //Log not writeable
+                QString strMessage = tr("Error whilst opening log.\nPlease ensure you have access to the log file ").append(ui->edit_LogFile->text()).append(" and have enough free space on your hard drive.");
+                gpmErrorForm->SetMessage(&strMessage);
+                gpmErrorForm->show();
+            }
+        }
+
+        //Allow file drops for uploads
+        setAcceptDrops(true);
+
+#ifndef SKIPSCRIPTINGFORM
+        if (gusScriptingForm != 0)
+        {
+            gusScriptingForm->SerialPortStatus(true);
+        }
+#endif
+
+        gtmrPortOpened.start();
+        gintLastSerialTimeUpdate = 0;
     }
 }
 
 void AutMainWindow::on_check_Break_stateChanged()
 {
     //Break status changed
-    gspSerialPort.setBreakEnabled(ui->check_Break->isChecked());
+    transport_setBreakEnabled(ui->check_Break->isChecked());
 }
 
 void AutMainWindow::on_check_RTS_stateChanged()
 {
     //RTS status changed
-    gspSerialPort.setRequestToSend(ui->check_RTS->isChecked());
+    transport_setRequestToSend(ui->check_RTS->isChecked());
 #ifndef SKIPSPEEDTEST
     if (ui->check_SpeedRTS->isChecked() != ui->check_RTS->isChecked())
     {
@@ -2269,7 +2446,7 @@ void AutMainWindow::on_check_RTS_stateChanged()
 void AutMainWindow::on_check_DTR_stateChanged()
 {
     //DTR status changed
-    gspSerialPort.setDataTerminalReady(ui->check_DTR->isChecked());
+    transport_setDataTerminalReady(ui->check_DTR->isChecked());
 #ifndef SKIPSPEEDTEST
     if (ui->check_SpeedDTR->isChecked() != ui->check_DTR->isChecked())
     {
@@ -2496,7 +2673,7 @@ void AutMainWindow::on_btn_Duplicate_clicked()
 void AutMainWindow::MessagePass(QByteArray baDataString, bool bEscapeString, bool bFromScripting)
 {
     //Receive a command from the automation window
-    if (gspSerialPort.isOpen() == true && (gbTermBusy == false || bFromScripting == true) && gbLoopbackMode == false)
+    if (transport_isOpen() == true && (gbTermBusy == false || bFromScripting == true) && gbLoopbackMode == false)
     {
         if (bEscapeString == true)
         {
@@ -2505,7 +2682,7 @@ void AutMainWindow::MessagePass(QByteArray baDataString, bool bEscapeString, boo
         }
 
         //Output the data and send it to the log
-        gspSerialPort.write(baDataString);
+        transport_write(baDataString);
         gintQueuedTXBytes += baDataString.size();
         gpMainLog->WriteRawLogData(baDataString);
 
@@ -2531,7 +2708,7 @@ void AutMainWindow::MessagePass(QByteArray baDataString, bool bEscapeString, boo
             gpMainLog->WriteLogData("\n");
         }
     }
-    else if (gspSerialPort.isOpen() == true && gbLoopbackMode == true)
+    else if (transport_isOpen() == true && gbLoopbackMode == true)
     {
         //Loopback is enabled
         update_buffer("\n[Cannot send: Loopback mode is enabled.]\n", false);
@@ -2586,7 +2763,7 @@ void AutMainWindow::SerialBytesWritten(qint64 intByteCount)
         {
             //File stream in progress, read out a block
             QByteArray baFileData = gpStreamFileHandle->read(FileReadBlock);
-            gspSerialPort.write(baFileData);
+            transport_write(baFileData);
             gintQueuedTXBytes += baFileData.size();
             gintStreamBytesRead += baFileData.length();
             if (gpStreamFileHandle->atEnd())
@@ -2725,7 +2902,7 @@ void AutMainWindow::on_combo_COM_currentIndexChanged(int)
 void AutMainWindow::dragEnterEvent(QDragEnterEvent *dragEvent)
 {
     //A file is being dragged onto the window
-    if (dragEvent->mimeData()->urls().count() == 1 && gbTermBusy == false && gspSerialPort.isOpen() == true)
+    if (dragEvent->mimeData()->urls().count() == 1 && gbTermBusy == false && transport_isOpen() == true)
     {
         //Nothing is running, serial handle is open and a single file is being dragged - accept action
         dragEvent->acceptProposedAction();
@@ -3027,7 +3204,7 @@ void AutMainWindow::ContextMenuClosed()
 
 bool AutMainWindow::event(QEvent *evtEvent)
 {
-    if (evtEvent->type() == QEvent::WindowActivate && gspSerialPort.isOpen() == true && ui->selector_Tab->currentIndex() == ui->selector_Tab->indexOf(ui->tab_Term))
+    if (evtEvent->type() == QEvent::WindowActivate && transport_isOpen() == true && ui->selector_Tab->currentIndex() == ui->selector_Tab->indexOf(ui->tab_Term))
     {
         //Focus on the terminal
         ui->text_TermEditData->setFocus();
@@ -3484,7 +3661,7 @@ void AutMainWindow::ScriptStartRequest()
     //Request from scripting form to start running script
     unsigned char chReason = ScriptingReasonOK;
 
-    if (!gspSerialPort.isOpen())
+    if (!transport_isOpen())
     {
         //Serial port is not open
         chReason = ScriptingReasonPortClosed;
@@ -3647,7 +3824,7 @@ void AutMainWindow::SpeedMenuSelected(QAction *qaAction)
     //Speed test menu item selected
     qint8 chItem = qaAction->data().toInt();
 
-    if (gspSerialPort.isOpen() == true && gbTermBusy == false)
+    if (transport_isOpen() == true && gbTermBusy == false)
     {
         if (gbLoopbackMode == true)
         {
@@ -4112,7 +4289,7 @@ void AutMainWindow::SendSpeedTestData(int intMaxLength)
     while (intSendTimes > 0)
     {
         //Send out until finished
-        gspSerialPort.write(gbaSpeedMatchData);
+        transport_write(gbaSpeedMatchData);
         gintSpeedBufferCount += gintSpeedTestMatchDataLength;
         --intSendTimes;
         ++gintSpeedTestStatPacketsSent;
@@ -4144,7 +4321,7 @@ void AutMainWindow::SpeedTestReceive()
     if ((gchSpeedTestMode & SpeedModeRecv) == SpeedModeRecv)
     {
         //Check data as in receieve mode
-        uint64_t received_bytes = gspSerialPort.bytesAvailable();
+        uint64_t received_bytes = transport_bytesAvailable();
         gintSpeedBytesReceived += received_bytes;
         gintSpeedBytesReceived10s += received_bytes;
 
@@ -4158,7 +4335,7 @@ void AutMainWindow::SpeedTestReceive()
         if (ui->check_SpeedShowRX->isChecked() == true)
         {
             //Append RX data to buffer
-            gbaSpeedDisplayBuffer.append(gspSerialPort.peek(received_bytes));
+            gbaSpeedDisplayBuffer.append(transport_peek(received_bytes));
             if (!gtmrSpeedUpdateTimer.isActive())
             {
                 gtmrSpeedUpdateTimer.start();
@@ -4169,7 +4346,7 @@ void AutMainWindow::SpeedTestReceive()
         {
             //Test data is OK
             int32_t remove_size = 0;
-            gbaSpeedReceivedData.append(gspSerialPort.read(received_bytes));
+            gbaSpeedReceivedData.append(transport_read(received_bytes));
             while (remove_size < gbaSpeedReceivedData.length())
             {
                 //Data to check
@@ -4723,7 +4900,7 @@ void AutMainWindow::on_edit_Title_textEdited(const QString &)
     if (gpTermSettings->value("SysTrayIcon", DefaultSysTrayIcon).toBool() == true && QSystemTrayIcon::isSystemTrayAvailable())
     {
         //Also update system tray icon text
-        if (gspSerialPort.isOpen())
+        if (transport_isOpen())
         {
             strWindowTitle = QString("AuTerm v").append(UwVersion).append(" (").append(ui->combo_COM->currentText()).append(")");
         }
@@ -4791,7 +4968,7 @@ void AutMainWindow::plugin_set_status(bool busy, bool hide_terminal_output, bool
     }
     else
     {
-        if (gspSerialPort.isOpen() == false)
+        if (transport_isOpen() == false)
         {
             qDebug() << "A plugin tried to run whilst the UART was closed";
             return;
@@ -4841,7 +5018,7 @@ void AutMainWindow::plugin_serial_transmit(QByteArray *data)
 //    qDebug() << "Transmitted";
     if (gbPluginRunning == true)
     {
-        gspSerialPort.write(*data);
+        transport_write(*data);
         gintQueuedTXBytes += data->size();
 
 //TODO: Add to log
@@ -4858,7 +5035,7 @@ void AutMainWindow::plugin_add_open_close_button(QPushButton *button)
 {
     list_plugin_open_close_buttons.append(button);
     connect(button, SIGNAL(clicked(bool)), this, SLOT(on_btn_TermClose_clicked()));
-    button->setText(gspSerialPort.isOpen() == true ? "C&lose Port" : "&Open Port");
+    button->setText(transport_isOpen() == true ? "C&lose Port" : "&Open Port");
 }
 
 void AutMainWindow::plugin_serial_open_close(uint8_t mode)
@@ -4867,7 +5044,7 @@ void AutMainWindow::plugin_serial_open_close(uint8_t mode)
         case 0:
         {
             //Open port
-            if (gspSerialPort.isOpen())
+            if (transport_isOpen())
             {
                 return;
             }
@@ -4877,7 +5054,7 @@ void AutMainWindow::plugin_serial_open_close(uint8_t mode)
         case 1:
         {
             //Close port
-            if (!gspSerialPort.isOpen())
+            if (!transport_isOpen())
             {
                 return;
             }
@@ -4896,7 +5073,7 @@ void AutMainWindow::plugin_serial_open_close(uint8_t mode)
 
 void AutMainWindow::plugin_serial_is_open(bool *open)
 {
-    *open = gspSerialPort.isOpen();
+    *open = transport_isOpen();
 }
 
 void AutMainWindow::plugin_to_hex(QByteArray *data)
@@ -5159,6 +5336,218 @@ void AutMainWindow::on_check_reconnect_after_disconnect_toggled(bool checked)
             serial_detect = nullptr;
         }
     }
+}
+#endif
+
+#ifndef SKIPPLUGINS_TRANSPORT
+bool AutMainWindow::transport_open(QIODeviceBase::OpenMode mode)
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.open(mode);
+    }
+
+    return plugin_transport->open(mode);
+}
+
+void AutMainWindow::transport_close()
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.close();
+    }
+
+    return plugin_transport->close();
+}
+
+bool AutMainWindow::transport_isOpen() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.isOpen();
+    }
+
+    return plugin_transport->isOpen();
+}
+
+QSerialPort::DataBits AutMainWindow::transport_dataBits() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.dataBits();
+    }
+
+    return plugin_transport->dataBits();
+}
+
+AutTransportPlugin::StopBits AutMainWindow::transport_stopBits() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return (AutTransportPlugin::StopBits)gspSerialPort.stopBits();
+    }
+
+    return plugin_transport->stopBits();
+}
+
+QSerialPort::Parity AutMainWindow::transport_parity() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.parity();
+    }
+
+    return plugin_transport->parity();
+}
+
+qint64 AutMainWindow::transport_write(const QByteArray &data)
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.write(data);
+    }
+
+    return plugin_transport->write(data);
+}
+
+qint64 AutMainWindow::transport_bytesAvailable() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.bytesAvailable();
+    }
+
+    return plugin_transport->bytesAvailable();
+}
+
+QByteArray AutMainWindow::transport_peek(qint64 maxlen)
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.peek(maxlen);
+    }
+
+    return plugin_transport->peek(maxlen);
+}
+
+QByteArray AutMainWindow::transport_read(qint64 maxlen)
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.read(maxlen);
+    }
+
+    return plugin_transport->read(maxlen);
+}
+
+QByteArray AutMainWindow::transport_readAll()
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.readAll();
+    }
+
+    return plugin_transport->readAll();
+}
+
+bool AutMainWindow::transport_clear(QSerialPort::Directions directions)
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.clear(directions);
+    }
+
+    return plugin_transport->clear(directions);
+}
+
+bool AutMainWindow::transport_setBreakEnabled(bool set)
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.setBreakEnabled(set);
+    }
+
+    return plugin_transport->setBreakEnabled(set);
+}
+
+bool AutMainWindow::transport_setRequestToSend(bool set)
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.setRequestToSend(set);
+    }
+
+    return plugin_transport->setRequestToSend(set);
+}
+
+bool AutMainWindow::transport_setDataTerminalReady(bool set)
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.setDataTerminalReady(set);
+    }
+
+    return plugin_transport->setDataTerminalReady(set);
+}
+
+QSerialPort::PinoutSignals AutMainWindow::transport_pinoutSignals()
+{
+    if (plugin_transport_in_use == false)
+    {
+        return gspSerialPort.pinoutSignals();
+    }
+
+    return plugin_transport->pinoutSignals();
+}
+
+QString AutMainWindow::transport_error_to_error_string(int error)
+{
+    if (plugin_transport_in_use == false)
+    {
+//        return gspSerialPort.er
+    }
+
+    return plugin_transport->to_error_string(error);
+}
+
+QString AutMainWindow::transport_name() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return "Serial port";
+    }
+
+    return plugin_transport->transport_name();
+}
+
+bool AutMainWindow::transport_supports_break() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return true;
+    }
+
+    return plugin_transport->supports_break();
+}
+
+bool AutMainWindow::transport_supports_request_to_send() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return true;
+    }
+
+    return plugin_transport->supports_request_to_send();
+}
+
+bool AutMainWindow::transport_supports_data_terminal_ready() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return true;
+    }
+
+    return plugin_transport->supports_data_terminal_ready();
 }
 #endif
 

@@ -183,19 +183,6 @@ namespace Ui
     class AutMainWindow;
 }
 
-//Enum used for specifying type of data
-enum class BitByteTypes
-{
-    TypeBytes,
-    TypeDataBits,
-    TypeAllBits
-};
-
-enum modes {
-    mode_idle = 0,
-    mode_check_for_update,
-};
-
 //Union used for checking received byte array contents whilst speed testing
 union pointer_buf {
     uint8_t *p8;
@@ -215,6 +202,22 @@ struct plugins {
 #endif
 };
 #endif
+
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
+//Enum used for specifying type of data
+enum class BitByteTypes
+{
+    TypeBytes,
+    TypeDataBits,
+    TypeAllBits
+};
+
+enum modes {
+    mode_idle = 0,
+    mode_check_for_update,
+};
 
 /******************************************************************************/
 // Class definitions
@@ -322,8 +325,6 @@ private slots:
 #ifndef SKIPPLUGINS
     void on_btn_Plugin_Abort_clicked();
     void on_btn_Plugin_Config_clicked();
-    void plugin_set_status(bool busy, bool hide_terminal_output, bool *accepted);
-    void find_plugin(QString name, plugin_data *plugin);
 #endif
     void on_radio_vt100_ignore_toggled(bool checked);
     void on_radio_vt100_strip_toggled(bool checked);
@@ -352,6 +353,8 @@ signals:
     void plugin_serial_closed();
 
 public slots:
+    void plugin_set_status(bool busy, bool hide_terminal_output, bool *accepted);
+    void find_plugin(QString name, plugin_data *plugin);
     void plugin_serial_transmit(QByteArray *data);
     void plugin_add_open_close_button(QPushButton *button);
     void plugin_serial_open_close(uint8_t mode);
@@ -389,6 +392,29 @@ private:
     void update_buffer(QByteArray data, bool apply_formatting);
     void update_buffer(QByteArray *data, bool apply_formatting);
     void update_display_trimming();
+#ifndef SKIPPLUGINS_TRANSPORT
+    bool transport_open(QIODeviceBase::OpenMode mode);
+    void transport_close();
+    bool transport_isOpen() const;
+    QSerialPort::DataBits transport_dataBits() const;
+    AutTransportPlugin::StopBits transport_stopBits() const;
+    QSerialPort::Parity transport_parity() const;
+    qint64 transport_write(const QByteArray &data);
+    qint64 transport_bytesAvailable() const;
+    QByteArray transport_peek(qint64 maxlen);
+    QByteArray transport_read(qint64 maxlen);
+    QByteArray transport_readAll();
+    bool transport_clear(QSerialPort::Directions directions = QSerialPort::AllDirections);
+    bool transport_setBreakEnabled(bool set = true);
+    bool transport_setRequestToSend(bool set);
+    bool transport_setDataTerminalReady(bool set);
+    QSerialPort::PinoutSignals transport_pinoutSignals();
+    QString transport_error_to_error_string(int error);
+    QString transport_name() const;
+    bool transport_supports_break() const;
+    bool transport_supports_request_to_send() const;
+    bool transport_supports_data_terminal_ready() const;
+#endif
 
     //Private variables
     bool gbTermBusy; //True when compiling or loading a program or streaming a file (busy)
@@ -497,6 +523,10 @@ private:
     AutSerialDetect *serial_detect;
     bool serial_detect_waiting;
     bool serial_close_dialog_open;
+#endif
+#ifndef SKIPPLUGINS_TRANSPORT
+    bool plugin_transport_in_use;
+    AutTransportPlugin *plugin_transport;
 #endif
 
 protected:

@@ -4858,3 +4858,13 @@ void plugin_mcumgr::on_btn_error_lookup_clicked()
 {
     error_lookup_form->show();
 }
+
+AutPlugin::PluginType plugin_mcumgr::plugin_type()
+{
+    return AutPlugin::Feature;
+}
+
+QObject *plugin_mcumgr::plugin_object()
+{
+    return this;
+}

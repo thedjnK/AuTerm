@@ -159,6 +159,8 @@ public:
     bool plugin_configuration();
     static QMainWindow *get_main_window();
     void setup_finished();
+    PluginType plugin_type();
+    QObject *plugin_object();
 
 signals:
     void show_message_box(QString str_message);

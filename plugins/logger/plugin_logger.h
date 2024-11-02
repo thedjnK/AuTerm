@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -23,21 +23,35 @@
 #ifndef PLUGIN_LOGGER_H
 #define PLUGIN_LOGGER_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include <QWidget>
 #include <QColor>
 #include "AutPlugin.h"
 
-namespace Ui {
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
+namespace Ui
+{
     class plugin_logger;
 }
 
-enum log_level_types {
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
+enum log_level_types
+{
     log_level_error = 0,
     log_level_warning,
     log_level_information,
     log_level_debug,
 };
 
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class plugin_logger : public QWidget, AutPlugin
 {
     Q_OBJECT
@@ -51,6 +65,8 @@ public:
     void setup(QMainWindow *main_window);
     const QString plugin_about();
     bool plugin_configuration();
+    PluginType plugin_type();
+    QObject *plugin_object();
 
 public slots:
     void log_level_enabled(enum log_level_types type, bool *enabled);
@@ -70,3 +86,7 @@ private:
 };
 
 #endif // PLUGIN_LOGGER_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/
