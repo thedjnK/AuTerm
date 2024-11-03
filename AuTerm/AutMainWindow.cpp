@@ -118,40 +118,50 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     struct plugins plugin;
     while (i < static_plugins.length())
     {
-        if (static_plugins.at(i).metaData().contains("IID") == true && static_plugins.at(i).metaData().value("IID").toString() == AuTermPluginInterface_iid)
+        if (static_plugins.at(i).metaData().contains("IID") == true && static_plugins.at(i).metaData().value("IID").toString() == AuTermPluginInterface_iid && static_plugins.at(i).metaData().value("MetaData").toObject().contains("Name") == true && static_plugins.at(i).metaData().value("MetaData").toObject().contains("Version") == true && static_plugins.at(i).metaData().value("MetaData").toObject().contains("Type") == true)
         {
-            plugin.object = static_plugins.at(i).instance();
-            plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
-
-            if (plugin.plugin)
+            if (plugin_type_supported(plugin_type((QStaticPlugin *)&static_plugins.at(i))) == true)
             {
-                plugin.plugin->setup(this);
-                plugin_list.append(plugin);
+                plugin.object = static_plugins.at(i).instance();
+                plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
 
-                ui->list_Plugin_Plugins->addItem(QString(static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(static_plugins.at(i).metaData().value("MetaData").toObject().value("Version").toString()));
-
-#ifndef SKIPPLUGINS_TRANSPORT
-                if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                if (plugin.plugin)
                 {
-                    QObject *plugin_object;
-                    QWidget *plugin_tab = new QWidget();
+                    plugin.plugin->setup(this);
+                    plugin_list.append(plugin);
 
-                    plugin_transport = (AutTransportPlugin *)plugin.plugin;
-                    plugin_tab->setObjectName("tab_" % static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString());
-                    ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
-                    plugin_transport_in_use = true;
-                    qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
-                    plugin_object = plugin_transport->plugin_object();
+                    ui->list_Plugin_Plugins->addItem(QString(static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(static_plugins.at(i).metaData().value("MetaData").toObject().value("Version").toString()));
+#ifndef SKIPPLUGINS_TRANSPORT
+                    if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                    {
+                        QObject *plugin_object;
+                        QWidget *plugin_tab = new QWidget();
 
-                    connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
-                    //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
-                    connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
-                    connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+                        plugin_transport = (AutTransportPlugin *)plugin.plugin;
+                        plugin_tab->setObjectName("tab_" % static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString());
+                        ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
+                        plugin_transport_in_use = true;
+                        qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
+                        plugin_object = plugin_transport->plugin_object();
 
-                    plugin_transport->transport_setup(plugin_tab);
-                }
+                        connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
+                        //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
+                        connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
+                        connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+
+                        plugin_transport->transport_setup(plugin_tab);
+                    }
 #endif
+                }
             }
+            else
+            {
+                qDebug() << "Unsupported plugin type: " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Type").toString();
+            }
+        }
+        else
+        {
+            qDebug() << "Not an AuTerm plugin";
         }
 
         ++i;
@@ -179,51 +189,68 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     while (i < plugin_names.length())
     {
         plugin.plugin_loader = new QPluginLoader(lib_dir.path().append("/").append(plugin_names.at(i)));
-        plugin.object = plugin.plugin_loader->instance();
 
-        if (plugin.plugin_loader->isLoaded())
+        if (plugin.plugin_loader->metaData().contains("IID") == true && plugin.plugin_loader->metaData().value("IID").toString() == AuTermPluginInterface_iid && plugin.plugin_loader->metaData().contains("Name") == true && plugin.plugin_loader->metaData().contains("Version") == true && plugin.plugin_loader->metaData().contains("Type") == true)
         {
-            plugin.filename = plugin_names.at(i);
-            plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
-
-            if (plugin.plugin)
+            if (plugin_type_supported(plugin_type(plugin.plugin_loader)) == true)
             {
-                plugin.plugin->setup(this);
-                plugin_list.append(plugin);
+                plugin.object = plugin.plugin_loader->instance();
 
-                ui->list_Plugin_Plugins->addItem(QString(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Version").toString()));
+                if (plugin.plugin_loader->isLoaded())
+                {
+                    plugin.filename = plugin_names.at(i);
+                    plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
+
+                    if (plugin.plugin)
+                    {
+                        plugin.plugin->setup(this);
+                        plugin_list.append(plugin);
+
+                        ui->list_Plugin_Plugins->addItem(QString(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Version").toString()));
 
 #ifndef SKIPPLUGINS_TRANSPORT
-                if (plugin.plugin->plugin_type() == AutPlugin::Transport)
-                {
-                    QObject *plugin_object;
-                    QWidget *plugin_tab = new QWidget();
+                        if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                        {
+                            QObject *plugin_object;
+                            QWidget *plugin_tab = new QWidget();
 
-                    plugin_transport = (AutTransportPlugin *)plugin.plugin;
-                    plugin_tab->setObjectName("tab_" % static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString());
-                    ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
-                    plugin_transport_in_use = true;
-                    qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
-                    plugin_object = plugin_transport->plugin_object();
+                            plugin_transport = (AutTransportPlugin *)plugin.plugin;
+                            plugin_tab->setObjectName("tab_" % plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString());
+                            ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
+                            plugin_transport_in_use = true;
+                            qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
+                            plugin_object = plugin_transport->plugin_object();
 
-                    connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
-                    //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
-                    connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
-                    connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+                            connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
+                            //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
+                            connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
+                            connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
 
-                    plugin_transport->transport_setup(plugin_tab);
-                }
+                            plugin_transport->transport_setup(plugin_tab);
+                        }
 #endif
+                    }
+                    else
+                    {
+                        plugin.plugin_loader->unload();
+                        delete plugin.plugin_loader;
+                    }
+                }
+                else
+                {
+                    qDebug() << plugin.plugin_loader->errorString();
+                    delete plugin.plugin_loader;
+                }
             }
             else
             {
-                plugin.plugin_loader->unload();
+                qDebug() << "Unsupported plugin type: " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Type").toString();
                 delete plugin.plugin_loader;
             }
         }
         else
         {
-            qDebug() << plugin.plugin_loader->errorString();
+            qDebug() << "Not an AuTerm plugin: " << lib_dir.path().append("/").append(plugin_names.at(i));
             delete plugin.plugin_loader;
         }
 
@@ -5558,6 +5585,46 @@ bool AutMainWindow::transport_supports_data_terminal_ready() const
     }
 
     return plugin_transport->supports_data_terminal_ready();
+}
+
+#ifdef QT_STATIC
+AutPlugin::PluginType AutMainWindow::plugin_type(QStaticPlugin *plugin)
+#else
+AutPlugin::PluginType AutMainWindow::plugin_type(QPluginLoader *plugin)
+#endif
+{
+    QJsonObject plugin_metadata = plugin->metaData().value("MetaData").toObject();
+
+    if (plugin_metadata.contains("Type") == true)
+    {
+        QString plugin_type = plugin_metadata.value("Type").toString();
+
+        if (plugin_type == "feature")
+        {
+            return AutPlugin::Feature;
+        }
+
+        if (plugin_type == "transport")
+        {
+            return AutPlugin::Transport;
+        }
+    }
+
+    return AutPlugin::Unknown;
+}
+
+bool AutMainWindow::plugin_type_supported(AutPlugin::PluginType type)
+{
+    switch (type)
+    {
+        case AutPlugin::Feature:
+#ifndef SKIPPLUGINS_TRANSPORT
+        case AutPlugin::Transport:
+#endif
+            return true;
+        default:
+            return false;
+    };
 }
 #endif
 

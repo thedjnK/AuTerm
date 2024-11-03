@@ -414,6 +414,12 @@ private:
     bool transport_supports_break() const;
     bool transport_supports_request_to_send() const;
     bool transport_supports_data_terminal_ready() const;
+#ifdef QT_STATIC
+    AutPlugin::PluginType plugin_type(QStaticPlugin *plugin);
+#else
+    AutPlugin::PluginType plugin_type(QPluginLoader *plugin);
+#endif
+    bool plugin_type_supported(AutPlugin::PluginType type);
 #endif
 
     //Private variables
