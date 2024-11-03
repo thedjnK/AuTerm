@@ -1,5 +1,6 @@
 {
     "Name": "echo_transport",
     "Version": "0.0.1",
+    "Type": "transport",
     "keys": [ ]
 }
