@@ -151,6 +151,19 @@ CONFIG(release, debug|release) {
                     else: PRE_TARGETDEPS += $$DESTDIR/libplugin_echo_transport.a
                 }
             }
+
+            !contains(DEFINES, SKIPPLUGIN_TRANSPORT_NUS) {
+                exists(../plugins/nus_transport) {
+                    DEFINES += "STATICPLUGIN_TRANSPORT_NUS"
+
+                    win32: LIBS += -L$$DESTDIR -lplugin_nus_transport
+                    else: LIBS += -L$$DESTDIR -lplugin_nus_transport
+
+                    win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_nus_transport.a
+                    else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_nus_transport.lib
+                    else: PRE_TARGETDEPS += $$DESTDIR/libplugin_nus_transport.a
+                }
+            }
         }
     }
 }

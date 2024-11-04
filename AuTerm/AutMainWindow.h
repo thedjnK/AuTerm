@@ -363,6 +363,9 @@ public slots:
     void plugin_save_setting(QString name, QVariant data);
     void plugin_load_setting(QString name, QVariant *data, bool *found);
     void plugin_get_image_pixmap(QString name, QPixmap **pixmap);
+    void plugin_force_image_update();
+    void plugin_show_message_box(QString message);
+    void plugin_transport_error(int error);
 #endif
 
 private:
@@ -396,6 +399,7 @@ private:
     bool transport_open(QIODeviceBase::OpenMode mode);
     void transport_close();
     bool transport_isOpen() const;
+    bool transport_isOpening() const;
     QSerialPort::DataBits transport_dataBits() const;
     AutTransportPlugin::StopBits transport_stopBits() const;
     QSerialPort::Parity transport_parity() const;

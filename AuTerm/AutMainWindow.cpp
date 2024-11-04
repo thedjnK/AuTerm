@@ -118,50 +118,53 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     struct plugins plugin;
     while (i < static_plugins.length())
     {
-        if (static_plugins.at(i).metaData().contains("IID") == true && static_plugins.at(i).metaData().value("IID").toString() == AuTermPluginInterface_iid && static_plugins.at(i).metaData().value("MetaData").toObject().contains("Name") == true && static_plugins.at(i).metaData().value("MetaData").toObject().contains("Version") == true && static_plugins.at(i).metaData().value("MetaData").toObject().contains("Type") == true)
+        if (static_plugins.at(i).metaData().contains("IID") == true && static_plugins.at(i).metaData().value("IID").toString() == AuTermPluginInterface_iid)
         {
-            if (plugin_type_supported(plugin_type((QStaticPlugin *)&static_plugins.at(i))) == true)
+            if (static_plugins.at(i).metaData().value("MetaData").toObject().contains("Name") == true && static_plugins.at(i).metaData().value("MetaData").toObject().contains("Version") == true && static_plugins.at(i).metaData().value("MetaData").toObject().contains("Type") == true)
             {
-                plugin.object = static_plugins.at(i).instance();
-                plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
-
-                if (plugin.plugin)
+                if (plugin_type_supported(plugin_type((QStaticPlugin *)&static_plugins.at(i))) == true)
                 {
-                    plugin.plugin->setup(this);
-                    plugin_list.append(plugin);
+                    plugin.object = static_plugins.at(i).instance();
+                    plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
 
-                    ui->list_Plugin_Plugins->addItem(QString(static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(static_plugins.at(i).metaData().value("MetaData").toObject().value("Version").toString()));
-#ifndef SKIPPLUGINS_TRANSPORT
-                    if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                    if (plugin.plugin)
                     {
-                        QObject *plugin_object;
-                        QWidget *plugin_tab = new QWidget();
+                        plugin.plugin->setup(this);
+                        plugin_list.append(plugin);
 
-                        plugin_transport = (AutTransportPlugin *)plugin.plugin;
-                        plugin_tab->setObjectName("tab_" % static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString());
-                        ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
-                        plugin_transport_in_use = true;
-                        qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
-                        plugin_object = plugin_transport->plugin_object();
+                        ui->list_Plugin_Plugins->addItem(QString(static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(static_plugins.at(i).metaData().value("MetaData").toObject().value("Version").toString()));
+#ifndef SKIPPLUGINS_TRANSPORT
+                        if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                        {
+                            QObject *plugin_object;
+                            QWidget *plugin_tab = new QWidget();
 
-                        connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
-                        //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
-                        connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
-                        connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+                            plugin_transport = (AutTransportPlugin *)plugin.plugin;
+                            plugin_tab->setObjectName("tab_" % static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString());
+                            ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
+                            plugin_transport_in_use = true;
+                            qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
+                            plugin_object = plugin_transport->plugin_object();
 
-                        plugin_transport->transport_setup(plugin_tab);
-                    }
+                            connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
+                            //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
+                            connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
+                            connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+
+                            plugin_transport->transport_setup(plugin_tab);
+                        }
 #endif
+                    }
+                }
+                else
+                {
+                    qDebug() << "Unsupported plugin type: " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Type").toString();
                 }
             }
             else
             {
-                qDebug() << "Unsupported plugin type: " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Type").toString();
+                qDebug() << "Not an AuTerm plugin";
             }
-        }
-        else
-        {
-            qDebug() << "Not an AuTerm plugin";
         }
 
         ++i;
@@ -190,68 +193,70 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     {
         plugin.plugin_loader = new QPluginLoader(lib_dir.path().append("/").append(plugin_names.at(i)));
 
-        if (plugin.plugin_loader->metaData().contains("IID") == true && plugin.plugin_loader->metaData().value("IID").toString() == AuTermPluginInterface_iid && plugin.plugin_loader->metaData().contains("Name") == true && plugin.plugin_loader->metaData().contains("Version") == true && plugin.plugin_loader->metaData().contains("Type") == true)
+        if (plugin.plugin_loader->metaData().contains("IID") == true && plugin.plugin_loader->metaData().value("IID").toString() == AuTermPluginInterface_iid)
         {
-            if (plugin_type_supported(plugin_type(plugin.plugin_loader)) == true)
+            if (plugin.plugin_loader->metaData().value("MetaData").toObject().contains("Name") == true && plugin.plugin_loader->metaData().value("MetaData").toObject().contains("Version") == true && plugin.plugin_loader->metaData().value("MetaData").toObject().contains("Type") == true)
             {
-                plugin.object = plugin.plugin_loader->instance();
-
-                if (plugin.plugin_loader->isLoaded())
+                if (plugin_type_supported(plugin_type(plugin.plugin_loader)) == true)
                 {
-                    plugin.filename = plugin_names.at(i);
-                    plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
+                    plugin.object = plugin.plugin_loader->instance();
 
-                    if (plugin.plugin)
+                    if (plugin.plugin_loader->isLoaded())
                     {
-                        plugin.plugin->setup(this);
-                        plugin_list.append(plugin);
+                        plugin.filename = plugin_names.at(i);
+                        plugin.plugin = qobject_cast<AutPlugin *>(plugin.object);
 
-                        ui->list_Plugin_Plugins->addItem(QString(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Version").toString()));
-
-#ifndef SKIPPLUGINS_TRANSPORT
-                        if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                        if (plugin.plugin)
                         {
-                            QObject *plugin_object;
-                            QWidget *plugin_tab = new QWidget();
+                            plugin.plugin->setup(this);
+                            plugin_list.append(plugin);
 
-                            plugin_transport = (AutTransportPlugin *)plugin.plugin;
-                            plugin_tab->setObjectName("tab_" % plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString());
-                            ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
-                            plugin_transport_in_use = true;
-                            qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
-                            plugin_object = plugin_transport->plugin_object();
+                            ui->list_Plugin_Plugins->addItem(QString(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString()).append(", version ").append(plugin.plugin_loader->metaData().value("MetaData").toObject().value("Version").toString()));
+#ifndef SKIPPLUGINS_TRANSPORT
+                            if (plugin.plugin->plugin_type() == AutPlugin::Transport)
+                            {
+                                QObject *plugin_object;
+                                QWidget *plugin_tab = new QWidget();
 
-                            connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
-                            //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
-                            connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
-                            connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+                                plugin_transport = (AutTransportPlugin *)plugin.plugin;
+                                plugin_tab->setObjectName("tab_" % plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString());
+                                ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
+                                plugin_transport_in_use = true;
+                                qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
+                                plugin_object = plugin_transport->plugin_object();
 
-                            plugin_transport->transport_setup(plugin_tab);
-                        }
+                                connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
+                                //connect(plugin_object, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialError(QSerialPort::SerialPortError)));
+                                connect(plugin_object, SIGNAL(bytesWritten(qint64)), this, SLOT(SerialBytesWritten(qint64)));
+                                connect(plugin_object, SIGNAL(aboutToClose()), this, SLOT(SerialPortClosing()));
+
+                                plugin_transport->transport_setup(plugin_tab);
+                            }
 #endif
+                        }
+                        else
+                        {
+                            plugin.plugin_loader->unload();
+                            delete plugin.plugin_loader;
+                        }
                     }
                     else
                     {
-                        plugin.plugin_loader->unload();
+                        qDebug() << plugin.plugin_loader->errorString();
                         delete plugin.plugin_loader;
                     }
                 }
                 else
                 {
-                    qDebug() << plugin.plugin_loader->errorString();
+                    qDebug() << "Unsupported plugin type: " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Type").toString();
                     delete plugin.plugin_loader;
                 }
             }
             else
             {
-                qDebug() << "Unsupported plugin type: " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Type").toString();
+                qDebug() << "Not an AuTerm plugin: " << lib_dir.path().append("/").append(plugin_names.at(i));
                 delete plugin.plugin_loader;
             }
-        }
-        else
-        {
-            qDebug() << "Not an AuTerm plugin: " << lib_dir.path().append("/").append(plugin_names.at(i));
-            delete plugin.plugin_loader;
         }
 
         ++i;
@@ -1082,7 +1087,7 @@ AutMainWindow::~AutMainWindow()
     }
 #endif
 
-    if (transport_isOpen() == true)
+    if (transport_isOpen() == true || transport_isOpening() == true)
     {
         //Close serial connection before quitting
         transport_close();
@@ -1262,7 +1267,7 @@ void AutMainWindow::on_btn_Connect_clicked()
 
 void AutMainWindow::on_btn_TermClose_clicked(bool from_plugin)
 {
-    if (transport_isOpen() == false)
+    if (transport_isOpen() == false && transport_isOpening() == false)
     {
         //Open connection
         OpenDevice(from_plugin);
@@ -1337,17 +1342,14 @@ void AutMainWindow::on_btn_TermClose_clicked(bool from_plugin)
 #endif
 
         //Close the serial port
-        if (transport_isOpen() == true)
-        {
-            transport_clear();
-            transport_close();
+        transport_clear();
+        transport_close();
 
 #ifndef SKIPPLUGINS
-            emit plugin_serial_closed();
-            gbPluginHideTerminalOutput = false;
-            gbPluginRunning = false;
+        emit plugin_serial_closed();
+        gbPluginHideTerminalOutput = false;
+        gbPluginRunning = false;
 #endif
-        }
         gpSignalTimer->stop();
 
         //Disable active checkboxes
@@ -2086,7 +2088,6 @@ void AutMainWindow::SerialStatus(bool bType)
         //Disable timer
         gpSignalTimer->stop();
     }
-    return;
 }
 
 void AutMainWindow::SerialStatusSlot()
@@ -2100,7 +2101,7 @@ void AutMainWindow::OpenDevice(bool from_plugin)
     //Function to open serial port
     bool port_opened = false;
 
-    if (transport_isOpen() == true)
+    if (transport_isOpen() == true || transport_isOpening() == true)
     {
         //Serial port is already open - cancel any pending operations
         if (gbTermBusy == true)
@@ -2121,17 +2122,14 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 #endif
 
         //Close serial port
-        if (transport_isOpen() == true)
-        {
-            transport_clear();
-            transport_close();
+        transport_clear();
+        transport_close();
 
 #ifndef SKIPPLUGINS
-            emit plugin_serial_closed();
-            gbPluginHideTerminalOutput = false;
-            gbPluginRunning = false;
+        emit plugin_serial_closed();
+        gbPluginHideTerminalOutput = false;
+        gbPluginRunning = false;
 #endif
-        }
         gpSignalTimer->stop();
 
         //Change status message
@@ -5072,7 +5070,7 @@ void AutMainWindow::plugin_add_open_close_button(QPushButton *button)
 {
     list_plugin_open_close_buttons.append(button);
     connect(button, SIGNAL(clicked(bool)), this, SLOT(on_btn_TermClose_clicked()));
-    button->setText(transport_isOpen() == true ? "C&lose Port" : "&Open Port");
+    button->setText((transport_isOpen() == true || transport_isOpening() == true) ? "C&lose Port" : "&Open Port");
 }
 
 void AutMainWindow::plugin_serial_open_close(uint8_t mode)
@@ -5081,7 +5079,7 @@ void AutMainWindow::plugin_serial_open_close(uint8_t mode)
         case 0:
         {
             //Open port
-            if (transport_isOpen())
+            if (transport_isOpen() == true || transport_isOpening() == true)
             {
                 return;
             }
@@ -5091,7 +5089,7 @@ void AutMainWindow::plugin_serial_open_close(uint8_t mode)
         case 1:
         {
             //Close port
-            if (!transport_isOpen())
+            if (transport_isOpen() == false && transport_isOpening() == false)
             {
                 return;
             }
@@ -5407,6 +5405,16 @@ bool AutMainWindow::transport_isOpen() const
     return plugin_transport->isOpen();
 }
 
+bool AutMainWindow::transport_isOpening() const
+{
+    if (plugin_transport_in_use == false)
+    {
+        return false;
+    }
+
+    return plugin_transport->isOpening();
+}
+
 QSerialPort::DataBits AutMainWindow::transport_dataBits() const
 {
     if (plugin_transport_in_use == false)
@@ -5585,6 +5593,193 @@ bool AutMainWindow::transport_supports_data_terminal_ready() const
     }
 
     return plugin_transport->supports_data_terminal_ready();
+}
+
+void AutMainWindow::plugin_transport_error(int error)
+{
+    //TODO: unify with SerialError() and make a common clean up function
+#ifndef SKIPSCRIPTINGFORM
+    if (gbScriptingRunning == true)
+    {
+//        gusScriptingForm->SerialPortError(speErrorCode);
+    }
+#endif
+
+    //Resource error or permission error (device unplugged?)
+    QString strMessage = "Fatal error with transport connection: " % QString::number(error) % ".\nPlease reconnect to the device to continue.";
+    gpmErrorForm->SetMessage(&strMessage);
+    gpmErrorForm->show();
+    ui->text_TermEditData->set_serial_open(false);
+
+        if (gbStreamingFile == true)
+        {
+            //Clear up file stream
+            gtmrStreamTimer.invalidate();
+            gbStreamingFile = false;
+            gpStreamFileHandle->close();
+            delete gpStreamFileHandle;
+        }
+#ifndef SKIPSPEEDTEST
+        else if (gbSpeedTestRunning == true)
+        {
+            //Clear up speed testing
+            if (gtmrSpeedTestDelayTimer != 0)
+            {
+                //Clean up timer
+                disconnect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStartTimer()));
+                disconnect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStopTimer()));
+                delete gtmrSpeedTestDelayTimer;
+                gtmrSpeedTestDelayTimer = 0;
+            }
+
+            ui->btn_SpeedStartStop->setEnabled(false);
+            ui->check_SpeedSyncReceive->setEnabled(true);
+            ui->combo_SpeedDataType->setEnabled(true);
+            if (ui->combo_SpeedDataType->currentIndex() == 1)
+            {
+                //Enable string options
+                ui->edit_SpeedTestData->setEnabled(true);
+                ui->check_SpeedStringUnescape->setEnabled(true);
+            }
+
+            //Update values
+            OutputSpeedTestAvgStats((gtmrSpeedTimer.nsecsElapsed() < 1000000000LL ? 1000000000LL : gtmrSpeedTimer.nsecsElapsed()/1000000000LL));
+
+            //Set speed test as no longer running
+            gchSpeedTestMode = SpeedModeInactive;
+            gbSpeedTestRunning = false;
+
+            if (gtmrSpeedTimer.isValid())
+            {
+                //Invalidate speed test timer
+                gtmrSpeedTimer.invalidate();
+            }
+            if (gtmrSpeedTestStats.isActive())
+            {
+                //Stop stats update timer
+                gtmrSpeedTestStats.stop();
+            }
+            if (gtmrSpeedTestStats10s.isActive())
+            {
+                //Stop 10 second stats update timer
+                gtmrSpeedTestStats10s.stop();
+            }
+
+            //Clear buffers
+            gbaSpeedMatchData.clear();
+            gbaSpeedReceivedData.clear();
+
+            //Show finished message in status bar
+            ui->statusBar->showMessage("Speed testing failed due to serial port error.");
+        }
+#endif
+
+        //No longer busy
+        gbTermBusy = false;
+        gchTermMode = 0;
+
+#ifndef SKIPSERIALDETECT
+        if (serial_detect_waiting == false)
+        {
+#endif
+            //Disable cancel button
+            ui->btn_Cancel->setEnabled(false);
+#ifndef SKIPSERIALDETECT
+        }
+#endif
+
+        //Disable active checkboxes
+        ui->check_Break->setEnabled(false);
+        ui->check_DTR->setEnabled(false);
+        ui->check_Echo->setEnabled(false);
+        ui->check_Line->setEnabled(false);
+        ui->check_RTS->setEnabled(false);
+#ifndef SKIPSPEEDTEST
+        ui->check_SpeedDTR->setEnabled(false);
+        ui->check_SpeedRTS->setEnabled(false);
+#endif
+
+        //Disable text entry
+        ui->text_TermEditData->setReadOnly(true);
+
+#ifndef SKIPSERIALDETECT
+        if (serial_detect_waiting == false)
+        {
+#endif
+            //Change status message
+            ui->statusBar->showMessage("");
+#ifndef SKIPSERIALDETECT
+        }
+#endif
+
+        //Change button text
+        ui->btn_TermClose->setText("&Open Port");
+#ifndef SKIPSPEEDTEST
+        ui->btn_SpeedClose->setText("&Open Port");
+#endif
+
+        //Update images
+        UpdateImages();
+
+        //Close log file if open
+        if (gpMainLog->IsLogOpen() == true)
+        {
+            gpMainLog->CloseLogFile();
+        }
+
+        //Enable log options
+        ui->edit_LogFile->setEnabled(true);
+        ui->check_LogEnable->setEnabled(true);
+        ui->check_LogAppend->setEnabled(true);
+        ui->btn_LogFileSelect->setEnabled(true);
+
+#ifndef SKIPAUTOMATIONFORM
+        //Notify automation form
+        if (guaAutomationForm != 0)
+        {
+            guaAutomationForm->ConnectionChange(false);
+        }
+#endif
+
+        //Show disconnection balloon
+        if (gbSysTrayEnabled == true && !this->isActiveWindow() && !gpmErrorForm->isActiveWindow()
+#ifndef SKIPAUTOMATIONFORM
+           && (guaAutomationForm == 0 || (guaAutomationForm != 0 && !guaAutomationForm->isActiveWindow()))
+#endif
+           )
+        {
+            gpSysTray->showMessage(ui->combo_COM->currentText().append(" Removed"), QString("Connection to device ").append(ui->combo_COM->currentText()).append(" has been lost due to disconnection."), QSystemTrayIcon::Critical);
+        }
+
+        //Disallow file drops
+        setAcceptDrops(false);
+
+#ifndef SKIPPLUGINS
+//    emit plugin_serial_error(speErrorCode);
+
+//    if (port_closed == true)
+    {
+        emit plugin_serial_closed();
+        gbPluginHideTerminalOutput = false;
+        gbPluginRunning = false;
+    }
+#endif
+}
+
+void AutMainWindow::plugin_force_image_update()
+{
+    SerialStatus(true);
+
+    if (gpSignalTimer->isActive() == false)
+    {
+        gpSignalTimer->start(gpTermSettings->value("SerialSignalCheckInterval", DefaultSerialSignalCheckInterval).toUInt());
+    }
+}
+
+void AutMainWindow::plugin_show_message_box(QString message)
+{
+    gpmErrorForm->SetMessage(&message);
+    gpmErrorForm->show();
 }
 
 #ifdef QT_STATIC

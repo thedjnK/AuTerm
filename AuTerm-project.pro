@@ -27,5 +27,12 @@ SUBDIRS += \
 
             AuTerm.depends += plugins/echo_transport
         }
+
+        !contains(DEFINES, SKIPPLUGIN_TRANSPORT_NUS) {
+            SUBDIRS += \
+                plugins/nus_transport
+
+            AuTerm.depends += plugins/nus_transport
+        }
     }
 }

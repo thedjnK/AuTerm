@@ -40,6 +40,9 @@ macx: DEFINES += "SKIPSERIALDETECT"
 # Uncomment to skip building dummy echo transport plugin
 DEFINES += "SKIPPLUGIN_TRANSPORT_ECHO"
 
+# Uncomment to skip building NUS transport plugin
+#DEFINES += "SKIPPLUGIN_TRANSPORT_NUS"
+
 # Uncomment to build MCUmgr plugin transports (note: static builds need these extra modules in the base AuTerm build also)
 !contains(DEFINES, SKIPPLUGINS) {
     !contains(DEFINES, SKIPPLUGIN_MCUMGR) {
@@ -60,7 +63,16 @@ DEFINES += "SKIPPLUGIN_TRANSPORT_ECHO"
     }
 }
 
-contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) {
+!contains(DEFINES, SKIPPLUGINS_TRANSPORT) {
+    !contains(DEFINES, SKIPPLUGIN_TRANSPORT_NUS) {
+        qtHaveModule(bluetooth) {
+            # Requires qtconnectivity
+            DEFINES += "PLUGIN_TRANSPORT_NUS_BLUETOOTH"
+        }
+    }
+}
+
+contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) | contains(DEFINES, PLUGIN_TRANSPORT_NUS_BLUETOOTH) {
     ADDITIONAL_MODULES += "bluetooth"
 }
 

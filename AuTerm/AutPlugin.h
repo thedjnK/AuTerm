@@ -88,6 +88,7 @@ public:
     virtual bool open(QIODeviceBase::OpenMode mode) = 0;
     virtual void close() = 0;
     virtual bool isOpen() const = 0;
+    virtual bool isOpening() const = 0;
     virtual QSerialPort::DataBits dataBits() const = 0;
     virtual StopBits stopBits() const = 0;
     virtual QSerialPort::Parity parity() const = 0;
@@ -99,14 +100,17 @@ public:
     virtual bool clear(QSerialPort::Directions directions = QSerialPort::AllDirections) = 0;
     virtual bool setBreakEnabled(bool set = true)
     {
+        Q_UNUSED(set);
         return false;
     }
     virtual bool setRequestToSend(bool set)
     {
+        Q_UNUSED(set);
         return false;
     }
     virtual bool setDataTerminalReady(bool set)
     {
+        Q_UNUSED(set);
         return false;
     }
     virtual QSerialPort::PinoutSignals pinoutSignals() = 0;
@@ -164,6 +168,9 @@ public slots:
     void plugin_save_setting(QString name, QVariant data);
     void plugin_load_setting(QString name, QVariant *data, bool *found);
     void plugin_get_image_pixmap(QString name, QPixmap **pixmap);
+    void plugin_force_image_update();
+    void plugin_show_message_box(QString message);
+    void plugin_transport_error(int error);
 };
 #endif
 

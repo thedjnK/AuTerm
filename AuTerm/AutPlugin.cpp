@@ -35,6 +35,11 @@ Q_IMPORT_PLUGIN(plugin_mcumgr)
 Q_IMPORT_PLUGIN(plugin_logger)
 #endif
 
+#ifdef STATICPLUGIN_TRANSPORT_NUS
+//NUS transport plugin
+Q_IMPORT_PLUGIN(plugin_nus_transport)
+#endif
+
 #ifdef STATICPLUGIN_TRANSPORT_ECHO
 //Dummy echo transport plugin
 Q_IMPORT_PLUGIN(plugin_echo_transport)
