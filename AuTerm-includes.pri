@@ -57,7 +57,7 @@ DEFINES += "SKIPPLUGIN_TRANSPORT_ECHO"
 
             qtHaveModule(mqtt) {
                 # Requires qtnetwork and qtmqtt
-                DEFINES += "PLUGIN_MCUMGR_TRANSPORT_LORAWAN"
+#                DEFINES += "PLUGIN_MCUMGR_TRANSPORT_LORAWAN"
             }
         }
     }
