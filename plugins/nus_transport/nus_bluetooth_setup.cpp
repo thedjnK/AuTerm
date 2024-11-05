@@ -33,6 +33,15 @@ nus_bluetooth_setup::nus_bluetooth_setup(QWidget *parent) :
     connected = false;
     red_circle = nullptr;
     green_circle = nullptr;
+
+#ifdef _WIN32
+    //Remove address selection on windows as it is useless
+    ui->radio_address_type_public->deleteLater();
+    ui->radio_address_type_random->deleteLater();
+    ui->radio_address_type_default->deleteLater();
+    ui->label_2->deleteLater();
+    ui->horizontalLayout->deleteLater();
+#endif
 }
 
 nus_bluetooth_setup::~nus_bluetooth_setup()
@@ -142,7 +151,12 @@ bool nus_bluetooth_setup::connect()
         if (ui->list_devices->selectedItems().count() == 1)
         {
             ui->label_status->setText("Connecting...");
-            emit connect_to_device(ui->list_devices->currentRow(), (ui->radio_address_type_public->isChecked() ? BLUETOOTH_FORCE_ADDRESS_PUBLIC : (ui->radio_address_type_random->isChecked() ? BLUETOOTH_FORCE_ADDRESS_RANDOM : BLUETOOTH_FORCE_ADDRESS_DEFAULT)));
+            emit connect_to_device(ui->list_devices->currentRow(),
+#ifdef _WIN32
+                                   BLUETOOTH_FORCE_ADDRESS_DEFAULT);
+#else
+                                   (ui->radio_address_type_public->isChecked() ? BLUETOOTH_FORCE_ADDRESS_PUBLIC : (ui->radio_address_type_random->isChecked() ? BLUETOOTH_FORCE_ADDRESS_RANDOM : BLUETOOTH_FORCE_ADDRESS_DEFAULT)));
+#endif
         }
 
         return true;

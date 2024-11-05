@@ -105,7 +105,7 @@ private slots:
     void form_connect_to_device(uint16_t index, uint8_t address_type);
     void form_disconnect_from_device();
     void form_bluetooth_status(bool *scanning, bool *connecting);
-//    void connection_updated(QLowEnergyConnectionParameters parameters);
+    void connection_updated(QLowEnergyConnectionParameters parameters);
 
 signals:
     void readyRead();
