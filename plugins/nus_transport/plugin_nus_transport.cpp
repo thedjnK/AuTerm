@@ -571,7 +571,7 @@ void plugin_nus_transport::form_connect_to_device(uint16_t index, uint8_t addres
         QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
         QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
         QObject::disconnect(controller, SIGNAL(connectionUpdated(QLowEnergyConnectionParameters)), this, SLOT(connection_updated(QLowEnergyConnectionParameters)));
-#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
         QObject::disconnect(controller, SIGNAL(errorOccurred(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
         QObject::disconnect(controller, SIGNAL(mtuChanged(int)), this, SLOT(mtu_updated(int)));
 #else
