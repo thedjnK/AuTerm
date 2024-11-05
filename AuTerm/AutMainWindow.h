@@ -1,6 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -170,7 +170,8 @@ const qint8 SpeedModeSend                       = 2;
 const qint8 SpeedModeSendRecv                   = 3;
 //Constants for speed testing
 const qint16 SpeedTestChunkSize                 = 512;  //Maximum number of bytes to send per chunk when speed testing
-const qint16 SpeedTestMinBufSize                = 128;  //Minimum buffer size when speed testing, when there are less than this number of bytes in the output buffer it will be topped up
+//const qint16 SpeedTestMinBufSize                = 128;  //Minimum buffer size when speed testing, when there are less than this number of bytes in the output buffer it will be topped up
+const qint16 SpeedTestMinBufSize                = 384;  //Minimum buffer size when speed testing, when there are less than this number of bytes in the output buffer it will be topped up
 const qint16 SpeedTestStatUpdateTime            = 500;  //Time (in ms) between status updates for speed test mode
 const QString WINDOWS_NEWLINE                   = "\r\n";
 const QChar NEWLINE                             = '\n';
@@ -535,8 +536,7 @@ private:
     bool serial_close_dialog_open;
 #endif
 #ifndef SKIPPLUGINS_TRANSPORT
-    bool plugin_transport_in_use;
-    AutTransportPlugin *plugin_transport;
+    AutTransportPlugin *plugin_active_transport;
 #endif
 
 protected:

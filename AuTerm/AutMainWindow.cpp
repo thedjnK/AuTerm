@@ -1,6 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -103,10 +103,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 {
     int32_t i = 0;
 
-#ifndef SKIPPLUGINS_TRANSPORT
-    plugin_transport_in_use = false;
-#endif
-
     //Setup the GUI
     ui->setupUi(this);
 
@@ -137,12 +133,12 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                         if (plugin.plugin->plugin_type() == AutPlugin::Transport)
                         {
                             QObject *plugin_object;
+                            AutTransportPlugin *plugin_transport;
                             QWidget *plugin_tab = new QWidget();
 
                             plugin_transport = (AutTransportPlugin *)plugin.plugin;
-                            plugin_tab->setObjectName("tab_" % static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString());
+                            plugin_tab->setObjectName("tab_transport_plugin_" % QString::number(plugin_list.count() - 1));
                             ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
-                            plugin_transport_in_use = true;
                             qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
                             plugin_object = plugin_transport->plugin_object();
 
@@ -216,12 +212,12 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                             if (plugin.plugin->plugin_type() == AutPlugin::Transport)
                             {
                                 QObject *plugin_object;
+                                AutTransportPlugin *plugin_transport;
                                 QWidget *plugin_tab = new QWidget();
 
                                 plugin_transport = (AutTransportPlugin *)plugin.plugin;
-                                plugin_tab->setObjectName("tab_" % plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString());
+                                plugin_tab->setObjectName("tab_transport_plugin_" % QString::number(plugin_list.count() - 1));
                                 ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
-                                plugin_transport_in_use = true;
                                 qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
                                 plugin_object = plugin_transport->plugin_object();
 
@@ -2156,9 +2152,10 @@ void AutMainWindow::OpenDevice(bool from_plugin)
     }
 
 #ifndef SKIPPLUGINS_TRANSPORT
-    if (plugin_transport_in_use == false)
+    if (ui->tab_transport->currentIndex() == 0)
 #endif
     {
+        //Use UART
         if (ui->combo_COM->currentText().length() > 0)
         {
             //Port selected: setup serial port
@@ -2231,7 +2228,28 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 #ifndef SKIPPLUGINS_TRANSPORT
     else
     {
-        if (plugin_transport->open(QIODevice::ReadWrite))
+        qsizetype pos_underscore = ui->tab_transport->currentWidget()->objectName().lastIndexOf('_');
+        uint plugin_index;
+
+        if (pos_underscore == -1)
+        {
+            //TODO: error
+            return;
+        }
+
+        plugin_index = ui->tab_transport->currentWidget()->objectName().mid((pos_underscore + 1)).toUInt();
+
+        if (plugin_index >= plugin_list.length())
+        {
+            //TODO: error
+            return;
+        }
+
+        //TODO: ensure plugin is transport
+
+        plugin_active_transport = (AutTransportPlugin *)plugin_list.at(plugin_index).plugin;
+
+        if (plugin_active_transport->open(QIODevice::ReadWrite))
         {
             //Successful
             port_opened = true;
@@ -2272,6 +2290,7 @@ void AutMainWindow::OpenDevice(bool from_plugin)
         else
         {
             //Error whilst opening
+            //todo: change to transport
             ui->statusBar->showMessage("Error: ");
             ui->statusBar->showMessage(ui->statusBar->currentMessage().append(gspSerialPort.errorString()));
 
@@ -2284,6 +2303,8 @@ void AutMainWindow::OpenDevice(bool from_plugin)
             gpmErrorForm->SetMessage(&strMessage);
             gpmErrorForm->show();
             ui->text_TermEditData->set_serial_open(false);
+
+            plugin_active_transport = nullptr;
         }
     }
 #endif
@@ -5377,222 +5398,224 @@ void AutMainWindow::on_check_reconnect_after_disconnect_toggled(bool checked)
 #ifndef SKIPPLUGINS_TRANSPORT
 bool AutMainWindow::transport_open(QIODeviceBase::OpenMode mode)
 {
-    if (plugin_transport_in_use == false)
+    //TODO:
+    if (ui->tab_transport->currentIndex() == 0)
     {
         return gspSerialPort.open(mode);
     }
 
-    return plugin_transport->open(mode);
+    return plugin_active_transport->open(mode);
 }
 
 void AutMainWindow::transport_close()
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.close();
     }
 
-    return plugin_transport->close();
+    plugin_active_transport->close();
+    plugin_active_transport = nullptr;
 }
 
 bool AutMainWindow::transport_isOpen() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.isOpen();
     }
 
-    return plugin_transport->isOpen();
+    return plugin_active_transport->isOpen();
 }
 
 bool AutMainWindow::transport_isOpening() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return false;
     }
 
-    return plugin_transport->isOpening();
+    return plugin_active_transport->isOpening();
 }
 
 QSerialPort::DataBits AutMainWindow::transport_dataBits() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.dataBits();
     }
 
-    return plugin_transport->dataBits();
+    return plugin_active_transport->dataBits();
 }
 
 AutTransportPlugin::StopBits AutMainWindow::transport_stopBits() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return (AutTransportPlugin::StopBits)gspSerialPort.stopBits();
     }
 
-    return plugin_transport->stopBits();
+    return plugin_active_transport->stopBits();
 }
 
 QSerialPort::Parity AutMainWindow::transport_parity() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.parity();
     }
 
-    return plugin_transport->parity();
+    return plugin_active_transport->parity();
 }
 
 qint64 AutMainWindow::transport_write(const QByteArray &data)
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.write(data);
     }
 
-    return plugin_transport->write(data);
+    return plugin_active_transport->write(data);
 }
 
 qint64 AutMainWindow::transport_bytesAvailable() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.bytesAvailable();
     }
 
-    return plugin_transport->bytesAvailable();
+    return plugin_active_transport->bytesAvailable();
 }
 
 QByteArray AutMainWindow::transport_peek(qint64 maxlen)
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.peek(maxlen);
     }
 
-    return plugin_transport->peek(maxlen);
+    return plugin_active_transport->peek(maxlen);
 }
 
 QByteArray AutMainWindow::transport_read(qint64 maxlen)
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.read(maxlen);
     }
 
-    return plugin_transport->read(maxlen);
+    return plugin_active_transport->read(maxlen);
 }
 
 QByteArray AutMainWindow::transport_readAll()
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.readAll();
     }
 
-    return plugin_transport->readAll();
+    return plugin_active_transport->readAll();
 }
 
 bool AutMainWindow::transport_clear(QSerialPort::Directions directions)
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.clear(directions);
     }
 
-    return plugin_transport->clear(directions);
+    return plugin_active_transport->clear(directions);
 }
 
 bool AutMainWindow::transport_setBreakEnabled(bool set)
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.setBreakEnabled(set);
     }
 
-    return plugin_transport->setBreakEnabled(set);
+    return plugin_active_transport->setBreakEnabled(set);
 }
 
 bool AutMainWindow::transport_setRequestToSend(bool set)
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.setRequestToSend(set);
     }
 
-    return plugin_transport->setRequestToSend(set);
+    return plugin_active_transport->setRequestToSend(set);
 }
 
 bool AutMainWindow::transport_setDataTerminalReady(bool set)
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.setDataTerminalReady(set);
     }
 
-    return plugin_transport->setDataTerminalReady(set);
+    return plugin_active_transport->setDataTerminalReady(set);
 }
 
 QSerialPort::PinoutSignals AutMainWindow::transport_pinoutSignals()
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return gspSerialPort.pinoutSignals();
     }
 
-    return plugin_transport->pinoutSignals();
+    return plugin_active_transport->pinoutSignals();
 }
 
 QString AutMainWindow::transport_error_to_error_string(int error)
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
 //        return gspSerialPort.er
     }
 
-    return plugin_transport->to_error_string(error);
+    return plugin_active_transport->to_error_string(error);
 }
 
 QString AutMainWindow::transport_name() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
-        return "Serial port";
+        return "UART";
     }
 
-    return plugin_transport->transport_name();
+    return plugin_active_transport->transport_name();
 }
 
 bool AutMainWindow::transport_supports_break() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return true;
     }
 
-    return plugin_transport->supports_break();
+    return plugin_active_transport->supports_break();
 }
 
 bool AutMainWindow::transport_supports_request_to_send() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return true;
     }
 
-    return plugin_transport->supports_request_to_send();
+    return plugin_active_transport->supports_request_to_send();
 }
 
 bool AutMainWindow::transport_supports_data_terminal_ready() const
 {
-    if (plugin_transport_in_use == false)
+    if (plugin_active_transport == nullptr)
     {
         return true;
     }
 
-    return plugin_transport->supports_data_terminal_ready();
+    return plugin_active_transport->supports_data_terminal_ready();
 }
 
 void AutMainWindow::plugin_transport_error(int error)
@@ -5764,6 +5787,8 @@ void AutMainWindow::plugin_transport_error(int error)
         gbPluginRunning = false;
     }
 #endif
+
+    plugin_active_transport = nullptr;
 }
 
 void AutMainWindow::plugin_force_image_update()
