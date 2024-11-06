@@ -139,7 +139,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                             plugin_transport = (AutTransportPlugin *)plugin.plugin;
                             plugin_tab->setObjectName("tab_transport_plugin_" % QString::number(plugin_list.count() - 1));
                             ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
-                            qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
+//                            qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
                             plugin_object = plugin_transport->plugin_object();
 
                             connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
@@ -218,7 +218,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                                 plugin_transport = (AutTransportPlugin *)plugin.plugin;
                                 plugin_tab->setObjectName("tab_transport_plugin_" % QString::number(plugin_list.count() - 1));
                                 ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
-                                qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
+//                                qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
                                 plugin_object = plugin_transport->plugin_object();
 
                                 connect(plugin_object, SIGNAL(readyRead()), this, SLOT(SerialRead()));
