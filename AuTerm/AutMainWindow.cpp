@@ -371,6 +371,9 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 #endif
     gbAppStarted = false;
     display_update_pending = false;
+#ifndef SKIPPLUGINS_TRANSPORT
+    plugin_active_transport = nullptr;
+#endif
 
 #ifndef SKIPSPEEDTEST
     //Also reserve 64KB of RAM to reduce mallocs when speed testing
