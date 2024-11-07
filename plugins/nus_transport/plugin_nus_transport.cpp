@@ -51,12 +51,15 @@ static const int mtu_atu_overhead = 3;
 void plugin_nus_transport::setup(QMainWindow *main_window)
 {
     parent_window = main_window;
+
+    //Hardcoded until clarification from qt on multiple bugs that have been raised
+    //bluetooth_write_with_response = false; //Write without response
+    bluetooth_write_with_response = true; //Write with response
 }
 
 void plugin_nus_transport::transport_setup(QWidget *tab)
 {
     bluetooth_window = new nus_bluetooth_setup(tab);
-
     QObject::connect(bluetooth_window, SIGNAL(refresh_devices()), this, SLOT(form_refresh_devices()));
     QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t,uint8_t)), this, SLOT(form_connect_to_device(uint16_t,uint8_t)));
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
@@ -64,7 +67,6 @@ void plugin_nus_transport::transport_setup(QWidget *tab)
     QObject::connect(bluetooth_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), parent_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
     QObject::connect(this, SIGNAL(update_images()), parent_window, SLOT(plugin_force_image_update()));
     QObject::connect(this, SIGNAL(transport_error(int)), parent_window, SLOT(plugin_transport_error(int)));
-
     bluetooth_window->show();
 }
 
@@ -73,17 +75,12 @@ plugin_nus_transport::plugin_nus_transport()
 #ifndef SKIPPLUGIN_LOGGER
     logger = new debug_logger(this);
 #endif
-
     bluetooth_service_nus = nullptr;
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
     discoveryAgent->setLowEnergyDiscoveryTimeout(8000);
     QObject::connect(discoveryAgent, SIGNAL(deviceDiscovered(QBluetoothDeviceInfo)), this, SLOT(deviceDiscovered(QBluetoothDeviceInfo)));
     QObject::connect(discoveryAgent, SIGNAL(finished()), this, SLOT(finished()));
     device_connected = false;
-
-    QObject::connect(&retry_timer, SIGNAL(timeout()), this, SLOT(timeout_timer()));
-    retry_timer.setInterval(500);
-    retry_timer.setSingleShot(true);
 
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
     QObject::connect(&discover_timer, SIGNAL(timeout()), this, SLOT(discover_timer_timeout()));
@@ -93,10 +90,6 @@ plugin_nus_transport::plugin_nus_transport()
 
     mtu_max_worked = 0;
 }
-/*
-    void error(QBluetoothDeviceDiscoveryAgent::Error error);
-    void canceled();
- */
 
 plugin_nus_transport::~plugin_nus_transport()
 {
@@ -121,6 +114,12 @@ plugin_nus_transport::~plugin_nus_transport()
         QObject::disconnect(discoveryAgent, SIGNAL(finished()), this, SLOT(finished()));
         delete discoveryAgent;
         discoveryAgent = nullptr;
+    }
+
+    if (device_connected == true)
+    {
+        controller->disconnectFromDevice();
+        device_connected = false;
     }
 
     if (bluetooth_service_nus != nullptr)
@@ -249,7 +248,6 @@ void plugin_nus_transport::disconnected()
 void plugin_nus_transport::discovery_finished()
 {
     bluetooth_window->set_status_text("Service scan finished");
-//bluetooth_service_nus = controller->createServiceObject(QBluetoothUuid(QString("8D53DC1D-1DB7-4CD3-868B-8A527460AA84")));
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
     mtu = (controller->mtu() - mtu_atu_overhead);
@@ -330,15 +328,13 @@ void plugin_nus_transport::nus_service_characteristic_written(QLowEnergyCharacte
             mtu_max_worked = baData.length();
         }
 
-        retry_count = 0;
-
         if (send_buffer.length() > 0)
         {
             send_buffer.remove(0, baData.length());
 
             if (send_buffer.length() > 0)
             {
-                bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+                bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu), (bluetooth_write_with_response == false ? QLowEnergyService::WriteWithoutResponse : QLowEnergyService::WriteWithResponse));
 
                 log_debug() << "Bluetooth service characteristic write of " << (send_buffer.length() > mtu ? mtu : send_buffer.length()) << " bytes";
             }
@@ -358,14 +354,13 @@ void plugin_nus_transport::nus_service_descriptor_written(const QLowEnergyDescri
 
         if (send_buffer.length() > 0)
         {
-            retry_count = 0;
 
             if (mtu < mtu_max_worked)
             {
                 mtu = mtu_max_worked;
             }
 
-            bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+            bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu), (bluetooth_write_with_response == false ? QLowEnergyService::WriteWithoutResponse : QLowEnergyService::WriteWithResponse));
         }
     }
 }
@@ -525,33 +520,27 @@ void plugin_nus_transport::nus_service_error(QLowEnergyService::ServiceError err
     {
         log_error() << "Bluetooth characteristic write failed with MTU " << mtu;
 
-        ++retry_count;
-
-        if (retry_count > 2)
+        if (mtu > 20)
         {
-            retry_count = 0;
-
-            if (mtu >= 25)
+            if (mtu >= 100)
             {
-                if (mtu >= 100)
-                {
-                    mtu -= 32;
-                }
-                else
-                {
-                    mtu -= 16;
-                }
-
-                bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+                mtu -= 32;
+            }
+            else if (mtu >= 40)
+            {
+                mtu = 20;
             }
             else
             {
-                send_buffer.clear();
+                mtu -= 16;
             }
+
+            bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu), (bluetooth_write_with_response == false ? QLowEnergyService::WriteWithoutResponse : QLowEnergyService::WriteWithResponse));
         }
         else
         {
-            retry_timer.start();
+            send_buffer.clear();
+            log_error() << "Unable to write Bluetooth characteristic with minimal MTU size, this connection is unusable";
         }
     }
 }
@@ -641,11 +630,6 @@ void plugin_nus_transport::form_disconnect_from_device()
         disconnecting_from_device = true;
         controller->disconnectFromDevice();
     }
-}
-
-void plugin_nus_transport::timeout_timer()
-{
-    bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
 }
 
 void plugin_nus_transport::form_min_params()
@@ -774,14 +758,12 @@ qint64 plugin_nus_transport::write(const QByteArray &data)
 
     if (send_now == true && ready_to_send == true)
     {
-        retry_count = 0;
-
         if (mtu < mtu_max_worked)
         {
             mtu = mtu_max_worked;
         }
 
-        bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+        bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu), (bluetooth_write_with_response == false ? QLowEnergyService::WriteWithoutResponse : QLowEnergyService::WriteWithResponse));
     }
 
     return 0;

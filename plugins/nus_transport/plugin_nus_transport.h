@@ -97,7 +97,6 @@ private slots:
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
     void mtu_updated(int mtu);
 #endif
-    void timeout_timer();
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
     void discover_timer_timeout();
 #endif
@@ -135,8 +134,6 @@ private:
     uint16_t mtu_max_worked;
     QByteArray send_buffer;
     nus_bluetooth_setup *bluetooth_window;
-    QTimer retry_timer;
-    int retry_count;
     bool disconnecting_from_device;
     bool ready_to_send;
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
@@ -145,6 +142,7 @@ private:
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;
 #endif
+    bool bluetooth_write_with_response;
 };
 
 #endif // PLUGIN_NUS_TRANSPORT_H
