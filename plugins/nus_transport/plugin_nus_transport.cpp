@@ -27,6 +27,8 @@
 #include "plugin_nus_transport.h"
 #include <QGroupBox>
 #include <QTabWidget>
+#include <QVBoxLayout>
+#include <QLabel>
 
 /******************************************************************************/
 // Constants
@@ -59,7 +61,13 @@ void plugin_nus_transport::setup(QMainWindow *main_window)
 
 void plugin_nus_transport::transport_setup(QWidget *tab)
 {
-    bluetooth_window = new nus_bluetooth_setup(tab);
+    QVBoxLayout *vertical_layout = new QVBoxLayout(tab);
+    vertical_layout->setSpacing(0);
+    vertical_layout->setObjectName("verticalLayout_2");
+    vertical_layout->setContentsMargins(2, 2, 2, 2);
+    bluetooth_window = new nus_bluetooth_setup(vertical_layout->widget());
+    bluetooth_window->setFixedWidth(tab->widthMM());
+    vertical_layout->addWidget(bluetooth_window);
     QObject::connect(bluetooth_window, SIGNAL(refresh_devices()), this, SLOT(form_refresh_devices()));
     QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t,uint8_t)), this, SLOT(form_connect_to_device(uint16_t,uint8_t)));
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
