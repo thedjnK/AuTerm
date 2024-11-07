@@ -120,6 +120,7 @@ plugin_nus_transport::~plugin_nus_transport()
         QObject::disconnect(discoveryAgent, SIGNAL(deviceDiscovered(QBluetoothDeviceInfo)), this, SLOT(deviceDiscovered(QBluetoothDeviceInfo)));
         QObject::disconnect(discoveryAgent, SIGNAL(finished()), this, SLOT(finished()));
         delete discoveryAgent;
+        discoveryAgent = nullptr;
     }
 
     if (bluetooth_service_nus != nullptr)
@@ -134,6 +135,7 @@ plugin_nus_transport::~plugin_nus_transport()
 #endif
         QObject::disconnect(bluetooth_service_nus, SIGNAL(stateChanged(QLowEnergyService::ServiceState)), this, SLOT(nus_service_state_changed(QLowEnergyService::ServiceState)));
         delete bluetooth_service_nus;
+        bluetooth_service_nus = nullptr;
     }
 
     if (controller != nullptr)
@@ -143,7 +145,15 @@ plugin_nus_transport::~plugin_nus_transport()
         QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
         QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
         QObject::disconnect(controller, SIGNAL(connectionUpdated(QLowEnergyConnectionParameters)), this, SLOT(connection_updated(QLowEnergyConnectionParameters)));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+        QObject::disconnect(controller, SIGNAL(errorOccurred(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
+        QObject::disconnect(controller, SIGNAL(mtuChanged(int)), this, SLOT(mtu_updated(int)));
+#else
+        QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
+#endif
+        QObject::disconnect(controller, SIGNAL(stateChanged(QLowEnergyController::ControllerState)), this, SLOT(stateChanged(QLowEnergyController::ControllerState)));
         delete controller;
+        controller = nullptr;
     }
 
     bluetooth_device_list.clear();
@@ -201,6 +211,7 @@ void plugin_nus_transport::disconnected()
         bluetooth_service_nus = nullptr;
     }
 
+#if 0
     if (controller != nullptr)
     {
         QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
@@ -210,12 +221,18 @@ void plugin_nus_transport::disconnected()
         QObject::disconnect(controller, SIGNAL(connectionUpdated(QLowEnergyConnectionParameters)), this, SLOT(connection_updated(QLowEnergyConnectionParameters)));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
         QObject::disconnect(controller, SIGNAL(errorOccurred(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
+        QObject::disconnect(controller, SIGNAL(mtuChanged(int)), this, SLOT(mtu_updated(int)));
 #else
         QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
 #endif
+        QObject::disconnect(controller, SIGNAL(stateChanged(QLowEnergyController::ControllerState)), this, SLOT(stateChanged(QLowEnergyController::ControllerState)));
+
         delete controller;
         controller = nullptr;
+
+        //controller->deleteLater();
     }
+#endif
 
     bluetooth_window->connection_state(false);
 
@@ -322,6 +339,7 @@ void plugin_nus_transport::nus_service_characteristic_written(QLowEnergyCharacte
             if (send_buffer.length() > 0)
             {
                 bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+
                 log_debug() << "Bluetooth service characteristic write of " << (send_buffer.length() > mtu ? mtu : send_buffer.length()) << " bytes";
             }
         }
@@ -496,6 +514,11 @@ void plugin_nus_transport::connection_updated(QLowEnergyConnectionParameters par
     log_debug() << "Bluetooth connection parameters: " << parameters.minimumInterval() << "-" << parameters.maximumInterval() << ", latency: " << parameters.latency() << ", timeout: " << parameters.supervisionTimeout();
 }
 
+void plugin_nus_transport::stateChanged(QLowEnergyController::ControllerState state)
+{
+    log_debug() << "controller state: " << state;
+}
+
 void plugin_nus_transport::nus_service_error(QLowEnergyService::ServiceError error)
 {
     if (error == QLowEnergyService::CharacteristicWriteError)
@@ -564,6 +587,7 @@ void plugin_nus_transport::form_connect_to_device(uint16_t index, uint8_t addres
         discoveryAgent->stop();
     }
 
+#if 1
     if (controller)
     {
         QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
@@ -577,9 +601,11 @@ void plugin_nus_transport::form_connect_to_device(uint16_t index, uint8_t addres
 #else
         QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
 #endif
+        QObject::disconnect(controller, SIGNAL(stateChanged(QLowEnergyController::ControllerState)), this, SLOT(stateChanged(QLowEnergyController::ControllerState)));
         delete controller;
         controller = nullptr;
     }
+#endif
 
     // Connecting signals and slots for connecting to LE services.
     controller = QLowEnergyController::createCentral(bluetooth_device_list.at(index));
@@ -594,6 +620,7 @@ void plugin_nus_transport::form_connect_to_device(uint16_t index, uint8_t addres
 #else
     QObject::connect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
 #endif
+    QObject::connect(controller, SIGNAL(stateChanged(QLowEnergyController::ControllerState)), this, SLOT(stateChanged(QLowEnergyController::ControllerState)));
 
     if (address_type == BLUETOOTH_FORCE_ADDRESS_RANDOM)
     {
