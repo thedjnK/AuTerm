@@ -44,7 +44,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
     bluetooth_window = new bluetooth_setup(main_window);
 
     QObject::connect(bluetooth_window, SIGNAL(refresh_devices()), this, SLOT(form_refresh_devices()));
-    QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t,uint8_t)), this, SLOT(form_connect_to_device(uint16_t,uint8_t)));
+    QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t,uint8_t,bool)), this, SLOT(form_connect_to_device(uint16_t,uint8_t,bool)));
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
     QObject::connect(bluetooth_window, SIGNAL(bluetooth_status(bool*,bool*)), this, SLOT(form_bluetooth_status(bool*,bool*)));
     QObject::connect(bluetooth_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
@@ -56,10 +56,6 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
     QObject::connect(discoveryAgent, SIGNAL(finished()), this, SLOT(finished()));
     device_connected = false;
 
-    QObject::connect(&retry_timer, SIGNAL(timeout()), this, SLOT(timeout_timer()));
-    retry_timer.setInterval(500);
-    retry_timer.setSingleShot(true);
-
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
     QObject::connect(&discover_timer, SIGNAL(timeout()), this, SLOT(discover_timer_timeout()));
     discover_timer.setInterval(50);
@@ -67,6 +63,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
 #endif
 
     mtu_max_worked = 0;
+    ready_to_send = false;
 }
 /*
     void error(QBluetoothDeviceDiscoveryAgent::Error error);
@@ -76,7 +73,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
 smp_bluetooth::~smp_bluetooth()
 {
     QObject::disconnect(this, SLOT(form_refresh_devices()));
-    QObject::disconnect(this, SLOT(form_connect_to_device(uint16_t,uint8_t)));
+    QObject::disconnect(this, SLOT(form_connect_to_device(uint16_t,uint8_t,bool)));
     QObject::disconnect(this, SLOT(form_disconnect_from_device()));
     QObject::disconnect(this, SLOT(form_bluetooth_status(bool*,bool*)));
     QObject::disconnect(bluetooth_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
@@ -94,10 +91,15 @@ smp_bluetooth::~smp_bluetooth()
     {
         QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)), this, SLOT(mcumgr_service_characteristic_changed(QLowEnergyCharacteristic,QByteArray)));
         QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), this, SLOT(mcumgr_service_characteristic_written(QLowEnergyCharacteristic,QByteArray)));
-//        connect(bluetooth_service_mcumgr, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(ServiceDescriptorWritten(QLowEnergyDescriptor,QByteArray)));
+        QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(mcumgr_service_descriptor_written(QLowEnergyDescriptor,QByteArray)));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+        QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(errorOccurred(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
+#else
         QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(error(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
+#endif
         QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(stateChanged(QLowEnergyService::ServiceState)), this, SLOT(mcumgr_service_state_changed(QLowEnergyService::ServiceState)));
         delete bluetooth_service_mcumgr;
+        bluetooth_service_mcumgr = nullptr;
     }
 
     if (controller != nullptr)
@@ -106,8 +108,14 @@ smp_bluetooth::~smp_bluetooth()
         QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
         QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
         QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
-//        disconnect(controller, SIGNAL(connectionUpdated(QLowEnergyConnectionParameters)), this, SLOT(connection_updated(QLowEnergyConnectionParameters)));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+        QObject::disconnect(controller, SIGNAL(errorOccurred(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
+        QObject::disconnect(controller, SIGNAL(mtuChanged(int)), this, SLOT(mtu_updated(int)));
+#else
+        QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
+#endif
         delete controller;
+        controller = nullptr;
     }
 
     bluetooth_device_list.clear();
@@ -145,20 +153,24 @@ void smp_bluetooth::disconnected()
     bluetooth_window->set_status_text("Disconnected");
     device_connected = false;
     mtu_max_worked = 0;
+    ready_to_send = false;
 
     if (bluetooth_service_mcumgr != nullptr)
     {
         QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)), this, SLOT(mcumgr_service_characteristic_changed(QLowEnergyCharacteristic,QByteArray)));
         QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), this, SLOT(mcumgr_service_characteristic_written(QLowEnergyCharacteristic,QByteArray)));
-//        connect(bluetooth_service_mcumgr, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(ServiceDescriptorWritten(QLowEnergyDescriptor,QByteArray)));
+        QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(mcumgr_service_descriptor_written(QLowEnergyDescriptor,QByteArray)));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+        QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(errorOccurred(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
+#else
         QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(error(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
+#endif
         QObject::disconnect(bluetooth_service_mcumgr, SIGNAL(stateChanged(QLowEnergyService::ServiceState)), this, SLOT(mcumgr_service_state_changed(QLowEnergyService::ServiceState)));
-
         delete bluetooth_service_mcumgr;
-
         bluetooth_service_mcumgr = nullptr;
     }
 
+#if 0
     if (controller != nullptr)
     {
         QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
@@ -166,11 +178,10 @@ void smp_bluetooth::disconnected()
         QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
         QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
         QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
-
         delete controller;
-
         controller = nullptr;
     }
+#endif
 
     bluetooth_window->connection_state(false);
 }
@@ -205,8 +216,13 @@ void smp_bluetooth::discovery_finished()
         //Connect MCUmgr server signals
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)), this, SLOT(mcumgr_service_characteristic_changed(QLowEnergyCharacteristic,QByteArray)));
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), this, SLOT(mcumgr_service_characteristic_written(QLowEnergyCharacteristic,QByteArray)));
-//        connect(bluetooth_service_mcumgr, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(ServiceDescriptorWritten(QLowEnergyDescriptor,QByteArray)));
+        QObject::connect(bluetooth_service_mcumgr, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(mcumgr_service_descriptor_written(QLowEnergyDescriptor,QByteArray)));
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(error(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+        QObject::connect(bluetooth_service_mcumgr, SIGNAL(errorOccurred(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
+#else
+        QObject::connect(bluetooth_service_mcumgr, SIGNAL(error(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
+#endif
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(stateChanged(QLowEnergyService::ServiceState)), this, SLOT(mcumgr_service_state_changed(QLowEnergyService::ServiceState)));
 
         //Request minimum connection interval
@@ -263,8 +279,37 @@ void smp_bluetooth::mcumgr_service_characteristic_written(QLowEnergyCharacterist
 
         if (send_buffer.length() > 0)
         {
-            bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+            bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu), bluetooth_write_mode);
             log_debug() << "Bluetooth service characteristic write of " << (send_buffer.length() > mtu ? mtu : send_buffer.length()) << " bytes";
+        }
+    }
+}
+
+void smp_bluetooth::mcumgr_service_descriptor_written(const QLowEnergyDescriptor info, const QByteArray value)
+{
+    if (info == bluetooth_descriptor_receive_cccd && ready_to_send == false)
+    {
+        ready_to_send = true;
+
+        if (send_buffer.length() > 0)
+        {
+            //Send out pre-buffered data to device
+            if (bluetooth_write_mode == QLowEnergyService::WriteWithResponse)
+            {
+                bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+                log_debug() << "Bluetooth service characteristic write with response of " << (send_buffer.length() > mtu ? mtu : send_buffer.length()) << " bytes";
+            }
+            else
+            {
+                while (send_buffer.length() > 0)
+                {
+                    uint16_t send_size = mtu > send_buffer.length() ? send_buffer.length() : mtu;
+
+                    bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(send_size), QLowEnergyService::WriteWithoutResponse);
+                    send_buffer.remove(0, send_size);
+                    log_debug() << "Bluetooth service characteristic write without response of " << send_size << " bytes";
+                }
+            }
         }
     }
 }
@@ -296,9 +341,9 @@ void smp_bluetooth::mcumgr_service_state_changed(QLowEnergyService::ServiceState
             else
             {
                 //Tx notifications descriptor
-                const QLowEnergyDescriptor descTXDesc = bluetooth_characteristic_transmit.descriptor(QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
+                bluetooth_descriptor_receive_cccd = bluetooth_characteristic_transmit.descriptor(QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
 
-                if (!descTXDesc.isValid())
+                if (!bluetooth_descriptor_receive_cccd.isValid())
                 {
                     //Tx descriptor missing
                     disconnect_from_device = true;
@@ -307,7 +352,7 @@ void smp_bluetooth::mcumgr_service_state_changed(QLowEnergyService::ServiceState
                 else
                 {
                     //Enable Tx descriptor notifications
-                    bluetooth_service_mcumgr->writeDescriptor(descTXDesc, QByteArray::fromHex("0100"));
+                    bluetooth_service_mcumgr->writeDescriptor(bluetooth_descriptor_receive_cccd, QByteArray::fromHex("0100"));
                 }
             }
         }
@@ -387,11 +432,9 @@ void smp_bluetooth::errorz(QLowEnergyController::Error error)
 
     if (disconnect_from_device == true)
     {
-        if (device_connected == true)
-        {
-            disconnect(true);
-        }
-        else
+        disconnect(true);
+
+        if (device_connected == false)
         {
             bluetooth_window->discovery_state(false);
             bluetooth_window->connection_state(false);
@@ -431,10 +474,26 @@ int smp_bluetooth::send(smp_message *message)
     }
 
     send_buffer.append(*message->data());
-    bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
 
-    //bluetooth_window->add_debug(QString("Writing ").append(QString::number(mtu)).append(send_buffer.left(mtu)));
-    log_debug() << "Bluetooth service characteristic write of " << (send_buffer.length() > mtu ? mtu : send_buffer.length()) << " bytes";
+    if (ready_to_send == true)
+    {
+        if (bluetooth_write_mode == QLowEnergyService::WriteWithResponse)
+        {
+            bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+            log_debug() << "Bluetooth service characteristic write with response of " << (send_buffer.length() > mtu ? mtu : send_buffer.length()) << " bytes";
+        }
+        else
+        {
+            while (send_buffer.length() > 0)
+            {
+                uint16_t send_size = mtu > send_buffer.length() ? send_buffer.length() : mtu;
+
+                bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(send_size), QLowEnergyService::WriteWithoutResponse);
+                send_buffer.remove(0, send_size);
+                log_debug() << "Bluetooth service characteristic write without response of " << send_size << " bytes";
+            }
+        }
+    }
 
     return SMP_TRANSPORT_ERROR_OK;
 }
@@ -445,33 +504,28 @@ void smp_bluetooth::mcumgr_service_error(QLowEnergyService::ServiceError error)
     {
         log_error() << "Bluetooth characteristic write failed with MTU " << mtu;
 
-        ++retry_count;
-
-        if (retry_count > 2)
+        if (mtu > 20)
         {
-            retry_count = 0;
-
-            if (mtu >= 25)
+            if (mtu >= 100)
             {
-                if (mtu >= 100)
-                {
-                    mtu -= 32;
-                }
-                else
-                {
-                    mtu -= 16;
-                }
-
-                bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
+                mtu -= 32;
+            }
+            else if (mtu >= 40)
+            {
+                mtu = 20;
             }
             else
             {
-                send_buffer.clear();
+                mtu -= 16;
             }
+
+            bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
         }
         else
         {
-            retry_timer.start();
+            send_buffer.clear();
+            log_error() << "Unable to write Bluetooth characteristic with minimal MTU size, this connection is unusable";
+            bluetooth_window->set_status_text("Minimal MTU write failed, connection is unusable");
         }
     }
 }
@@ -497,7 +551,7 @@ void smp_bluetooth::form_refresh_devices()
     bluetooth_window->set_status_text("Scanning...");
 }
 
-void smp_bluetooth::form_connect_to_device(uint16_t index, uint8_t address_type)
+void smp_bluetooth::form_connect_to_device(uint16_t index, uint8_t address_type, bool write_with_response)
 {
     if (discoveryAgent->isActive())
     {
@@ -510,11 +564,12 @@ void smp_bluetooth::form_connect_to_device(uint16_t index, uint8_t address_type)
         QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
         QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
         QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
-        QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+        QObject::disconnect(controller, SIGNAL(errorOccurred(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
         QObject::disconnect(controller, SIGNAL(mtuChanged(int)), this, SLOT(mtu_updated(int)));
+#else
+        QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
 #endif
-
         delete controller;
         controller = nullptr;
     }
@@ -525,9 +580,11 @@ void smp_bluetooth::form_connect_to_device(uint16_t index, uint8_t address_type)
     QObject::connect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
     QObject::connect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
     QObject::connect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
-    QObject::connect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+    QObject::connect(controller, SIGNAL(errorOccurred(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
     QObject::connect(controller, SIGNAL(mtuChanged(int)), this, SLOT(mtu_updated(int)));
+#else
+    QObject::connect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
 #endif
 
     if (address_type == BLUETOOTH_FORCE_ADDRESS_RANDOM)
@@ -539,7 +596,9 @@ void smp_bluetooth::form_connect_to_device(uint16_t index, uint8_t address_type)
         controller->setRemoteAddressType(QLowEnergyController::PublicAddress);
     }
 
+    ready_to_send = false;
     controller->connectToDevice();
+    bluetooth_write_mode = (write_with_response == true ? QLowEnergyService::WriteWithResponse : QLowEnergyService::WriteWithoutResponse);
 }
 
 void smp_bluetooth::form_disconnect_from_device()
@@ -581,11 +640,6 @@ void smp_bluetooth::open_connect_dialog()
         discoveryAgent->start();
         bluetooth_window->discovery_state(true);
     }
-}
-
-void smp_bluetooth::timeout_timer()
-{
-    bluetooth_service_mcumgr->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu));
 }
 
 void smp_bluetooth::form_min_params()

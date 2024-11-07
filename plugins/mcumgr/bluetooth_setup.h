@@ -78,7 +78,7 @@ private slots:
 
 signals:
     void refresh_devices();
-    void connect_to_device(uint16_t index, uint8_t address_type);
+    void connect_to_device(uint16_t index, uint8_t address_type, bool write_with_response);
     void disconnect_from_device();
     void bluetooth_status(bool *scanning, bool *connecting);
     void plugin_get_image_pixmap(QString name, QPixmap **pixmap);

@@ -66,19 +66,19 @@ private slots:
     void service_discovered(QBluetoothUuid service_uuid);
     void mcumgr_service_characteristic_changed(QLowEnergyCharacteristic lecCharacteristic, QByteArray baData);
     void mcumgr_service_characteristic_written(QLowEnergyCharacteristic lecCharacteristic, QByteArray baData);
+    void mcumgr_service_descriptor_written(const QLowEnergyDescriptor info, const QByteArray value);
     void mcumgr_service_error(QLowEnergyService::ServiceError error);
     void mcumgr_service_state_changed(QLowEnergyService::ServiceState nNewState);
     void errorz(QLowEnergyController::Error error);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
     void mtu_updated(int mtu);
 #endif
-    void timeout_timer();
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
     void discover_timer_timeout();
 #endif
 
     void form_refresh_devices();
-    void form_connect_to_device(uint16_t index, uint8_t address_type);
+    void form_connect_to_device(uint16_t index, uint8_t address_type, bool write_with_response);
     void form_disconnect_from_device();
     void form_bluetooth_status(bool *scanning, bool *connecting);
 //    void connection_updated(QLowEnergyConnectionParameters parameters);
@@ -99,15 +99,17 @@ private:
     QList<QBluetoothUuid> services;
     QLowEnergyService *bluetooth_service_mcumgr;
     QLowEnergyCharacteristic bluetooth_characteristic_transmit;
+    QLowEnergyDescriptor bluetooth_descriptor_receive_cccd;
     uint16_t mtu;
     uint16_t mtu_max_worked;
     QByteArray send_buffer;
     bluetooth_setup *bluetooth_window;
-    QTimer retry_timer;
     int retry_count;
+    QLowEnergyService::WriteMode bluetooth_write_mode;
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
     QTimer discover_timer;
 #endif
+    bool ready_to_send;
 };
 
 #endif // SMP_BLUETOOTH_H

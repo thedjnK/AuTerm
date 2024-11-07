@@ -63,7 +63,7 @@ void bluetooth_setup::on_btn_connect_clicked()
         {
             ui->btn_connect->setEnabled(false);
             ui->label_status->setText("Connecting...");
-            emit connect_to_device(ui->list_devices->currentRow(), (ui->radio_address_type_public->isChecked() ? BLUETOOTH_FORCE_ADDRESS_PUBLIC : (ui->radio_address_type_random->isChecked() ? BLUETOOTH_FORCE_ADDRESS_RANDOM : BLUETOOTH_FORCE_ADDRESS_DEFAULT)));
+            emit connect_to_device(ui->list_devices->currentRow(), (ui->radio_address_type_public->isChecked() ? BLUETOOTH_FORCE_ADDRESS_PUBLIC : (ui->radio_address_type_random->isChecked() ? BLUETOOTH_FORCE_ADDRESS_RANDOM : BLUETOOTH_FORCE_ADDRESS_DEFAULT)), ui->check_write_with_response->isChecked());
         }
     }
     else
