@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>622</width>
-    <height>412</height>
+    <height>416</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -2373,6 +2373,439 @@
               </item>
              </layout>
             </item>
+            <item row="8" column="0">
+             <widget class="QGroupBox" name="group_SpeedBytesBits">
+              <property name="title">
+               <string>Bytes</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_14">
+               <property name="leftMargin">
+                <number>2</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>2</number>
+               </property>
+               <property name="bottomMargin">
+                <number>1</number>
+               </property>
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <item row="0" column="0">
+                <layout class="QGridLayout" name="gridLayout_13">
+                 <property name="topMargin">
+                  <number>1</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>1</number>
+                 </property>
+                 <property name="horizontalSpacing">
+                  <number>2</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="edit_SpeedBytesSent">
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="edit_SpeedBytesRec">
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <widget class="QLabel" name="label_38">
+                   <property name="text">
+                    <string>Sent Average/1s:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_SpeedConn_4">
+                   <property name="text">
+                    <string>Received:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QLineEdit" name="edit_SpeedBytesSent10s">
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QLineEdit" name="edit_SpeedBytesRec10s">
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="4">
+                  <widget class="QLabel" name="label_40">
+                   <property name="text">
+                    <string>Received Average/1s:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="label_35">
+                   <property name="text">
+                    <string>Sent/10s:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="label_41">
+                   <property name="text">
+                    <string>Received/10s:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_SpeedConn_5">
+                   <property name="text">
+                    <string>Sent:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="5">
+                  <widget class="QLineEdit" name="edit_SpeedBytesSentAvg">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="5">
+                  <widget class="QLineEdit" name="edit_SpeedBytesRecAvg">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="10" column="0">
+             <layout class="QVBoxLayout" name="verticalLayout_4b">
+              <property name="spacing">
+               <number>2</number>
+              </property>
+              <property name="topMargin">
+               <number>5</number>
+              </property>
+              <property name="bottomMargin">
+               <number>5</number>
+              </property>
+              <item>
+               <widget class="QTextEdit" name="text_SpeedEditData">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>166666</height>
+                 </size>
+                </property>
+                <property name="palette">
+                 <palette>
+                  <active>
+                   <colorrole role="WindowText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>255</red>
+                      <green>255</green>
+                      <blue>255</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="Text">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>255</red>
+                      <green>255</green>
+                      <blue>255</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="Base">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>0</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="PlaceholderText">
+                    <brush brushstyle="NoBrush">
+                     <color alpha="128">
+                      <red>255</red>
+                      <green>255</green>
+                      <blue>255</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                  </active>
+                  <inactive>
+                   <colorrole role="WindowText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>255</red>
+                      <green>255</green>
+                      <blue>255</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="Text">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>255</red>
+                      <green>255</green>
+                      <blue>255</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="Base">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>0</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="PlaceholderText">
+                    <brush brushstyle="NoBrush">
+                     <color alpha="128">
+                      <red>255</red>
+                      <green>255</green>
+                      <blue>255</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                  </inactive>
+                  <disabled>
+                   <colorrole role="WindowText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>120</red>
+                      <green>120</green>
+                      <blue>120</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="Text">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>120</red>
+                      <green>120</green>
+                      <blue>120</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="Base">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>240</red>
+                      <green>240</green>
+                      <blue>240</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="PlaceholderText">
+                    <brush brushstyle="NoBrush">
+                     <color alpha="128">
+                      <red>255</red>
+                      <green>255</green>
+                      <blue>255</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                  </disabled>
+                 </palette>
+                </property>
+                <property name="verticalScrollBarPolicy">
+                 <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+                </property>
+                <property name="horizontalScrollBarPolicy">
+                 <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+                </property>
+                <property name="sizeAdjustPolicy">
+                 <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="6" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_16">
+              <property name="spacing">
+               <number>2</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_33">
+                <property name="text">
+                 <string>Data type:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="combo_SpeedDataType">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="currentIndex">
+                 <number>1</number>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Speed only</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>String</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="Line" name="line_7b_4">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_43">
+                <property name="text">
+                 <string>Display:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="combo_SpeedDataDisplay">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="currentIndex">
+                 <number>0</number>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Bytes</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Data bits</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Bits</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="Line" name="line_7b_5">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_34">
+                <property name="text">
+                 <string>Data:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="edit_SpeedTestData">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="text">
+                 <string>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!&quot;£$%^&amp;*()_+-=[]{};:'@#~,&lt;.&gt;/?\|¬`</string>
+                </property>
+                <property name="readOnly">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="check_SpeedStringUnescape">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Check this to escape character codes (scroll down in the 'About' tab for information on this feature)</string>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LayoutDirection::RightToLeft</enum>
+                </property>
+                <property name="text">
+                 <string>Un-Escape</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_SpeedCopy">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>1677</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Copy Stats</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
             <item row="5" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_3b">
               <property name="spacing">
@@ -2568,169 +3001,102 @@
               </item>
              </layout>
             </item>
-            <item row="9" column="0">
-             <layout class="QVBoxLayout" name="verticalLayout_4b">
+            <item row="7" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_19">
               <property name="spacing">
                <number>2</number>
               </property>
               <property name="topMargin">
-               <number>5</number>
-              </property>
-              <property name="bottomMargin">
-               <number>5</number>
+               <number>0</number>
               </property>
               <item>
-               <widget class="QTextEdit" name="text_SpeedEditData">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>166666</height>
-                 </size>
-                </property>
-                <property name="palette">
-                 <palette>
-                  <active>
-                   <colorrole role="WindowText">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>255</red>
-                      <green>255</green>
-                      <blue>255</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="Text">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>255</red>
-                      <green>255</green>
-                      <blue>255</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="Base">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>0</red>
-                      <green>0</green>
-                      <blue>0</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="PlaceholderText">
-                    <brush brushstyle="NoBrush">
-                     <color alpha="128">
-                      <red>255</red>
-                      <green>255</green>
-                      <blue>255</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                  </active>
-                  <inactive>
-                   <colorrole role="WindowText">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>255</red>
-                      <green>255</green>
-                      <blue>255</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="Text">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>255</red>
-                      <green>255</green>
-                      <blue>255</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="Base">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>0</red>
-                      <green>0</green>
-                      <blue>0</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="PlaceholderText">
-                    <brush brushstyle="NoBrush">
-                     <color alpha="128">
-                      <red>255</red>
-                      <green>255</green>
-                      <blue>255</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                  </inactive>
-                  <disabled>
-                   <colorrole role="WindowText">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>120</red>
-                      <green>120</green>
-                      <blue>120</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="Text">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>120</red>
-                      <green>120</green>
-                      <blue>120</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="Base">
-                    <brush brushstyle="SolidPattern">
-                     <color alpha="255">
-                      <red>240</red>
-                      <green>240</green>
-                      <blue>240</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                   <colorrole role="PlaceholderText">
-                    <brush brushstyle="NoBrush">
-                     <color alpha="128">
-                      <red>255</red>
-                      <green>255</green>
-                      <blue>255</blue>
-                     </color>
-                    </brush>
-                   </colorrole>
-                  </disabled>
-                 </palette>
-                </property>
-                <property name="verticalScrollBarPolicy">
-                 <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
-                </property>
-                <property name="horizontalScrollBarPolicy">
-                 <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-                </property>
-                <property name="sizeAdjustPolicy">
-                 <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
+               <widget class="QLabel" name="label_47">
+                <property name="text">
+                 <string>Minimum buffer size:</string>
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QSpinBox" name="edit_speed_test_minimum_buffer_size">
+                <property name="minimumSize">
+                 <size>
+                  <width>60</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Minimum buffer size when speed testing, when there are less than this number of bytes in the output buffer it will be topped up</string>
+                </property>
+                <property name="minimum">
+                 <number>32</number>
+                </property>
+                <property name="maximum">
+                 <number>16384</number>
+                </property>
+                <property name="value">
+                 <number>384</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="Line" name="line_7b_6">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_50">
+                <property name="text">
+                 <string>Chunk append size:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="Line" name="line_7b_7">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="edit_speed_test_chunk_append_size">
+                <property name="minimumSize">
+                 <size>
+                  <width>60</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Maximum number of bytes to send per chunk when speed testing</string>
+                </property>
+                <property name="minimum">
+                 <number>32</number>
+                </property>
+                <property name="maximum">
+                 <number>16384</number>
+                </property>
+                <property name="value">
+                 <number>512</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </item>
-            <item row="8" column="0">
+            <item row="9" column="0">
              <widget class="QGroupBox" name="groupBox_8">
               <property name="title">
                <string>Packets</string>
@@ -2759,8 +3125,11 @@
                  <property name="bottomMargin">
                   <number>1</number>
                  </property>
-                 <property name="spacing">
+                 <property name="horizontalSpacing">
                   <number>2</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>0</number>
                  </property>
                  <item row="0" column="1">
                   <widget class="QLineEdit" name="edit_SpeedPacketsSent">
@@ -2907,274 +3276,6 @@
                </item>
               </layout>
              </widget>
-            </item>
-            <item row="7" column="0">
-             <widget class="QGroupBox" name="group_SpeedBytesBits">
-              <property name="title">
-               <string>Bytes</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_14">
-               <property name="leftMargin">
-                <number>2</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>2</number>
-               </property>
-               <property name="bottomMargin">
-                <number>1</number>
-               </property>
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <item row="0" column="0">
-                <layout class="QGridLayout" name="gridLayout_13">
-                 <property name="topMargin">
-                  <number>1</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>1</number>
-                 </property>
-                 <property name="spacing">
-                  <number>2</number>
-                 </property>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="edit_SpeedBytesSent">
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLineEdit" name="edit_SpeedBytesRec">
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="4">
-                  <widget class="QLabel" name="label_38">
-                   <property name="text">
-                    <string>Sent Average/1s:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_SpeedConn_4">
-                   <property name="text">
-                    <string>Received:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="3">
-                  <widget class="QLineEdit" name="edit_SpeedBytesSent10s">
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="3">
-                  <widget class="QLineEdit" name="edit_SpeedBytesRec10s">
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="4">
-                  <widget class="QLabel" name="label_40">
-                   <property name="text">
-                    <string>Received Average/1s:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QLabel" name="label_35">
-                   <property name="text">
-                    <string>Sent/10s:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <widget class="QLabel" name="label_41">
-                   <property name="text">
-                    <string>Received/10s:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_SpeedConn_5">
-                   <property name="text">
-                    <string>Sent:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="5">
-                  <widget class="QLineEdit" name="edit_SpeedBytesSentAvg">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="5">
-                  <widget class="QLineEdit" name="edit_SpeedBytesRecAvg">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="readOnly">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout_16">
-              <property name="spacing">
-               <number>2</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="label_33">
-                <property name="text">
-                 <string>Data type:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="combo_SpeedDataType">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="currentIndex">
-                 <number>1</number>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>Speed only</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>String</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item>
-               <widget class="Line" name="line_7b_4">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_43">
-                <property name="text">
-                 <string>Display:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="combo_SpeedDataDisplay">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="currentIndex">
-                 <number>0</number>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>Bytes</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Data bits</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Bits</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item>
-               <widget class="Line" name="line_7b_5">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_34">
-                <property name="text">
-                 <string>Data:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="edit_SpeedTestData">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="text">
-                 <string>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!&quot;£$%^&amp;*()_+-=[]{};:'@#~,&lt;.&gt;/?\|¬`</string>
-                </property>
-                <property name="readOnly">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="check_SpeedStringUnescape">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Check this to escape character codes (scroll down in the 'About' tab for information on this feature)</string>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LayoutDirection::RightToLeft</enum>
-                </property>
-                <property name="text">
-                 <string>Un-Escape</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btn_SpeedCopy">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>1677</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Copy Stats</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
             </item>
            </layout>
           </item>

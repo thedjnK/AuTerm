@@ -1312,7 +1312,7 @@ void AutMainWindow::on_btn_TermClose_clicked(bool from_plugin)
             OutputSpeedTestAvgStats((gtmrSpeedTimer.nsecsElapsed() < 1000000000LL ? 1000000000LL : gtmrSpeedTimer.nsecsElapsed()/1000000000LL));
 
             //Set speed test as no longer running
-            gchSpeedTestMode = SpeedModeInactive;
+            gchSpeedTestMode = SPEED_MODE_INACTIVE;
             gbSpeedTestRunning = false;
 
             if (gtmrSpeedTimer.isValid())
@@ -2601,7 +2601,7 @@ void AutMainWindow::SerialError(QSerialPort::SerialPortError speErrorCode)
             OutputSpeedTestAvgStats((gtmrSpeedTimer.nsecsElapsed() < 1000000000LL ? 1000000000LL : gtmrSpeedTimer.nsecsElapsed()/1000000000LL));
 
             //Set speed test as no longer running
-            gchSpeedTestMode = SpeedModeInactive;
+            gchSpeedTestMode = SPEED_MODE_INACTIVE;
             gbSpeedTestRunning = false;
 
             if (gtmrSpeedTimer.isValid())
@@ -3789,10 +3789,10 @@ void AutMainWindow::on_btn_SpeedStartStop_clicked()
             //Clean up delayed send data timer
             if (gtmrSpeedTestDelayTimer->isActive())
             {
-                if (gchSpeedTestMode == SpeedModeRecv)
+                if (gchSpeedTestMode == SPEED_MODE_RECEIVE)
                 {
                     //Cancel instantly
-                    gchSpeedTestMode = SpeedModeInactive;
+                    gchSpeedTestMode = SPEED_MODE_INACTIVE;
                 }
                 gtmrSpeedTestDelayTimer->stop();
             }
@@ -3802,10 +3802,10 @@ void AutMainWindow::on_btn_SpeedStartStop_clicked()
             gtmrSpeedTestDelayTimer = 0;
         }
 
-        if ((gchSpeedTestMode == SpeedModeSendRecv || gchSpeedTestMode == SpeedModeRecv) && (gintSpeedBytesReceived10s > 0 || ui->edit_SpeedBytesRec10s->text().toInt() > 0))
+        if ((gchSpeedTestMode == SPEED_MODE_RECEIVE_TRANSMIT || gchSpeedTestMode == SPEED_MODE_RECEIVE) && (gintSpeedBytesReceived10s > 0 || ui->edit_SpeedBytesRec10s->text().toInt() > 0))
         {
             //Data has been received in the past 10 seconds: start a timer before stopping to catch the extra data packets
-            gchSpeedTestMode = SpeedModeRecv;
+            gchSpeedTestMode = SPEED_MODE_RECEIVE;
             gtmrSpeedTestDelayTimer = new QTimer();
             gtmrSpeedTestDelayTimer->setSingleShot(true);
             connect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStopTimer()));
@@ -3814,10 +3814,10 @@ void AutMainWindow::on_btn_SpeedStartStop_clicked()
             //Show message that test will end soon
             ui->statusBar->showMessage("Waiting 5 seconds for packets to be received... Click cancel again to stop instantly.");
         }
-        else if (gchSpeedTestMode == SpeedModeSendRecv || gchSpeedTestMode == SpeedModeSend)
+        else if (gchSpeedTestMode == SPEED_MODE_RECEIVE_TRANSMIT || gchSpeedTestMode == SPEED_MODE_TRANSMIT)
         {
             //Delay for 5 seconds for buffer to clear
-            gchSpeedTestMode = SpeedModeInactive;
+            gchSpeedTestMode = SPEED_MODE_INACTIVE;
             gtmrSpeedTestDelayTimer = new QTimer();
             gtmrSpeedTestDelayTimer->setSingleShot(true);
             connect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStopTimer()));
@@ -3843,7 +3843,7 @@ void AutMainWindow::on_btn_SpeedStartStop_clicked()
             OutputSpeedTestAvgStats((gtmrSpeedTimer.nsecsElapsed() < 1000000000LL ? 1000000000LL : gtmrSpeedTimer.nsecsElapsed()/1000000000LL));
 
             //Set speed test as no longer running
-            gchSpeedTestMode = SpeedModeInactive;
+            gchSpeedTestMode = SPEED_MODE_INACTIVE;
             gbSpeedTestRunning = false;
 
             if (gtmrSpeedTimer.isValid())
@@ -3987,20 +3987,20 @@ void AutMainWindow::SpeedMenuSelected(QAction *qaAction)
         if (chItem == SpeedMenuActionRecv)
         {
             //Receive only test
-            gchSpeedTestMode = SpeedModeRecv;
+            gchSpeedTestMode = SPEED_MODE_RECEIVE;
         }
         else if (chItem == SpeedMenuActionSend)
         {
             //Send only test
-            gchSpeedTestMode = SpeedModeSend;
+            gchSpeedTestMode = SPEED_MODE_TRANSMIT;
 
             //Send data
-            SendSpeedTestData(SpeedTestChunkSize);
+            SendSpeedTestData(ui->edit_speed_test_chunk_append_size->value());
         }
         else if (chItem == SpeedMenuActionSendRecv || chItem == SpeedMenuActionSendRecv5Delay || chItem == SpeedMenuActionSendRecv10Delay || chItem == SpeedMenuActionSendRecv15Delay)
         {
             //Send and receive test
-            gchSpeedTestMode = SpeedModeSendRecv;
+            gchSpeedTestMode = SPEED_MODE_RECEIVE_TRANSMIT;
 
             if (chItem == SpeedMenuActionSendRecv5Delay || chItem == SpeedMenuActionSendRecv10Delay || chItem == SpeedMenuActionSendRecv15Delay)
             {
@@ -4014,7 +4014,7 @@ void AutMainWindow::SpeedMenuSelected(QAction *qaAction)
             else
             {
                 //Send immediately
-                SendSpeedTestData(SpeedTestChunkSize);
+                SendSpeedTestData(ui->edit_speed_test_chunk_append_size->value());
             }
         }
 
@@ -4025,7 +4025,7 @@ void AutMainWindow::SpeedMenuSelected(QAction *qaAction)
         }
 
         //Show message in status bar
-        ui->statusBar->showMessage(QString((gchSpeedTestMode == SpeedModeSendRecv ? "Send & Receive" : (gchSpeedTestMode == SpeedModeRecv ? "Receive only" : (gchSpeedTestMode == SpeedModeSend ? "Send only" : "Unknown")))).append(" Speed testing started."));
+        ui->statusBar->showMessage(QString((gchSpeedTestMode == SPEED_MODE_RECEIVE_TRANSMIT ? "Send & Receive" : (gchSpeedTestMode == SPEED_MODE_RECEIVE ? "Receive only" : (gchSpeedTestMode == SPEED_MODE_TRANSMIT ? "Send only" : "Unknown")))).append(" Speed testing started."));
 
         //Start timers
         gtmrSpeedTestStats.start();
@@ -4057,7 +4057,7 @@ void AutMainWindow::OutputSpeedTestStats()
         ui->edit_SpeedPacketsSent10s->setText(QString::number(gintSpeedBytesSent10s/gintSpeedTestMatchDataLength));
         gintSpeedBytesSent10s = 0;
     }
-    if ((gchSpeedTestMode & SpeedModeRecv) == SpeedModeRecv)
+    if ((gchSpeedTestMode & SPEED_MODE_RECEIVE) == SPEED_MODE_RECEIVE)
     {
         //Receiving active
         if (ui->combo_SpeedDataDisplay->currentIndex() == 1)
@@ -4292,7 +4292,7 @@ void AutMainWindow::on_btn_SpeedCopy_clicked()
         append("\r\n    > Receive Delay: ").
         append(QString::number(gintDelayedSpeedTestReceive)).
         append("\r\n    > Test Type: ").
-        append((gchSpeedTestMode == SpeedModeSendRecv ? "Send/Receive" : (gchSpeedTestMode == SpeedModeSend ? "Send" : (gchSpeedTestMode == SpeedModeRecv ? "Receive" : "Inactive")))).
+        append((gchSpeedTestMode == SPEED_MODE_RECEIVE_TRANSMIT ? "Send/Receive" : (gchSpeedTestMode == SPEED_MODE_TRANSMIT ? "Send" : (gchSpeedTestMode == SPEED_MODE_RECEIVE ? "Receive" : "Inactive")))).
         append("\r\n---------------------------------\r\nResults:\r\n    > Test time: ").
         append(ui->label_SpeedTime->text()).
         append(strResultStr).
@@ -4358,14 +4358,14 @@ void AutMainWindow::SendSpeedTestData(int intMaxLength)
 void AutMainWindow::SpeedTestBytesWritten(qint64 intByteCount)
 {
     //Serial port bytes have been written in speed test mode
-    if ((gchSpeedTestMode & SpeedModeSend) == SpeedModeSend)
+    if ((gchSpeedTestMode & SPEED_MODE_TRANSMIT) == SPEED_MODE_TRANSMIT)
     {
         //Sending data in speed test
         gintSpeedBufferCount -= intByteCount;
-        if (gintSpeedBufferCount <= SpeedTestMinBufSize)
+        if (gintSpeedBufferCount <= ui->edit_speed_test_minimum_buffer_size->value())
         {
             //Buffer has space: send more data
-            SendSpeedTestData(SpeedTestChunkSize);
+            SendSpeedTestData(ui->edit_speed_test_chunk_append_size->value());
         }
     }
 
@@ -4377,7 +4377,7 @@ void AutMainWindow::SpeedTestBytesWritten(qint64 intByteCount)
 void AutMainWindow::SpeedTestReceive()
 {
     //Receieved data from serial port in speed test mode
-    if ((gchSpeedTestMode & SpeedModeRecv) == SpeedModeRecv)
+    if ((gchSpeedTestMode & SPEED_MODE_RECEIVE) == SPEED_MODE_RECEIVE)
     {
         //Check data as in receieve mode
         uint64_t received_bytes = transport_bytesAvailable();
@@ -4608,7 +4608,7 @@ void AutMainWindow::UpdateSpeedTestValues()
         ui->edit_SpeedPacketsSent->setText(QString::number(gintSpeedTestStatPacketsSent));
     }
 
-    if ((gchSpeedTestMode & SpeedModeRecv) == SpeedModeRecv)
+    if ((gchSpeedTestMode & SPEED_MODE_RECEIVE) == SPEED_MODE_RECEIVE)
     {
         //Receive mode active
         ui->label_SpeedRx->setText(QString::number(gintSpeedBytesReceived));
@@ -4644,7 +4644,7 @@ void AutMainWindow::SpeedTestStartTimer()
     disconnect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStartTimer()));
     delete gtmrSpeedTestDelayTimer;
     gtmrSpeedTestDelayTimer = 0;
-    SendSpeedTestData(SpeedTestChunkSize);
+    SendSpeedTestData(ui->edit_speed_test_chunk_append_size->value());
 }
 
 void AutMainWindow::SpeedTestStopTimer()
@@ -4667,7 +4667,7 @@ void AutMainWindow::SpeedTestStopTimer()
     OutputSpeedTestAvgStats(gtmrSpeedTimer.nsecsElapsed()/1000000000LL);
 
     //Set speed test as no longer running
-    gchSpeedTestMode = SpeedModeInactive;
+    gchSpeedTestMode = SPEED_MODE_INACTIVE;
     gbSpeedTestRunning = false;
 
     if (gtmrSpeedTimer.isValid())
@@ -4718,7 +4718,7 @@ void AutMainWindow::OutputSpeedTestAvgStats(qint64 lngElapsed)
         ui->edit_SpeedPacketsSentAvg->setText(QString::number((quint64)gintSpeedBytesSent/(quint64)gintSpeedTestMatchDataLength/((quint64)lngElapsed-(quint64)gintDelayedSpeedTestSend)));
     }
 
-    if ((gchSpeedTestMode & SpeedModeRecv) == SpeedModeRecv)
+    if ((gchSpeedTestMode & SPEED_MODE_RECEIVE) == SPEED_MODE_RECEIVE)
     {
         //Receiving active
         if (ui->combo_SpeedDataDisplay->currentIndex() == 1)
@@ -5672,7 +5672,7 @@ void AutMainWindow::plugin_transport_error(int error)
             OutputSpeedTestAvgStats((gtmrSpeedTimer.nsecsElapsed() < 1000000000LL ? 1000000000LL : gtmrSpeedTimer.nsecsElapsed()/1000000000LL));
 
             //Set speed test as no longer running
-            gchSpeedTestMode = SpeedModeInactive;
+            gchSpeedTestMode = SPEED_MODE_INACTIVE;
             gbSpeedTestRunning = false;
 
             if (gtmrSpeedTimer.isValid())

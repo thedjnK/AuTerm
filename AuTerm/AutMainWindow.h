@@ -134,44 +134,10 @@ const bool DefaultReconnectAfterDisconnect      = false;
 const QString URLLinuxNonRootSetup = "https://github.com/LairdCP/AuTerm/wiki/Granting-non-root-USB-device-access-(Linux)";
 const qint8 FilenameIndexScripting              = 0;
 const qint8 FilenameIndexOthers                 = 1;
-//Constants for right click menu options
-enum menu_actions {
-    MenuActionError                             = 0,
-    MenuActionLoopback,
-    MenuActionStreamFile,
-    MenuActionFont,
-    MenuActionTextColour,
-    MenuActionBackground,
-    MenuActionRestoreDefaults,
-    MenuActionAutomation,
-    MenuActionScripting,
-    MenuActionClearDisplay,
-    MenuActionClearRxTx,
-    MenuActionCopy,
-    MenuActionCopyAll,
-    MenuActionPaste,
-    MenuActionSelectAll
-};
 //Constants for balloon (notification area) icon options
 const qint8 BalloonActionShow                   = 1;
 const qint8 BalloonActionExit                   = 2;
-//Constants for speed test menu
-enum speed_menu_actions {
-    SpeedMenuActionRecv                         = 0,
-    SpeedMenuActionSend,
-    SpeedMenuActionSendRecv,
-    SpeedMenuActionSendRecv5Delay,
-    SpeedMenuActionSendRecv10Delay,
-    SpeedMenuActionSendRecv15Delay
-};
-const qint8 SpeedModeInactive                   = 0;
-const qint8 SpeedModeRecv                       = 1;
-const qint8 SpeedModeSend                       = 2;
-const qint8 SpeedModeSendRecv                   = 3;
 //Constants for speed testing
-const qint16 SpeedTestChunkSize                 = 512;  //Maximum number of bytes to send per chunk when speed testing
-//const qint16 SpeedTestMinBufSize                = 128;  //Minimum buffer size when speed testing, when there are less than this number of bytes in the output buffer it will be topped up
-const qint16 SpeedTestMinBufSize                = 384;  //Minimum buffer size when speed testing, when there are less than this number of bytes in the output buffer it will be topped up
 const qint16 SpeedTestStatUpdateTime            = 500;  //Time (in ms) between status updates for speed test mode
 const QString WINDOWS_NEWLINE                   = "\r\n";
 const QChar NEWLINE                             = '\n';
@@ -218,6 +184,42 @@ enum class BitByteTypes
 enum modes {
     mode_idle = 0,
     mode_check_for_update,
+};
+
+//Right-click menu options
+enum menu_actions {
+    MenuActionError                             = 0,
+    MenuActionLoopback,
+    MenuActionStreamFile,
+    MenuActionFont,
+    MenuActionTextColour,
+    MenuActionBackground,
+    MenuActionRestoreDefaults,
+    MenuActionAutomation,
+    MenuActionScripting,
+    MenuActionClearDisplay,
+    MenuActionClearRxTx,
+    MenuActionCopy,
+    MenuActionCopyAll,
+    MenuActionPaste,
+    MenuActionSelectAll
+};
+
+//Speed test menu
+enum speed_menu_actions {
+    SpeedMenuActionRecv                         = 0,
+    SpeedMenuActionSend,
+    SpeedMenuActionSendRecv,
+    SpeedMenuActionSendRecv5Delay,
+    SpeedMenuActionSendRecv10Delay,
+    SpeedMenuActionSendRecv15Delay
+};
+
+enum speed_modes {
+    SPEED_MODE_INACTIVE,
+    SPEED_MODE_RECEIVE,
+    SPEED_MODE_TRANSMIT,
+    SPEED_MODE_RECEIVE_TRANSMIT,
 };
 
 /******************************************************************************/
@@ -391,8 +393,7 @@ private:
     void AuTermUpdateCheck();
     bool is_newer(const QString *new_version, const QString *current_version);
 #endif
-    void
-    UpdateCustomisation(bool bDefault);
+    void UpdateCustomisation(bool bDefault);
     void update_buffer(QByteArray data, bool apply_formatting);
     void update_buffer(QByteArray *data, bool apply_formatting);
     void update_display_trimming();
