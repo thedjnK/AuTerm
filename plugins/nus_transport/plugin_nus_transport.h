@@ -104,6 +104,7 @@ private slots:
     void form_connect_to_device(uint16_t index, uint8_t address_type);
     void form_disconnect_from_device();
     void form_bluetooth_status(bool *scanning, bool *connecting);
+    void form_request_connect();
     void connection_updated(QLowEnergyConnectionParameters parameters);
     void stateChanged(QLowEnergyController::ControllerState state);
 
@@ -114,6 +115,7 @@ signals:
     void aboutToClose();
     void update_images();
     void transport_error(int error);
+    void transport_open_close(uint8_t mode);
 
 private:
     void form_min_params();

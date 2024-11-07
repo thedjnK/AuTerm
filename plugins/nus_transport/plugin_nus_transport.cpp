@@ -65,8 +65,10 @@ void plugin_nus_transport::transport_setup(QWidget *tab)
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
     QObject::connect(bluetooth_window, SIGNAL(bluetooth_status(bool*,bool*)), this, SLOT(form_bluetooth_status(bool*,bool*)));
     QObject::connect(bluetooth_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), parent_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
+    QObject::connect(bluetooth_window, SIGNAL(request_connect()), this, SLOT(form_request_connect()));
     QObject::connect(this, SIGNAL(update_images()), parent_window, SLOT(plugin_force_image_update()));
     QObject::connect(this, SIGNAL(transport_error(int)), parent_window, SLOT(plugin_transport_error(int)));
+    QObject::connect(this, SIGNAL(transport_open_close(uint8_t)), parent_window, SLOT(plugin_serial_open_close(uint8_t)));
     bluetooth_window->show();
 }
 
@@ -98,8 +100,10 @@ plugin_nus_transport::~plugin_nus_transport()
     QObject::disconnect(this, SLOT(form_disconnect_from_device()));
     QObject::disconnect(this, SLOT(form_bluetooth_status(bool*,bool*)));
     QObject::disconnect(bluetooth_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), parent_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
+    QObject::disconnect(this, SLOT(form_request_connect()));
     QObject::disconnect(this, SIGNAL(update_images()), parent_window, SLOT(plugin_force_image_update()));
     QObject::disconnect(this, SIGNAL(transport_error(int)), parent_window, SLOT(plugin_transport_error(int)));
+    QObject::disconnect(this, SIGNAL(transport_open_close(uint8_t)), parent_window, SLOT(plugin_serial_open_close(uint8_t)));
 
 #ifndef SKIPPLUGIN_LOGGER
     delete logger;
@@ -653,6 +657,30 @@ void plugin_nus_transport::form_bluetooth_status(bool *scanning, bool *connectin
 {
     *scanning = discoveryAgent->isActive();
     *connecting = device_connected;
+}
+
+void plugin_nus_transport::form_request_connect()
+{
+    QTabWidget *selector_tab = parent_window->findChild<QTabWidget *>("selector_Tab");
+    QWidget *tab_term = selector_tab->findChild<QWidget *>("tab_Term");
+
+    if (selector_tab == nullptr || tab_term == nullptr)
+    {
+        log_error() << "Either selector_Tab or tab_Term were not found";
+        return;
+    }
+
+    if (device_connected == true)
+    {
+        emit transport_open_close(1);
+    }
+
+    emit transport_open_close(0);
+
+    if (selector_tab->currentIndex() != selector_tab->indexOf(tab_term))
+    {
+        selector_tab->setCurrentIndex(selector_tab->indexOf(tab_term));
+    }
 }
 
 void plugin_nus_transport::setup_finished()

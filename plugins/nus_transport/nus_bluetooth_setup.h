@@ -81,6 +81,7 @@ signals:
     void disconnect_from_device();
     void bluetooth_status(bool *scanning, bool *connecting);
     void plugin_get_image_pixmap(QString name, QPixmap **pixmap);
+    void request_connect();
 
 private:
     Ui::nus_bluetooth_setup *ui;

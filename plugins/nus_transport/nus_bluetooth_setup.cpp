@@ -56,8 +56,8 @@ void nus_bluetooth_setup::on_btn_refresh_clicked()
 
 void nus_bluetooth_setup::on_list_devices_itemDoubleClicked(QListWidgetItem *)
 {
-    //TODO:
-//    on_btn_connect_clicked();
+    //Request a connect, which will perform a disconnect (if connected) then a connect
+    emit request_connect();
 }
 
 void nus_bluetooth_setup::clear_devices()
