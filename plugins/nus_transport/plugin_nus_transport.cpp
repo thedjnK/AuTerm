@@ -28,7 +28,6 @@
 #include <QGroupBox>
 #include <QTabWidget>
 #include <QVBoxLayout>
-#include <QLabel>
 
 /******************************************************************************/
 // Constants
@@ -61,13 +60,20 @@ void plugin_nus_transport::setup(QMainWindow *main_window)
 
 void plugin_nus_transport::transport_setup(QWidget *tab)
 {
+    QVBoxLayout *tmp_widget = new QVBoxLayout(nullptr);
+    QGroupBox *window_main_widget;
     QVBoxLayout *vertical_layout = new QVBoxLayout(tab);
     vertical_layout->setSpacing(0);
     vertical_layout->setObjectName("verticalLayout_2");
     vertical_layout->setContentsMargins(2, 2, 2, 2);
-    bluetooth_window = new nus_bluetooth_setup(vertical_layout->widget());
-    bluetooth_window->setFixedWidth(tab->widthMM());
-    vertical_layout->addWidget(bluetooth_window);
+
+    //Very silly workaround to prevent issue with Qt having an initial wrong large sized width
+    bluetooth_window = new nus_bluetooth_setup(tmp_widget->widget());
+    window_main_widget = bluetooth_window->findChild<QGroupBox *>("groupBox");
+    bluetooth_window->setParent(vertical_layout->widget());
+    vertical_layout->addWidget(window_main_widget);
+    tmp_widget->deleteLater();
+
     QObject::connect(bluetooth_window, SIGNAL(refresh_devices()), this, SLOT(form_refresh_devices()));
     QObject::connect(bluetooth_window, SIGNAL(connect_to_device(uint16_t,uint8_t)), this, SLOT(form_connect_to_device(uint16_t,uint8_t)));
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
@@ -77,7 +83,6 @@ void plugin_nus_transport::transport_setup(QWidget *tab)
     QObject::connect(this, SIGNAL(update_images()), parent_window, SLOT(plugin_force_image_update()));
     QObject::connect(this, SIGNAL(transport_error(int)), parent_window, SLOT(plugin_transport_error(int)));
     QObject::connect(this, SIGNAL(transport_open_close(uint8_t)), parent_window, SLOT(plugin_serial_open_close(uint8_t)));
-    bluetooth_window->show();
 }
 
 plugin_nus_transport::plugin_nus_transport()

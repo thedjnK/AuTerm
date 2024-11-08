@@ -35,12 +35,14 @@ nus_bluetooth_setup::nus_bluetooth_setup(QWidget *parent) :
     green_circle = nullptr;
 
 #ifdef _WIN32
-    //Remove address selection on windows as it is useless
-    ui->radio_address_type_public->deleteLater();
-    ui->radio_address_type_random->deleteLater();
-    ui->radio_address_type_default->deleteLater();
-    ui->label_2->deleteLater();
-    ui->horizontalLayout->deleteLater();
+    /* Remove address selection on windows as it is useless - delete instead of
+     * delete later as using delete later causes the GUI to mess up
+     */
+    delete ui->radio_address_type_public;
+    delete ui->radio_address_type_random;
+    delete ui->radio_address_type_default;
+    delete ui->label_2;
+    delete ui->horizontalLayout;
 #endif
 }
 
