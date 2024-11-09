@@ -4,6 +4,43 @@
 
 Note that AuTerm is currently in the process of being developed for an initial release, the code is not considered stable and only pre-release test versions are available for download.
 
+## About
+
+AuTerm is a cross-platform terminal utility, designed for communicating with embedded devices and systems (with a primary focus on Zephyr devices, but supports any device be it embedded or not), created in Qt 6 (and supporting Qt 5, though Qt 6 is recommended).
+
+## Features
+
+* Serial port support
+* UTF-8 text support
+* Speed test feature (including statistics and validity)
+* File streaming functionality
+* Customisable interface
+* Scripting functionality
+* Log file output and log viewer
+* Error code viewer
+* VT100 control code support
+* Plugin support for additional features and transports
+* MCUmgr plugin
+  - Image management group support
+  - Filesystem management group support
+  - OS management group support
+  - Statistic management group support
+  - Shell management group support
+  - Settings management group support
+  - Zephyr basic management group support
+  - Enumeration management group support
+  - Custom command support using JSON or CBOR
+  - UART transport support
+  - Bluetooth transport support (supporting write with and without response modes)
+  - UDP transport support
+  - LoRaWAN (TTS via MQTT) transport support
+* Logger plugin
+* NUS (Nordic UART Service) transport plugin
+
+Functionality can be disabled in custom builds by uncommenting the SKIP lines in ``AuTerm-includes.pri``, which allows for lean and reduced size builds.
+
+## Screenshots
+
 Test release on Linux:
 
 ![Linux test release screenshot](/docs/images/linux_build.png?raw=true)
@@ -11,10 +48,6 @@ Test release on Linux:
 Test release on Windows:
 
 ![Windows test release screenshot](/docs/images/windows_build.png?raw=true)
-
-## About
-
-AuTerm is a cross-platform terminal utility, designed for communicating with embedded devices and systems (with a primary focus on Zephyr devices, but supports any device be it embedded or not), created in Qt 6 (and supporting Qt 5, though Qt 6 is recommended).
 
 ## Downloading
 
