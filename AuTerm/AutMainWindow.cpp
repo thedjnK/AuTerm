@@ -288,6 +288,8 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     ui->btn_SpeedClose->deleteLater();
     ui->btn_SpeedCopy->deleteLater();
     ui->btn_SpeedStartStop->deleteLater();
+    ui->edit_speed_test_minimum_buffer_size->deleteLater();
+    ui->edit_speed_test_chunk_append_size->deleteLater();
     ui->tab_SpeedTest->deleteLater();
 #endif
 
@@ -1301,6 +1303,8 @@ void AutMainWindow::on_btn_TermClose_clicked(bool from_plugin)
             ui->btn_SpeedStartStop->setEnabled(false);
             ui->check_SpeedSyncReceive->setEnabled(true);
             ui->combo_SpeedDataType->setEnabled(true);
+            ui->edit_speed_test_minimum_buffer_size->setEnabled(true);
+            ui->edit_speed_test_chunk_append_size->setEnabled(true);
             if (ui->combo_SpeedDataType->currentIndex() == 1)
             {
                 //Enable string options
@@ -2585,6 +2589,8 @@ void AutMainWindow::SerialError(QSerialPort::SerialPortError speErrorCode)
             ui->btn_SpeedStartStop->setEnabled(false);
             ui->check_SpeedSyncReceive->setEnabled(true);
             ui->combo_SpeedDataType->setEnabled(true);
+            ui->edit_speed_test_minimum_buffer_size->setEnabled(true);
+            ui->edit_speed_test_chunk_append_size->setEnabled(true);
             if (ui->combo_SpeedDataType->currentIndex() == 1)
             {
                 //Enable string options
@@ -3840,6 +3846,8 @@ void AutMainWindow::on_btn_SpeedStartStop_clicked()
             ui->btn_SpeedStartStop->setText(tr("&Start Test"));
             ui->check_SpeedSyncReceive->setEnabled(true);
             ui->combo_SpeedDataType->setEnabled(true);
+            ui->edit_speed_test_minimum_buffer_size->setEnabled(true);
+            ui->edit_speed_test_chunk_append_size->setEnabled(true);
             if (ui->combo_SpeedDataType->currentIndex() == 1)
             {
                 //Enable string options
@@ -3921,6 +3929,8 @@ void AutMainWindow::SpeedMenuSelected(QAction *qaAction)
         ui->combo_SpeedDataType->setEnabled(false);
         ui->edit_SpeedTestData->setEnabled(false);
         ui->check_SpeedStringUnescape->setEnabled(false);
+        ui->edit_speed_test_minimum_buffer_size->setEnabled(false);
+        ui->edit_speed_test_chunk_append_size->setEnabled(false);
 
         if (gtmrSpeedTimer.isValid())
         {
@@ -4112,6 +4122,8 @@ void AutMainWindow::on_combo_SpeedDataType_currentIndexChanged(int)
         ui->edit_SpeedPacketsGood->setEnabled(false);
         ui->edit_SpeedPacketsBad->setEnabled(false);
         ui->edit_SpeedPacketsErrorRate->setEnabled(false);
+        ui->edit_speed_test_minimum_buffer_size->setEnabled(false);
+        ui->edit_speed_test_chunk_append_size->setEnabled(false);
 
         //Disable sending modes
         while (i < gpSpeedMenu->actions().length())
@@ -4133,6 +4145,8 @@ void AutMainWindow::on_combo_SpeedDataType_currentIndexChanged(int)
         ui->edit_SpeedPacketsGood->setEnabled(true);
         ui->edit_SpeedPacketsBad->setEnabled(true);
         ui->edit_SpeedPacketsErrorRate->setEnabled(true);
+        ui->edit_speed_test_minimum_buffer_size->setEnabled(true);
+        ui->edit_speed_test_chunk_append_size->setEnabled(true);
 
         //Enable sending modes
         while (i < gpSpeedMenu->actions().length())
@@ -4664,6 +4678,8 @@ void AutMainWindow::SpeedTestStopTimer()
     ui->btn_SpeedStartStop->setText(tr("&Start Test"));
     ui->check_SpeedSyncReceive->setEnabled(true);
     ui->combo_SpeedDataType->setEnabled(true);
+    ui->edit_speed_test_minimum_buffer_size->setEnabled(true);
+    ui->edit_speed_test_chunk_append_size->setEnabled(true);
     if (ui->combo_SpeedDataType->currentIndex() == 1)
     {
         //Enable string options
@@ -5731,6 +5747,8 @@ void AutMainWindow::plugin_transport_error(int error)
         ui->btn_SpeedStartStop->setEnabled(false);
         ui->check_SpeedSyncReceive->setEnabled(true);
         ui->combo_SpeedDataType->setEnabled(true);
+        ui->edit_speed_test_minimum_buffer_size->setEnabled(true);
+        ui->edit_speed_test_chunk_append_size->setEnabled(true);
         if (ui->combo_SpeedDataType->currentIndex() == 1)
         {
             //Enable string options
