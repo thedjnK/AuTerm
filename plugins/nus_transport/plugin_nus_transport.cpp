@@ -210,6 +210,7 @@ void plugin_nus_transport::disconnected()
     device_connected = false;
     ready_to_send = false;
     mtu_max_worked = 0;
+    connected_device_name.clear();
 
     log_debug() << "disconnected";
 
@@ -669,6 +670,7 @@ void plugin_nus_transport::form_connect_to_device(uint16_t index, uint8_t addres
     }
 
     controller->connectToDevice();
+    connected_device_name = bluetooth_device_list.at(index).name();
 }
 
 void plugin_nus_transport::form_disconnect_from_device()
@@ -982,6 +984,11 @@ AutPlugin::PluginType plugin_nus_transport::plugin_type()
 QObject *plugin_nus_transport::plugin_object()
 {
     return this;
+}
+
+QString plugin_nus_transport::connection_display_name()
+{
+    return connected_device_name;
 }
 
 /******************************************************************************/

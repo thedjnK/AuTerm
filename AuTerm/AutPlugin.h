@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -132,6 +132,7 @@ public:
     {
         return false;
     }
+    virtual QString connection_display_name() = 0;
 
 signals:
     void readyRead();

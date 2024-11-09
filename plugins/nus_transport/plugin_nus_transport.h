@@ -114,6 +114,7 @@ public:
     QString to_error_string(int error);
     QString transport_name() const;
     QObject *plugin_object();
+    QString connection_display_name();
 
 private slots:
     void deviceDiscovered(const QBluetoothDeviceInfo &info);
@@ -173,6 +174,7 @@ private:
     bool disconnecting_from_device;
     bool ready_to_send;
     bool bluetooth_write_with_response;
+    QString connected_device_name;
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
     QTimer discover_timer;
 #endif

@@ -162,6 +162,11 @@ QObject *plugin_echo_transport::plugin_object()
     return this;
 }
 
+QString plugin_echo_transport::connection_display_name()
+{
+    return "Echo loopback";
+}
+
 /******************************************************************************/
 // END OF FILE
 /******************************************************************************/

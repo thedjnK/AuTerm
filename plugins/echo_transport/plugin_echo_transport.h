@@ -64,6 +64,7 @@ public:
     QSerialPort::PinoutSignals pinoutSignals();
     QString to_error_string(int error);
     QString transport_name() const;
+    QString connection_display_name();
 
 signals:
     void readyRead();
