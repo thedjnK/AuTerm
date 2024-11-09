@@ -2260,8 +2260,7 @@ void AutMainWindow::OpenDevice(bool from_plugin)
             //Update tooltip of system tray
             if (gbSysTrayEnabled == true)
             {
-//TODO
-                gpSysTray->setToolTip(QString("AuTerm v").append(UwVersion).append(" (").append(ui->combo_COM->currentText()).append(")"));
+                gpSysTray->setToolTip(QString("AuTerm v") % UwVersion % " (" % plugin_active_transport->transport_name() % ":" % plugin_active_transport->connection_display_name() % ")");
             }
 
 //TODO
@@ -2294,15 +2293,10 @@ void AutMainWindow::OpenDevice(bool from_plugin)
         {
             //Error whilst opening
             //todo: change to transport
-            ui->statusBar->showMessage("Error: ");
-            ui->statusBar->showMessage(ui->statusBar->currentMessage().append(gspSerialPort.errorString()));
+            ui->statusBar->showMessage("Error: Transport open failed");
+            //ui->statusBar->showMessage(ui->statusBar->currentMessage().append(gspSerialPort.errorString()));
 
-            QString strMessage = tr("Error whilst attempting to open the serial device: ").append(gspSerialPort.errorString()).append("\n\nIf the serial port is open in another application, please close the other application")
-#if !defined(_WIN32) && !defined( __APPLE__)
-                                     .append(", please also ensure you have been granted permission to the serial device in /dev/")
-#endif
-                                     .append((ui->combo_Baud->currentText().toULong() > 115200 ? ", please also ensure that your serial device supports baud rates greater than 115200 (normal COM ports do not have support for these baud rates)" : ""))
-                                     .append(" and try again.");
+            QString strMessage = "Error whilst attempting to open the select transport";
             gpmErrorForm->SetMessage(&strMessage);
             gpmErrorForm->show();
             ui->text_TermEditData->set_serial_open(false);
@@ -2314,7 +2308,8 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 
     if (port_opened == true)
     {
-        ui->statusBar->showMessage(QString("[").append(ui->combo_COM->currentText()).append(":").append(ui->combo_Baud->currentText()).append(",").append((ui->combo_Parity->currentIndex() == 0 ? "N" : ui->combo_Parity->currentIndex() == 1 ? "O" : ui->combo_Parity->currentIndex() == 2 ? "E" : "")).append(",").append(ui->combo_Data->currentText()).append(",").append(ui->combo_Stop->currentText()).append(",").append((ui->combo_Handshake->currentIndex() == 0 ? "N" : ui->combo_Handshake->currentIndex() == 1 ? "H" : ui->combo_Handshake->currentIndex() == 2 ? "S" : "")).append("]{").append((ui->radio_LCR->isChecked() ? "\\r" : (ui->radio_LLF->isChecked() ? "\\n" : (ui->radio_LCRLF->isChecked() ? "\\r\\n" : "")))).append("}"));
+
+        ui->statusBar->showMessage(QString("[") % plugin_active_transport->transport_name() % ":" % plugin_active_transport->connection_display_name() % "]{" % (ui->radio_LCR->isChecked() ? "\\r" : (ui->radio_LLF->isChecked() ? "\\n" : (ui->radio_LCRLF->isChecked() ? "\\r\\n" : ""))) % "}");
         ui->label_TermConn->setText(ui->statusBar->currentMessage());
 #ifndef SKIPSPEEDTEST
         ui->label_SpeedConn->setText(ui->statusBar->currentMessage());
@@ -2455,7 +2450,7 @@ void AutMainWindow::OpenDevice(bool from_plugin)
                 gpMainLog->WriteLogData(tr("-").repeated(31));
                 gpMainLog->WriteLogData(tr("\n Log opened ").append(QDate::currentDate().toString("dd/MM/yyyy")).append(" @ ").append(QTime::currentTime().toString("hh:mm")).append(" \n"));
                 gpMainLog->WriteLogData(tr(" AuTerm ").append(UwVersion).append(" \n"));
-                gpMainLog->WriteLogData(QString(" Port: ").append(ui->combo_COM->currentText()).append("\n"));
+                gpMainLog->WriteLogData(QString(" Transport: ") % plugin_active_transport->transport_name() % ", device: " % plugin_active_transport->connection_display_name() % "\n");
                 gpMainLog->WriteLogData(tr("-").repeated(31).append("\n\n"));
                 gbMainLogEnabled = true;
             }
