@@ -5624,171 +5624,175 @@ bool AutMainWindow::transport_supports_data_terminal_ready() const
 void AutMainWindow::plugin_transport_error(int error)
 {
     //TODO: unify with SerialError() and make a common clean up function
+    if (this->sender() != plugin_active_transport->plugin_object())
+    {
+        qDebug() << "A transport plugin tried to declare an error when it is not the active transport";
+        return;
+    }
+
 #ifndef SKIPSCRIPTINGFORM
     if (gbScriptingRunning == true)
     {
+//TODO: update to transport error
 //        gusScriptingForm->SerialPortError(speErrorCode);
     }
 #endif
 
     //Resource error or permission error (device unplugged?)
-    QString strMessage = "Fatal error with transport connection: " % QString::number(error) % ".\nPlease reconnect to the device to continue.";
+    QString strMessage = "Fatal error with transport connection: " % transport_error_to_error_string(error) % ".\nPlease reconnect to the device to continue.";
     gpmErrorForm->SetMessage(&strMessage);
     gpmErrorForm->show();
     ui->text_TermEditData->set_serial_open(false);
 
-        if (gbStreamingFile == true)
-        {
-            //Clear up file stream
-            gtmrStreamTimer.invalidate();
-            gbStreamingFile = false;
-            gpStreamFileHandle->close();
-            delete gpStreamFileHandle;
-        }
+    if (gbStreamingFile == true)
+    {
+        //Clear up file stream
+        gtmrStreamTimer.invalidate();
+        gbStreamingFile = false;
+        gpStreamFileHandle->close();
+        delete gpStreamFileHandle;
+    }
 #ifndef SKIPSPEEDTEST
-        else if (gbSpeedTestRunning == true)
+    else if (gbSpeedTestRunning == true)
+    {
+        //Clear up speed testing
+        if (gtmrSpeedTestDelayTimer != 0)
         {
-            //Clear up speed testing
-            if (gtmrSpeedTestDelayTimer != 0)
-            {
-                //Clean up timer
-                disconnect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStartTimer()));
-                disconnect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStopTimer()));
-                delete gtmrSpeedTestDelayTimer;
-                gtmrSpeedTestDelayTimer = 0;
-            }
-
-            ui->btn_SpeedStartStop->setEnabled(false);
-            ui->check_SpeedSyncReceive->setEnabled(true);
-            ui->combo_SpeedDataType->setEnabled(true);
-            if (ui->combo_SpeedDataType->currentIndex() == 1)
-            {
-                //Enable string options
-                ui->edit_SpeedTestData->setEnabled(true);
-                ui->check_SpeedStringUnescape->setEnabled(true);
-            }
-
-            //Update values
-            OutputSpeedTestAvgStats((gtmrSpeedTimer.nsecsElapsed() < 1000000000LL ? 1000000000LL : gtmrSpeedTimer.nsecsElapsed()/1000000000LL));
-
-            //Set speed test as no longer running
-            gchSpeedTestMode = SPEED_MODE_INACTIVE;
-            gbSpeedTestRunning = false;
-
-            if (gtmrSpeedTimer.isValid())
-            {
-                //Invalidate speed test timer
-                gtmrSpeedTimer.invalidate();
-            }
-            if (gtmrSpeedTestStats.isActive())
-            {
-                //Stop stats update timer
-                gtmrSpeedTestStats.stop();
-            }
-            if (gtmrSpeedTestStats10s.isActive())
-            {
-                //Stop 10 second stats update timer
-                gtmrSpeedTestStats10s.stop();
-            }
-
-            //Clear buffers
-            gbaSpeedMatchData.clear();
-            gbaSpeedReceivedData.clear();
-
-            //Show finished message in status bar
-            ui->statusBar->showMessage("Speed testing failed due to serial port error.");
+            //Clean up timer
+            disconnect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStartTimer()));
+            disconnect(gtmrSpeedTestDelayTimer, SIGNAL(timeout()), this, SLOT(SpeedTestStopTimer()));
+            delete gtmrSpeedTestDelayTimer;
+            gtmrSpeedTestDelayTimer = 0;
         }
+
+        ui->btn_SpeedStartStop->setEnabled(false);
+        ui->check_SpeedSyncReceive->setEnabled(true);
+        ui->combo_SpeedDataType->setEnabled(true);
+        if (ui->combo_SpeedDataType->currentIndex() == 1)
+        {
+            //Enable string options
+            ui->edit_SpeedTestData->setEnabled(true);
+            ui->check_SpeedStringUnescape->setEnabled(true);
+        }
+
+        //Update values
+        OutputSpeedTestAvgStats((gtmrSpeedTimer.nsecsElapsed() < 1000000000LL ? 1000000000LL : gtmrSpeedTimer.nsecsElapsed()/1000000000LL));
+
+        //Set speed test as no longer running
+        gchSpeedTestMode = SPEED_MODE_INACTIVE;
+        gbSpeedTestRunning = false;
+
+        if (gtmrSpeedTimer.isValid())
+        {
+            //Invalidate speed test timer
+            gtmrSpeedTimer.invalidate();
+        }
+        if (gtmrSpeedTestStats.isActive())
+        {
+            //Stop stats update timer
+            gtmrSpeedTestStats.stop();
+        }
+        if (gtmrSpeedTestStats10s.isActive())
+        {
+            //Stop 10 second stats update timer
+            gtmrSpeedTestStats10s.stop();
+        }
+
+        //Clear buffers
+        gbaSpeedMatchData.clear();
+        gbaSpeedReceivedData.clear();
+
+        //Show finished message in status bar
+        ui->statusBar->showMessage("Speed testing failed due to serial port error.");
+    }
 #endif
 
-        //No longer busy
-        gbTermBusy = false;
-        gchTermMode = 0;
+    //No longer busy
+    gbTermBusy = false;
+    gchTermMode = 0;
 
 #ifndef SKIPSERIALDETECT
-        if (serial_detect_waiting == false)
-        {
+    if (serial_detect_waiting == false)
+    {
 #endif
-            //Disable cancel button
-            ui->btn_Cancel->setEnabled(false);
+        //Disable cancel button
+        ui->btn_Cancel->setEnabled(false);
 #ifndef SKIPSERIALDETECT
-        }
+    }
 #endif
 
-        //Disable active checkboxes
-        ui->check_Break->setEnabled(false);
-        ui->check_DTR->setEnabled(false);
-        ui->check_Echo->setEnabled(false);
-        ui->check_Line->setEnabled(false);
-        ui->check_RTS->setEnabled(false);
+    //Disable active checkboxes
+    ui->check_Break->setEnabled(false);
+    ui->check_DTR->setEnabled(false);
+    ui->check_Echo->setEnabled(false);
+    ui->check_Line->setEnabled(false);
+    ui->check_RTS->setEnabled(false);
 #ifndef SKIPSPEEDTEST
-        ui->check_SpeedDTR->setEnabled(false);
-        ui->check_SpeedRTS->setEnabled(false);
+    ui->check_SpeedDTR->setEnabled(false);
+    ui->check_SpeedRTS->setEnabled(false);
 #endif
 
-        //Disable text entry
-        ui->text_TermEditData->setReadOnly(true);
+    //Disable text entry
+    ui->text_TermEditData->setReadOnly(true);
 
 #ifndef SKIPSERIALDETECT
-        if (serial_detect_waiting == false)
-        {
+    if (serial_detect_waiting == false)
+    {
 #endif
-            //Change status message
-            ui->statusBar->showMessage("");
+        //Change status message
+        ui->statusBar->showMessage("");
 #ifndef SKIPSERIALDETECT
-        }
+    }
 #endif
 
-        //Change button text
-        ui->btn_TermClose->setText("&Open Port");
+    //Change button text
+    ui->btn_TermClose->setText("&Open Port");
 #ifndef SKIPSPEEDTEST
-        ui->btn_SpeedClose->setText("&Open Port");
+    ui->btn_SpeedClose->setText("&Open Port");
 #endif
 
-        //Update images
-        UpdateImages();
+    //Update images
+    UpdateImages();
 
-        //Close log file if open
-        if (gpMainLog->IsLogOpen() == true)
-        {
-            gpMainLog->CloseLogFile();
-        }
+    //Close log file if open
+    if (gpMainLog->IsLogOpen() == true)
+    {
+        gpMainLog->CloseLogFile();
+    }
 
-        //Enable log options
-        ui->edit_LogFile->setEnabled(true);
-        ui->check_LogEnable->setEnabled(true);
-        ui->check_LogAppend->setEnabled(true);
-        ui->btn_LogFileSelect->setEnabled(true);
+    //Enable log options
+    ui->edit_LogFile->setEnabled(true);
+    ui->check_LogEnable->setEnabled(true);
+    ui->check_LogAppend->setEnabled(true);
+    ui->btn_LogFileSelect->setEnabled(true);
 
 #ifndef SKIPAUTOMATIONFORM
-        //Notify automation form
-        if (guaAutomationForm != 0)
-        {
-            guaAutomationForm->ConnectionChange(false);
-        }
+    //Notify automation form
+    if (guaAutomationForm != 0)
+    {
+        guaAutomationForm->ConnectionChange(false);
+    }
 #endif
 
-        //Show disconnection balloon
-        if (gbSysTrayEnabled == true && !this->isActiveWindow() && !gpmErrorForm->isActiveWindow()
+    //Show disconnection balloon
+    if (gbSysTrayEnabled == true && !this->isActiveWindow() && !gpmErrorForm->isActiveWindow()
 #ifndef SKIPAUTOMATIONFORM
-           && (guaAutomationForm == 0 || (guaAutomationForm != 0 && !guaAutomationForm->isActiveWindow()))
+       && (guaAutomationForm == 0 || (guaAutomationForm != 0 && !guaAutomationForm->isActiveWindow()))
 #endif
-           )
-        {
-            gpSysTray->showMessage(ui->combo_COM->currentText().append(" Removed"), QString("Connection to device ").append(ui->combo_COM->currentText()).append(" has been lost due to disconnection."), QSystemTrayIcon::Critical);
-        }
+       )
+    {
+        gpSysTray->showMessage(ui->combo_COM->currentText().append(" Removed"), QString("Connection to device ").append(ui->combo_COM->currentText()).append(" has been lost due to disconnection."), QSystemTrayIcon::Critical);
+    }
 
-        //Disallow file drops
-        setAcceptDrops(false);
+    //Disallow file drops
+    setAcceptDrops(false);
 
 #ifndef SKIPPLUGINS
+//TODO: update to transport error
 //    emit plugin_serial_error(speErrorCode);
-
-//    if (port_closed == true)
-    {
-        emit plugin_serial_closed();
-        gbPluginHideTerminalOutput = false;
-        gbPluginRunning = false;
-    }
+    emit plugin_serial_closed();
+    gbPluginHideTerminalOutput = false;
+    gbPluginRunning = false;
 #endif
 
     plugin_active_transport = nullptr;
