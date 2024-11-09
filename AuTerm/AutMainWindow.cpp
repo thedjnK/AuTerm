@@ -3108,6 +3108,7 @@ void AutMainWindow::replyFinished(QNetworkReply* nrReply)
 void AutMainWindow::sslErrors(QNetworkReply* nrReply, const QList<QSslError> lstSSLErrors)
 {
     //Error detected with SSL
+    Q_UNUSED(nrReply);
     QString string_response = "SSL error(s) during network request: ";
     uint16_t i = 0;
 
@@ -3374,6 +3375,7 @@ void AutMainWindow::on_btn_LogRefresh_clicked()
 void AutMainWindow::on_btn_Licenses_clicked()
 {
     //Show license text
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QFile license_file = QFile("://licenses");
     QString license_text;
 
@@ -3382,6 +3384,17 @@ void AutMainWindow::on_btn_Licenses_clicked()
     license_file.close();
     gpmErrorForm->SetMessage(&license_text);
     gpmErrorForm->show();
+#else
+    QFile *license_file = new QFile("://licenses");
+    QString license_text;
+
+    license_file->open(QFile::ReadOnly | QFile::Text);
+    license_text = license_file->readAll();
+    license_file->close();
+    delete license_file;
+    gpmErrorForm->SetMessage(&license_text);
+    gpmErrorForm->show();
+#endif
 
 #ifndef SKIPSERIALDETECT
     serial_close_dialog_open = false;
@@ -5399,7 +5412,11 @@ void AutMainWindow::on_check_reconnect_after_disconnect_toggled(bool checked)
 #endif
 
 #ifndef SKIPPLUGINS_TRANSPORT
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 bool AutMainWindow::transport_open(QIODeviceBase::OpenMode mode)
+#else
+bool AutMainWindow::transport_open(QIODevice::OpenMode mode)
+#endif
 {
     //TODO:
     if (ui->tab_transport->currentIndex() == 0)
@@ -5573,9 +5590,60 @@ QSerialPort::PinoutSignals AutMainWindow::transport_pinoutSignals()
 
 QString AutMainWindow::transport_error_to_error_string(int error)
 {
+    if (error == 0)
+    {
+        return "No error";
+    }
+
     if (plugin_active_transport == nullptr)
     {
-//        return gspSerialPort.er
+        switch (error)
+        {
+            case QSerialPort::DeviceNotFoundError:
+            {
+                return "Device not found";
+            }
+            case QSerialPort::PermissionError:
+            {
+                return "Permission denied";
+            }
+            case QSerialPort::OpenError:
+            {
+                return "Open failed";
+            }
+            case QSerialPort::WriteError:
+            {
+                return "Write failed";
+            }
+            case QSerialPort::ReadError:
+            {
+                return "Read failed";
+            }
+            case QSerialPort::ResourceError:
+            {
+                return "Resource error";
+            }
+            case QSerialPort::UnsupportedOperationError:
+            {
+                return "Unsupported operation";
+            }
+            case QSerialPort::UnknownError:
+            {
+                return "Unknown error";
+            }
+            case QSerialPort::TimeoutError:
+            {
+                return "Timeout";
+            }
+            case QSerialPort::NotOpenError:
+            {
+                return "Device not open";
+            }
+            default:
+            {
+                return "Other undefined error";
+            }
+        };
     }
 
     return plugin_active_transport->to_error_string(error);

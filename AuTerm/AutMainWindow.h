@@ -398,7 +398,11 @@ private:
     void update_buffer(QByteArray *data, bool apply_formatting);
     void update_display_trimming();
 #ifndef SKIPPLUGINS_TRANSPORT
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool transport_open(QIODeviceBase::OpenMode mode);
+#else
+    bool transport_open(QIODevice::OpenMode mode);
+#endif
     void transport_close();
     bool transport_isOpen() const;
     bool transport_isOpening() const;

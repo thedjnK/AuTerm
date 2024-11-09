@@ -57,7 +57,11 @@ bool plugin_echo_transport::plugin_configuration()
     return false;
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 bool plugin_echo_transport::open(QIODeviceBase::OpenMode mode)
+#else
+bool plugin_echo_transport::open(QIODevice::OpenMode mode)
+#endif
 {
     device_connected = true;
     return true;

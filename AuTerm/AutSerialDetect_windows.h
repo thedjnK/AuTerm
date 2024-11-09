@@ -46,7 +46,11 @@ public:
     ~AutSerialDetect();
     void start(QString port);
     void stop();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     virtual bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) Q_DECL_OVERRIDE;
+#else
+    virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE;
+#endif
 
 private:
     HDEVNOTIFY access;

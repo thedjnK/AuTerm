@@ -174,7 +174,17 @@ void udp_setup::load_settings()
 
                 if (this->saved_history.count() > max_history)
                 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
                     this->saved_history.remove(0, (this->saved_history.count() - max_history));
+#else
+                    uint8_t l = this->saved_history.count() - max_history;
+
+                    while (l > 0)
+                    {
+                        this->saved_history.removeAt(0);
+                        --l;
+                    }
+#endif
                 }
 
                 while (i < this->saved_history.length())
@@ -187,7 +197,7 @@ void udp_setup::load_settings()
                     }
                     else
                     {
-                        this->saved_history.remove(i);
+                        this->saved_history.removeAt(i);
                         --i;
                     }
 
@@ -249,7 +259,7 @@ void udp_setup::add_to_history()
             if (this->saved_history.at((items - 1)) != data)
             {
                 ui->combo_history->removeItem(items);
-                this->saved_history.remove((items - 1));
+                this->saved_history.removeAt((items - 1));
                 break;
             }
             else
@@ -268,10 +278,15 @@ void udp_setup::add_to_history()
 
     if (items > max_history)
     {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         this->saved_history.remove(0, (items - max_history));
+#endif
 
         while (items > max_history)
         {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            this->saved_history.removeAt(0);
+#endif
             ui->combo_history->removeItem(1);
             --items;
         }

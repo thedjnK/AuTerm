@@ -3488,7 +3488,11 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
             else if (user_data == ACTION_OS_BOOTLOADER_INFO)
             {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
                 switch (bootloader_info_response.typeId())
+#else
+                switch (bootloader_info_response.type())
+#endif
                 {
                     case QMetaType::Bool:
                     {

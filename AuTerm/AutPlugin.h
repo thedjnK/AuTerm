@@ -85,7 +85,11 @@ public:
     };
 
     virtual void transport_setup(QWidget *tab) = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     virtual bool open(QIODeviceBase::OpenMode mode) = 0;
+#else
+    virtual bool open(QIODevice::OpenMode mode) = 0;
+#endif
     virtual void close() = 0;
     virtual bool isOpen() const = 0;
     virtual bool isOpening() const = 0;

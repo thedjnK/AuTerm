@@ -46,6 +46,7 @@
 // Enum typedefs
 /******************************************************************************/
 enum NUS_TRANSPORT_ERRORS {
+    NUS_TRANSPORT_ERROR_NONE,
     NUS_TRANSPORT_ERROR_MISSING_NUS_SERVICE,
     NUS_TRANSPORT_ERROR_MISSING_TX_CHARACTERISTIC,
     NUS_TRANSPORT_ERROR_MISSING_RX_CHARACTERISTIC,
@@ -92,7 +93,11 @@ public:
     static QMainWindow *get_main_window();
     void setup_finished();
     PluginType plugin_type();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool open(QIODeviceBase::OpenMode mode) override;
+#else
+    bool open(QIODevice::OpenMode mode) override;
+#endif
     void close();
     bool isOpen() const;
     bool isOpening() const;

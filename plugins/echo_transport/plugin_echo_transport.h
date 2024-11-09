@@ -45,7 +45,11 @@ public:
     bool plugin_configuration();
     PluginType plugin_type();
     QObject *plugin_object();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool open(QIODeviceBase::OpenMode mode) override;
+#else
+    bool open(QIODevice::OpenMode mode) override;
+#endif
     void close();
     bool isOpen() const;
     QSerialPort::DataBits dataBits() const;

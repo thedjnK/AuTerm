@@ -769,7 +769,11 @@ bool plugin_nus_transport::plugin_configuration()
     return false;
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 bool plugin_nus_transport::open(QIODeviceBase::OpenMode mode)
+#else
+bool plugin_nus_transport::open(QIODevice::OpenMode mode)
+#endif
 {
     Q_UNUSED(mode);
 
