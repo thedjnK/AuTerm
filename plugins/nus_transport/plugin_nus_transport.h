@@ -43,6 +43,36 @@
 #include "nus_bluetooth_setup.h"
 
 /******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
+enum NUS_TRANSPORT_ERRORS {
+    NUS_TRANSPORT_ERROR_MISSING_NUS_SERVICE,
+    NUS_TRANSPORT_ERROR_MISSING_TX_CHARACTERISTIC,
+    NUS_TRANSPORT_ERROR_MISSING_RX_CHARACTERISTIC,
+    NUS_TRANSPORT_ERROR_MISSING_RX_DESCRIPTOR,
+    NUS_TRANSPORT_ERROR_MINIMAL_MTU_WRITE_FAILED,
+    NUS_TRANSPORT_ERROR_UNEXPECTED_DISCONNECT,
+    NUS_TRANSPORT_ERROR_CONTROLLER_UNKNOWN,
+    NUS_TRANSPORT_ERROR_CONTROLLER_UNKNOWN_REMOTE_DEVICE,
+    NUS_TRANSPORT_ERROR_CONTROLLER_NETWORK,
+    NUS_TRANSPORT_ERROR_CONTROLLER_INVALID_BLUETOOTH_ADAPTER,
+    NUS_TRANSPORT_ERROR_CONTROLLER_CONNECTION,
+    NUS_TRANSPORT_ERROR_CONTROLLER_ADVERTISING,
+    NUS_TRANSPORT_ERROR_CONTROLLER_REMOTE_HOST_CLOSED,
+    NUS_TRANSPORT_ERROR_CONTROLLER_AUTHORISATION,
+    NUS_TRANSPORT_ERROR_CONTROLLER_NOT_DEFINED,
+    NUS_TRANSPORT_ERROR_SERVICE_CHARACTERISTIC_READ,
+    NUS_TRANSPORT_ERROR_SERVICE_CHARACTERISTIC_WRITE,
+    NUS_TRANSPORT_ERROR_SERVICE_DESCRIPTOR_READ,
+    NUS_TRANSPORT_ERROR_SERVICE_DESCRIPTOR_WRITE,
+    NUS_TRANSPORT_ERROR_SERVICE_OPERATION,
+    NUS_TRANSPORT_ERROR_SERVICE_UNKNOWN,
+    NUS_TRANSPORT_ERROR_SERVICE_NOT_DEFINED,
+
+    NUS_TRANSPORT_ERROR_COUNT
+};
+
+/******************************************************************************/
 // Class definitions
 /******************************************************************************/
 class plugin_nus_transport : public QObject, public AutTransportPlugin
@@ -122,7 +152,6 @@ private:
 
     QMainWindow *parent_window;
     QBluetoothDeviceDiscoveryAgent *discoveryAgent = nullptr;
-//    DeviceInfo currentDevice;
     QLowEnergyController *controller = nullptr;
     bool device_connected;
     QByteArray received_data;
@@ -138,13 +167,13 @@ private:
     nus_bluetooth_setup *bluetooth_window;
     bool disconnecting_from_device;
     bool ready_to_send;
+    bool bluetooth_write_with_response;
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
     QTimer discover_timer;
 #endif
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;
 #endif
-    bool bluetooth_write_with_response;
 };
 
 #endif // PLUGIN_NUS_TRANSPORT_H

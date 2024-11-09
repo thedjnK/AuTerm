@@ -53,7 +53,7 @@ void plugin_nus_transport::setup(QMainWindow *main_window)
 {
     parent_window = main_window;
 
-    //Hardcoded until clarification from qt on multiple bugs that have been raised
+//TODO: Hardcoded until clarification from qt on multiple bugs that have been raised
     //bluetooth_write_with_response = false; //Write without response
     bluetooth_write_with_response = true; //Write with response
 }
@@ -63,6 +63,7 @@ void plugin_nus_transport::transport_setup(QWidget *tab)
     QVBoxLayout *tmp_widget = new QVBoxLayout(nullptr);
     QGroupBox *window_main_widget;
     QVBoxLayout *vertical_layout = new QVBoxLayout(tab);
+
     vertical_layout->setSpacing(0);
     vertical_layout->setObjectName("verticalLayout_2");
     vertical_layout->setContentsMargins(2, 2, 2, 2);
@@ -227,34 +228,11 @@ void plugin_nus_transport::disconnected()
         bluetooth_service_nus = nullptr;
     }
 
-#if 0
-    if (controller != nullptr)
-    {
-        QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
-        QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
-        QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
-        QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
-        QObject::disconnect(controller, SIGNAL(connectionUpdated(QLowEnergyConnectionParameters)), this, SLOT(connection_updated(QLowEnergyConnectionParameters)));
-#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
-        QObject::disconnect(controller, SIGNAL(errorOccurred(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
-        QObject::disconnect(controller, SIGNAL(mtuChanged(int)), this, SLOT(mtu_updated(int)));
-#else
-        QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
-#endif
-        QObject::disconnect(controller, SIGNAL(stateChanged(QLowEnergyController::ControllerState)), this, SLOT(stateChanged(QLowEnergyController::ControllerState)));
-
-        delete controller;
-        controller = nullptr;
-
-        //controller->deleteLater();
-    }
-#endif
-
     bluetooth_window->connection_state(false);
 
     if (disconnecting_from_device == false)
     {
-        emit transport_error(0);
+        emit transport_error(NUS_TRANSPORT_ERROR_UNEXPECTED_DISCONNECT);
     }
     else
     {
@@ -283,8 +261,9 @@ void plugin_nus_transport::discovery_finished()
 
     if (!bluetooth_service_nus)
     {
-        bluetooth_window->set_status_text("Error: NUS service not found");
+        bluetooth_window->set_status_text(to_error_string(NUS_TRANSPORT_ERROR_MISSING_NUS_SERVICE));
         controller->disconnectFromDevice();
+        emit transport_error(NUS_TRANSPORT_ERROR_MISSING_NUS_SERVICE);
     }
     else
     {
@@ -367,8 +346,6 @@ void plugin_nus_transport::nus_service_descriptor_written(const QLowEnergyDescri
     {
         ready_to_send = true;
 
-//        form_min_params();
-
         if (send_buffer.length() > 0)
         {
 
@@ -385,6 +362,8 @@ void plugin_nus_transport::nus_service_descriptor_written(const QLowEnergyDescri
 void plugin_nus_transport::nus_service_state_changed(QLowEnergyService::ServiceState nNewState)
 {
     bool disconnect_from_device = false;
+    int error_code = 0;
+
     log_debug() << "Bluetooth service state changed: " << nNewState;
 
     //Service state changed
@@ -403,14 +382,16 @@ void plugin_nus_transport::nus_service_state_changed(QLowEnergyService::ServiceS
 
             if (!bluetooth_characteristic_transmit.isValid())
             {
-                //Missing Tx characteristic
+                //Missing TX characteristic
                 disconnect_from_device = true;
+                error_code = NUS_TRANSPORT_ERROR_MISSING_TX_CHARACTERISTIC;
                 log_error() << "Bluetooth transmit characteristic not valid";
             }
             else if (!bluetooth_characteristic_receive.isValid())
             {
-                //Missing Tx characteristic
+                //Missing RX characteristic
                 disconnect_from_device = true;
+                error_code = NUS_TRANSPORT_ERROR_MISSING_RX_CHARACTERISTIC;
                 log_error() << "Bluetooth recieve characteristic not valid";
             }
             else
@@ -420,8 +401,9 @@ void plugin_nus_transport::nus_service_state_changed(QLowEnergyService::ServiceS
 
                 if (!bluetooth_descriptor_receive_cccd.isValid())
                 {
-                    //Tx descriptor missing
+                    //RX descriptor missing
                     disconnect_from_device = true;
+                    error_code = NUS_TRANSPORT_ERROR_MISSING_RX_DESCRIPTOR;
                     log_error() << "Bluetooth recieve descriptor not valid";
                 }
                 else
@@ -436,13 +418,14 @@ void plugin_nus_transport::nus_service_state_changed(QLowEnergyService::ServiceS
     if (disconnect_from_device == true)
     {
         controller->disconnectFromDevice();
+        emit transport_error(error_code);
     }
 }
 
 void plugin_nus_transport::errorz(QLowEnergyController::Error error)
 {
     bool disconnect_from_device = false;
-    QString err;
+    int error_code = 0;
 
     switch (error)
     {
@@ -453,57 +436,58 @@ void plugin_nus_transport::errorz(QLowEnergyController::Error error)
         case QLowEnergyController::UnknownError:
         {
             disconnect_from_device = true;
-            err = "Unknown error";
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_UNKNOWN;
             break;
         }
         case QLowEnergyController::UnknownRemoteDeviceError:
         {
             disconnect_from_device = true;
-            err = "Unknown remote device";
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_UNKNOWN_REMOTE_DEVICE;
             break;
         }
         case QLowEnergyController::NetworkError:
         {
             disconnect_from_device = true;
-            err = "Network error";
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_NETWORK;
             break;
         }
         case QLowEnergyController::InvalidBluetoothAdapterError:
         {
             disconnect_from_device = true;
-            err = "Invalud bluetooth adapter";
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_INVALID_BLUETOOTH_ADAPTER;
             break;
         }
         case QLowEnergyController::ConnectionError:
         {
             disconnect_from_device = true;
-            err = "Connection error";
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_CONNECTION;
             break;
         }
         case QLowEnergyController::AdvertisingError:
         {
-            err = "Advertising error";
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_ADVERTISING;
             break;
         }
         case QLowEnergyController::RemoteHostClosedError:
         {
             disconnect_from_device = true;
-            err = "Remote host closed";
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_REMOTE_HOST_CLOSED;
             break;
         }
         case QLowEnergyController::AuthorizationError:
         {
-            err = "Authorisation error";
+            disconnect_from_device = true;
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_AUTHORISATION;
             break;
         }
         default:
         {
-            err = "Other";
+            error_code = NUS_TRANSPORT_ERROR_CONTROLLER_NOT_DEFINED;
             break;
         }
     };
-//    bluetooth_window->add_debug(QString::number(error));
-    bluetooth_window->set_status_text(err);
+
+    bluetooth_window->set_status_text(to_error_string(error_code));
 
     if (disconnect_from_device == true)
     {
@@ -517,7 +501,7 @@ void plugin_nus_transport::errorz(QLowEnergyController::Error error)
             disconnected();
         }
 
-        emit transport_error(error);
+        emit transport_error(error_code);
     }
 }
 
@@ -528,37 +512,87 @@ void plugin_nus_transport::connection_updated(QLowEnergyConnectionParameters par
 
 void plugin_nus_transport::stateChanged(QLowEnergyController::ControllerState state)
 {
-    log_debug() << "controller state: " << state;
+    log_debug() << "Bluetooth controller state: " << state;
 }
 
 void plugin_nus_transport::nus_service_error(QLowEnergyService::ServiceError error)
 {
-    if (error == QLowEnergyService::CharacteristicWriteError)
-    {
-        log_error() << "Bluetooth characteristic write failed with MTU " << mtu;
+    int error_code = 0;
 
-        if (mtu > 20)
+    switch (error)
+    {
+        case QLowEnergyService::NoError:
         {
-            if (mtu >= 100)
+            return;
+        }
+        case QLowEnergyService::CharacteristicWriteError:
+        {
+            log_error() << "Bluetooth characteristic write failed with MTU " << mtu;
+
+//TODO: refactor code when various qt bugs are replied to asking why mtu update and other functions do literally nothing on the only apparent supported OS linux
+            if (mtu > 20)
             {
-                mtu -= 32;
-            }
-            else if (mtu >= 40)
-            {
-                mtu = 20;
+                if (mtu >= 100)
+                {
+                    mtu -= 32;
+                }
+                else if (mtu >= 40)
+                {
+                    mtu = 20;
+                }
+                else
+                {
+                    mtu -= 16;
+                }
+
+                bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu), (bluetooth_write_with_response == false ? QLowEnergyService::WriteWithoutResponse : QLowEnergyService::WriteWithResponse));
+                return;
             }
             else
             {
-                mtu -= 16;
+                send_buffer.clear();
+                log_error() << "Unable to write Bluetooth characteristic with minimal MTU size, this connection is unusable";
+                error_code = NUS_TRANSPORT_ERROR_SERVICE_CHARACTERISTIC_WRITE;
+                break;
             }
-
-            bluetooth_service_nus->writeCharacteristic(bluetooth_characteristic_transmit, send_buffer.left(mtu), (bluetooth_write_with_response == false ? QLowEnergyService::WriteWithoutResponse : QLowEnergyService::WriteWithResponse));
         }
-        else
+        case QLowEnergyService::OperationError:
         {
-            send_buffer.clear();
-            log_error() << "Unable to write Bluetooth characteristic with minimal MTU size, this connection is unusable";
+            error_code = NUS_TRANSPORT_ERROR_SERVICE_OPERATION;
+            break;
         }
+        case QLowEnergyService::DescriptorWriteError:
+        {
+            error_code = NUS_TRANSPORT_ERROR_SERVICE_DESCRIPTOR_WRITE;
+            break;
+        }
+        case QLowEnergyService::UnknownError:
+        {
+            error_code = NUS_TRANSPORT_ERROR_SERVICE_UNKNOWN;
+            break;
+        }
+        case QLowEnergyService::CharacteristicReadError:
+        {
+            error_code = NUS_TRANSPORT_ERROR_SERVICE_CHARACTERISTIC_READ;
+            break;
+        }
+        case QLowEnergyService::DescriptorReadError:
+        {
+            error_code = NUS_TRANSPORT_ERROR_SERVICE_DESCRIPTOR_READ;
+            break;
+        }
+        default:
+        {
+            error_code = NUS_TRANSPORT_ERROR_SERVICE_NOT_DEFINED;
+            break;
+        }
+    };
+
+    if (error_code != 0)
+    {
+        bluetooth_window->set_status_text(to_error_string(NUS_TRANSPORT_ERROR_MISSING_NUS_SERVICE));
+        controller->disconnectFromDevice();
+        emit transport_error(error_code);
     }
 }
 
@@ -593,7 +627,6 @@ void plugin_nus_transport::form_connect_to_device(uint16_t index, uint8_t addres
         discoveryAgent->stop();
     }
 
-#if 1
     if (controller)
     {
         QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
@@ -611,9 +644,7 @@ void plugin_nus_transport::form_connect_to_device(uint16_t index, uint8_t addres
         delete controller;
         controller = nullptr;
     }
-#endif
 
-    // Connecting signals and slots for connecting to LE services.
     controller = QLowEnergyController::createCentral(bluetooth_device_list.at(index));
     QObject::connect(controller, SIGNAL(connected()), this, SLOT(connected()));
     QObject::connect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -730,7 +761,7 @@ QWidget *plugin_nus_transport::GetWidget()
 
 const QString plugin_nus_transport::plugin_about()
 {
-    return "AuTerm NUS transport plugin\r\nCopyright 2024 Jamie M.\r\n\r\nCan be used to communicate with Nordic UART Service devices over Bluetooth.\r\n\r\nUNFINISHED INITIAL TEST USE ONLY, NOT REPRESENTATIVE OF FINAL PRODUCT.\r\n\r\nBuilt using Qt " QT_VERSION_STR;
+    return "AuTerm NUS transport plugin\r\nCopyright 2024 Jamie M.\r\n\r\nCan be used to communicate with Nordic UART Service devices over Bluetooth.\r\n\r\nBuilt using Qt " QT_VERSION_STR;
 }
 
 bool plugin_nus_transport::plugin_configuration()
@@ -740,6 +771,8 @@ bool plugin_nus_transport::plugin_configuration()
 
 bool plugin_nus_transport::open(QIODeviceBase::OpenMode mode)
 {
+    Q_UNUSED(mode);
+
     if (device_connected == true)
     {
         controller->disconnectFromDevice();
@@ -791,7 +824,7 @@ qint64 plugin_nus_transport::write(const QByteArray &data)
 
     if (device_connected == false)
     {
-        log_error() << "not connected";
+        log_error() << "Cannot write, not connected to Bluetooth device";
         return 0;
     }
 
@@ -863,7 +896,73 @@ QSerialPort::PinoutSignals plugin_nus_transport::pinoutSignals()
 
 QString plugin_nus_transport::to_error_string(int error)
 {
-return 0;
+    switch (error)
+    {
+        case NUS_TRANSPORT_ERROR_MISSING_NUS_SERVICE:
+        {
+            return "Missing NUS service";
+        }
+        case NUS_TRANSPORT_ERROR_MISSING_TX_CHARACTERISTIC:
+        {
+            return "Missing TX characteristic";
+        }
+        case NUS_TRANSPORT_ERROR_MISSING_RX_CHARACTERISTIC:
+        {
+            return "Missing RX characteristic";
+        }
+        case NUS_TRANSPORT_ERROR_MISSING_RX_DESCRIPTOR:
+        {
+            return "Missing RX descriptor";
+        }
+        case NUS_TRANSPORT_ERROR_MINIMAL_MTU_WRITE_FAILED:
+        {
+            return "Minimal MTU write failed, connection is unusable";
+        }
+        case NUS_TRANSPORT_ERROR_UNEXPECTED_DISCONNECT:
+        {
+            return "Unexpected disconection";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_UNKNOWN:
+        {
+            return "Unknown controller error";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_UNKNOWN_REMOTE_DEVICE:
+        {
+            return "Unknown remote device controller error";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_NETWORK:
+        {
+            return "Network error";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_INVALID_BLUETOOTH_ADAPTER:
+        {
+            return "Invalud Bluetooth adapter";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_CONNECTION:
+        {
+            return "Connection error";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_ADVERTISING:
+        {
+            return "Advertising error";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_REMOTE_HOST_CLOSED:
+        {
+            return "Remote host closed";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_AUTHORISATION:
+        {
+            return "Authorisation error";
+        }
+        case NUS_TRANSPORT_ERROR_CONTROLLER_NOT_DEFINED:
+        {
+            return "Other undefined error";
+        }
+        default:
+        {
+            return "Invalid NUS error code";
+        }
+    };
 }
 
 QString plugin_nus_transport::transport_name() const

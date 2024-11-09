@@ -1,6 +1,6 @@
 {
     "Name": "nus_transport",
-    "Version": "0.0.1",
+    "Version": "0.8.0",
     "Type": "transport",
     "keys": [ ]
 }
