@@ -42,7 +42,7 @@ nus_bluetooth_setup::nus_bluetooth_setup(QWidget *parent) :
     delete ui->radio_address_type_random;
     delete ui->radio_address_type_default;
     delete ui->label_2;
-    delete ui->horizontalLayout;
+    delete ui->formLayout_2;
 #endif
 }
 
