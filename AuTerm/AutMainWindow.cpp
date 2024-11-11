@@ -2312,8 +2312,15 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 
     if (port_opened == true)
     {
+        if (plugin_active_transport == nullptr)
+        {
+            ui->statusBar->showMessage(QString("[").append(ui->combo_COM->currentText()).append(":").append(ui->combo_Baud->currentText()).append(",").append((ui->combo_Parity->currentIndex() == 0 ? "N" : ui->combo_Parity->currentIndex() == 1 ? "O" : ui->combo_Parity->currentIndex() == 2 ? "E" : "")).append(",").append(ui->combo_Data->currentText()).append(",").append(ui->combo_Stop->currentText()).append(",").append((ui->combo_Handshake->currentIndex() == 0 ? "N" : ui->combo_Handshake->currentIndex() == 1 ? "H" : ui->combo_Handshake->currentIndex() == 2 ? "S" : "")).append("]{").append((ui->radio_LCR->isChecked() ? "\\r" : (ui->radio_LLF->isChecked() ? "\\n" : (ui->radio_LCRLF->isChecked() ? "\\r\\n" : "")))).append("}"));
+        }
+        else
+        {
+            ui->statusBar->showMessage(QString("[") % plugin_active_transport->transport_name() % ":" % plugin_active_transport->connection_display_name() % "]{" % (ui->radio_LCR->isChecked() ? "\\r" : (ui->radio_LLF->isChecked() ? "\\n" : (ui->radio_LCRLF->isChecked() ? "\\r\\n" : ""))) % "}");
+        }
 
-        ui->statusBar->showMessage(QString("[") % plugin_active_transport->transport_name() % ":" % plugin_active_transport->connection_display_name() % "]{" % (ui->radio_LCR->isChecked() ? "\\r" : (ui->radio_LLF->isChecked() ? "\\n" : (ui->radio_LCRLF->isChecked() ? "\\r\\n" : ""))) % "}");
         ui->label_TermConn->setText(ui->statusBar->currentMessage());
 #ifndef SKIPSPEEDTEST
         ui->label_SpeedConn->setText(ui->statusBar->currentMessage());
@@ -2345,26 +2352,34 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 #endif
         }
 
-#if 0
         //Flow control
-        if (ui->combo_Handshake->currentIndex() == 1)
+        if (plugin_active_transport == nullptr)
         {
-            //Hardware handshaking
+            if (ui->combo_Handshake->currentIndex() == 1)
+            {
+                //Hardware handshaking
+                ui->check_RTS->setEnabled(false);
+#ifndef SKIPSPEEDTEST
+                ui->check_SpeedRTS->setEnabled(false);
+#endif
+            }
+            else
+            {
+                //Not hardware handshaking - RTS
+                ui->check_RTS->setEnabled(true);
+#ifndef SKIPSPEEDTEST
+                ui->check_SpeedRTS->setEnabled(true);
+#endif
+                gspSerialPort.setRequestToSend(ui->check_RTS->isChecked());
+            }
+        }
+        else
+        {
             ui->check_RTS->setEnabled(false);
 #ifndef SKIPSPEEDTEST
             ui->check_SpeedRTS->setEnabled(false);
 #endif
         }
-        else
-        {
-            //Not hardware handshaking - RTS
-            ui->check_RTS->setEnabled(true);
-#ifndef SKIPSPEEDTEST
-            ui->check_SpeedRTS->setEnabled(true);
-#endif
-            gspSerialPort.setRequestToSend(ui->check_RTS->isChecked());
-        }
-#endif
 
         //Break
         if (transport_supports_break() == true)
@@ -2454,7 +2469,14 @@ void AutMainWindow::OpenDevice(bool from_plugin)
                 gpMainLog->WriteLogData(tr("-").repeated(31));
                 gpMainLog->WriteLogData(tr("\n Log opened ").append(QDate::currentDate().toString("dd/MM/yyyy")).append(" @ ").append(QTime::currentTime().toString("hh:mm")).append(" \n"));
                 gpMainLog->WriteLogData(tr(" AuTerm ").append(UwVersion).append(" \n"));
-                gpMainLog->WriteLogData(QString(" Transport: ") % plugin_active_transport->transport_name() % ", device: " % plugin_active_transport->connection_display_name() % "\n");
+                if (plugin_active_transport == nullptr)
+                {
+                    gpMainLog->WriteLogData(QString(" Port: ").append(ui->combo_COM->currentText()).append("\n"));
+                }
+                else
+                {
+                    gpMainLog->WriteLogData(QString(" Transport: ") % plugin_active_transport->transport_name() % ", device: " % plugin_active_transport->connection_display_name() % "\n");
+                }
                 gpMainLog->WriteLogData(tr("-").repeated(31).append("\n\n"));
                 gbMainLogEnabled = true;
             }
