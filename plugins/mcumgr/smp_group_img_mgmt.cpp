@@ -45,7 +45,11 @@ enum img_mgmt_commands : uint8_t {
 static const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
 static const QByteArray image_tlv_magic_reverse_endian = QByteArrayLiteral("\x69\x07");
 static const uint16_t image_tlv_tag_sha256 = 0x10;
+static const uint16_t image_tlv_tag_sha384 = 0x11;
+static const uint16_t image_tlv_tag_sha512 = 0x12;
 static const uint8_t sha256_size = 32;
+static const uint8_t sha384_size = 48;
+static const uint8_t sha512_size = 64;
 static const uint8_t image_tlv_magic_size = 2;
 static const uint8_t image_tlv_legnth_offset_1 = 2;
 static const uint8_t image_tlv_legnth_offset_2 = 3;
@@ -57,6 +61,7 @@ static const uint8_t ih_magic_none[] = { 0xff, 0xff, 0xff, 0xff };
 static const uint8_t ih_magic_v1[] = { 0x96, 0xf3, 0xb8, 0x3c };
 static const uint8_t ih_magic_v2[] = { 0x96, 0xf3, 0xb8, 0x3d };
 static const uint8_t ih_hdr_size_offs = 8;
+static const uint8_t ih_protected_tlv_size_offs = 10;
 static const uint8_t ih_img_size_offs = 12;
 
 static QStringList smp_error_defines = QStringList() <<
@@ -184,6 +189,7 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
     bool hash_found = false;
 
     uint16_t hdr_size;
+    uint16_t protected_tlv_size;
     uint32_t img_size;
 
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
@@ -195,6 +201,9 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
         hdr_size = (uint8_t)file_data->at(ih_hdr_size_offs);
         hdr_size |= (uint16_t)((uint8_t)file_data->at(ih_hdr_size_offs + 1)) << 8;
 
+        protected_tlv_size = (uint8_t)file_data->at(ih_protected_tlv_size_offs);
+        protected_tlv_size |= (uint16_t)((uint8_t)file_data->at(ih_protected_tlv_size_offs + 1)) << 8;
+
         img_size = (uint8_t)file_data->at(ih_img_size_offs);
         img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 1)) << 8;
         img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 2)) << 16;
@@ -204,6 +213,9 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
     {
         hdr_size = (uint8_t)file_data->at(ih_hdr_size_offs + 1);
         hdr_size |= (uint16_t)((uint8_t)file_data->at(ih_hdr_size_offs)) << 8;
+
+        protected_tlv_size = (uint8_t)file_data->at(ih_protected_tlv_size_offs + 1);
+        protected_tlv_size |= (uint16_t)((uint8_t)file_data->at(ih_protected_tlv_size_offs)) << 8;
 
         img_size = (uint8_t)file_data->at(ih_img_size_offs + 3);
         img_size |= (uint32_t)((uint8_t)file_data->at(ih_img_size_offs + 2)) << 8;
@@ -217,10 +229,10 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
         return false;
     }
 
-    int32_t pos = hdr_size + img_size;
+    int32_t pos = hdr_size + protected_tlv_size + img_size;
     uint16_t tlv_area_length;
 
-    while (pos + image_tlv_magic_size < file_data->length())
+    while ((pos + image_tlv_magic_size) < file_data->length())
     {
         if ((upload_endian != ENDIAN_BIG && file_data->mid(pos, image_tlv_magic_size) == image_tlv_magic) || (upload_endian == ENDIAN_BIG && file_data->mid(pos, image_tlv_magic_size) == image_tlv_magic_reverse_endian))
         {
@@ -274,8 +286,10 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
 
             //		    qDebug() << "Type " << type << ", length " << local_length;
 
-            if (type == image_tlv_tag_sha256)
+            if (type == image_tlv_tag_sha256 || type == image_tlv_tag_sha384 || type == image_tlv_tag_sha512)
             {
+                uint8_t hash_size = (type == image_tlv_tag_sha256 ? sha512_size : (type == image_tlv_tag_sha384 ? sha384_size : sha512_size));
+
                 if (hash_found == true)
                 {
                     //Duplicate hash has been found
@@ -283,7 +297,7 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
                     return false;
                 }
 
-                if (local_length == sha256_size)
+                if (local_length == hash_size)
                 {
                     //We have the hash we wanted
                     *hash = file_data->mid((new_pos + 4), local_length);
