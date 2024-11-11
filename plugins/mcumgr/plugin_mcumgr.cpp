@@ -2244,6 +2244,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     table_Enum_List_Details->setColumnWidth(1, 300);
     table_Enum_List_Details->setColumnWidth(2, 80);
 
+    //Sort slot info table in ascending (natural) order
+    tree_IMG_Slot_Info->sortByColumn(0, Qt::AscendingOrder);
+
     //Remove non-supported transports
 #if !defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     radio_transport_udp->deleteLater();
