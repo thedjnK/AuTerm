@@ -87,7 +87,7 @@ bool plugin_logger::plugin_configuration()
     return true;
 }
 
-QWidget *plugin_logger::GetWidget()
+QWidget *plugin_logger::plugin_widget()
 {
     return this;
 }

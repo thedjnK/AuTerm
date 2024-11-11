@@ -85,7 +85,6 @@ class plugin_nus_transport : public QObject, public AutTransportPlugin
 public:
     plugin_nus_transport();
     ~plugin_nus_transport();
-    QWidget *GetWidget();
     void setup(QMainWindow *main_window);
     void transport_setup(QWidget *tab);
     const QString plugin_about();

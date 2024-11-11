@@ -2426,11 +2426,6 @@ bool plugin_mcumgr::plugin_configuration()
     return false;
 }
 
-QWidget *plugin_mcumgr::GetWidget()
-{
-    return 0;
-}
-
 void plugin_mcumgr::serial_error(QSerialPort::SerialPortError serial_error)
 {
     log_error() << "Serial error: " << serial_error;

@@ -756,11 +756,6 @@ void plugin_nus_transport::mtu_updated(int mtu)
 }
 #endif
 
-QWidget *plugin_nus_transport::GetWidget()
-{
-    return nullptr;
-}
-
 const QString plugin_nus_transport::plugin_about()
 {
     return "AuTerm NUS transport plugin\r\nCopyright 2024 Jamie M.\r\n\r\nCan be used to communicate with Nordic UART Service devices over Bluetooth.\r\n\r\nBuilt using Qt " QT_VERSION_STR;

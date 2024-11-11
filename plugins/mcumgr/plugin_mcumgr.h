@@ -153,7 +153,6 @@ class plugin_mcumgr : public QObject, AutPlugin
 
 public:
     ~plugin_mcumgr();
-    QWidget *GetWidget();
     void setup(QMainWindow *main_window);
     const QString plugin_about();
     bool plugin_configuration();

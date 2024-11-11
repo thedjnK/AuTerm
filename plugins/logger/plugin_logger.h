@@ -61,7 +61,7 @@ class plugin_logger : public QWidget, AutPlugin
 public:
     explicit plugin_logger(QWidget *parent = nullptr);
     ~plugin_logger();
-    QWidget *GetWidget();
+    QWidget *plugin_widget();
     void setup(QMainWindow *main_window);
     const QString plugin_about();
     bool plugin_configuration();
