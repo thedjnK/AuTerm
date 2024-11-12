@@ -288,7 +288,7 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
 
             if (type == image_tlv_tag_sha256 || type == image_tlv_tag_sha384 || type == image_tlv_tag_sha512)
             {
-                uint8_t hash_size = (type == image_tlv_tag_sha256 ? sha512_size : (type == image_tlv_tag_sha384 ? sha384_size : sha512_size));
+                uint8_t hash_size = (type == image_tlv_tag_sha256 ? sha256_size : (type == image_tlv_tag_sha384 ? sha384_size : sha512_size));
 
                 if (hash_found == true)
                 {
