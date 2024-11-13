@@ -646,27 +646,14 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
                 else
                 {
                     //Upload complete
-                    mode = MODE_IDLE;
-                    local_file.close();
-                    local_file_size = 0;
-                    file_upload_area = 0;
-                    //todo:
-                    upload_tmr.invalidate();
-                    device_file_name.clear();
-
+                    cleanup();
                     emit progress(smp_user_data, 100);
                     emit status(smp_user_data, STATUS_COMPLETE, "Upload complete");
                 }
             }
             else
             {
-                mode = MODE_IDLE;
-                local_file.close();
-                local_file_size = 0;
-                file_upload_area = 0;
-                upload_tmr.invalidate();
-                device_file_name.clear();
-
+                cleanup();
                 emit status(smp_user_data, STATUS_ERROR, "Missing off parameter");
             }
         }
@@ -700,20 +687,12 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             {
                 //Download next chunk
                 download_chunk();
-
                 emit progress(smp_user_data, file_upload_area * 100 / local_file_size);
             }
             else
             {
                 //Download complete
-                mode = MODE_IDLE;
-                local_file.close();
-                local_file_size = 0;
-                file_upload_area = 0;
-                //todo:
-                upload_tmr.invalidate();
-                device_file_name.clear();
-
+                cleanup();
                 emit progress(smp_user_data, 100);
                 emit status(smp_user_data, STATUS_COMPLETE, "Download complete");
             }
@@ -722,44 +701,43 @@ void smp_group_fs_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         {
             QCborStreamReader cbor_reader(data);
             bool good = parse_status_response(cbor_reader, file_size_object);
-            mode = MODE_IDLE;
 
             log_debug() << "status done";
             log_debug() << "Len: " << *file_size_object;
 
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (mode == MODE_HASH_CHECKSUM && command == COMMAND_HASH_CHECKSUM)
         {
             QString type;
-
             QCborStreamReader cbor_reader(data);
-            bool good = parse_hash_checksum_response(cbor_reader, &type, hash_checksum_result_object, file_size_object);
-            mode = MODE_IDLE;
 
+            bool good = parse_hash_checksum_response(cbor_reader, &type, hash_checksum_result_object, file_size_object);
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, type);
         }
         else if (mode == MODE_SUPPORTED_HASHES_CHECKSUMS && command == COMMAND_SUPPORTED_HASHES_CHECKSUMS)
         {
             hash_checksum_t temp_item;
-
             QCborStreamReader cbor_reader(data);
             hash_checksum_object->clear();
             bool good = parse_supported_hashes_checksums_response(cbor_reader, false, nullptr, &temp_item);
-            mode = MODE_IDLE;
 
+            cleanup();
             log_debug() << "supported hash/checksum done";
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (mode == MODE_FILE_CLOSE && command == COMMAND_FILE_CLOSE)
         {
-            mode = MODE_IDLE;
             log_debug() << "file close done";
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else
         {
             log_error() << "Unsupported command received";
+            cleanup();
         }
     }
 }
@@ -771,7 +749,7 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
     Q_UNUSED(group);
     Q_UNUSED(error);
 
-    bool cleanup = true;
+    bool run_cleanup = true;
     log_error() << "error :(";
 
     if (command == COMMAND_UPLOAD_DOWNLOAD && mode == MODE_UPLOAD)
@@ -816,35 +794,27 @@ void smp_group_fs_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         emit status(smp_user_data, STATUS_ERROR, QString("Unexpected error (Mode: %1, op: %2)").arg(mode_to_string(mode), command_to_string(command)));
     }
 
-    if (cleanup == true)
+    if (run_cleanup == true)
     {
-        mode = MODE_IDLE;
+        cleanup();
     }
-}
-
-void smp_group_fs_mgmt::timeout(smp_message *message)
-{
-    log_error() << "timeout :(";
-
-    //TODO:
-    emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));
-
-    mode = MODE_IDLE;
 }
 
 void smp_group_fs_mgmt::cancel()
 {
     if (mode != MODE_IDLE)
     {
-        mode = MODE_IDLE;
-
+        cleanup();
         emit status(smp_user_data, STATUS_CANCELLED, nullptr);
     }
 }
 
-void smp_group_fs_mgmt::upload_chunk()
+bool smp_group_fs_mgmt::upload_chunk()
 {
+    uint max_size = processor->max_message_data_size(smp_mtu);
+    uint remaining_file_size;
     smp_message *tmp_message = new smp_message();
+
     tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_FS, COMMAND_UPLOAD_DOWNLOAD, (file_upload_area == 0 ? 4 : 3));
 
     if (local_file.pos() != file_upload_area)
@@ -864,16 +834,28 @@ void smp_group_fs_mgmt::upload_chunk()
     tmp_message->writer()->append("off");
     tmp_message->writer()->append(file_upload_area);
     tmp_message->writer()->append("data");
-    tmp_message->writer()->append(local_file.read(64));
+
+    //CBOR element header is 2 bytes with 1 byte end token
+    max_size = max_size - tmp_message->size() - 3;
+    remaining_file_size = local_file_size - local_file.pos();
+    if (max_size > remaining_file_size)
+    {
+        max_size = remaining_file_size;
+    }
+    tmp_message->writer()->append(local_file.read(max_size));
     tmp_message->end_message();
 
-    //TODO: Not always true
-    file_upload_area += 64;
+    file_upload_area += max_size;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
+
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
-void smp_group_fs_mgmt::download_chunk()
+bool smp_group_fs_mgmt::download_chunk()
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_FS, COMMAND_UPLOAD_DOWNLOAD, 2);
@@ -890,7 +872,12 @@ void smp_group_fs_mgmt::download_chunk()
     tmp_message->writer()->append(file_upload_area);
     tmp_message->end_message();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
+
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_fs_mgmt::start_upload(QString file_name, QString destination_name)
@@ -911,9 +898,7 @@ bool smp_group_fs_mgmt::start_upload(QString file_name, QString destination_name
 
     //	    qDebug() << "len: " << message.length();
 
-    upload_chunk();
-
-    return true;
+    return upload_chunk();
 }
 
 bool smp_group_fs_mgmt::start_download(QString file_name, QString destination_name)
@@ -933,9 +918,7 @@ bool smp_group_fs_mgmt::start_download(QString file_name, QString destination_na
 
     //	    qDebug() << "len: " << message.length();
 
-    download_chunk();
-
-    return true;
+    return download_chunk();
 }
 
 //TODO
@@ -947,13 +930,23 @@ bool smp_group_fs_mgmt::start_status(QString file_name, uint32_t *file_size)
     tmp_message->writer()->append(file_name);
     tmp_message->end_message();
 
+    if (tmp_message->contents().length() > processor->max_message_data_size(smp_mtu))
+    {
+        delete tmp_message;
+        emit status(smp_user_data, STATUS_ERROR, QString("Message is too large to send: %1 vs %2 maximum").arg(QString::number(tmp_message->contents().length()), QString::number(processor->max_message_data_size(smp_mtu))));
+        return false;
+    }
+
     mode = MODE_STATUS;
     file_size_object = file_size;
     *file_size = 0;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_checksum, QByteArray *result, uint32_t *file_size)
@@ -972,9 +965,12 @@ bool smp_group_fs_mgmt::start_hash_checksum(QString file_name, QString hash_chec
     file_size_object = file_size;
     *file_size = 0;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_fs_mgmt::start_supported_hashes_checksums(QList<hash_checksum_t> *hash_checksum_list)
@@ -986,9 +982,12 @@ bool smp_group_fs_mgmt::start_supported_hashes_checksums(QList<hash_checksum_t> 
     mode = MODE_SUPPORTED_HASHES_CHECKSUMS;
     hash_checksum_object = hash_checksum_list;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_fs_mgmt::start_file_close()
@@ -999,9 +998,12 @@ bool smp_group_fs_mgmt::start_file_close()
 
     mode = MODE_FILE_CLOSE;
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 QString smp_group_fs_mgmt::mode_to_string(uint8_t mode)
@@ -1085,4 +1087,27 @@ void smp_group_fs_mgmt::flip_endian(uint8_t *data, uint8_t size)
 
         ++i;
     }
+}
+
+void smp_group_fs_mgmt::cleanup()
+{
+    mode = MODE_IDLE;
+
+    if (local_file.isOpen())
+    {
+        local_file.close();
+    }
+
+    local_file_size = 0;
+    file_upload_area = 0;
+
+    if (upload_tmr.isValid())
+    {
+        upload_tmr.invalidate();
+    }
+
+    device_file_name.clear();
+    hash_checksum_object = nullptr;
+    hash_checksum_result_object = nullptr;
+    file_size_object = nullptr;
 }

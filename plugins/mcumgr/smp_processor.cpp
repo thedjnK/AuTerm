@@ -63,34 +63,52 @@ void smp_processor::set_logger(debug_logger *object)
 }
 #endif
 
-bool smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check)
+smp_transport_error_t smp_processor::send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check)
 {
+    smp_transport_error_t transport_error = SMP_TRANSPORT_ERROR_OK;
+
     if (busy)
     {
-        return false;
+        transport_error = SMP_TRANSPORT_ERROR_PROCESSOR_BUSY;
     }
-
-    last_message = message;
-    last_message_header = message->get_header();
-
-    //Set message sequence
-    last_message_header->nh_seq = sequence;
-    last_message_version_check = allow_version_check;
-    last_message_version = last_message_header->nh_version;
-    repeat_timer.setInterval(timeout_ms);
-    repeat_times = repeats;
-    busy = true;
-
-    transport->send(last_message);
-    repeat_timer.start();
-    ++sequence;
-
-    if (json_object != nullptr && message_logging == true)
+    else if (transport->is_connected() == 0)
     {
-        json_object->append_data(true, message);
+        transport_error = SMP_TRANSPORT_ERROR_NOT_CONNECTED;
     }
 
-    return true;
+    if (transport_error == SMP_TRANSPORT_ERROR_OK)
+    {
+        last_message = message;
+        last_message_header = message->get_header();
+
+        //Set message sequence
+        last_message_header->nh_seq = sequence;
+        last_message_version_check = allow_version_check;
+        last_message_version = last_message_header->nh_version;
+        repeat_timer.setInterval(timeout_ms);
+        repeat_times = repeats;
+        busy = true;
+
+        transport_error = transport->send(last_message);
+
+        if (transport_error == SMP_TRANSPORT_ERROR_OK)
+        {
+            repeat_timer.start();
+            ++sequence;
+
+            if (json_object != nullptr && message_logging == true)
+            {
+                json_object->append_data(true, message);
+            }
+        }
+    }
+
+    if (transport_error != SMP_TRANSPORT_ERROR_OK)
+    {
+        cleanup();
+    }
+
+    return transport_error;
 }
 
 bool smp_processor::is_busy()

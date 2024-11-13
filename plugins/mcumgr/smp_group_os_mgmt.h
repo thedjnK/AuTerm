@@ -58,7 +58,6 @@ public:
     smp_group_os_mgmt(smp_processor *parent);
     void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
     void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void timeout(smp_message *message);
     void cancel();
     bool start_echo(QString data);
     bool start_task_stats(QList<task_list_t> *tasks);
@@ -72,6 +71,11 @@ public:
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
 
+protected:
+    void cleanup();
+    QString mode_to_string(uint8_t mode);
+    QString command_to_string(uint8_t command);
+
 private:
     bool parse_echo_response(QCborStreamReader &reader, QString *response);
     bool parse_task_stats_response(QCborStreamReader &reader, bool *in_tasks, task_list_t *current_task, QList<task_list_t> *task_array);
@@ -81,11 +85,7 @@ private:
     bool parse_date_time_response(QCborStreamReader &reader, QDateTime *date_time);
     bool parse_bootloader_info_response(QCborStreamReader &reader, QVariant *response);
 
-    QString mode_to_string(uint8_t mode);
-    QString command_to_string(uint8_t command);
-
     //
-    uint8_t mode;
     QList<task_list_t> *task_list;
     QList<memory_pool_t> *memory_list;
     QString bootloader_query_value;

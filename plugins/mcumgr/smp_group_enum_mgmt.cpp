@@ -457,6 +457,8 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
             bool count_found = false;
             bool good = parse_count_response(cbor_reader, groups_count, &count_found);
 
+            cleanup();
+
             if (good == true)
             {
                 if (count_found == true)
@@ -472,8 +474,6 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
             {
                 emit status(smp_user_data, STATUS_ERROR, "Did not decode response successfully");
             }
-
-            mode = MODE_IDLE;
         }
         else if (mode == MODE_LIST && command == COMMAND_LIST)
         {
@@ -481,6 +481,8 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
             QCborStreamReader cbor_reader(data);
             bool groups_found = false;
             bool good = parse_list_response(cbor_reader, nullptr, groups_list, &groups_found);
+
+            cleanup();
 
             if (good == true)
             {
@@ -497,8 +499,6 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
             {
                 emit status(smp_user_data, STATUS_ERROR, "Did not decode response successfully");
             }
-
-            mode = MODE_IDLE;
         }
         else if (mode == MODE_SINGLE && command == COMMAND_SINGLE)
         {
@@ -506,6 +506,8 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
             QCborStreamReader cbor_reader(data);
             bool group_found = false;
             bool good = parse_single_response(cbor_reader, group_single_id, group_single_end, &group_found);
+
+            cleanup();
 
             if (good == true)
             {
@@ -522,8 +524,6 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
             {
                 emit status(smp_user_data, STATUS_ERROR, "Did not decode response successfully");
             }
-
-            mode = MODE_IDLE;
         }
         else if (mode == MODE_DETAILS && command == COMMAND_DETAILS)
         {
@@ -531,6 +531,8 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
             QCborStreamReader cbor_reader(data);
             bool groups_found = false;
             bool good = parse_details_response(cbor_reader, 0, groups_details, &groups_found, groups_details_fields_present);
+
+            cleanup();
 
             if (good == true)
             {
@@ -547,13 +549,11 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
             {
                 emit status(smp_user_data, STATUS_ERROR, "Did not decode response successfully");
             }
-
-            mode = MODE_IDLE;
         }
         else
         {
             log_error() << "Unsupported command received";
-            mode = MODE_IDLE;
+            cleanup();
         }
     }
 }
@@ -565,7 +565,7 @@ void smp_group_enum_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gr
     Q_UNUSED(group);
     Q_UNUSED(error);
 
-    bool cleanup = true;
+    bool run_cleanup = true;
     log_error() << "error :(";
 
     if (command == COMMAND_COUNT && mode == MODE_COUNT)
@@ -594,28 +594,17 @@ void smp_group_enum_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gr
         emit status(smp_user_data, STATUS_ERROR, QString("Unexpected error (Mode: %1, op: %2)").arg(mode_to_string(mode), command_to_string(command)));
     }
 
-    if (cleanup == true)
+    if (run_cleanup == true)
     {
-        mode = MODE_IDLE;
+        cleanup();
     }
-}
-
-void smp_group_enum_mgmt::timeout(smp_message *message)
-{
-    log_error() << "timeout :(";
-
-    //TODO:
-    emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));
-
-    mode = MODE_IDLE;
 }
 
 void smp_group_enum_mgmt::cancel()
 {
     if (mode != MODE_IDLE)
     {
-        mode = MODE_IDLE;
-
+        cleanup();
         emit status(smp_user_data, STATUS_CANCELLED, nullptr);
     }
 }
@@ -632,9 +621,12 @@ bool smp_group_enum_mgmt::start_enum_count(uint16_t *count)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_enum_mgmt::start_enum_list(QList<uint16_t> *groups)
@@ -649,9 +641,12 @@ bool smp_group_enum_mgmt::start_enum_list(QList<uint16_t> *groups)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_enum_mgmt::start_enum_single(uint16_t index, uint16_t *id, bool *end)
@@ -675,9 +670,12 @@ bool smp_group_enum_mgmt::start_enum_single(uint16_t index, uint16_t *id, bool *
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_enum_mgmt::start_enum_details(QList<enum_details_t> *groups, enum_fields_present_t *fields_present)
@@ -696,9 +694,12 @@ bool smp_group_enum_mgmt::start_enum_details(QList<enum_details_t> *groups, enum
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 QString smp_group_enum_mgmt::mode_to_string(uint8_t mode)
@@ -761,4 +762,15 @@ bool smp_group_enum_mgmt::error_define_lookup(int32_t rc, QString *error)
     }
 
     return false;
+}
+
+void smp_group_enum_mgmt::cleanup()
+{
+    mode = MODE_IDLE;
+    groups_count = nullptr;
+    groups_list = nullptr;
+    group_single_id = nullptr;
+    group_single_end = nullptr;
+    groups_details = nullptr;
+    groups_details_fields_present = nullptr;
 }

@@ -989,11 +989,16 @@ log_error() << "Going in circles...";
 
         //      qDebug() << "len: " << tmp_message->data()->length();
 
-        processor->send(tmp_message, smp_timeout, smp_retries, (this->file_upload_area == 0 ? true : false));
+        if (check_message_before_send(tmp_message) == false)
+        {
+            return;
+        }
+
+        handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, (this->file_upload_area == 0 ? true : false)));
     }
     else
     {
-        mode = MODE_IDLE;
+        cleanup();
     }
 }
 
@@ -1064,8 +1069,8 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
 
             //file_list_in_progress = false;
             //emit plugin_set_status(false, false);
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-            mode = MODE_IDLE;
         }
         else if (mode == MODE_LIST_IMAGES && command == COMMAND_STATE)
         {
@@ -1081,27 +1086,27 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
 
             //file_list_in_progress = false;
             //emit plugin_set_status(false, false);
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-            mode = MODE_IDLE;
         }
         else if (mode == MODE_ERASE_IMAGE && command == COMMAND_ERASE)
         {
             //Response to erase image
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-            mode = MODE_IDLE;
         }
         else if (mode == MODE_SLOT_INFO && command == COMMAND_SLOT_INFO)
         {
             //Response to slot info
             QCborStreamReader cbor_reader(data);
             bool good = parse_slot_info_response(cbor_reader, host_slots, NULL, NULL);
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
-            mode = MODE_IDLE;
         }
         else
         {
             log_error() << "Unsupported command received";
-            mode = MODE_IDLE;
+            cleanup();
         }
     }
 }
@@ -1113,7 +1118,7 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
     Q_UNUSED(group);
     Q_UNUSED(error);
 
-    bool cleanup = true;
+    bool run_cleanup = true;
     log_error() << "error :(";
 
     if (command == COMMAND_STATE && mode == MODE_LIST_IMAGES)
@@ -1149,58 +1154,17 @@ void smp_group_img_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t gro
         emit status(smp_user_data, STATUS_ERROR, QString("Unexpected error (Mode: %1, op: %2)").arg(mode_to_string(mode), command_to_string(command)));
     }
 
-    if (cleanup == true)
+    if (run_cleanup == true)
     {
-        if (mode == MODE_UPLOAD_FIRMWARE)
-        {
-            upload_image = 0;
-            file_upload_data.clear();
-            file_upload_area = 0;
-            upload_tmr.invalidate();
-            upload_hash.clear();
-            upgrade_only = false;
-        }
-
-        mode = MODE_IDLE;
+        cleanup();
     }
-}
-
-void smp_group_img_mgmt::timeout(smp_message *message)
-{
-    log_error() << "timeout :(";
-
-    if (mode == MODE_UPLOAD_FIRMWARE)
-    {
-        upload_image = 0;
-        file_upload_data.clear();
-        file_upload_area = 0;
-        upload_tmr.invalidate();
-        upload_hash.clear();
-        upgrade_only = false;
-    }
-
-    //TODO:
-    emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));
-
-    mode = MODE_IDLE;
 }
 
 void smp_group_img_mgmt::cancel()
 {
     if (mode != MODE_IDLE)
     {
-        if (mode == MODE_UPLOAD_FIRMWARE)
-        {
-            upload_image = 0;
-            file_upload_data.clear();
-            file_upload_area = 0;
-            upload_tmr.invalidate();
-            upload_hash.clear();
-            upgrade_only = false;
-        }
-
-        mode = MODE_IDLE;
-
+        cleanup();
         emit status(smp_user_data, STATUS_CANCELLED, nullptr);
     }
 }
@@ -1220,9 +1184,12 @@ bool smp_group_img_mgmt::start_image_get(QList<image_state_t> *images)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm, QList<image_state_t> *images)
@@ -1246,11 +1213,14 @@ bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm, QList<i
     tmp_message->end_message();
 
     mode = MODE_SET_IMAGE;
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
+
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 
 //    lbl_IMG_Status->setText(QString("Marking image ").append(radio_IMG_Test->isChecked() ? "for test." : "as confirmed."));
-
-    return true;
 }
 
 bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash)
@@ -1312,9 +1282,13 @@ bool smp_group_img_mgmt::start_image_erase(uint8_t slot)
     tmp_message->end_message();
 
     mode = MODE_ERASE_IMAGE;
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
 
-    return true;
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
+
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_img_mgmt::start_image_slot_info(QList<slot_info_t> *images)
@@ -1330,9 +1304,12 @@ bool smp_group_img_mgmt::start_image_slot_info(QList<slot_info_t> *images)
     host_slots = images;
     host_slots->clear();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 QString smp_group_img_mgmt::mode_to_string(uint8_t mode)
@@ -1397,4 +1374,24 @@ bool smp_group_img_mgmt::error_define_lookup(int32_t rc, QString *error)
     }
 
     return false;
+}
+
+void smp_group_img_mgmt::cleanup()
+{
+    mode = MODE_IDLE;
+    upload_image = 0;
+    file_upload_data.clear();
+    file_upload_area = 0;
+
+    if (upload_tmr.isValid())
+    {
+        upload_tmr.invalidate();
+    }
+
+    upload_hash.clear();
+    upload_endian = ENDIAN_UNKNOWN;
+    upgrade_only = false;
+    upload_repeated_parts = 0;
+    host_images = nullptr;
+    host_slots = nullptr;
 }

@@ -288,22 +288,11 @@ void smp_group_settings_mgmt::receive_error(uint8_t version, uint8_t op, uint16_
     }
 }
 
-void smp_group_settings_mgmt::timeout(smp_message *message)
-{
-    log_error() << "timeout :(";
-
-    //TODO:
-    emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));
-
-    mode = MODE_IDLE;
-}
-
 void smp_group_settings_mgmt::cancel()
 {
     if (mode != MODE_IDLE)
     {
-        mode = MODE_IDLE;
-
+        cleanup();
         emit status(smp_user_data, STATUS_CANCELLED, nullptr);
     }
 }
@@ -328,9 +317,12 @@ bool smp_group_settings_mgmt::start_read(QString name, uint32_t max_length, QByt
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_settings_mgmt::start_write(QString name, QByteArray value)
@@ -347,9 +339,12 @@ bool smp_group_settings_mgmt::start_write(QString name, QByteArray value)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_settings_mgmt::start_delete(QString name)
@@ -364,9 +359,12 @@ bool smp_group_settings_mgmt::start_delete(QString name)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_settings_mgmt::start_commit(void)
@@ -379,9 +377,12 @@ bool smp_group_settings_mgmt::start_commit(void)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_settings_mgmt::start_load(void)
@@ -394,9 +395,12 @@ bool smp_group_settings_mgmt::start_load(void)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_settings_mgmt::start_save(void)
@@ -409,9 +413,12 @@ bool smp_group_settings_mgmt::start_save(void)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 QString smp_group_settings_mgmt::mode_to_string(uint8_t mode)
@@ -478,4 +485,10 @@ bool smp_group_settings_mgmt::error_define_lookup(int32_t rc, QString *error)
     }
 
     return false;
+}
+
+void smp_group_settings_mgmt::cleanup()
+{
+    mode = MODE_IDLE;
+    return_value = nullptr;
 }

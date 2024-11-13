@@ -35,12 +35,13 @@
 /******************************************************************************/
 // Enum typedefs
 /******************************************************************************/
-enum {
+enum smp_transport_error_t {
     SMP_TRANSPORT_ERROR_OK = 0,
     SMP_TRANSPORT_ERROR_UNSUPPORTED = -1,
     SMP_TRANSPORT_ERROR_NOT_CONNECTED = -2,
     SMP_TRANSPORT_ERROR_ALREADY_CONNECTED = -3,
     SMP_TRANSPORT_ERROR_NO_DATA = -4,
+    SMP_TRANSPORT_ERROR_PROCESSOR_BUSY = -5,
 };
 
 
@@ -71,7 +72,7 @@ public:
     {
         return SMP_TRANSPORT_ERROR_UNSUPPORTED;
     }
-    virtual int send(smp_message *message) = 0;
+    virtual smp_transport_error_t send(smp_message *message) = 0;
 //    virtual int receive(QByteArray *data, uint16_t max_size) = 0;
 
     virtual void open_connect_dialog()

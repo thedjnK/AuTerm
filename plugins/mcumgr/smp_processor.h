@@ -62,7 +62,7 @@ public:
 #ifndef SKIPPLUGIN_LOGGER
     void set_logger(debug_logger *object);
 #endif
-    bool send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check);
+    smp_transport_error_t send(smp_message *message, uint32_t timeout_ms, uint8_t repeats, bool allow_version_check);
     bool is_busy();
     void register_handler(uint16_t group, smp_group *handler);
     void unregister_handler(uint16_t group);

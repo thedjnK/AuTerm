@@ -39,20 +39,20 @@ public:
     smp_group_shell_mgmt(smp_processor *parent);
     void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
     void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void timeout(smp_message *message);
     void cancel();
     bool start_execute(QStringList *arguments, int32_t *ret);
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
 
-private:
-    bool parse_execute_response(QCborStreamReader &reader, int32_t *ret, QString *response);
-
+protected:
+    void cleanup();
     QString mode_to_string(uint8_t mode);
     QString command_to_string(uint8_t command);
 
+private:
+    bool parse_execute_response(QCborStreamReader &reader, int32_t *ret, QString *response);
+
     //
-    uint8_t mode;
     int32_t *return_ret;
 };
 

@@ -191,7 +191,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
     }
 }
 
-int smp_uart::send(smp_message *message)
+smp_transport_error_t smp_uart::send(smp_message *message)
 {
     //127 bytes = 3 + base 64 message
     //base64 = 4 bytes output per 3 byte input
@@ -241,7 +241,7 @@ end:
         output.clear();
     }
 
-    return 0;
+    return SMP_TRANSPORT_ERROR_OK;
 }
 
 uint16_t smp_uart::max_message_data_size(uint16_t mtu)

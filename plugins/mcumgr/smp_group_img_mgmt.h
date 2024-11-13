@@ -91,7 +91,6 @@ public:
     smp_group_img_mgmt(smp_processor *parent);
     void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
     void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void timeout(smp_message *message);
     void cancel();
     bool start_image_get(QList<image_state_t> *images);
     bool start_image_set(QByteArray *hash, bool confirm, QList<image_state_t> *images);
@@ -100,6 +99,11 @@ public:
     bool start_image_slot_info(QList<slot_info_t> *images);
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
+
+protected:
+    void cleanup();
+    QString mode_to_string(uint8_t mode);
+    QString command_to_string(uint8_t command);
 
 signals:
     void plugin_to_hex(QByteArray *data);
@@ -111,11 +115,8 @@ private:
     bool parse_state_response(QCborStreamReader &reader, QString array_name);
     bool parse_slot_info_response(QCborStreamReader &reader, QList<slot_info_t> *images, struct slot_info_t *image_data, struct slot_info_slots_t *slot_data);
     void file_upload(QByteArray *message);
-    QString mode_to_string(uint8_t mode);
-    QString command_to_string(uint8_t command);
 
     //
-    uint8_t mode;
     uint8_t upload_image;
     QByteArray file_upload_data;
     uint32_t file_upload_area;

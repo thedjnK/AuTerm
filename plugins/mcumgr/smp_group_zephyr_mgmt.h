@@ -39,18 +39,18 @@ public:
     smp_group_zephyr_mgmt(smp_processor *parent);
     void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
     void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void timeout(smp_message *message);
     void cancel();
     bool start_storage_erase(void);
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
 
-private:
+protected:
+    void cleanup();
     QString mode_to_string(uint8_t mode);
     QString command_to_string(uint8_t command);
 
+private:
     //
-    uint8_t mode;
 };
 
 #endif // SMP_GROUP_ZEPHYR_MGMT_H

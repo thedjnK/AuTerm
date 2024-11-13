@@ -45,7 +45,7 @@ public:
     int disconnect(bool force) override;
     void open_connect_dialog();
     int is_connected() override;
-    int send(smp_message *message);
+    smp_transport_error_t send(smp_message *message);
     void close_connect_dialog();
     void setup_finished();
 

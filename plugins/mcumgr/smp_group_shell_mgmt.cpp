@@ -215,16 +215,6 @@ void smp_group_shell_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t g
     }
 }
 
-void smp_group_shell_mgmt::timeout(smp_message *message)
-{
-    log_error() << "timeout :(";
-
-    //TODO:
-    emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));
-
-    mode = MODE_IDLE;
-}
-
 void smp_group_shell_mgmt::cancel()
 {
     if (mode != MODE_IDLE)
@@ -258,9 +248,12 @@ bool smp_group_shell_mgmt::start_execute(QStringList *arguments, int32_t *ret)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 QString smp_group_shell_mgmt::mode_to_string(uint8_t mode)
@@ -311,4 +304,10 @@ bool smp_group_shell_mgmt::error_define_lookup(int32_t rc, QString *error)
     }
 
     return false;
+}
+
+void smp_group_shell_mgmt::cleanup()
+{
+    mode = MODE_IDLE;
+    return_ret = nullptr;
 }

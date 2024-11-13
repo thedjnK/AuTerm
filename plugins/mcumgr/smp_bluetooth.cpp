@@ -458,7 +458,7 @@ void smp_bluetooth::connection_updated(QLowEnergyConnectionParameters parameters
 }
 */
 
-int smp_bluetooth::send(smp_message *message)
+smp_transport_error_t smp_bluetooth::send(smp_message *message)
 {
     if (device_connected == false)
     {
@@ -617,6 +617,8 @@ int smp_bluetooth::connect()
 
 int smp_bluetooth::disconnect(bool force)
 {
+    Q_UNUSED(force);
+
     if (controller != nullptr && device_connected == true)
     {
         controller->disconnectFromDevice();

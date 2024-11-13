@@ -39,7 +39,6 @@ public:
     smp_group_settings_mgmt(smp_processor *parent);
     void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
     void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void timeout(smp_message *message);
     void cancel();
     bool start_read(QString name, uint32_t max_length, QByteArray *value);
     bool start_write(QString name, QByteArray value);
@@ -50,14 +49,15 @@ public:
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
 
-private:
-    bool parse_read_response(QCborStreamReader &reader, QByteArray *value);
-
+protected:
+    void cleanup();
     QString mode_to_string(uint8_t mode);
     QString command_to_string(uint8_t command);
 
+private:
+    bool parse_read_response(QCborStreamReader &reader, QByteArray *value);
+
     //
-    uint8_t mode;
     QByteArray *return_value;
 };
 

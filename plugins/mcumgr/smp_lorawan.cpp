@@ -96,6 +96,8 @@ int smp_lorawan::connect(void)
 
 int smp_lorawan::disconnect(bool force)
 {
+    Q_UNUSED(force);
+
     if (mqtt_is_connected == false)
     {
         return SMP_TRANSPORT_ERROR_NOT_CONNECTED;
@@ -122,7 +124,7 @@ int smp_lorawan::is_connected()
     return 0;
 }
 
-int smp_lorawan::send(smp_message *message)
+smp_transport_error_t smp_lorawan::send(smp_message *message)
 {
     QJsonObject json_object;
     QJsonArray json_object_downlink_array;

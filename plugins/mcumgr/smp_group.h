@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -29,8 +29,6 @@
 #include "smp_error.h"
 #include "debug_logger.h"
 
-#include <QDebug>
-
 /******************************************************************************/
 // Enum typedefs
 /******************************************************************************/
@@ -39,7 +37,9 @@ enum group_status : uint8_t {
     STATUS_ERROR,
     STATUS_UNSUPPORTED,
     STATUS_TIMEOUT,
-    STATUS_CANCELLED
+    STATUS_CANCELLED,
+    STATUS_PROCESSOR_TRANSPORT_ERROR,
+    STATUS_MESSAGE_TOO_LARGE
 };
 
 enum smp_group_ids : uint16_t {
@@ -105,6 +105,69 @@ public:
         return false;
     }
 
+    bool check_message_before_send(smp_message *tmp_message)
+    {
+        if (tmp_message->contents().length() > processor->max_message_data_size(smp_mtu))
+        {
+            //Message is larger than the transport provides
+            QString response = QString("Message too large for transport, ") % QString::number(tmp_message->contents().length()) % " vs " % QString::number(processor->max_message_data_size(smp_mtu)) % " bytes";
+
+            delete tmp_message;
+            cleanup();
+            emit status(smp_user_data, STATUS_MESSAGE_TOO_LARGE, response);
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    bool handle_transport_error(smp_transport_error_t transport_error)
+    {
+        if (transport_error == SMP_TRANSPORT_ERROR_OK)
+        {
+            return true;
+        }
+        else
+        {
+            QString response = "Message send failed, ";
+
+            switch (transport_error)
+            {
+                case SMP_TRANSPORT_ERROR_NOT_CONNECTED:
+                {
+                    response.append("transport not connected");
+                    break;
+                }
+                case SMP_TRANSPORT_ERROR_PROCESSOR_BUSY:
+                {
+                    response.append("processor busy");
+                    break;
+                }
+                default:
+                {
+                    response.append("unknown error: ").append(QString::number(transport_error));
+                    break;
+                }
+            }
+
+            cleanup();
+            emit status(smp_user_data, STATUS_PROCESSOR_TRANSPORT_ERROR, response);
+            return false;
+        }
+    }
+
+    void timeout(smp_message *message)
+    {
+        Q_UNUSED(message);
+        QString response = QString("Timeout (Mode: %1)").arg(mode_to_string(mode));
+
+        log_error() << "MCUmgr command timed out";
+        cleanup();
+        emit status(smp_user_data, STATUS_TIMEOUT, response);
+    }
+
 #ifndef SKIPPLUGIN_LOGGER
     void set_logger(debug_logger *object)
     {
@@ -114,7 +177,6 @@ public:
 
     virtual void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) = 0;
     virtual void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) = 0;
-    virtual void timeout(smp_message *message) = 0;
     virtual void cancel() = 0;
 
 protected:
@@ -131,6 +193,10 @@ protected:
         return STATUS_ERROR;
     }
 
+    virtual void cleanup() = 0;
+    virtual QString mode_to_string(uint8_t mode) = 0;
+    virtual QString command_to_string(uint8_t command) = 0;
+
 signals:
     void status(uint8_t user_data, group_status status, QString error_string);
     void progress(uint8_t user_data, uint8_t percent);
@@ -146,6 +212,7 @@ protected:
     uint8_t smp_user_data;
     smp_error_lookup error_lookup;
     smp_error_define_lookup error_define_lookup;
+    uint8_t mode;
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;
 #endif

@@ -802,6 +802,8 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             QString response;
             QCborStreamReader cbor_reader(data);
             bool good = parse_echo_response(cbor_reader, &response);
+
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, response);
         }
         else if (finished_mode == MODE_TASK_STATS && command == COMMAND_TASK_STATS)
@@ -812,6 +814,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             task_list_t current_task;
             bool good = parse_task_stats_response(cbor_reader, &in_tasks, &current_task, task_list);
 
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (finished_mode == MODE_MEMORY_POOL && command == COMMAND_MEMORY_POOL)
@@ -821,6 +824,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             memory_pool_t current_memory;
             bool good = parse_memory_pool_response(cbor_reader, &current_memory, memory_list);
 
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (finished_mode == MODE_DATE_TIME_GET && command == COMMAND_DATE_TIME)
@@ -829,16 +833,19 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             QCborStreamReader cbor_reader(data);
             bool good = parse_date_time_response(cbor_reader, rtc_get_date_time);
 
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (finished_mode == MODE_DATE_TIME_SET && command == COMMAND_DATE_TIME)
         {
             //No need to check response, it would have returned success to come through this callback
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (finished_mode == MODE_RESET && command == COMMAND_RESET)
         {
             //No need to check response, it would have returned success to come through this callback
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (finished_mode == MODE_MCUMGR_PARAMETERS && command == COMMAND_MCUMGR_PARAMETERS)
@@ -851,6 +858,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
             log_debug() << "buffer size: " << buffer_size << ", buffer count: " << buffer_count;
 
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, QString("Buffer size: %1\nBuffer count: %2").arg(QString::number(buffer_size), QString::number(buffer_count)));
         }
         else if (finished_mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
@@ -862,6 +870,7 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
 
             log_debug() << response;
 
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, response);
         }
         else if (finished_mode == MODE_BOOTLOADER_INFO && command == COMMAND_BOOTLOADER_INFO)
@@ -870,11 +879,13 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
             QCborStreamReader cbor_reader(data);
             bool good = parse_bootloader_info_response(cbor_reader, bootloader_info_response);
 
+            cleanup();
             emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else
         {
             log_error() << "Unsupported command received";
+            cleanup();
         }
     }
 }
@@ -886,7 +897,7 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
     Q_UNUSED(group);
     Q_UNUSED(error);
 
-    bool cleanup = true;
+    bool run_cleanup = true;
     log_error() << "error :(";
 
     if (command == COMMAND_ECHO && mode == MODE_ECHO)
@@ -940,28 +951,17 @@ void smp_group_os_mgmt::receive_error(uint8_t version, uint8_t op, uint16_t grou
         emit status(smp_user_data, STATUS_ERROR, QString("Unexpected error (Mode: %1, op: %2)").arg(mode_to_string(mode), command_to_string(command)));
     }
 
-    if (cleanup == true)
+    if (run_cleanup == true)
     {
-        mode = MODE_IDLE;
+        cleanup();
     }
-}
-
-void smp_group_os_mgmt::timeout(smp_message *message)
-{
-    log_error() << "timeout :(";
-
-    //TODO:
-    emit status(smp_user_data, STATUS_TIMEOUT, QString("Timeout (Mode: %1)").arg(mode_to_string(mode)));
-
-    mode = MODE_IDLE;
 }
 
 void smp_group_os_mgmt::cancel()
 {
     if (mode != MODE_IDLE)
     {
-        mode = MODE_IDLE;
-
+        cleanup();
         emit status(smp_user_data, STATUS_CANCELLED, nullptr);
     }
 }
@@ -978,9 +978,12 @@ bool smp_group_os_mgmt::start_echo(QString data)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_os_mgmt::start_task_stats(QList<task_list_t> *tasks)
@@ -995,9 +998,12 @@ bool smp_group_os_mgmt::start_task_stats(QList<task_list_t> *tasks)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_os_mgmt::start_memory_pool(QList<memory_pool_t> *memory)
@@ -1012,9 +1018,12 @@ bool smp_group_os_mgmt::start_memory_pool(QList<memory_pool_t> *memory)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_os_mgmt::start_reset(bool force)
@@ -1033,9 +1042,12 @@ bool smp_group_os_mgmt::start_reset(bool force)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_os_mgmt::start_mcumgr_parameters()
@@ -1048,9 +1060,12 @@ bool smp_group_os_mgmt::start_mcumgr_parameters()
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_os_mgmt::start_os_application_info(QString format)
@@ -1070,9 +1085,12 @@ bool smp_group_os_mgmt::start_os_application_info(QString format)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_os_mgmt::start_date_time_get(QDateTime *date_time)
@@ -1086,9 +1104,12 @@ bool smp_group_os_mgmt::start_date_time_get(QDateTime *date_time)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_os_mgmt::start_date_time_set(QDateTime date_time)
@@ -1103,9 +1124,12 @@ bool smp_group_os_mgmt::start_date_time_set(QDateTime date_time)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 bool smp_group_os_mgmt::start_bootloader_info(QString query, QVariant *response)
@@ -1131,9 +1155,12 @@ bool smp_group_os_mgmt::start_bootloader_info(QString query, QVariant *response)
 
     //	    qDebug() << "len: " << message.length();
 
-    processor->send(tmp_message, smp_timeout, smp_retries, true);
+    if (check_message_before_send(tmp_message) == false)
+    {
+        return false;
+    }
 
-    return true;
+    return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
 QString smp_group_os_mgmt::mode_to_string(uint8_t mode)
@@ -1212,4 +1239,14 @@ bool smp_group_os_mgmt::error_define_lookup(int32_t rc, QString *error)
     }
 
     return false;
+}
+
+void smp_group_os_mgmt::cleanup()
+{
+    mode = MODE_IDLE;
+    task_list = nullptr;
+    memory_list = nullptr;
+    bootloader_query_value.clear();
+    bootloader_info_response = nullptr;
+    rtc_get_date_time = nullptr;
 }

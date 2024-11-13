@@ -91,6 +91,8 @@ int smp_udp::connect(void)
 
 int smp_udp::disconnect(bool force)
 {
+    Q_UNUSED(force);
+
     if (socket_is_connected == false)
     {
         return SMP_TRANSPORT_ERROR_NOT_CONNECTED;
@@ -118,7 +120,7 @@ int smp_udp::is_connected()
     return 0;
 }
 
-int smp_udp::send(smp_message *message)
+smp_transport_error_t smp_udp::send(smp_message *message)
 {
     if (socket_is_connected == false)
     {
