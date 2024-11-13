@@ -37,19 +37,20 @@ class smp_group_zephyr_mgmt : public smp_group
 
 public:
     smp_group_zephyr_mgmt(smp_processor *parent);
-    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
-    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void cancel();
+    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) override;
+    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) override;
+    void cancel() override;
     bool start_storage_erase(void);
+
+protected:
+    void cleanup() override;
+    QString mode_to_string(uint8_t mode) override;
+    QString command_to_string(uint8_t command) override;
+
+private:
     static bool error_lookup(int32_t rc, QString *error);
     static bool error_define_lookup(int32_t rc, QString *error);
 
-protected:
-    void cleanup();
-    QString mode_to_string(uint8_t mode);
-    QString command_to_string(uint8_t command);
-
-private:
     //
 };
 

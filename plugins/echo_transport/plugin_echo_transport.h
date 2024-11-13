@@ -39,32 +39,32 @@ class plugin_echo_transport : public QObject, public AutTransportPlugin
     Q_INTERFACES(AutTransportPlugin)
 
 public:
-    void setup(QMainWindow *main_window);
-    void transport_setup(QWidget *tab);
-    const QString plugin_about();
-    bool plugin_configuration();
-    PluginType plugin_type();
-    QObject *plugin_object();
+    void setup(QMainWindow *main_window) override;
+    void transport_setup(QWidget *tab) override;
+    const QString plugin_about() override;
+    bool plugin_configuration() override;
+    PluginType plugin_type() override;
+    QObject *plugin_object() override;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool open(QIODeviceBase::OpenMode mode) override;
 #else
     bool open(QIODevice::OpenMode mode) override;
 #endif
-    void close();
-    bool isOpen() const;
-    QSerialPort::DataBits dataBits() const;
-    StopBits stopBits() const;
-    QSerialPort::Parity parity() const;
-    qint64 write(const QByteArray &data);
-    qint64 bytesAvailable() const;
-    QByteArray peek(qint64 maxlen);
-    QByteArray read(qint64 maxlen);
-    QByteArray readAll();
-    bool clear(QSerialPort::Directions directions = QSerialPort::AllDirections);
-    QSerialPort::PinoutSignals pinoutSignals();
-    QString to_error_string(int error);
-    QString transport_name() const;
-    QString connection_display_name();
+    void close() override;
+    bool isOpen() const override;
+    QSerialPort::DataBits dataBits() const override;
+    StopBits stopBits() const override;
+    QSerialPort::Parity parity() const override;
+    qint64 write(const QByteArray &data) override;
+    qint64 bytesAvailable() const override;
+    QByteArray peek(qint64 maxlen) override;
+    QByteArray read(qint64 maxlen) override;
+    QByteArray readAll() override;
+    bool clear(QSerialPort::Directions directions = QSerialPort::AllDirections) override;
+    QSerialPort::PinoutSignals pinoutSignals() override;
+    QString to_error_string(int error) override;
+    QString transport_name() const override;
+    QString connection_display_name() override;
 
 signals:
     void readyRead();

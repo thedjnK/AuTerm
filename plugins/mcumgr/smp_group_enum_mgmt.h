@@ -50,22 +50,22 @@ class smp_group_enum_mgmt : public smp_group
 
 public:
     smp_group_enum_mgmt(smp_processor *parent);
-    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
-    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void cancel();
+    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) override;
+    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) override;
+    void cancel() override;
     bool start_enum_count(uint16_t *count);
     bool start_enum_list(QList<uint16_t> *groups);
     bool start_enum_single(uint16_t index, uint16_t *id, bool *end);
     bool start_enum_details(QList<enum_details_t> *groups, enum_fields_present_t *fields_present);
-    static bool error_lookup(int32_t rc, QString *error);
-    static bool error_define_lookup(int32_t rc, QString *error);
 
 protected:
-    void cleanup();
-    QString mode_to_string(uint8_t mode);
-    QString command_to_string(uint8_t command);
+    void cleanup() override;
+    QString mode_to_string(uint8_t mode) override;
+    QString command_to_string(uint8_t command) override;
 
 private:
+    static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
     bool parse_count_response(QCborStreamReader &reader, uint16_t *count, bool *count_found);
     bool parse_list_response(QCborStreamReader &reader, const QString *list_key, QList<uint16_t> *groups, bool *groups_found);
     bool parse_single_response(QCborStreamReader &reader, uint16_t *id, bool *end, bool *group_found);

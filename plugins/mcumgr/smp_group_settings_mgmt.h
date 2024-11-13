@@ -37,24 +37,24 @@ class smp_group_settings_mgmt : public smp_group
 
 public:
     smp_group_settings_mgmt(smp_processor *parent);
-    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
-    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void cancel();
+    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) override;
+    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) override;
+    void cancel() override;
     bool start_read(QString name, uint32_t max_length, QByteArray *value);
     bool start_write(QString name, QByteArray value);
     bool start_delete(QString name);
     bool start_commit(void);
     bool start_load(void);
     bool start_save(void);
-    static bool error_lookup(int32_t rc, QString *error);
-    static bool error_define_lookup(int32_t rc, QString *error);
 
 protected:
-    void cleanup();
-    QString mode_to_string(uint8_t mode);
-    QString command_to_string(uint8_t command);
+    void cleanup() override;
+    QString mode_to_string(uint8_t mode) override;
+    QString command_to_string(uint8_t command) override;
 
 private:
+    static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
     bool parse_read_response(QCborStreamReader &reader, QByteArray *value);
 
     //

@@ -85,35 +85,35 @@ class plugin_nus_transport : public QObject, public AutTransportPlugin
 public:
     plugin_nus_transport();
     ~plugin_nus_transport();
-    void setup(QMainWindow *main_window);
-    void transport_setup(QWidget *tab);
-    const QString plugin_about();
-    bool plugin_configuration();
+    void setup(QMainWindow *main_window) override;
+    void transport_setup(QWidget *tab) override;
+    const QString plugin_about() override;
+    bool plugin_configuration() override;
     static QMainWindow *get_main_window();
-    void setup_finished();
-    PluginType plugin_type();
+    void setup_finished() override;
+    PluginType plugin_type() override;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool open(QIODeviceBase::OpenMode mode) override;
 #else
     bool open(QIODevice::OpenMode mode) override;
 #endif
-    void close();
-    bool isOpen() const;
-    bool isOpening() const;
-    QSerialPort::DataBits dataBits() const;
-    StopBits stopBits() const;
-    QSerialPort::Parity parity() const;
-    qint64 write(const QByteArray &data);
-    qint64 bytesAvailable() const;
-    QByteArray peek(qint64 maxlen);
-    QByteArray read(qint64 maxlen);
-    QByteArray readAll();
-    bool clear(QSerialPort::Directions directions = QSerialPort::AllDirections);
-    QSerialPort::PinoutSignals pinoutSignals();
-    QString to_error_string(int error);
-    QString transport_name() const;
-    QObject *plugin_object();
-    QString connection_display_name();
+    void close() override;
+    bool isOpen() const override;
+    bool isOpening() const override;
+    QSerialPort::DataBits dataBits() const override;
+    StopBits stopBits() const override;
+    QSerialPort::Parity parity() const override;
+    qint64 write(const QByteArray &data) override;
+    qint64 bytesAvailable() const override;
+    QByteArray peek(qint64 maxlen) override;
+    QByteArray read(qint64 maxlen) override;
+    QByteArray readAll() override;
+    bool clear(QSerialPort::Directions directions = QSerialPort::AllDirections) override;
+    QSerialPort::PinoutSignals pinoutSignals() override;
+    QString to_error_string(int error) override;
+    QString transport_name() const override;
+    QObject *plugin_object() override;
+    QString connection_display_name() override;
 
 private slots:
     void deviceDiscovered(const QBluetoothDeviceInfo &info);

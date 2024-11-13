@@ -153,13 +153,13 @@ class plugin_mcumgr : public QObject, AutPlugin
 
 public:
     ~plugin_mcumgr();
-    void setup(QMainWindow *main_window);
-    const QString plugin_about();
-    bool plugin_configuration();
+    void setup(QMainWindow *main_window) override;
+    const QString plugin_about() override;
+    bool plugin_configuration() override;
     static QMainWindow *get_main_window();
-    void setup_finished();
-    PluginType plugin_type();
-    QObject *plugin_object();
+    void setup_finished() override;
+    PluginType plugin_type() override;
+    QObject *plugin_object() override;
 
 signals:
     void show_message_box(QString str_message);
@@ -176,7 +176,7 @@ private slots:
     void serial_about_to_close();
     void serial_opened();
     void serial_closed();
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event) override;
     void group_to_hex(QByteArray *data);
 
     void status(uint8_t user_data, group_status status, QString error_string);

@@ -89,26 +89,26 @@ class smp_group_img_mgmt : public smp_group
 
 public:
     smp_group_img_mgmt(smp_processor *parent);
-    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
-    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void cancel();
+    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) override;
+    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) override;
+    void cancel() override;
     bool start_image_get(QList<image_state_t> *images);
     bool start_image_set(QByteArray *hash, bool confirm, QList<image_state_t> *images);
     bool start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash);
     bool start_image_erase(uint8_t slot);
     bool start_image_slot_info(QList<slot_info_t> *images);
-    static bool error_lookup(int32_t rc, QString *error);
-    static bool error_define_lookup(int32_t rc, QString *error);
 
 protected:
-    void cleanup();
-    QString mode_to_string(uint8_t mode);
-    QString command_to_string(uint8_t command);
+    void cleanup() override;
+    QString mode_to_string(uint8_t mode) override;
+    QString command_to_string(uint8_t command) override;
 
 signals:
     void plugin_to_hex(QByteArray *data);
 
 private:
+    static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
     bool extract_header(QByteArray *file_data, image_endian_t *endian);
     bool extract_hash(QByteArray *file_data, QByteArray *hash);
     bool parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match);

@@ -35,8 +35,8 @@ class smp_uart : public smp_transport
 public:
     smp_uart(QObject *parent = nullptr);
     ~smp_uart();
-    smp_transport_error_t send(smp_message *message);
-    uint16_t max_message_data_size(uint16_t mtu);
+    smp_transport_error_t send(smp_message *message) override;
+    uint16_t max_message_data_size(uint16_t mtu) override;
 
 private:
     void data_received(QByteArray *message);

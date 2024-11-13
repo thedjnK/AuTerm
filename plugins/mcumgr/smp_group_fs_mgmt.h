@@ -44,24 +44,24 @@ class smp_group_fs_mgmt : public smp_group
 
 public:
     smp_group_fs_mgmt(smp_processor *parent);
-    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
-    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void cancel();
+    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) override;
+    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) override;
+    void cancel() override;
     bool start_upload(QString file_name, QString destination_name);
     bool start_download(QString file_name, QString destination_name);
     bool start_status(QString file_name, uint32_t *file_size);
     bool start_hash_checksum(QString file_name, QString hash_checksum, QByteArray *result, uint32_t *file_size);
     bool start_supported_hashes_checksums(QList<hash_checksum_t> *hash_checksum_list);
     bool start_file_close();
-    static bool error_lookup(int32_t rc, QString *error);
-    static bool error_define_lookup(int32_t rc, QString *error);
 
 protected:
-    void cleanup();
-    QString mode_to_string(uint8_t mode);
-    QString command_to_string(uint8_t command);
+    void cleanup() override;
+    QString mode_to_string(uint8_t mode) override;
+    QString command_to_string(uint8_t command) override;
 
 private:
+    static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
     bool parse_upload_response(QCborStreamReader &reader, uint32_t *off, bool *off_found);
     bool parse_download_response(QCborStreamReader &reader, uint32_t *off, uint32_t *len, QByteArray *file_data);
     bool parse_status_response(QCborStreamReader &reader, uint32_t *len);

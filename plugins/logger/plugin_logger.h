@@ -61,12 +61,12 @@ class plugin_logger : public QWidget, AutPlugin
 public:
     explicit plugin_logger(QWidget *parent = nullptr);
     ~plugin_logger();
-    QWidget *plugin_widget();
-    void setup(QMainWindow *main_window);
-    const QString plugin_about();
-    bool plugin_configuration();
-    PluginType plugin_type();
-    QObject *plugin_object();
+    QWidget *plugin_widget() override;
+    void setup(QMainWindow *main_window) override;
+    const QString plugin_about() override;
+    bool plugin_configuration() override;
+    PluginType plugin_type() override;
+    QObject *plugin_object() override;
 
 public slots:
     void log_level_enabled(enum log_level_types type, bool *enabled);

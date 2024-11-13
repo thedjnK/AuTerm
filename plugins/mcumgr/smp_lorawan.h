@@ -40,10 +40,10 @@ public:
     ~smp_lorawan();
     int connect(void) override;
     int disconnect(bool force) override;
-    void open_connect_dialog();
+    void open_connect_dialog() override;
     int is_connected() override;
-    smp_transport_error_t send(smp_message *message);
-    void close_connect_dialog();
+    smp_transport_error_t send(smp_message *message) override;
+    void close_connect_dialog() override;
     void setup_finished();
     uint8_t get_retries() override;
     uint32_t get_timeout() override;

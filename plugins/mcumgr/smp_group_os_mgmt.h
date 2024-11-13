@@ -56,9 +56,9 @@ class smp_group_os_mgmt : public smp_group
 
 public:
     smp_group_os_mgmt(smp_processor *parent);
-    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data);
-    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error);
-    void cancel();
+    void receive_ok(uint8_t version, uint8_t op, uint16_t group, uint8_t command, QByteArray data) override;
+    void receive_error(uint8_t version, uint8_t op, uint16_t group, uint8_t command, smp_error_t error) override;
+    void cancel() override;
     bool start_echo(QString data);
     bool start_task_stats(QList<task_list_t> *tasks);
     bool start_memory_pool(QList<memory_pool_t> *memory);
@@ -68,15 +68,15 @@ public:
     bool start_date_time_get(QDateTime *date_time);
     bool start_date_time_set(QDateTime date_time);
     bool start_bootloader_info(QString query, QVariant *response);
-    static bool error_lookup(int32_t rc, QString *error);
-    static bool error_define_lookup(int32_t rc, QString *error);
 
 protected:
-    void cleanup();
-    QString mode_to_string(uint8_t mode);
-    QString command_to_string(uint8_t command);
+    void cleanup() override;
+    QString mode_to_string(uint8_t mode) override;
+    QString command_to_string(uint8_t command) override;
 
 private:
+    static bool error_lookup(int32_t rc, QString *error);
+    static bool error_define_lookup(int32_t rc, QString *error);
     bool parse_echo_response(QCborStreamReader &reader, QString *response);
     bool parse_task_stats_response(QCborStreamReader &reader, bool *in_tasks, task_list_t *current_task, QList<task_list_t> *task_array);
     bool parse_memory_pool_response(QCborStreamReader &reader, memory_pool_t *current_memory, QList<memory_pool_t> *memory_array);
