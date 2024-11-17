@@ -30,6 +30,7 @@
 /******************************************************************************/
 // Constants
 /******************************************************************************/
+static const bool default_save_history = true;
 static const uint16_t max_history = 10;
 static const uint16_t history_tokens = 1;
 static const uint16_t history_elements = 2;
@@ -130,7 +131,7 @@ void udp_setup::on_combo_history_currentIndexChanged(int index)
     if (index == 0 && ui->combo_history->count() > 1)
     {
         ui->edit_address->clear();
-        ui->edit_port->setValue(8883);
+        ui->edit_port->setValue(1337);
         return;
     }
     else if (index <= 0)
@@ -156,7 +157,7 @@ void udp_setup::load_settings()
     QVariant data;
     bool found = false;
 
-    emit plugin_load_setting(QString("mcumgr_udp_save_history"), &data, &found);
+    emit plugin_load_setting("mcumgr_udp_save_history", &data, &found);
 
     if (found == true)
     {
@@ -211,6 +212,15 @@ void udp_setup::load_settings()
         {
             ui->check_save_history->setChecked(false);
             ui->combo_history->setEnabled(false);
+        }
+    }
+    else
+    {
+        emit plugin_save_setting("mcumgr_udp_save_history", default_save_history);
+
+        if (ui->check_save_history->isChecked() != default_save_history)
+        {
+            ui->check_save_history->setChecked(default_save_history);
         }
     }
 }
