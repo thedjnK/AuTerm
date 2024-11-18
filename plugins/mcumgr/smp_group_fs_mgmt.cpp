@@ -932,8 +932,10 @@ bool smp_group_fs_mgmt::start_status(QString file_name, uint32_t *file_size)
 
     if (tmp_message->contents().length() > processor->max_message_data_size(smp_mtu))
     {
+        QString response = QString("Message is too large to send: ") % QString::number(tmp_message->contents().length()) % " vs " % QString::number(processor->max_message_data_size(smp_mtu)) % " maximum";
+
         delete tmp_message;
-        emit status(smp_user_data, STATUS_ERROR, QString("Message is too large to send: %1 vs %2 maximum").arg(QString::number(tmp_message->contents().length()), QString::number(processor->max_message_data_size(smp_mtu))));
+        emit status(smp_user_data, STATUS_ERROR, response);
         return false;
     }
 
