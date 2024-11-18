@@ -95,6 +95,9 @@ CONFIG(release, debug|release) {
     CONFIG += no_plugin_name_prefix
 }
 
+# This is a GUI build
+DEFINES += GUI_PRESENT
+
 FORMS += \
     error_lookup.ui
 

@@ -38,7 +38,9 @@
 #include "plugin_mcumgr.h"
 #include "smp_transport.h"
 #include "smp_message.h"
+#if defined(GUI_PRESENT)
 #include "bluetooth_setup.h"
+#endif
 
 class smp_bluetooth : public smp_transport
 {
@@ -49,10 +51,12 @@ public:
     ~smp_bluetooth();
     int connect(void) override;
     int disconnect(bool force) override;
+#if defined(GUI_PRESENT)
     void open_connect_dialog() override;
+    void close_connect_dialog() override;
+#endif
     int is_connected() override;
     smp_transport_error_t send(smp_message *message) override;
-    void close_connect_dialog() override;
     void setup_finished();
 
 private slots:
@@ -88,7 +92,10 @@ signals:
 private:
     void form_min_params();
 
+#if defined(GUI_PRESENT)
     QMainWindow *main_window;
+    bluetooth_setup *bluetooth_window;
+#endif
     QBluetoothDeviceDiscoveryAgent *discoveryAgent = nullptr;
 //    DeviceInfo currentDevice;
     QLowEnergyController *controller = nullptr;
@@ -102,7 +109,6 @@ private:
     uint16_t mtu;
     uint16_t mtu_max_worked;
     QByteArray send_buffer;
-    bluetooth_setup *bluetooth_window;
     int retry_count;
     QLowEnergyService::WriteMode bluetooth_write_mode;
 #if !(QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))

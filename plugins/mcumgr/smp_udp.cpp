@@ -35,13 +35,9 @@ smp_udp::smp_udp(QObject *parent)
 {
     Q_UNUSED(parent);
 
+#if defined(GUI_PRESENT)
     main_window = plugin_mcumgr::get_main_window();
     udp_window = new udp_setup(main_window);
-
-    socket = new QUdpSocket(this);
-    socket_is_connected = false;
-
-    QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(socket_readyread()));
 
     QObject::connect(udp_window, SIGNAL(connect_to_device(QString,uint16_t)), this, SLOT(connect_to_device(QString,uint16_t)));
     QObject::connect(udp_window, SIGNAL(disconnect_from_device()), this, SLOT(disconnect_from_device()));
@@ -49,18 +45,26 @@ smp_udp::smp_udp(QObject *parent)
     QObject::connect(udp_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
     QObject::connect(udp_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
     QObject::connect(udp_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
+#endif
+
+    socket = new QUdpSocket(this);
+    socket_is_connected = false;
+
+    QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(socket_readyread()));
 }
 
 smp_udp::~smp_udp()
 {
     QObject::disconnect(this, SLOT(socket_readyread()));
 
+#if defined(GUI_PRESENT)
+    QObject::disconnect(this, SLOT(is_connected(bool*)));
     QObject::disconnect(this, SLOT(connect_to_device(QString,uint16_t)));
     QObject::disconnect(this, SLOT(disconnect_from_device()));
-    QObject::disconnect(this, SLOT(is_connected(bool*)));
     QObject::disconnect(udp_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
     QObject::disconnect(udp_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
     QObject::disconnect(udp_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
+#endif
 
     if (socket_is_connected == true)
     {
@@ -68,12 +72,14 @@ smp_udp::~smp_udp()
         socket_is_connected = false;
     }
 
+#if defined(GUI_PRESENT)
     if (udp_window->isVisible())
     {
         udp_window->close();
     }
 
     delete udp_window;
+#endif
     delete socket;
 }
 
@@ -105,10 +111,20 @@ int smp_udp::disconnect(bool force)
     return SMP_TRANSPORT_ERROR_OK;
 }
 
+#if defined(GUI_PRESENT)
 void smp_udp::open_connect_dialog()
 {
     udp_window->show();
 }
+
+void smp_udp::close_connect_dialog()
+{
+    if (udp_window->isVisible())
+    {
+        udp_window->close();
+    }
+}
+#endif
 
 int smp_udp::is_connected()
 {
@@ -153,14 +169,6 @@ void smp_udp::connect_to_device(QString host, uint16_t port)
     socket->connectToHost(host, port);
     socket_is_connected = true;
     //TODO: need to alert parent
-}
-
-void smp_udp::close_connect_dialog()
-{
-    if (udp_window->isVisible())
-    {
-        udp_window->close();
-    }
 }
 
 void smp_udp::setup_finished()

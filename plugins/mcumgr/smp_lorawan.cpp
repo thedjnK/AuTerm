@@ -27,8 +27,10 @@ smp_lorawan::smp_lorawan(QObject *parent)
 {
     Q_UNUSED(parent);
 
+#if defined(GUI_PRESENT)
     main_window = plugin_mcumgr::get_main_window();
     lorawan_window = new lorawan_setup(main_window);
+#endif
 
     mqtt_client = new QMqttClient(this);
     mqtt_topic_subscription = nullptr;
@@ -39,11 +41,13 @@ smp_lorawan::smp_lorawan(QObject *parent)
     QObject::connect(mqtt_client, SIGNAL(stateChanged(QMqttClient::ClientState)), this, SLOT(mqtt_state_changed(QMqttClient::ClientState)));
     QObject::connect(mqtt_client, SIGNAL(errorChanged(QMqttClient::ClientError)), this, SLOT(mqtt_error_changed(QMqttClient::ClientError)));
     QObject::connect(mqtt_client, SIGNAL(authenticationRequested(QMqttAuthenticationProperties)), this, SLOT(mqtt_authentication_requested(QMqttAuthenticationProperties)));
+#if defined(GUI_PRESENT)
     QObject::connect(lorawan_window, SIGNAL(connect_to_service(QString,uint16_t,bool,QString,QString,QString)), this, SLOT(connect_to_service(QString,uint16_t,bool,QString,QString,QString)));
     QObject::connect(lorawan_window, SIGNAL(disconnect_from_service()), this, SLOT(disconnect_from_service()));
     QObject::connect(lorawan_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
     QObject::connect(lorawan_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
     QObject::connect(lorawan_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
+#endif
 }
 
 smp_lorawan::~smp_lorawan()
@@ -54,10 +58,12 @@ smp_lorawan::~smp_lorawan()
     QObject::disconnect(this, SLOT(mqtt_error_changed(QMqttClient::ClientError)));
     QObject::disconnect(this, SLOT(mqtt_authentication_requested(QMqttAuthenticationProperties)));
     QObject::disconnect(this, SLOT(connect_to_service(QString,uint16_t,bool,QString,QString,QString)));
+#if defined(GUI_PRESENT)
     QObject::disconnect(this, SLOT(disconnect_from_service()));
     QObject::disconnect(lorawan_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
     QObject::disconnect(lorawan_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
     QObject::disconnect(lorawan_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
+#endif
 
     if (mqtt_topic_subscription != nullptr)
     {
@@ -75,12 +81,14 @@ smp_lorawan::~smp_lorawan()
         mqtt_is_connected = false;
     }
 
+#if defined(GUI_PRESENT)
     if (lorawan_window->isVisible())
     {
         lorawan_window->close();
     }
 
     delete lorawan_window;
+#endif
     delete mqtt_client;
 }
 
@@ -109,10 +117,20 @@ int smp_lorawan::disconnect(bool force)
     return SMP_TRANSPORT_ERROR_OK;
 }
 
+#if defined(GUI_PRESENT)
 void smp_lorawan::open_connect_dialog()
 {
     lorawan_window->show();
 }
+
+void smp_lorawan::close_connect_dialog()
+{
+    if (lorawan_window->isVisible())
+    {
+        lorawan_window->close();
+    }
+}
+#endif
 
 int smp_lorawan::is_connected()
 {
@@ -191,25 +209,20 @@ void smp_lorawan::connect_to_service(QString host, uint16_t port,  bool tls, QSt
 
     mqtt_topic = QString(topic).append("/up");
     mqtt_downlink_topic = QString(topic).append("/down/push");
+#if defined(GUI_PRESENT)
     lorawan_window->set_connection_options_enabled(false);
-}
-
-void smp_lorawan::close_connect_dialog()
-{
-    if (lorawan_window->isVisible())
-    {
-        lorawan_window->close();
-    }
+#endif
 }
 
 void smp_lorawan::setup_finished()
 {
+#if defined(GUI_PRESENT)
 #ifndef SKIPPLUGIN_LOGGER
     lorawan_window->set_logger(logger);
 #endif
-
     lorawan_window->load_settings();
     lorawan_window->load_pixmaps();
+#endif
 }
 
 void smp_lorawan::mqtt_connected()
@@ -233,7 +246,9 @@ void smp_lorawan::mqtt_disconnected()
         mqtt_topic_subscription = nullptr;
     }
 
+#if defined(GUI_PRESENT)
     lorawan_window->set_connection_options_enabled(true);
+#endif
 }
 
 void smp_lorawan::mqtt_state_changed(QMqttClient::ClientState state)
@@ -243,7 +258,9 @@ void smp_lorawan::mqtt_state_changed(QMqttClient::ClientState state)
         case QMqttClient::Disconnected:
         {
             mqtt_is_connected = false;
+#if defined(GUI_PRESENT)
             lorawan_window->set_connection_state(false);
+#endif
             return;
         }
         case QMqttClient::Connected:
@@ -254,7 +271,9 @@ void smp_lorawan::mqtt_state_changed(QMqttClient::ClientState state)
             QObject::connect(mqtt_topic_subscription, SIGNAL(messageReceived(QMqttMessage)), this, SLOT(mqtt_topic_message_received(QMqttMessage)));
             QObject::connect(mqtt_topic_subscription, SIGNAL(stateChanged(QMqttSubscription::SubscriptionState)), this, SLOT(mqtt_topic_state_changed(QMqttSubscription::SubscriptionState)));
 
+#if defined(GUI_PRESENT)
             lorawan_window->set_connection_state(true);
+#endif
             log_debug() << "Subscribed to " << mqtt_topic;
             return;
         }
@@ -394,6 +413,7 @@ void smp_lorawan::mqtt_topic_message_received(QMqttMessage message)
         received_data.clear();
     }
 
+//TODO: move this
     if (lorawan_window->get_auto_fragment_size() == true)
     {
         //Also get device's data rate to calculate maximum size of messages
@@ -463,19 +483,23 @@ void smp_lorawan::disconnect_from_service()
 {
     if (mqtt_is_connected == false)
     {
+#if defined(GUI_PRESENT)
         lorawan_window->set_connection_state(false);
         lorawan_window->set_connection_options_enabled(true);
+#endif
         return;
     }
 
     mqtt_client->disconnectFromHost();
 }
 
+//TODO: move
 uint8_t smp_lorawan::get_retries()
 {
     return lorawan_window->get_resends();
 }
 
+//TODO: move
 uint32_t smp_lorawan::get_timeout()
 {
     return lorawan_window->get_timeout();

@@ -40,6 +40,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
 {
     Q_UNUSED(parent);
 
+#if defined(GUI_PRESENT)
     main_window = plugin_mcumgr::get_main_window();
     bluetooth_window = new bluetooth_setup(main_window);
 
@@ -48,6 +49,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
     QObject::connect(bluetooth_window, SIGNAL(disconnect_from_device()), this, SLOT(form_disconnect_from_device()));
     QObject::connect(bluetooth_window, SIGNAL(bluetooth_status(bool*,bool*)), this, SLOT(form_bluetooth_status(bool*,bool*)));
     QObject::connect(bluetooth_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
+#endif
 
     bluetooth_service_mcumgr = nullptr;
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
@@ -72,6 +74,7 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
 
 smp_bluetooth::~smp_bluetooth()
 {
+#if defined(GUI_PRESENT)
     QObject::disconnect(this, SLOT(form_refresh_devices()));
     QObject::disconnect(this, SLOT(form_connect_to_device(uint16_t,uint8_t,bool)));
     QObject::disconnect(this, SLOT(form_disconnect_from_device()));
@@ -79,6 +82,7 @@ smp_bluetooth::~smp_bluetooth()
     QObject::disconnect(bluetooth_window, SIGNAL(plugin_get_image_pixmap(QString,QPixmap**)), main_window, SLOT(plugin_get_image_pixmap(QString,QPixmap**)));
 
     delete bluetooth_window;
+#endif
 
     if (discoveryAgent != nullptr)
     {
@@ -125,7 +129,9 @@ void smp_bluetooth::deviceDiscovered(const QBluetoothDeviceInfo &info)
 {
     bluetooth_device_list.append(info);
     QString device = QString(info.address().toString()).append(" ").append(info.name());
+#if defined(GUI_PRESENT)
     bluetooth_window->add_device(&device);
+#endif
 }
 
 void smp_bluetooth::deviceUpdated(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields)
@@ -134,23 +140,30 @@ void smp_bluetooth::deviceUpdated(const QBluetoothDeviceInfo &info, QBluetoothDe
 
 void smp_bluetooth::finished()
 {
+#if defined(GUI_PRESENT)
     bluetooth_window->set_status_text("Discovery finished");
     bluetooth_window->discovery_state(false);
+#endif
 }
 
 void smp_bluetooth::connected()
 {
+#if defined(GUI_PRESENT)
     bluetooth_window->set_status_text("Connected");
+    bluetooth_window->connection_state(true);
+#endif
     controller->discoverServices();
     device_connected = true;
     mtu = default_mtu;
     mtu_max_worked = 0;
-    bluetooth_window->connection_state(true);
 }
 
 void smp_bluetooth::disconnected()
 {
+#if defined(GUI_PRESENT)
     bluetooth_window->set_status_text("Disconnected");
+    bluetooth_window->connection_state(false);
+#endif
     device_connected = false;
     mtu_max_worked = 0;
     ready_to_send = false;
@@ -182,13 +195,13 @@ void smp_bluetooth::disconnected()
         controller = nullptr;
     }
 #endif
-
-    bluetooth_window->connection_state(false);
 }
 
 void smp_bluetooth::discovery_finished()
 {
+#if defined(GUI_PRESENT)
     bluetooth_window->set_status_text("Service scan finished");
+#endif
 //bluetooth_service_mcumgr = controller->createServiceObject(QBluetoothUuid(QString("8D53DC1D-1DB7-4CD3-868B-8A527460AA84")));
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
@@ -208,7 +221,9 @@ void smp_bluetooth::discovery_finished()
 
     if (!bluetooth_service_mcumgr)
     {
+#if defined(GUI_PRESENT)
         bluetooth_window->set_status_text("Error: SMP service not found");
+#endif
         controller->disconnectFromDevice();
     }
     else
@@ -427,8 +442,10 @@ void smp_bluetooth::errorz(QLowEnergyController::Error error)
             break;
         }
     };
-//    bluetooth_window->add_debug(QString::number(error));
+
+#if defined(GUI_PRESENT)
     bluetooth_window->set_status_text(err);
+#endif
 
     if (disconnect_from_device == true)
     {
@@ -436,8 +453,10 @@ void smp_bluetooth::errorz(QLowEnergyController::Error error)
 
         if (device_connected == false)
         {
+#if defined(GUI_PRESENT)
             bluetooth_window->discovery_state(false);
             bluetooth_window->connection_state(false);
+#endif
         }
     }
 }
@@ -537,7 +556,9 @@ void smp_bluetooth::form_refresh_devices()
         return;
     }
 
+#if defined(GUI_PRESENT)
     bluetooth_window->clear_devices();
+#endif
     bluetooth_device_list.clear();
 
     if (discoveryAgent->isActive())
@@ -546,9 +567,10 @@ void smp_bluetooth::form_refresh_devices()
     }
 
     discoveryAgent->start();
+#if defined(GUI_PRESENT)
     bluetooth_window->discovery_state(true);
-
     bluetooth_window->set_status_text("Scanning...");
+#endif
 }
 
 void smp_bluetooth::form_connect_to_device(uint16_t index, uint8_t address_type, bool write_with_response)
@@ -625,12 +647,15 @@ int smp_bluetooth::disconnect(bool force)
     }
     else
     {
+#if defined(GUI_PRESENT)
         bluetooth_window->connection_state(false);
+#endif
     }
 
     return SMP_TRANSPORT_ERROR_OK;
 }
 
+#if defined(GUI_PRESENT)
 void smp_bluetooth::open_connect_dialog()
 {
     bluetooth_window->show();
@@ -643,6 +668,15 @@ void smp_bluetooth::open_connect_dialog()
         bluetooth_window->discovery_state(true);
     }
 }
+
+void smp_bluetooth::close_connect_dialog()
+{
+    if (bluetooth_window->isVisible())
+    {
+        bluetooth_window->close();
+    }
+}
+#endif
 
 void smp_bluetooth::form_min_params()
 {
@@ -661,14 +695,6 @@ void smp_bluetooth::discover_timer_timeout()
 }
 #endif
 
-void smp_bluetooth::close_connect_dialog()
-{
-    if (bluetooth_window->isVisible())
-    {
-        bluetooth_window->close();
-    }
-}
-
 void smp_bluetooth::form_bluetooth_status(bool *scanning, bool *connecting)
 {
     *scanning = discoveryAgent->isActive();
@@ -677,10 +703,12 @@ void smp_bluetooth::form_bluetooth_status(bool *scanning, bool *connecting)
 
 void smp_bluetooth::setup_finished()
 {
+#if defined(GUI_PRESENT)
 #ifndef SKIPPLUGIN_LOGGER
     bluetooth_window->set_logger(logger);
 #endif
     bluetooth_window->load_pixmaps();
+#endif
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)

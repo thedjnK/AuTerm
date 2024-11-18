@@ -28,7 +28,9 @@
 /******************************************************************************/
 #include "plugin_mcumgr.h"
 #include "smp_transport.h"
+#if defined(GUI_PRESENT)
 #include "udp_setup.h"
+#endif
 #include <QUdpSocket>
 
 /******************************************************************************/
@@ -43,10 +45,12 @@ public:
     ~smp_udp();
     int connect(void) override;
     int disconnect(bool force) override;
+#if defined(GUI_PRESENT)
     void open_connect_dialog() override;
+    void close_connect_dialog() override;
+#endif
     int is_connected() override;
     smp_transport_error_t send(smp_message *message) override;
-    void close_connect_dialog() override;
     void setup_finished();
 
 private slots:
@@ -56,8 +60,10 @@ private slots:
     void socket_readyread();
 
 private:
+#if defined(GUI_PRESENT)
     udp_setup *udp_window;
     QMainWindow *main_window;
+#endif
     QUdpSocket *socket;
     bool socket_is_connected;
     smp_message received_data;

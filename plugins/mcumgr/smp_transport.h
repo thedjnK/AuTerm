@@ -75,6 +75,7 @@ public:
     virtual smp_transport_error_t send(smp_message *message) = 0;
 //    virtual int receive(QByteArray *data, uint16_t max_size) = 0;
 
+#if defined(GUI_PRESENT)
     virtual void open_connect_dialog()
     {
     }
@@ -82,6 +83,7 @@ public:
     virtual void close_connect_dialog()
     {
     }
+#endif
 
     virtual uint16_t max_message_data_size(uint16_t mtu)
     {

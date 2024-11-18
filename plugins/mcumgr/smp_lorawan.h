@@ -25,7 +25,9 @@
 
 #include "plugin_mcumgr.h"
 #include "smp_transport.h"
+#if defined(GUI_PRESENT)
 #include "lorawan_setup.h"
+#endif
 #include <QByteArray>
 #include <QtMqtt/QMqttClient>
 #include <QtMqtt/QMqttSubscription>
@@ -40,10 +42,12 @@ public:
     ~smp_lorawan();
     int connect(void) override;
     int disconnect(bool force) override;
+#if defined(GUI_PRESENT)
     void open_connect_dialog() override;
+    void close_connect_dialog() override;
+#endif
     int is_connected() override;
     smp_transport_error_t send(smp_message *message) override;
-    void close_connect_dialog() override;
     void setup_finished();
     uint8_t get_retries() override;
     uint32_t get_timeout() override;
@@ -60,8 +64,10 @@ private slots:
     void mqtt_topic_state_changed(QMqttSubscription::SubscriptionState state);
 
 private:
+#if defined(GUI_PRESENT)
     lorawan_setup *lorawan_window;
     QMainWindow *main_window;
+#endif
     QMqttClient *mqtt_client;
     QMqttSubscription *mqtt_topic_subscription;
     QString mqtt_topic;
