@@ -25,7 +25,6 @@
 
 #include <QObject>
 #include <QTimer>
-#include <QListWidgetItem>
 #include <QBluetoothUuid>
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
