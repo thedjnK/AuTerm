@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>572</width>
+    <width>600</width>
     <height>404</height>
    </rect>
   </property>
@@ -197,7 +197,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QTabWidget" name="tabWidget_2">
+        <widget class="QTabWidget" name="selector_group">
          <property name="tabPosition">
           <enum>QTabWidget::TabPosition::West</enum>
          </property>
@@ -225,7 +225,7 @@
             <number>2</number>
            </property>
            <item row="0" column="0">
-            <widget class="QTabWidget" name="tabWidget_3">
+            <widget class="QTabWidget" name="selector_img">
              <property name="currentIndex">
               <number>0</number>
              </property>
@@ -3019,8 +3019,8 @@
   <tabstop>radio_transport_udp</tabstop>
   <tabstop>radio_transport_bluetooth</tabstop>
   <tabstop>btn_transport_connect</tabstop>
-  <tabstop>tabWidget_2</tabstop>
-  <tabstop>tabWidget_3</tabstop>
+  <tabstop>selector_group</tabstop>
+  <tabstop>selector_img</tabstop>
   <tabstop>edit_IMG_Local</tabstop>
   <tabstop>btn_IMG_Local</tabstop>
   <tabstop>edit_IMG_Image</tabstop>
@@ -3132,11 +3132,11 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_5"/>
   <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_6"/>
+  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_5"/>
  </buttongroups>
 </ui>

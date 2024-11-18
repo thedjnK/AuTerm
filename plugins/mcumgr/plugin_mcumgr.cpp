@@ -188,17 +188,17 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     verticalLayout_2->addLayout(horizontalLayout_7);
 
-    tabWidget_2 = new QTabWidget(tab);
-    tabWidget_2->setObjectName("tabWidget_2");
-    tabWidget_2->setTabPosition(QTabWidget::TabPosition::West);
+    selector_group = new QTabWidget(tab);
+    selector_group->setObjectName("selector_group");
+    selector_group->setTabPosition(QTabWidget::TabPosition::West);
     tab_IMG = new QWidget();
     tab_IMG->setObjectName("tab_IMG");
     gridLayout_3 = new QGridLayout(tab_IMG);
     gridLayout_3->setSpacing(2);
     gridLayout_3->setObjectName("gridLayout_3");
     gridLayout_3->setContentsMargins(6, 6, 6, 6);
-    tabWidget_3 = new QTabWidget(tab_IMG);
-    tabWidget_3->setObjectName("tabWidget_3");
+    selector_img = new QTabWidget(tab_IMG);
+    selector_img->setObjectName("selector_img");
     tab_IMG_Upload = new QWidget();
     tab_IMG_Upload->setObjectName("tab_IMG_Upload");
     gridLayout_4 = new QGridLayout(tab_IMG_Upload);
@@ -285,7 +285,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_4->addItem(verticalSpacer_4, 4, 0, 1, 1);
 
-    tabWidget_3->addTab(tab_IMG_Upload, QString());
+    selector_img->addTab(tab_IMG_Upload, QString());
     tab_IMG_Images = new QWidget();
     tab_IMG_Images->setObjectName("tab_IMG_Images");
     gridLayout_5 = new QGridLayout(tab_IMG_Images);
@@ -343,7 +343,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_5->addLayout(horizontalLayout_6, 1, 0, 1, 1);
 
-    tabWidget_3->addTab(tab_IMG_Images, QString());
+    selector_img->addTab(tab_IMG_Images, QString());
     tab_IMG_Erase = new QWidget();
     tab_IMG_Erase->setObjectName("tab_IMG_Erase");
     gridLayout_10 = new QGridLayout(tab_IMG_Erase);
@@ -368,7 +368,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_10->addItem(verticalSpacer_2, 1, 0, 1, 1);
 
-    tabWidget_3->addTab(tab_IMG_Erase, QString());
+    selector_img->addTab(tab_IMG_Erase, QString());
     tab_IMG_Slots = new QWidget();
     tab_IMG_Slots->setObjectName("tab_IMG_Slots");
     verticalLayout_6 = new QVBoxLayout(tab_IMG_Slots);
@@ -388,9 +388,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     verticalLayout_6->addWidget(tree_IMG_Slot_Info);
 
-    tabWidget_3->addTab(tab_IMG_Slots, QString());
+    selector_img->addTab(tab_IMG_Slots, QString());
 
-    gridLayout_3->addWidget(tabWidget_3, 0, 0, 1, 1);
+    gridLayout_3->addWidget(selector_img, 0, 0, 1, 1);
 
     horizontalLayout_3 = new QHBoxLayout();
     horizontalLayout_3->setSpacing(2);
@@ -417,7 +417,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_3->addWidget(lbl_IMG_Status, 3, 0, 1, 2);
 
-    tabWidget_2->addTab(tab_IMG, QString());
+    selector_group->addTab(tab_IMG, QString());
     tab_FS = new QWidget();
     tab_FS->setObjectName("tab_FS");
     gridLayout_2 = new QGridLayout(tab_FS);
@@ -553,7 +553,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_2->addWidget(edit_FS_Size, 4, 1, 1, 1);
 
-    tabWidget_2->addTab(tab_FS, QString());
+    selector_group->addTab(tab_FS, QString());
     tab_OS = new QWidget();
     tab_OS->setObjectName("tab_OS");
     gridLayout_7 = new QGridLayout(tab_OS);
@@ -750,11 +750,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_os_datetime_date_time->setMinimumDate(QDate(1970, 1, 1));
     edit_os_datetime_date_time->setCurrentSection(QDateTimeEdit::Section::YearSection);
     edit_os_datetime_date_time->setCalendarPopup(true);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-    edit_os_datetime_date_time->setTimeZone(QTimeZone::LocalTime);
-#else
     edit_os_datetime_date_time->setTimeSpec(Qt::TimeSpec::LocalTime);
-#endif
 
     gridLayout_18->addWidget(edit_os_datetime_date_time, 0, 1, 1, 1);
 
@@ -852,7 +848,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_7->addWidget(selector_OS, 0, 0, 1, 1);
 
-    tabWidget_2->addTab(tab_OS, QString());
+    selector_group->addTab(tab_OS, QString());
     tab_Stats = new QWidget();
     tab_Stats->setObjectName("tab_Stats");
     gridLayout_11 = new QGridLayout(tab_Stats);
@@ -936,7 +932,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_11->addWidget(table_STAT_Values, 1, 1, 1, 1);
 
-    tabWidget_2->addTab(tab_Stats, QString());
+    selector_group->addTab(tab_Stats, QString());
     tab_Shell = new QWidget();
     tab_Shell->setObjectName("tab_Shell");
     gridLayout_9 = new QGridLayout(tab_Shell);
@@ -1028,7 +1024,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_9->addLayout(horizontalLayout_17, 2, 0, 1, 2);
 
-    tabWidget_2->addTab(tab_Shell, QString());
+    selector_group->addTab(tab_Shell, QString());
     tab_Settings = new QWidget();
     tab_Settings->setObjectName("tab_Settings");
     gridLayout_15 = new QGridLayout(tab_Settings);
@@ -1210,7 +1206,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
 
-    tabWidget_2->addTab(tab_Settings, QString());
+    selector_group->addTab(tab_Settings, QString());
     tab_zephyr = new QWidget();
     tab_zephyr->setObjectName("tab_zephyr");
     gridLayout_16 = new QGridLayout(tab_zephyr);
@@ -1265,7 +1261,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_16->addWidget(lbl_zephyr_status, 1, 0, 1, 1);
 
-    tabWidget_2->addTab(tab_zephyr, QString());
+    selector_group->addTab(tab_zephyr, QString());
     tab_Enum = new QWidget();
     tab_Enum->setObjectName("tab_Enum");
     verticalLayout_3 = new QVBoxLayout(tab_Enum);
@@ -1403,7 +1399,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     verticalLayout_3->addLayout(horizontalLayout_20);
 
-    tabWidget_2->addTab(tab_Enum, QString());
+    selector_group->addTab(tab_Enum, QString());
     tab_custom = new QWidget();
     tab_custom->setObjectName("tab_custom");
     verticalLayout_5 = new QVBoxLayout(tab_custom);
@@ -1649,9 +1645,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     verticalLayout_5->addLayout(horizontalLayout_24);
 
-    tabWidget_2->addTab(tab_custom, QString());
+    selector_group->addTab(tab_custom, QString());
 
-    verticalLayout_2->addWidget(tabWidget_2);
+    verticalLayout_2->addWidget(selector_group);
 
 //    tabWidget->addTab(tab, QString());
     tab_2 = new QWidget();
@@ -1745,9 +1741,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(radio_transport_uart, radio_transport_udp);
     QWidget::setTabOrder(radio_transport_udp, radio_transport_bluetooth);
     QWidget::setTabOrder(radio_transport_bluetooth, btn_transport_connect);
-    QWidget::setTabOrder(btn_transport_connect, tabWidget_2);
-    QWidget::setTabOrder(tabWidget_2, tabWidget_3);
-    QWidget::setTabOrder(tabWidget_3, edit_IMG_Local);
+    QWidget::setTabOrder(btn_transport_connect, selector_group);
+    QWidget::setTabOrder(selector_group, selector_img);
+    QWidget::setTabOrder(selector_img, edit_IMG_Local);
     QWidget::setTabOrder(edit_IMG_Local, btn_IMG_Local);
     QWidget::setTabOrder(btn_IMG_Local, edit_IMG_Image);
     QWidget::setTabOrder(edit_IMG_Image, radio_IMG_No_Action);
@@ -1858,8 +1854,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 //    retranslateUi(Form);
 
 //    tabWidget->setCurrentIndex(0);
-    tabWidget_2->setCurrentIndex(0);
-    tabWidget_3->setCurrentIndex(0);
+    selector_group->setCurrentIndex(0);
+    selector_img->setCurrentIndex(0);
     selector_OS->setCurrentIndex(0);
     tabWidget_4->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
@@ -1872,7 +1868,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_uart->setText(QCoreApplication::translate("Form", "UART", nullptr));
     radio_transport_udp->setText(QCoreApplication::translate("Form", "UDP", nullptr));
     radio_transport_bluetooth->setText(QCoreApplication::translate("Form", "Bluetooth", nullptr));
-    radio_transport_lora->setText(QCoreApplication::translate("Form", "LoRa", nullptr));
+    radio_transport_lora->setText(QCoreApplication::translate("Form", "LoRaWAN", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
     btn_error_lookup->setText(QCoreApplication::translate("Form", "Error lookup", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
@@ -1884,22 +1880,22 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_IMG_No_Action->setText(QCoreApplication::translate("Form", "No action", nullptr));
     radio_IMG_Test->setText(QCoreApplication::translate("Form", "Test", nullptr));
     radio_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
-    tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Upload), QCoreApplication::translate("Form", "Upload", nullptr));
+    selector_img->setTabText(selector_img->indexOf(tab_IMG_Upload), QCoreApplication::translate("Form", "Upload", nullptr));
     label_5->setText(QCoreApplication::translate("Form", "State:", nullptr));
     radio_IMG_Get->setText(QCoreApplication::translate("Form", "Get", nullptr));
     radio_IMG_Set->setText(QCoreApplication::translate("Form", "Set", nullptr));
     radio_img_images_erase->setText(QCoreApplication::translate("Form", "Erase", nullptr));
     check_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
-    tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
+    selector_img->setTabText(selector_img->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));
-    tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
+    selector_img->setTabText(selector_img->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
     QTreeWidgetItem *___qtreewidgetitem = tree_IMG_Slot_Info->headerItem();
     ___qtreewidgetitem->setText(2, QCoreApplication::translate("Form", "Upload ID", nullptr));
     ___qtreewidgetitem->setText(1, QCoreApplication::translate("Form", "Size", nullptr));
-    tabWidget_3->setTabText(tabWidget_3->indexOf(tab_IMG_Slots), QCoreApplication::translate("Form", "Slots", nullptr));
+    selector_img->setTabText(selector_img->indexOf(tab_IMG_Slots), QCoreApplication::translate("Form", "Slots", nullptr));
     btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_IMG), QCoreApplication::translate("Form", "Img", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_IMG), QCoreApplication::translate("Form", "Img", nullptr));
     label_28->setText(QCoreApplication::translate("Form", "Hash/Checksum:", nullptr));
     lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     label_29->setText(QCoreApplication::translate("Form", "File size:", nullptr));
@@ -1913,7 +1909,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_FS_Hash_Checksum_Types->setText(QCoreApplication::translate("Form", "Types", nullptr));
     label_19->setText(QCoreApplication::translate("Form", "Type:", nullptr));
     btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
     btn_OS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_OS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     label_10->setText(QCoreApplication::translate("Form", "Input:", nullptr));
@@ -1964,7 +1960,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_os_bootloader_query->setPlaceholderText(QCoreApplication::translate("Form", "Bootloader", nullptr));
     label_21->setText(QCoreApplication::translate("Form", "Response:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Bootloader), QCoreApplication::translate("Form", "Bootloader", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_OS), QCoreApplication::translate("Form", "OS", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_OS), QCoreApplication::translate("Form", "OS", nullptr));
     lbl_STAT_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     radio_STAT_List->setText(QCoreApplication::translate("Form", "List Groups", nullptr));
     radio_STAT_Fetch->setText(QCoreApplication::translate("Form", "Fetch Stats", nullptr));
@@ -1975,13 +1971,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     ___qtablewidgetitem12->setText(QCoreApplication::translate("Form", "Name", nullptr));
     QTableWidgetItem *___qtablewidgetitem13 = table_STAT_Values->horizontalHeaderItem(1);
     ___qtablewidgetitem13->setText(QCoreApplication::translate("Form", "Value", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Stats), QCoreApplication::translate("Form", "Stats", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_Stats), QCoreApplication::translate("Form", "Stats", nullptr));
     lbl_SHELL_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_SHELL_Clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
     btn_SHELL_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
     check_shell_vt100_decoding->setText(QCoreApplication::translate("Form", "VT100 decoding", nullptr));
     check_shel_unescape_strings->setText(QCoreApplication::translate("Form", "Un-escape strings", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
     label_22->setText(QCoreApplication::translate("Form", "Action:", nullptr));
     lbl_settings_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     label_26->setText(QCoreApplication::translate("Form", "Decoded:", nullptr));
@@ -2001,12 +1997,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_settings_commit->setText(QCoreApplication::translate("Form", "Commit", nullptr));
     radio_settings_load->setText(QCoreApplication::translate("Form", "Load", nullptr));
     radio_settings_save->setText(QCoreApplication::translate("Form", "Save", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_Settings), QCoreApplication::translate("Form", "Settings", nullptr));
     btn_zephyr_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     label_12->setText(QCoreApplication::translate("Form", "This will erase the \"storage_partition\" flash partition on the device.", nullptr));
     tabWidget_4->setTabText(tabWidget_4->indexOf(tab_zephyr_storage_erase), QCoreApplication::translate("Form", "Storage Erase", nullptr));
     lbl_zephyr_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_zephyr), QCoreApplication::translate("Form", "Zephyr", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_zephyr), QCoreApplication::translate("Form", "Zephyr", nullptr));
     radio_Enum_Count->setText(QCoreApplication::translate("Form", "Count", nullptr));
     radio_Enum_List->setText(QCoreApplication::translate("Form", "List", nullptr));
     radio_Enum_Single->setText(QCoreApplication::translate("Form", "Single", nullptr));
@@ -2023,7 +2019,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     ___qtablewidgetitem16->setText(QCoreApplication::translate("Form", "Handlers", nullptr));
     lbl_enum_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_enum_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_Enum), QCoreApplication::translate("Form", "Enum", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_Enum), QCoreApplication::translate("Form", "Enum", nullptr));
     label_38->setText(QCoreApplication::translate("Form", "Mode:", nullptr));
     radio_custom_custom->setText(QCoreApplication::translate("Form", "Custom command", nullptr));
     radio_custom_logging->setText(QCoreApplication::translate("Form", "Logging", nullptr));
@@ -2045,7 +2041,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_custom_clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
     lbl_custom_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_custom_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_custom), QCoreApplication::translate("Form", "Custom", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_custom), QCoreApplication::translate("Form", "Custom", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Form", "MCUmgr", nullptr));
     label_7->setText(QCoreApplication::translate("Form", "Hash:", nullptr));
     label_8->setText(QCoreApplication::translate("Form", "Version:", nullptr));
@@ -2776,7 +2772,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         return;
     }
 
-    if (tabWidget_3->currentWidget() == tab_IMG_Upload)
+    if (selector_img->currentWidget() == tab_IMG_Upload)
     {
         //Upload
         if (edit_IMG_Local->text().isEmpty())
@@ -2800,7 +2796,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
             }
         }
     }
-    else if (tabWidget_3->currentWidget() == tab_IMG_Images)
+    else if (selector_img->currentWidget() == tab_IMG_Images)
     {
         //Image list
         if (radio_IMG_Get->isChecked())
@@ -2875,7 +2871,7 @@ finished:
             }
         }
     }
-    else if (tabWidget_3->currentWidget() == tab_IMG_Erase)
+    else if (selector_img->currentWidget() == tab_IMG_Erase)
     {
         //Erase
         mode = ACTION_IMG_IMAGE_ERASE;
@@ -2888,7 +2884,7 @@ finished:
             lbl_IMG_Status->setText("Erasing...");
         }
     }
-    else if (tabWidget_3->currentWidget() == tab_IMG_Slots)
+    else if (selector_img->currentWidget() == tab_IMG_Slots)
     {
         //Slot info
         mode = ACTION_IMG_IMAGE_SLOT_INFO;
@@ -4839,6 +4835,7 @@ void plugin_mcumgr::on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *ite
     if (!item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).isEmpty())
     {
         edit_IMG_Image->setValue(item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).toUInt());
+        selector_img->setCurrentIndex(selector_img->indexOf(tab_IMG_Upload));
     }
 }
 

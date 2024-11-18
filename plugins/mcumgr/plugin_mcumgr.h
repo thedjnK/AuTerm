@@ -282,10 +282,10 @@ private:
     QPushButton *btn_transport_connect;
     QPushButton *btn_error_lookup;
     QSpacerItem *horizontalSpacer_6;
-    QTabWidget *tabWidget_2;
+    QTabWidget *selector_group;
     QWidget *tab_IMG;
     QGridLayout *gridLayout_3;
-    QTabWidget *tabWidget_3;
+    QTabWidget *selector_img;
     QWidget *tab_IMG_Upload;
     QGridLayout *gridLayout_4;
     QLabel *label_6;
@@ -559,12 +559,12 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup_6;
     QButtonGroup *buttonGroup;
-    QButtonGroup *buttonGroup_3;
-    QButtonGroup *buttonGroup_5;
     QButtonGroup *buttonGroup_4;
+    QButtonGroup *buttonGroup_6;
+    QButtonGroup *buttonGroup_3;
     QButtonGroup *buttonGroup_2;
+    QButtonGroup *buttonGroup_5;
 ///AUTOGEN_END_OBJECTS
 
     //
