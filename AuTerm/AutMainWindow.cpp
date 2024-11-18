@@ -137,8 +137,8 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                             QWidget *plugin_tab = new QWidget();
 
                             plugin_transport = (AutTransportPlugin *)plugin.plugin;
-                            plugin_tab->setObjectName("tab_transport_plugin_" % QString::number(plugin_list.count() - 1));
-                            ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
+                            plugin_tab->setObjectName("selector_transport_plugin_" % QString::number(plugin_list.count() - 1));
+                            ui->selector_transport->addTab(plugin_tab, plugin_transport->transport_name());
 //                            qDebug() << "found transport plugin " << static_plugins.at(i).metaData().value("MetaData").toObject().value("Name").toString();
                             plugin_object = plugin_transport->plugin_object();
 
@@ -216,8 +216,8 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
                                 QWidget *plugin_tab = new QWidget();
 
                                 plugin_transport = (AutTransportPlugin *)plugin.plugin;
-                                plugin_tab->setObjectName("tab_transport_plugin_" % QString::number(plugin_list.count() - 1));
-                                ui->tab_transport->addTab(plugin_tab, plugin_transport->transport_name());
+                                plugin_tab->setObjectName("selector_transport_plugin_" % QString::number(plugin_list.count() - 1));
+                                ui->selector_transport->addTab(plugin_tab, plugin_transport->transport_name());
 //                                qDebug() << "found transport plugin " << plugin.plugin_loader->metaData().value("MetaData").toObject().value("Name").toString();
                                 plugin_object = plugin_transport->plugin_object();
 
@@ -2159,7 +2159,7 @@ void AutMainWindow::OpenDevice(bool from_plugin)
     }
 
 #ifndef SKIPPLUGINS_TRANSPORT
-    if (ui->tab_transport->currentIndex() == 0)
+    if (ui->selector_transport->currentIndex() == 0)
 #endif
     {
         //Use UART
@@ -2235,7 +2235,7 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 #ifndef SKIPPLUGINS_TRANSPORT
     else
     {
-        qsizetype pos_underscore = ui->tab_transport->currentWidget()->objectName().lastIndexOf('_');
+        qsizetype pos_underscore = ui->selector_transport->currentWidget()->objectName().lastIndexOf('_');
         uint plugin_index;
 
         if (pos_underscore == -1)
@@ -2244,7 +2244,7 @@ void AutMainWindow::OpenDevice(bool from_plugin)
             return;
         }
 
-        plugin_index = ui->tab_transport->currentWidget()->objectName().mid((pos_underscore + 1)).toUInt();
+        plugin_index = ui->selector_transport->currentWidget()->objectName().mid((pos_underscore + 1)).toUInt();
 
         if (plugin_index >= plugin_list.length())
         {
@@ -5452,7 +5452,7 @@ bool AutMainWindow::transport_open(QIODevice::OpenMode mode)
 #endif
 {
     //TODO:
-    if (ui->tab_transport->currentIndex() == 0)
+    if (ui->selector_transport->currentIndex() == 0)
     {
         return gspSerialPort.open(mode);
     }
