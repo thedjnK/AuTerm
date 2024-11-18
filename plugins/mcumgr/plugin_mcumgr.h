@@ -36,7 +36,7 @@
 #include "AutPlugin.h"
 #include "smp_processor.h"
 #include "smp_group.h"
-#include "smp_uart.h"
+#include "smp_uart_auterm.h"
 #include "smp_group_fs_mgmt.h"
 #include "smp_group_img_mgmt.h"
 #include "smp_group_os_mgmt.h"
@@ -583,7 +583,7 @@ private:
     error_lookup *error_lookup_form;
     smp_processor *processor;
     smp_group_array smp_groups;
-    class smp_uart *uart_transport;
+    class smp_uart_auterm *uart_transport;
     uint16_t enum_count;
     QList<uint16_t> enum_groups;
     uint16_t enum_single_id;

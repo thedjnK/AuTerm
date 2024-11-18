@@ -45,7 +45,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     parent_window = main_window;
 
     //Initialise transports
-    uart_transport = new smp_uart(this);
+    uart_transport = new smp_uart_auterm(this);
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     udp_transport = new smp_udp(this);

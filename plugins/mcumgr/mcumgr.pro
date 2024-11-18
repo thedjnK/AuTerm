@@ -32,7 +32,7 @@ SOURCES += \
     smp_json.cpp \
     smp_message.cpp \
     smp_processor.cpp \
-    smp_uart.cpp \
+    smp_uart_auterm.cpp \
     smp_group_img_mgmt.cpp
 
 HEADERS += \
@@ -56,7 +56,7 @@ HEADERS += \
     smp_message.h \
     smp_processor.h \
     smp_transport.h \
-    smp_uart.h \
+    smp_uart_auterm.h \
     smp_group.h \
     smp_group_img_mgmt.h
 

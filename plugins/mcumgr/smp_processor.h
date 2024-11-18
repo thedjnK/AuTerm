@@ -25,7 +25,7 @@
 
 #include <QObject>
 #include "smp_message.h"
-#include "smp_uart.h"
+#include "smp_transport.h"
 #include "debug_logger.h"
 #include "smp_json.h"
 

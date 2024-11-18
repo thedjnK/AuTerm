@@ -1,9 +1,9 @@
 /******************************************************************************
-** Copyright (C) 2021-2023 Jamie M.
+** Copyright (C) 2021-2024 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module:  smp_uart.h
+** Module:  smp_uart_auterm_auterm.h
 **
 ** Notes:
 **
@@ -20,21 +20,21 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#ifndef SMP_UART_H
-#define SMP_UART_H
+#ifndef SMP_UART_AUTERM_H
+#define SMP_UART_AUTERM_H
 
 #include <QObject>
 #include "smp_transport.h"
 #include "smp_message.h"
 #include "debug_logger.h"
 
-class smp_uart : public smp_transport
+class smp_uart_auterm : public smp_transport
 {
     Q_OBJECT
 
 public:
-    smp_uart(QObject *parent = nullptr);
-    ~smp_uart();
+    smp_uart_auterm(QObject *parent = nullptr);
+    ~smp_uart_auterm();
     smp_transport_error_t send(smp_message *message) override;
     uint16_t max_message_data_size(uint16_t mtu) override;
 
@@ -57,4 +57,4 @@ private:
     uint16_t waiting_packet_length = 0;
 };
 
-#endif // SMP_UART_H
+#endif // SMP_UART_AUTERM_H

@@ -1,9 +1,9 @@
 /******************************************************************************
-** Copyright (C) 2021-2023 Jamie M.
+** Copyright (C) 2021-2024 Jamie M.
 **
 ** Project: AuTerm
 **
-** Module:  smp_uart.cpp
+** Module:  smp_uart_auterm.cpp
 **
 ** Notes:
 **
@@ -20,20 +20,20 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#include "smp_uart.h"
+#include "smp_uart_auterm.h"
 #include "crc16.h"
 #include <math.h>
 
-smp_uart::smp_uart(QObject *parent)
+smp_uart_auterm::smp_uart_auterm(QObject *parent)
 {
     Q_UNUSED(parent);
 }
 
-smp_uart::~smp_uart()
+smp_uart_auterm::~smp_uart_auterm()
 {
 }
 
-void smp_uart::data_received(QByteArray *message)
+void smp_uart_auterm::data_received(QByteArray *message)
 {
     smp_message full_message;
     full_message.append(message);
@@ -45,7 +45,7 @@ void smp_uart::data_received(QByteArray *message)
     }
 }
 
-void smp_uart::serial_read(QByteArray *rec_data)
+void smp_uart_auterm::serial_read(QByteArray *rec_data)
 {
     SerialData.append(*rec_data);
 
@@ -191,7 +191,7 @@ void smp_uart::serial_read(QByteArray *rec_data)
     }
 }
 
-smp_transport_error_t smp_uart::send(smp_message *message)
+smp_transport_error_t smp_uart_auterm::send(smp_message *message)
 {
     //127 bytes = 3 + base 64 message
     //base64 = 4 bytes output per 3 byte input
@@ -244,7 +244,7 @@ end:
     return SMP_TRANSPORT_ERROR_OK;
 }
 
-uint16_t smp_uart::max_message_data_size(uint16_t mtu)
+uint16_t smp_uart_auterm::max_message_data_size(uint16_t mtu)
 {
     float available_mtu = mtu;
     int packets = ceil(available_mtu / 124.0);
