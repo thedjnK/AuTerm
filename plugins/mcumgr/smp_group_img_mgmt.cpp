@@ -882,56 +882,52 @@ log_error() << "Going in circles...";
 
         if (this->file_upload_area >= (uint32_t)this->file_upload_data.length())
         {
-            float blah = this->file_upload_data.length();
+            double upload_speed = NAN;
             uint8_t prefix = 0;
-            while (blah >= 1024)
+            QString speed_string;
+
+            if (this->upload_tmr.isValid() == true)
             {
-                blah /= 1024;
-                ++prefix;
-            }
-            QString bob;
-            if (prefix == 0)
-            {
-                bob = "B";
-            }
-            else if (prefix == 1)
-            {
-                bob = "KiB";
-            }
-            else if (prefix == 2)
-            {
-                bob = "MiB";
-            }
-            else if (prefix == 3)
-            {
-                bob = "GiB";
+                upload_speed = (double)this->file_upload_data.length() / (double)(this->upload_tmr.elapsed() / 1000);
+
+                while (upload_speed >= 1024.0 && prefix < 3)
+                {
+                    if (std::isnan(upload_speed) == true)
+                    {
+                        break;
+                    }
+
+                    upload_speed /= 1024.0;
+                    ++prefix;
+                }
+
+                if (std::isnan(upload_speed) == false)
+                {
+                    if (prefix == 0)
+                    {
+                        speed_string = "B";
+                    }
+                    else if (prefix == 1)
+                    {
+                        speed_string = "KiB";
+                    }
+                    else if (prefix == 2)
+                    {
+                        speed_string = "MiB";
+                    }
+                    else if (prefix == 3)
+                    {
+                        speed_string = "GiB";
+                    }
+
+                    speed_string = QString("~").append(QString::number(upload_speed)).append(speed_string).append("ps throughput");
+                }
             }
 
-            blah = this->file_upload_data.length() / (float)(this->upload_tmr.elapsed() / 1000);
-            prefix = 0;
-            while (blah >= 1024)
+            if (this->upload_tmr.isValid() == false || std::isnan(upload_speed) == true)
             {
-                blah /= 1024;
-                ++prefix;
+                speed_string = "Upload finished";
             }
-
-            if (prefix == 0)
-            {
-                bob = "B";
-            }
-            else if (prefix == 1)
-            {
-                bob = "KiB";
-            }
-            else if (prefix == 2)
-            {
-                bob = "MiB";
-            }
-            else if (prefix == 3)
-            {
-                bob = "GiB";
-            }
-//            edit_IMG_Log->appendPlainText(QString("~").append(QString::number(blah)).append(bob).append("ps throughput"));
 
             mode = MODE_IDLE;
             this->upload_image = 0;
@@ -943,7 +939,7 @@ log_error() << "Going in circles...";
 //                emit plugin_set_status(false, false);
 //                lbl_IMG_Status->setText("Finished.");
             emit progress(smp_user_data, 100);
-            emit status(smp_user_data, STATUS_COMPLETE, QString("~").append(QString::number(blah)).append(bob).append("ps throughput"));
+            emit status(smp_user_data, STATUS_COMPLETE, speed_string);
 
             return;
         }
