@@ -66,6 +66,8 @@ smp_bluetooth::smp_bluetooth(QObject *parent)
 
     mtu_max_worked = 0;
     ready_to_send = false;
+    bluetooth_config_set = false;
+    bluetooth_config_connection_in_progress = false;
 }
 /*
     void error(QBluetoothDeviceDiscoveryAgent::Error error);
@@ -108,8 +110,8 @@ smp_bluetooth::~smp_bluetooth()
 
     if (controller != nullptr)
     {
-        QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
-        QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
+        QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(bluetooth_connected()));
+        QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(bluetooth_disconnected()));
         QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
         QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
@@ -128,10 +130,20 @@ smp_bluetooth::~smp_bluetooth()
 void smp_bluetooth::deviceDiscovered(const QBluetoothDeviceInfo &info)
 {
     bluetooth_device_list.append(info);
-    QString device = QString(info.address().toString()).append(" ").append(info.name());
 #if defined(GUI_PRESENT)
+    QString device = QString(info.address().toString()).append(" ").append(info.name());
     bluetooth_window->add_device(&device);
 #endif
+
+    if (bluetooth_config_connection_in_progress == true)
+    {
+        if ((bluetooth_config.type == SMP_BLUETOOTH_CONNECT_TYPE_ADDRESS && bluetooth_config.address == info.address().toString()) || (bluetooth_config.type == SMP_BLUETOOTH_CONNECT_TYPE_NAME && bluetooth_config.name == info.name()))
+        {
+            //Connect to device as this is what we are looking for, prevent connecting to more
+            bluetooth_config_connection_in_progress = false;
+            form_connect_to_device((bluetooth_device_list.length() - 1), BLUETOOTH_FORCE_ADDRESS_DEFAULT, true);
+        }
+    }
 }
 
 void smp_bluetooth::deviceUpdated(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields)
@@ -146,7 +158,7 @@ void smp_bluetooth::finished()
 #endif
 }
 
-void smp_bluetooth::connected()
+void smp_bluetooth::bluetooth_connected()
 {
 #if defined(GUI_PRESENT)
     bluetooth_window->set_status_text("Connected");
@@ -158,7 +170,7 @@ void smp_bluetooth::connected()
     mtu_max_worked = 0;
 }
 
-void smp_bluetooth::disconnected()
+void smp_bluetooth::bluetooth_disconnected()
 {
 #if defined(GUI_PRESENT)
     bluetooth_window->set_status_text("Disconnected");
@@ -167,6 +179,7 @@ void smp_bluetooth::disconnected()
     device_connected = false;
     mtu_max_worked = 0;
     ready_to_send = false;
+    bluetooth_config_connection_in_progress = false;
 
     if (bluetooth_service_mcumgr != nullptr)
     {
@@ -186,8 +199,8 @@ void smp_bluetooth::disconnected()
 #if 0
     if (controller != nullptr)
     {
-        QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
-        QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
+        QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(bluetooth_connected()));
+        QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(bluetooth_disconnected()));
         QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
         QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
         QObject::disconnect(controller, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorz(QLowEnergyController::Error)));
@@ -195,6 +208,8 @@ void smp_bluetooth::disconnected()
         controller = nullptr;
     }
 #endif
+
+    emit disconnected();
 }
 
 void smp_bluetooth::discovery_finished()
@@ -232,7 +247,6 @@ void smp_bluetooth::discovery_finished()
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)), this, SLOT(mcumgr_service_characteristic_changed(QLowEnergyCharacteristic,QByteArray)));
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(characteristicWritten(QLowEnergyCharacteristic,QByteArray)), this, SLOT(mcumgr_service_characteristic_written(QLowEnergyCharacteristic,QByteArray)));
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)), this, SLOT(mcumgr_service_descriptor_written(QLowEnergyDescriptor,QByteArray)));
-        QObject::connect(bluetooth_service_mcumgr, SIGNAL(error(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
         QObject::connect(bluetooth_service_mcumgr, SIGNAL(errorOccurred(QLowEnergyService::ServiceError)), this, SLOT(mcumgr_service_error(QLowEnergyService::ServiceError)));
 #else
@@ -326,6 +340,8 @@ void smp_bluetooth::mcumgr_service_descriptor_written(const QLowEnergyDescriptor
                 }
             }
         }
+
+        emit connected();
     }
 }
 
@@ -544,7 +560,9 @@ void smp_bluetooth::mcumgr_service_error(QLowEnergyService::ServiceError error)
         {
             send_buffer.clear();
             log_error() << "Unable to write Bluetooth characteristic with minimal MTU size, this connection is unusable";
+#if defined(GUI_PRESENT)
             bluetooth_window->set_status_text("Minimal MTU write failed, connection is unusable");
+#endif
         }
     }
 }
@@ -582,8 +600,8 @@ void smp_bluetooth::form_connect_to_device(uint16_t index, uint8_t address_type,
 
     if (controller)
     {
-        QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(connected()));
-        QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
+        QObject::disconnect(controller, SIGNAL(connected()), this, SLOT(bluetooth_connected()));
+        QObject::disconnect(controller, SIGNAL(disconnected()), this, SLOT(bluetooth_disconnected()));
         QObject::disconnect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
         QObject::disconnect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
@@ -598,8 +616,8 @@ void smp_bluetooth::form_connect_to_device(uint16_t index, uint8_t address_type,
 
     // Connecting signals and slots for connecting to LE services.
     controller = QLowEnergyController::createCentral(bluetooth_device_list.at(index));
-    QObject::connect(controller, SIGNAL(connected()), this, SLOT(connected()));
-    QObject::connect(controller, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    QObject::connect(controller, SIGNAL(connected()), this, SLOT(bluetooth_connected()));
+    QObject::connect(controller, SIGNAL(disconnected()), this, SLOT(bluetooth_disconnected()));
     QObject::connect(controller, SIGNAL(discoveryFinished()), this, SLOT(discovery_finished()));
     QObject::connect(controller, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(service_discovered(QBluetoothUuid)));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
@@ -633,8 +651,20 @@ void smp_bluetooth::form_disconnect_from_device()
 
 int smp_bluetooth::connect()
 {
-    //TODO
-    return SMP_TRANSPORT_ERROR_UNSUPPORTED;
+    if (device_connected == true)
+    {
+        return SMP_TRANSPORT_ERROR_ALREADY_CONNECTED;
+    }
+
+    if (bluetooth_config_set == false)
+    {
+        return SMP_TRANSPORT_ERROR_INVALID_CONFIGURATION;
+    }
+
+    bluetooth_config_connection_in_progress = true;
+    form_refresh_devices();
+
+    return SMP_TRANSPORT_ERROR_OK;
 }
 
 int smp_bluetooth::disconnect(bool force)
@@ -728,3 +758,18 @@ void smp_bluetooth::mtu_updated(int mtu)
     log_debug() << "Bluetooth MTU updated to: " << this->mtu;
 }
 #endif
+
+int smp_bluetooth::set_connection_config(struct smp_bluetooth_config_t *configuration)
+{
+    if (device_connected == true)
+    {
+        return SMP_TRANSPORT_ERROR_ALREADY_CONNECTED;
+    }
+
+    bluetooth_config.address = configuration->address;
+    bluetooth_config.name = configuration->name;
+    bluetooth_config.type = configuration->type;
+    bluetooth_config_set = true;
+
+    return SMP_TRANSPORT_ERROR_OK;
+}

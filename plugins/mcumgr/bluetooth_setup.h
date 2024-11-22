@@ -29,17 +29,7 @@
 #include <QDialog>
 #include <QListWidgetItem>
 #include "debug_logger.h"
-
-/******************************************************************************/
-// Enum typedefs
-/******************************************************************************/
-enum BLUETOOTH_FORCE_ADDRESS {
-    BLUETOOTH_FORCE_ADDRESS_DEFAULT,
-    BLUETOOTH_FORCE_ADDRESS_RANDOM,
-    BLUETOOTH_FORCE_ADDRESS_PUBLIC,
-
-    BLUETOOTH_FORCE_ADDRESS_COUNT
-};
+#include "smp_bluetooth.h"
 
 /******************************************************************************/
 // Forward declaration of Class, Struct & Unions

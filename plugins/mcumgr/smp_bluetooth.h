@@ -23,6 +23,9 @@
 #ifndef SMP_BLUETOOTH_H
 #define SMP_BLUETOOTH_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include <QObject>
 #include <QTimer>
 #include <QBluetoothUuid>
@@ -35,13 +38,45 @@
 #include <qbluetoothlocaldevice.h>
 #include <qbluetoothdeviceinfo.h>
 #include <qbluetoothservicediscoveryagent.h>
-#include "plugin_mcumgr.h"
 #include "smp_transport.h"
 #include "smp_message.h"
 #if defined(GUI_PRESENT)
+#include "plugin_mcumgr.h"
 #include "bluetooth_setup.h"
 #endif
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
+enum BLUETOOTH_FORCE_ADDRESS {
+    BLUETOOTH_FORCE_ADDRESS_DEFAULT,
+    BLUETOOTH_FORCE_ADDRESS_RANDOM,
+    BLUETOOTH_FORCE_ADDRESS_PUBLIC,
+
+    BLUETOOTH_FORCE_ADDRESS_COUNT
+};
+
+enum smp_bluetooth_connect_type_t {
+    SMP_BLUETOOTH_CONNECT_TYPE_ADDRESS,
+    SMP_BLUETOOTH_CONNECT_TYPE_NAME,
+
+    SMP_BLUETOOTH_CONNECT_TYPE_COUNT
+};
+
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
+struct smp_bluetooth_config_t {
+    //union {
+        QString address;
+        QString name;
+    //};
+    enum smp_bluetooth_connect_type_t type;
+};
+
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class smp_bluetooth : public smp_transport
 {
     Q_OBJECT
@@ -56,6 +91,7 @@ public:
     void close_connect_dialog() override;
 #endif
     int is_connected() override;
+    int set_connection_config(struct smp_bluetooth_config_t *configuration);
     smp_transport_error_t send(smp_message *message) override;
     void setup_finished();
 
@@ -63,8 +99,8 @@ private slots:
     void deviceDiscovered(const QBluetoothDeviceInfo &info);
     void deviceUpdated(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
     void finished();
-    void connected();
-    void disconnected();
+    void bluetooth_connected();
+    void bluetooth_disconnected();
     void discovery_finished();
     void service_discovered(QBluetoothUuid service_uuid);
     void mcumgr_service_characteristic_changed(QLowEnergyCharacteristic lecCharacteristic, QByteArray baData);
@@ -96,6 +132,9 @@ private:
     QMainWindow *main_window;
     bluetooth_setup *bluetooth_window;
 #endif
+    struct smp_bluetooth_config_t bluetooth_config;
+    bool bluetooth_config_set;
+    bool bluetooth_config_connection_in_progress;
     QBluetoothDeviceDiscoveryAgent *discoveryAgent = nullptr;
 //    DeviceInfo currentDevice;
     QLowEnergyController *controller = nullptr;
@@ -118,3 +157,7 @@ private:
 };
 
 #endif // SMP_BLUETOOTH_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/
