@@ -24,14 +24,15 @@
 #define smp_processor_H
 
 #include <QObject>
-#include "smp_message.h"
-#include "smp_transport.h"
-#include "debug_logger.h"
-#include "smp_json.h"
-
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QCborStreamReader>
+#include "smp_message.h"
+#include "smp_transport.h"
+#include "debug_logger.h"
+#if defined(PLUGIN_MCUMGR_JSON)
+#include "smp_json.h"
+#endif
 
 /******************************************************************************/
 // Enum typedefs
@@ -68,7 +69,9 @@ public:
     void unregister_handler(uint16_t group);
     void set_transport(smp_transport *transport_object);
     uint16_t max_message_data_size(uint16_t mtu);
+#if defined(PLUGIN_MCUMGR_JSON)
     void set_json(smp_json *json);
+#endif
     void set_message_logging(bool enabled);
     void set_custom_message(bool enabled);
 
@@ -94,7 +97,9 @@ private:
     uint8_t repeat_times;
     bool busy;
     QList<smp_group_match_t> group_handlers;
+#if defined(PLUGIN_MCUMGR_JSON)
     smp_json *json_object;
+#endif
     bool message_logging;
     bool custom_message;
 

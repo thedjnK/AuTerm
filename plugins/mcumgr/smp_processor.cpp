@@ -33,7 +33,9 @@ smp_processor::smp_processor(QObject *parent)
     last_message_header = nullptr;
     repeat_times = 0;
     busy = false;
+#if defined(PLUGIN_MCUMGR_JSON)
     json_object = nullptr;
+#endif
     message_logging = false;
     custom_message = false;
 
@@ -96,10 +98,12 @@ smp_transport_error_t smp_processor::send(smp_message *message, uint32_t timeout
             repeat_timer.start();
             ++sequence;
 
+#if defined(PLUGIN_MCUMGR_JSON)
             if (json_object != nullptr && message_logging == true)
             {
                 json_object->append_data(true, message);
             }
+#endif
         }
     }
 
@@ -346,10 +350,12 @@ void smp_processor::message_received(smp_message *response)
             }
         }
 
+#if defined(PLUGIN_MCUMGR_JSON)
         if (json_object != nullptr && (message_logging || custom_message))
         {
             json_object->append_data(false, response);
         }
+#endif
     }
 
     custom_message = false;
@@ -465,10 +471,12 @@ uint16_t smp_processor::max_message_data_size(uint16_t mtu)
     return transport->max_message_data_size(mtu);
 }
 
+#if defined(PLUGIN_MCUMGR_JSON)
 void smp_processor::set_json(smp_json *json)
 {
     json_object = json;
 }
+#endif
 
 void smp_processor::set_message_logging(bool enabled)
 {

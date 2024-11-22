@@ -30,7 +30,6 @@
 #include <QCborArray>
 #include <QCborMap>
 #include <QCborValue>
-#include <QStandardItem>
 
 struct enum_details_t {
     uint16_t id;

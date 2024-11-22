@@ -45,6 +45,8 @@ DEFINES += "SKIPPLUGIN_TRANSPORT_ECHO"
 
 # Uncomment to build MCUmgr plugin transports (note: static builds need these extra modules in the base AuTerm build also)
 !contains(DEFINES, SKIPPLUGINS) {
+    DEFINES += "PLUGIN_MCUMGR_JSON"
+
     !contains(DEFINES, SKIPPLUGIN_MCUMGR) {
         qtHaveModule(bluetooth) {
             # Requires qtconnectivity
