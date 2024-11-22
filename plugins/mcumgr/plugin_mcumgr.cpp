@@ -3348,6 +3348,12 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     //todo: check status
 
                     log_debug() << "do reset";
+
+                    lbl_IMG_Status->setText("Resetting...");
+                }
+                else
+                {
+                    lbl_IMG_Status->setText("Upload finished, set image state failed: command not supported (likely MCUboot serial recovery)");
                 }
             }
         }

@@ -888,11 +888,19 @@ log_error() << "Going in circles...";
 
             if (this->upload_tmr.isValid() == true)
             {
-                upload_speed = (double)this->file_upload_data.length() / (double)(this->upload_tmr.elapsed() / 1000);
+                upload_speed = (double)(this->upload_tmr.elapsed() / 1000);
+
+                //If upload was completed in under a second, change to use time of 1 second (estimated speed is inaccurate anyway)
+                if (upload_speed < 1.0)
+                {
+                    upload_speed = 1.0;
+                }
+
+                upload_speed = (double)this->file_upload_data.length() / upload_speed;
 
                 while (upload_speed >= 1024.0 && prefix < 3)
                 {
-                    if (std::isnan(upload_speed) == true)
+                    if (std::isnan(upload_speed) == true || std::isinf(upload_speed) == true)
                     {
                         break;
                     }
@@ -901,7 +909,7 @@ log_error() << "Going in circles...";
                     ++prefix;
                 }
 
-                if (std::isnan(upload_speed) == false)
+                if (std::isnan(upload_speed) == false && std::isinf(upload_speed) == false)
                 {
                     if (prefix == 0)
                     {
@@ -924,7 +932,7 @@ log_error() << "Going in circles...";
                 }
             }
 
-            if (this->upload_tmr.isValid() == false || std::isnan(upload_speed) == true)
+            if (this->upload_tmr.isValid() == false || std::isnan(upload_speed) == true || std::isinf(upload_speed) == true)
             {
                 speed_string = "Upload finished";
             }
