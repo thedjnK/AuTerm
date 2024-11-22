@@ -3184,6 +3184,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
 
     QLabel *label_status = nullptr;
     bool finished = true;
+    bool skip_error_string = false;
 
     log_debug() << "Status: " << status;
 
@@ -3336,6 +3337,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             //Advance to next stage of image upload, this is likely to occur in MCUboot serial recovery whereby the image state functionality is not included
             if (user_data == ACTION_IMG_UPLOAD_SET)
             {
+                skip_error_string = true;
+
                 if (check_IMG_Reset->isChecked())
                 {
                     //Reboot device
@@ -3832,7 +3835,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
         }
     }
 
-    if (error_string != nullptr)
+    if (error_string != nullptr && skip_error_string == false)
     {
         if (label_status != nullptr)
         {
