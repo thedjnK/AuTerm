@@ -12,12 +12,15 @@ jobs:
     if: github.repository == 'thedjnK/AuTerm'
     steps:
       - name: 'Auto-assign issue'
+        if: ${{ toJSON(github.event.issue.assignees.*.login) == '[]' }}
         uses: pozil/auto-assign-issue@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: thedjnK
           allowSelfAssign: true
-      - run: gh issue edit "$NUMBER" --add-label "$LABELS"
+      - name: 'Auto-label issue'
+        if: ${{ toJSON(github.event.issue.labels.*.name) == '[]' }}
+        run: gh issue edit "$NUMBER" --add-label "$LABELS"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
