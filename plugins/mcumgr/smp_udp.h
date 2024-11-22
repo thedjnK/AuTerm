@@ -26,12 +26,20 @@
 /******************************************************************************/
 // Include Files
 /******************************************************************************/
-#include "plugin_mcumgr.h"
 #include "smp_transport.h"
 #if defined(GUI_PRESENT)
+#include "plugin_mcumgr.h"
 #include "udp_setup.h"
 #endif
 #include <QUdpSocket>
+
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
+struct smp_udp_config_t {
+    QString hostname;
+    uint16_t port;
+};
 
 /******************************************************************************/
 // Class definitions
@@ -52,6 +60,7 @@ public:
     int is_connected() override;
     smp_transport_error_t send(smp_message *message) override;
     void setup_finished();
+    int set_connection_config(struct smp_udp_config_t *configuration);
 
 private slots:
     void connect_to_device(QString host, uint16_t port);
@@ -64,6 +73,8 @@ private:
     udp_setup *udp_window;
     QMainWindow *main_window;
 #endif
+    struct smp_udp_config_t udp_config;
+    bool udp_config_set;
     QUdpSocket *socket;
     bool socket_is_connected;
     smp_message received_data;

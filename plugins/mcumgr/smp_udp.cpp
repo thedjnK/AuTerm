@@ -26,7 +26,6 @@
 /******************************************************************************/
 #include "smp_udp.h"
 #include <QNetworkDatagram>
-#include <QInputDialog>
 
 /******************************************************************************/
 // Local Functions or Private Members
@@ -49,6 +48,7 @@ smp_udp::smp_udp(QObject *parent)
 
     socket = new QUdpSocket(this);
     socket_is_connected = false;
+    udp_config_set = false;
 
     QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(socket_readyread()));
 }
@@ -90,7 +90,12 @@ int smp_udp::connect(void)
         return SMP_TRANSPORT_ERROR_ALREADY_CONNECTED;
     }
 
-    //TODO
+    if (udp_config_set == false)
+    {
+        return SMP_TRANSPORT_ERROR_INVALID_CONFIGURATION;
+    }
+
+    connect_to_device(udp_config.hostname, udp_config.port);
 
     return SMP_TRANSPORT_ERROR_OK;
 }
@@ -173,11 +178,13 @@ void smp_udp::connect_to_device(QString host, uint16_t port)
 
 void smp_udp::setup_finished()
 {
+#if defined(GUI_PRESENT)
 #ifndef SKIPPLUGIN_LOGGER
     udp_window->set_logger(logger);
 #endif
     udp_window->load_settings();
     udp_window->load_pixmaps();
+#endif
 }
 
 void smp_udp::disconnect_from_device()
@@ -188,6 +195,20 @@ void smp_udp::disconnect_from_device()
 void smp_udp::is_connected(bool *connected)
 {
     *connected = socket_is_connected;
+}
+
+int smp_udp::set_connection_config(struct smp_udp_config_t *configuration)
+{
+    if (socket_is_connected == true)
+    {
+        return SMP_TRANSPORT_ERROR_ALREADY_CONNECTED;
+    }
+
+    udp_config.hostname = configuration->hostname;
+    udp_config.port = configuration->port;
+    udp_config_set = true;
+
+    return SMP_TRANSPORT_ERROR_OK;
 }
 
 /******************************************************************************/
