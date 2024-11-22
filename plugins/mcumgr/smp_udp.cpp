@@ -50,11 +50,18 @@ smp_udp::smp_udp(QObject *parent)
     socket_is_connected = false;
     udp_config_set = false;
 
+    QObject::connect(socket, SIGNAL(connected()), this, SLOT(socket_connected()));
+    QObject::connect(socket, SIGNAL(disconnected()), this, SLOT(socket_disconnected()));
+    QObject::connect(socket, SIGNAL(aboutToClose()), this, SLOT(socket_about_to_close()));
+    QObject::connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(socket_bytes_written(qint64)));
+    QObject::connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(socket_error(QAbstractSocket::SocketError)));
     QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(socket_readyread()));
 }
 
 smp_udp::~smp_udp()
 {
+    QObject::disconnect(this, SLOT(socket_connected()));
+    QObject::disconnect(this, SLOT(socket_disconnected()));
     QObject::disconnect(this, SLOT(socket_readyread()));
 
 #if defined(GUI_PRESENT)
@@ -151,6 +158,30 @@ smp_transport_error_t smp_udp::send(smp_message *message)
     socket->write(*message->data());
 
     return SMP_TRANSPORT_ERROR_OK;
+}
+
+void smp_udp::socket_connected()
+{
+    emit connected();
+}
+
+void smp_udp::socket_disconnected()
+{
+    emit disconnected();
+}
+
+void smp_udp::socket_about_to_close()
+{
+}
+
+void smp_udp::socket_bytes_written(qint64 written)
+{
+//    qDebug() << "written: " << written;
+}
+
+void smp_udp::socket_error(QAbstractSocket::SocketError error)
+{
+//    qDebug() << "error: " << error;
 }
 
 void smp_udp::socket_readyread()

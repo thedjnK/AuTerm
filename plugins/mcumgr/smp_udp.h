@@ -66,6 +66,11 @@ private slots:
     void connect_to_device(QString host, uint16_t port);
     void disconnect_from_device();
     void is_connected(bool *connected);
+    void socket_connected();
+    void socket_disconnected();
+    void socket_about_to_close();
+    void socket_bytes_written(qint64 written);
+    void socket_error(QAbstractSocket::SocketError error);
     void socket_readyread();
 
 private:
