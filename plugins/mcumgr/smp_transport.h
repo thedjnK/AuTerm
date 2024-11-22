@@ -103,15 +103,10 @@ public:
     }
 
 signals:
-//    void connected();
-//    void disconnected();
-//    void error(int error_code);
-//    void send_complete();
-//    void receive_waiting();
-//    void device_found();
-//    void device_scan_finished();
-//    void device_scan_error();
-//    void bytes_written(qint64 bytes);
+    void connected();
+    void disconnected();
+    void error(int error_code);
+    void bytes_written(qint64 bytes);
     void receive_waiting(smp_message *message);
 
 protected:
