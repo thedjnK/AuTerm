@@ -23,9 +23,12 @@
 #ifndef SMP_LORAWAN_H
 #define SMP_LORAWAN_H
 
-#include "plugin_mcumgr.h"
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "smp_transport.h"
 #if defined(GUI_PRESENT)
+#include "plugin_mcumgr.h"
 #include "lorawan_setup.h"
 #endif
 #include <QByteArray>
@@ -33,6 +36,22 @@
 #include <QtMqtt/QMqttSubscription>
 #include <QtMqtt/QMqttMessage>
 
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
+struct smp_lorawan_config_t {
+    QString hostname;
+    uint16_t port;
+    bool tls;
+    QString username;
+    QString password;
+    QString topic;
+    uint8_t frame_port;
+};
+
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class smp_lorawan : public smp_transport
 {
     Q_OBJECT
@@ -51,6 +70,7 @@ public:
     void setup_finished();
     uint8_t get_retries() override;
     uint32_t get_timeout() override;
+    int set_connection_config(struct smp_lorawan_config_t *configuration);
 
 private slots:
     void connect_to_service(QString host, uint16_t port, bool tls, QString username, QString password, QString topic);
@@ -68,13 +88,20 @@ private:
     lorawan_setup *lorawan_window;
     QMainWindow *main_window;
 #endif
+    struct smp_lorawan_config_t lorawan_config;
+    bool lorawan_config_set;
     QMqttClient *mqtt_client;
     QMqttSubscription *mqtt_topic_subscription;
     QString mqtt_topic;
     QMqttTopicName mqtt_downlink_topic;
     bool mqtt_is_connected;
+    bool mqtt_is_ready;
     smp_message received_data;
     QByteArray buffered_send_data;
 };
 
 #endif // SMP_LORAWAN_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

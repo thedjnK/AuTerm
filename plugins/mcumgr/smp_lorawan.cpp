@@ -20,9 +20,18 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
-#include "smp_lorawan.h"
-#include <QInputDialog>
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
+#include "smp_lorawan.h"
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+
+/******************************************************************************/
+// Local Functions or Private Members
+/******************************************************************************/
 smp_lorawan::smp_lorawan(QObject *parent)
 {
     Q_UNUSED(parent);
@@ -35,6 +44,8 @@ smp_lorawan::smp_lorawan(QObject *parent)
     mqtt_client = new QMqttClient(this);
     mqtt_topic_subscription = nullptr;
     mqtt_is_connected = false;
+    mqtt_is_ready = false;
+    lorawan_config_set = false;
 
     QObject::connect(mqtt_client, SIGNAL(connected()), this, SLOT(mqtt_connected()));
     QObject::connect(mqtt_client, SIGNAL(disconnected()), this, SLOT(mqtt_disconnected()));
@@ -99,6 +110,13 @@ int smp_lorawan::connect(void)
         return SMP_TRANSPORT_ERROR_ALREADY_CONNECTED;
     }
 
+    if (lorawan_config_set == false)
+    {
+        return SMP_TRANSPORT_ERROR_INVALID_CONFIGURATION;
+    }
+
+    connect_to_service(lorawan_config.hostname, lorawan_config.port, lorawan_config.tls, lorawan_config.username, lorawan_config.password, lorawan_config.topic);
+
     return SMP_TRANSPORT_ERROR_OK;
 }
 
@@ -147,8 +165,14 @@ smp_transport_error_t smp_lorawan::send(smp_message *message)
     QJsonObject json_object;
     QJsonArray json_object_downlink_array;
     uint16_t processed = 0;
+#if defined(GUI_PRESENT)
     uint16_t fragment_size = lorawan_window->get_fragment_size();
     bool confirmed_download = lorawan_window->get_confirmed_downlinks();
+#else
+    //TODO
+    uint16_t fragment_size = 222;
+    bool confirmed_download = true;
+#endif
 
     if (mqtt_is_connected == false)
     {
@@ -172,7 +196,11 @@ smp_transport_error_t smp_lorawan::send(smp_message *message)
             chunk_size = fragment_size;
         }
 
+#if defined(GUI_PRESENT)
         json_object_downlink.insert("f_port", lorawan_window->get_frame_port());
+#else
+        json_object_downlink.insert("f_port", lorawan_config.frame_port);
+#endif
         json_object_downlink.insert("frm_payload", QString(message->data()->mid(processed, chunk_size).toBase64()));
 
         if (confirmed_download == true)
@@ -235,6 +263,7 @@ void smp_lorawan::mqtt_disconnected()
 {
     log_debug() << "MQTT disconnected";
     mqtt_is_connected = false;
+    mqtt_is_ready = false;
 
     if (mqtt_topic_subscription != nullptr)
     {
@@ -249,6 +278,8 @@ void smp_lorawan::mqtt_disconnected()
 #if defined(GUI_PRESENT)
     lorawan_window->set_connection_options_enabled(true);
 #endif
+
+    emit disconnected();
 }
 
 void smp_lorawan::mqtt_state_changed(QMqttClient::ClientState state)
@@ -384,7 +415,11 @@ void smp_lorawan::mqtt_topic_message_received(QMqttMessage message)
         return;
     }
 
+#if defined(GUI_PRESENT)
     if (json_object["f_port"].toInteger() != lorawan_window->get_frame_port())
+#else
+    if (json_object["f_port"].toInteger() != lorawan_config.frame_port)
+#endif
     {
         log_information() << "Received MQTT JSON message for different port: " << json_object["f_port"].toInteger();
         return;
@@ -414,6 +449,7 @@ void smp_lorawan::mqtt_topic_message_received(QMqttMessage message)
     }
 
 //TODO: move this
+#if defined(GUI_PRESENT)
     if (lorawan_window->get_auto_fragment_size() == true)
     {
         //Also get device's data rate to calculate maximum size of messages
@@ -449,6 +485,7 @@ void smp_lorawan::mqtt_topic_message_received(QMqttMessage message)
 
         log_error() << json_object["spreading_factor"].toInteger();
     }
+#endif
 }
 
 void smp_lorawan::mqtt_topic_state_changed(QMqttSubscription::SubscriptionState state)
@@ -465,6 +502,8 @@ void smp_lorawan::mqtt_topic_state_changed(QMqttSubscription::SubscriptionState 
         case QMqttSubscription::Subscribed:
         {
             log_information() << "MQTT topic state subscription complete";
+            mqtt_is_ready = true;
+            emit connected();
             return;
         }
         case QMqttSubscription::Error:
@@ -490,17 +529,49 @@ void smp_lorawan::disconnect_from_service()
         return;
     }
 
+    mqtt_is_ready = false;
     mqtt_client->disconnectFromHost();
 }
 
 //TODO: move
 uint8_t smp_lorawan::get_retries()
 {
+#if defined(GUI_PRESENT)
     return lorawan_window->get_resends();
+#else
+    return 0;
+#endif
 }
 
 //TODO: move
 uint32_t smp_lorawan::get_timeout()
 {
+#if defined(GUI_PRESENT)
     return lorawan_window->get_timeout();
+#else
+    return 300 * 1000;
+#endif
 }
+
+int smp_lorawan::set_connection_config(struct smp_lorawan_config_t *configuration)
+{
+    if (mqtt_is_connected == true)
+    {
+        return SMP_TRANSPORT_ERROR_ALREADY_CONNECTED;
+    }
+
+    lorawan_config.hostname = configuration->hostname;
+    lorawan_config.port = configuration->port;
+    lorawan_config.tls = configuration->tls;
+    lorawan_config.username = configuration->username;
+    lorawan_config.password = configuration->password;
+    lorawan_config.topic = configuration->topic;
+    lorawan_config.frame_port = configuration->frame_port;
+    lorawan_config_set = true;
+
+    return SMP_TRANSPORT_ERROR_OK;
+}
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/
