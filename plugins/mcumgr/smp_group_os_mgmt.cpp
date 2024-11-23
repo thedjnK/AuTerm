@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -20,8 +20,15 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
+
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "smp_group_os_mgmt.h"
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum modes : uint8_t {
     MODE_IDLE = 0,
     MODE_ECHO,
@@ -46,16 +53,22 @@ enum os_mgmt_commands : uint8_t {
     COMMAND_BOOTLOADER_INFO,
 };
 
-static QStringList smp_error_defines = QStringList() <<
+/******************************************************************************/
+// Constants
+/******************************************************************************/
+static const QStringList smp_error_defines = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "INVALID_FORMAT" <<
     "QUERY_YIELDS_NO_ANSWER";
 
-static QStringList smp_error_values = QStringList() <<
+static const QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "The provided format value is not valid" <<
     "Query was not recognized";
 
+/******************************************************************************/
+// Local Functions or Private Members
+/******************************************************************************/
 smp_group_os_mgmt::smp_group_os_mgmt(smp_processor *parent) : smp_group(parent, "OS", SMP_GROUP_ID_OS, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
@@ -1250,3 +1263,7 @@ void smp_group_os_mgmt::cleanup()
     bootloader_info_response = nullptr;
     rtc_get_date_time = nullptr;
 }
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

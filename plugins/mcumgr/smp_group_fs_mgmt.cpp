@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -20,8 +20,15 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
+
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "smp_group_fs_mgmt.h"
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum modes : uint8_t {
     MODE_IDLE = 0,
     MODE_UPLOAD,
@@ -60,7 +67,10 @@ enum fs_mgmt_errs : uint16_t {
     FS_MGMT_ERR_FILE_EMPTY
 };
 
-static QStringList smp_error_defines = QStringList() <<
+/******************************************************************************/
+// Constants
+/******************************************************************************/
+static const QStringList smp_error_defines = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "FILE_INVALID_NAME" <<
     "FILE_NOT_FOUND" <<
@@ -78,7 +88,7 @@ static QStringList smp_error_defines = QStringList() <<
     "READ_ONLY_FILESYSTEM" <<
     "FILE_EMPTY";
 
-static QStringList smp_error_values = QStringList() <<
+static const QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "The specified file name is not valid" <<
     "The specified file does not exist" <<
@@ -96,6 +106,9 @@ static QStringList smp_error_values = QStringList() <<
     "The specified mount point is that of a read-only filesystem" <<
     "The operation cannot be performed because the file is empty with no contents";
 
+/******************************************************************************/
+// Local Functions or Private Members
+/******************************************************************************/
 smp_group_fs_mgmt::smp_group_fs_mgmt(smp_processor *parent) : smp_group(parent, "FS", SMP_GROUP_ID_FS, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
@@ -1113,3 +1126,7 @@ void smp_group_fs_mgmt::cleanup()
     hash_checksum_result_object = nullptr;
     file_size_object = nullptr;
 }
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

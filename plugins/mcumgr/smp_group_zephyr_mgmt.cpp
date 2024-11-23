@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -20,8 +20,15 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
+
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "smp_group_zephyr_mgmt.h"
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum modes : uint8_t {
     MODE_IDLE = 0,
     MODE_STORAGE_ERASE,
@@ -31,18 +38,24 @@ enum zephyr_mgmt_commands : uint8_t {
     COMMAND_STORAGE_ERASE = 0,
 };
 
-static QStringList smp_error_defines = QStringList() <<
+/******************************************************************************/
+// Constants
+/******************************************************************************/
+static const QStringList smp_error_defines = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "FLASH_OPEN_FAILED" <<
     "FLASH_CONFIG_QUERY_FAIL" <<
     "FLASH_ERASE_FAILED";
 
-static QStringList smp_error_values = QStringList() <<
+static const QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "Opening of the flash area has failed" <<
     "Querying the flash area parameters has failed" <<
     "Erasing the flash area has failed";
 
+/******************************************************************************/
+// Local Functions or Private Members
+/******************************************************************************/
 smp_group_zephyr_mgmt::smp_group_zephyr_mgmt(smp_processor *parent) : smp_group(parent, "SETTINGS", SMP_GROUP_ID_ZEPHYR, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
@@ -196,3 +209,7 @@ void smp_group_zephyr_mgmt::cleanup()
 {
     mode = MODE_IDLE;
 }
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

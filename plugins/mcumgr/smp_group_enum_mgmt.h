@@ -23,6 +23,9 @@
 #ifndef SMP_GROUP_ENUM_MGMT_H
 #define SMP_GROUP_ENUM_MGMT_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "smp_group.h"
 #include "smp_error.h"
 #include <QCborStreamReader>
@@ -31,6 +34,9 @@
 #include <QCborMap>
 #include <QCborValue>
 
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
 struct enum_details_t {
     uint16_t id;
     QString name;
@@ -43,6 +49,9 @@ struct enum_fields_present_t {
     bool handlers;
 };
 
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class smp_group_enum_mgmt : public smp_group
 {
     Q_OBJECT
@@ -80,3 +89,7 @@ private:
 };
 
 #endif // SMP_GROUP_ENUM_MGMT_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/
