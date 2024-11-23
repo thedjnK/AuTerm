@@ -42,7 +42,6 @@
 #include "smp_message.h"
 #if defined(GUI_PRESENT)
 #include "plugin_mcumgr.h"
-#include "bluetooth_setup.h"
 #endif
 
 /******************************************************************************/
@@ -73,6 +72,8 @@ struct smp_bluetooth_config_t {
     //};
     enum smp_bluetooth_connect_type_t type;
 };
+
+class bluetooth_setup;
 
 /******************************************************************************/
 // Class definitions

@@ -21,6 +21,9 @@
 **
 *******************************************************************************/
 #include "smp_bluetooth.h"
+#if defined(GUI_PRESENT)
+#include "bluetooth_setup.h"
+#endif
 
 //Aim for a connection interval of between 7.5us-30us with a 4 second supervision timeout, allow connection latency for battery powered devices
 static const double connection_interval_min = 7.5;
