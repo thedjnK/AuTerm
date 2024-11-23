@@ -2818,32 +2818,10 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         {
             if (colview_IMG_Images->currentIndex().isValid() && colview_IMG_Images->currentIndex().parent().isValid())
             {
-                uint8_t i = 0;
-                uint8_t l = 0;
-                bool found = false;
+                uint8_t i = model_image_state.itemFromIndex(colview_IMG_Images->currentIndex())->parent()->data().toUInt();
+                uint8_t l = model_image_state.itemFromIndex(colview_IMG_Images->currentIndex())->data().toUInt();
 
-                while (i < images_list.length())
-                {
-                    if (images_list[i].item == model_image_state.itemFromIndex(colview_IMG_Images->currentIndex())->parent())
-                    {
-                        l = 0;
-                        while (l < images_list[i].slot_list.length())
-                        {
-                            if (model_image_state.itemFromIndex(colview_IMG_Images->currentIndex()) == images_list[i].slot_list[l].item)
-                            {
-                                found = true;
-                                goto finished;
-                            }
-
-                            ++l;
-                        }
-                    }
-
-                    ++i;
-                }
-
-finished:
-                if (found == true)
+                if (images_list.length() > i && images_list[i].slot_list.length() > l)
                 {
                     mode = ACTION_IMG_IMAGE_SET;
                     processor->set_transport(active_transport());
@@ -3132,44 +3110,34 @@ void plugin_mcumgr::on_btn_SHELL_Copy_clicked()
 
 void plugin_mcumgr::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex &index)
 {
-    uint8_t i = 0;
-    while (i < images_list.length())
+    uint8_t i = model_image_state.itemFromIndex(index)->parent()->data().toUInt();
+    uint8_t l = model_image_state.itemFromIndex(index)->data().toUInt();
+
+    if (images_list.length() > i && images_list[i].slot_list.length() > l)
     {
-        if (images_list[i].item == model_image_state.itemFromIndex(index)->parent())
+        QByteArray escaped_hash = images_list[i].slot_list[l].hash;
+
+        emit plugin_to_hex(&escaped_hash);
+        edit_IMG_Preview_Hash->setText(escaped_hash);
+        edit_IMG_Preview_Version->setText(images_list[i].slot_list[l].version);
+        check_IMG_Preview_Active->setChecked(images_list[i].slot_list[l].active);
+        check_IMG_Preview_Bootable->setChecked(images_list[i].slot_list[l].bootable);
+        check_IMG_Preview_Confirmed->setChecked(images_list[i].slot_list[l].confirmed);
+        check_IMG_Preview_Pending->setChecked(images_list[i].slot_list[l].pending);
+        check_IMG_Preview_Permanent->setChecked(images_list[i].slot_list[l].permanent);
+
+        if (colview_IMG_Images->previewWidget() != verticalLayoutWidget)
         {
-            uint8_t l = 0;
-            while (l < images_list[i].slot_list.length())
-            {
-                if (model_image_state.itemFromIndex(index) == images_list[i].slot_list[l].item)
-                {
-                    QByteArray escaped_hash = images_list[i].slot_list[l].hash;
-                    emit plugin_to_hex(&escaped_hash);
-                    edit_IMG_Preview_Hash->setText(escaped_hash);
-                    edit_IMG_Preview_Version->setText(images_list[i].slot_list[l].version);
-                    check_IMG_Preview_Active->setChecked(images_list[i].slot_list[l].active);
-                    check_IMG_Preview_Bootable->setChecked(images_list[i].slot_list[l].bootable);
-                    check_IMG_Preview_Confirmed->setChecked(images_list[i].slot_list[l].confirmed);
-                    check_IMG_Preview_Pending->setChecked(images_list[i].slot_list[l].pending);
-                    check_IMG_Preview_Permanent->setChecked(images_list[i].slot_list[l].permanent);
-
-                    i = 99;
-                    break;
-                }
-
-                ++l;
-            }
+            colview_IMG_Images->setPreviewWidget(verticalLayoutWidget);
         }
-
-        ++i;
-    }
-
-    if (colview_IMG_Images->previewWidget() != verticalLayoutWidget)
-    {
-        colview_IMG_Images->setPreviewWidget(verticalLayoutWidget);
+        else
+        {
+            colview_IMG_Images->previewWidget()->show();
+        }
     }
     else
     {
-        colview_IMG_Images->previewWidget()->show();
+        lbl_IMG_Status->setText("Could not find item bounds");
     }
 }
 
@@ -3234,26 +3202,14 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
             else if (user_data == ACTION_IMG_IMAGE_LIST)
             {
-                uint8_t i = 0;
-                while (i < images_list.length())
-                {
-                    model_image_state.appendRow(images_list[i].item);
-                    ++i;
-                }
+                update_img_state_table();
             }
             else if (user_data == ACTION_IMG_IMAGE_SET)
             {
                 if (parent_row != -1 && parent_column != -1 && child_row != -1 && child_column != -1)
                 {
-                    uint8_t i = 0;
-
                     model_image_state.clear();
-
-                    while (i < images_list.length())
-                    {
-                        model_image_state.appendRow(images_list[i].item);
-                        ++i;
-                    }
+                    update_img_state_table();
 
                     if (model_image_state.hasIndex(parent_row, parent_column) == true && model_image_state.index(child_row, child_column, model_image_state.index(parent_row, parent_column)).isValid() == true)
                     {
@@ -4875,4 +4831,55 @@ AutPlugin::PluginType plugin_mcumgr::plugin_type()
 QObject *plugin_mcumgr::plugin_object()
 {
     return this;
+}
+
+void plugin_mcumgr::update_img_state_table()
+{
+    QStandardItem *table_entry;
+
+    if (images_list.length() > 1)
+    {
+        //Multiple images
+        uint8_t i = 0;
+
+        while (i < images_list.length())
+        {
+            QStandardItem *table_sub_entry;
+            uint8_t l = 0;
+
+            table_entry = new QStandardItem(QString("Image ") % QString::number(images_list[i].image));
+            table_entry->setData(i);
+
+            while (l < images_list[i].slot_list.length())
+            {
+                table_sub_entry = new QStandardItem(QString("Slot ") % QString::number(images_list[i].slot_list[l].slot));
+                table_sub_entry->setData(l);
+                table_entry->appendRow(table_sub_entry);
+                ++l;
+            }
+
+            ++i;
+        }
+
+        model_image_state.appendRow(table_entry);
+    }
+    else if (images_list.length() == 1)
+    {
+        //Single image
+        QStandardItem *table_sub_entry;
+        uint8_t i = 0;
+
+        table_entry = new QStandardItem("Images");
+        table_entry->setData(0);
+
+        while (i < images_list[0].slot_list.length())
+        {
+            table_sub_entry = new QStandardItem(QString("Slot ") % QString::number(images_list[0].slot_list[i].slot));
+            table_sub_entry->setData(i);
+            table_entry->appendRow(table_sub_entry);
+            ++i;
+        }
+
+        model_image_state.appendRow(table_entry);
+    }
 }

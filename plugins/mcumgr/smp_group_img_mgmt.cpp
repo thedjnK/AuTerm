@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -20,11 +20,18 @@
 **          along with this program.  If not, see http://www.gnu.org/licenses/
 **
 *******************************************************************************/
+
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "smp_group_img_mgmt.h"
 #include <QFile>
 #include <QCryptographicHash>
 #include "smp_message.h"
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum modes : uint8_t {
     MODE_IDLE = 0,
     MODE_UPLOAD_FIRMWARE,
@@ -41,6 +48,9 @@ enum img_mgmt_commands : uint8_t {
     COMMAND_SLOT_INFO
 };
 
+/******************************************************************************/
+// Constants
+/******************************************************************************/
 //MCUboot TLV (Tag-Length-Value) related constants
 static const QByteArray image_tlv_magic = QByteArrayLiteral("\x07\x69");
 static const QByteArray image_tlv_magic_reverse_endian = QByteArrayLiteral("\x69\x07");
@@ -64,7 +74,7 @@ static const uint8_t ih_hdr_size_offs = 8;
 static const uint8_t ih_protected_tlv_size_offs = 10;
 static const uint8_t ih_img_size_offs = 12;
 
-static QStringList smp_error_defines = QStringList() <<
+static const QStringList smp_error_defines = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "FLASH_CONFIG_QUERY_FAIL" <<
     "NO_IMAGE" <<
@@ -99,7 +109,7 @@ static QStringList smp_error_defines = QStringList() <<
     "IMAGE_CONFIRMATION_DENIED" <<
     "IMAGE_SETTING_TEST_TO_ACTIVE_DENIED";
 
-static QStringList smp_error_values = QStringList() <<
+static const QStringList smp_error_values = QStringList() <<
     //Error index starts from 2 (no error and unknown error are common and handled in the base code)
     "Failed to query flash area configuration" <<
     "There is no image in the slot" <<
@@ -134,9 +144,9 @@ static QStringList smp_error_values = QStringList() <<
     "Confirmation of image has been denied" <<
     "Setting test to active slot is not allowed";
 
-image_state_t image_state_buffer;
-slot_state_t slot_state_buffer;
-
+/******************************************************************************/
+// Local Functions or Private Members
+/******************************************************************************/
 smp_group_img_mgmt::smp_group_img_mgmt(smp_processor *parent) : smp_group(parent, "IMG", SMP_GROUP_ID_IMG, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
@@ -441,7 +451,6 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
     image_state_buffer.image = 0;
     image_state_buffer.image_set = false;
     image_state_buffer.slot_list.clear();
-    image_state_buffer.item = nullptr;
     slot_state_buffer.slot = 0;
     slot_state_buffer.version.clear();
     slot_state_buffer.hash.clear();
@@ -451,7 +460,6 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
     slot_state_buffer.active = false;
     slot_state_buffer.permanent = false;
     slot_state_buffer.splitstatus = false;
-    slot_state_buffer.item = nullptr;
 
     while (!reader.lastError() && reader.hasNext())
     {
@@ -612,24 +620,13 @@ bool smp_group_img_mgmt::parse_state_response(QCborStreamReader &reader, QString
 
                         if (host_images != nullptr && image_state_ptr == nullptr)
                         {
-                            if (image_state_buffer.image_set == true)
-                            {
-                                image_state_buffer.item = new QStandardItem(QString("Image ").append(QString::number(image_state_buffer.image)));
-                            }
-                            else
-                            {
-                                image_state_buffer.item = new QStandardItem("Images");
-                            }
-
                             host_images->append(image_state_buffer);
                             image_state_ptr = &host_images->last();
                         }
 
                         if (image_state_ptr != nullptr)
                         {
-                            slot_state_buffer.item = new QStandardItem(QString("Slot ").append(QString::number(slot_state_buffer.slot)));
                             image_state_ptr->slot_list.append(slot_state_buffer);
-                            image_state_ptr->item->appendRow(slot_state_buffer.item);
                         }
                     }
                 }
@@ -1399,3 +1396,7 @@ void smp_group_img_mgmt::cleanup()
     host_images = nullptr;
     host_slots = nullptr;
 }
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

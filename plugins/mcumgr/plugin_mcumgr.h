@@ -262,6 +262,7 @@ private:
     void close_transport_windows();
     void set_group_transport_settings(smp_group *group);
     void set_group_transport_settings(smp_group *group, uint32_t timeout);
+    void update_img_state_table();
 
     //Form items
 ///AUTOGEN_START_OBJECTS

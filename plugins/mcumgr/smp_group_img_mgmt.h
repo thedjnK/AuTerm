@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2023 Jamie M.
+** Copyright (C) 2023-2024 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -23,6 +23,9 @@
 #ifndef SMP_GROUP_IMG_MGMT_H
 #define SMP_GROUP_IMG_MGMT_H
 
+/******************************************************************************/
+// Include Files
+/******************************************************************************/
 #include "smp_group.h"
 #include "smp_error.h"
 #include <QCborStreamReader>
@@ -30,8 +33,10 @@
 #include <QCborArray>
 #include <QCborMap>
 #include <QCborValue>
-#include <QStandardItem>
 
+/******************************************************************************/
+// Forward declaration of Class, Struct & Unions
+/******************************************************************************/
 struct slot_state_t {
     uint32_t slot;
     QByteArray version;
@@ -42,14 +47,12 @@ struct slot_state_t {
     bool active;
     bool permanent;
     bool splitstatus;
-    QStandardItem *item;
 };
 
 struct image_state_t {
     uint32_t image;
     bool image_set;
     QList<slot_state_t> slot_list;
-    QStandardItem *item;
 };
 
 struct slot_info_slots_t {
@@ -67,15 +70,15 @@ struct slot_info_t {
     bool max_image_size_present;
 };
 
+/******************************************************************************/
+// Enum typedefs
+/******************************************************************************/
 enum img_mgmt_upload_match : uint8_t {
     MATCH_NOT_PRESENT = 0,
     MATCH_FAILED,
     MATCH_PASSED
 };
 
-/******************************************************************************/
-// Enum typedefs
-/******************************************************************************/
 //Indicates the endianess of the image, if it matches the host PC or is opposite (or unknown)
 enum image_endian_t {
     ENDIAN_BIG,
@@ -83,6 +86,9 @@ enum image_endian_t {
     ENDIAN_UNKNOWN
 };
 
+/******************************************************************************/
+// Class definitions
+/******************************************************************************/
 class smp_group_img_mgmt : public smp_group
 {
     Q_OBJECT
@@ -127,6 +133,12 @@ private:
     uint8_t upload_repeated_parts;
     QList<image_state_t> *host_images;
     QList<slot_info_t> *host_slots;
+    image_state_t image_state_buffer;
+    slot_state_t slot_state_buffer;
 };
 
 #endif // SMP_GROUP_IMG_MGMT_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/
