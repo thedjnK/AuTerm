@@ -96,7 +96,7 @@ Where '\~/' is the location of where you want it extracted to, '\~/' will extrac
 
 ## Help and contributing
 
-Users are welcome to open issues and submit pull requests to have features merged. PRs on github should target the `main` branch, PRs on the internal git server should target the `develop` branch.
+Users are welcome to open issues and submit pull requests to have features merged. PRs on github should target the `testing` branch, PRs on the internal git server should target the `develop` branch.
 
 ## Speed/Throughput testing
 
