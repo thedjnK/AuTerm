@@ -162,11 +162,13 @@ smp_transport_error_t smp_udp::send(smp_message *message)
 
 void smp_udp::socket_connected()
 {
+    socket_is_connected = true;
     emit connected();
 }
 
 void smp_udp::socket_disconnected()
 {
+    socket_is_connected = false;
     emit disconnected();
 }
 
@@ -182,6 +184,13 @@ void smp_udp::socket_bytes_written(qint64 written)
 void smp_udp::socket_error(QAbstractSocket::SocketError error)
 {
 //    qDebug() << "error: " << error;
+    emit smp_transport::error(((int)error) + 1);
+
+    if (socket_is_connected == true)
+    {
+        socket_is_connected = false;
+        socket->disconnectFromHost();
+    }
 }
 
 void smp_udp::socket_readyread()
@@ -203,7 +212,6 @@ void smp_udp::socket_readyread()
 void smp_udp::connect_to_device(QString host, uint16_t port)
 {
     socket->connectToHost(host, port);
-    socket_is_connected = true;
     //TODO: need to alert parent
 }
 
@@ -240,6 +248,120 @@ int smp_udp::set_connection_config(struct smp_udp_config_t *configuration)
     udp_config_set = true;
 
     return SMP_TRANSPORT_ERROR_OK;
+}
+
+QString smp_udp::to_error_string(int error_code)
+{
+    if (error_code == 0)
+    {
+        return "";
+    }
+
+    --error_code;
+
+    switch (error_code)
+    {
+        case QAbstractSocket::ConnectionRefusedError:
+        {
+            return "UDP connection refused error";
+        }
+        case QAbstractSocket::RemoteHostClosedError:
+        {
+            return "UDP remote host closed error";
+        }
+        case QAbstractSocket::HostNotFoundError:
+        {
+            return "UDP host not found error";
+        }
+        case QAbstractSocket::SocketAccessError:
+        {
+            return "UDP socket access error";
+        }
+        case QAbstractSocket::SocketResourceError:
+        {
+            return "UDP socket resource error";
+        }
+        case QAbstractSocket::SocketTimeoutError:
+        {
+            return "UDP socket timeout error";
+        }
+        case QAbstractSocket::DatagramTooLargeError:
+        {
+            return "UDP datagram too large error";
+        }
+        case QAbstractSocket::NetworkError:
+        {
+            return "UDP network error";
+        }
+        case QAbstractSocket::AddressInUseError:
+        {
+            return "UDP address in use error";
+        }
+        case QAbstractSocket::SocketAddressNotAvailableError:
+        {
+            return "UDP socket address not available error";
+        }
+        case QAbstractSocket::UnsupportedSocketOperationError:
+        {
+            return "UDP unsupported socket operation error";
+        }
+        case QAbstractSocket::UnfinishedSocketOperationError:
+        {
+            return "UDP unfinished socket operation error";
+        }
+        case QAbstractSocket::ProxyAuthenticationRequiredError:
+        {
+            return "UDP proxy authentication required error";
+        }
+        case QAbstractSocket::SslHandshakeFailedError:
+        {
+            return "UDP SSL handshake failed error";
+        }
+        case QAbstractSocket::ProxyConnectionRefusedError:
+        {
+            return "UDP proxy connection refused error";
+        }
+        case QAbstractSocket::ProxyConnectionClosedError:
+        {
+            return "UDP proxy connection closed error";
+        }
+        case QAbstractSocket::ProxyConnectionTimeoutError:
+        {
+            return "UDP proxy connection timeout error";
+        }
+        case QAbstractSocket::ProxyNotFoundError:
+        {
+            return "UDP proxy not found error";
+        }
+        case QAbstractSocket::ProxyProtocolError:
+        {
+            return "UDP proxy protocol error";
+        }
+        case QAbstractSocket::OperationError:
+        {
+            return "UDP operation error";
+        }
+        case QAbstractSocket::SslInternalError:
+        {
+            return "UDP SSL internal error";
+        }
+        case QAbstractSocket::SslInvalidUserDataError:
+        {
+            return "UDP SSL invalid user data error";
+        }
+        case QAbstractSocket::TemporaryError:
+        {
+            return "UDP temporary error";
+        }
+        case QAbstractSocket::UnknownSocketError:
+        {
+            return "UDP unknown socket error";
+        }
+        default:
+        {
+            return "UDP unhandled error code";
+        }
+    };
 }
 
 /******************************************************************************/

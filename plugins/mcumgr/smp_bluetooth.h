@@ -95,6 +95,7 @@ public:
     int set_connection_config(struct smp_bluetooth_config_t *configuration);
     smp_transport_error_t send(smp_message *message) override;
     void setup_finished();
+    QString to_error_string(int error_code) override;
 
 private slots:
     void deviceDiscovered(const QBluetoothDeviceInfo &info);

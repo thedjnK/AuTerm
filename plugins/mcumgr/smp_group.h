@@ -39,7 +39,8 @@ enum group_status : uint8_t {
     STATUS_TIMEOUT,
     STATUS_CANCELLED,
     STATUS_PROCESSOR_TRANSPORT_ERROR,
-    STATUS_MESSAGE_TOO_LARGE
+    STATUS_MESSAGE_TOO_LARGE,
+    STATUS_TRANSPORT_DISCONNECTED
 };
 
 enum smp_group_ids : uint16_t {
@@ -166,6 +167,28 @@ public:
         log_error() << "MCUmgr command timed out";
         cleanup();
         emit status(smp_user_data, STATUS_TIMEOUT, response);
+    }
+
+    void transport_disconnected(smp_message *message, smp_transport *transport, int error_code)
+    {
+        Q_UNUSED(message);
+        Q_UNUSED(transport);
+        Q_UNUSED(error_code);
+        QString response = QString("Transport disconnected (Mode: %1)").arg(mode_to_string(mode));
+
+        log_error() << "MCUmgr transport disconnected";
+        cleanup();
+        emit status(smp_user_data, STATUS_TRANSPORT_DISCONNECTED, response);
+    }
+
+    void cancelled(smp_message *message)
+    {
+        Q_UNUSED(message);
+        QString response = QString("Cancelled (Mode: %1)").arg(mode_to_string(mode));
+
+        log_error() << "MCUmgr command cancelled";
+        cleanup();
+        emit status(smp_user_data, STATUS_TRANSPORT_DISCONNECTED, response);
     }
 
 #ifndef SKIPPLUGIN_LOGGER

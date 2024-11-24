@@ -61,6 +61,7 @@ public:
     smp_transport_error_t send(smp_message *message) override;
     void setup_finished();
     int set_connection_config(struct smp_udp_config_t *configuration);
+    QString to_error_string(int error_code) override;
 
 private slots:
     void connect_to_device(QString host, uint16_t port);

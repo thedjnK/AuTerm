@@ -102,6 +102,12 @@ public:
         return DEFAULT_TRANSPORT_TIMEOUT_MS;
     }
 
+    virtual QString to_error_string(int error_code)
+    {
+        Q_UNUSED(error_code);
+        return "";
+    }
+
 signals:
     void connected();
     void disconnected();

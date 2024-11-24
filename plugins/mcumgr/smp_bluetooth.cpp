@@ -39,6 +39,24 @@ static const int max_mtu = 509;
 //ATT overhead of messages
 static const int mtu_atu_overhead = 3;
 
+enum smp_bluetooth_error_t {
+    SMP_BLUETOOTH_ERROR_NONE,
+    SMP_BLUETOOTH_ERROR_SERVICE_OPERATION_ERROR,
+    SMP_BLUETOOTH_ERROR_SERVICE_DESCRIPTOR_WRITE_ERROR,
+    SMP_BLUETOOTH_ERROR_SERVICE_UNKNOWN_ERROR,
+    SMP_BLUETOOTH_ERROR_SERVICE_CHARACTERISTIC_READ_ERROR,
+    SMP_BLUETOOTH_ERROR_SERVICE_DESCRIPTOR_READ_ERROR,
+    SMP_BLUETOOTH_ERROR_CONTROLLER_UNKNOWN_ERROR,
+    SMP_BLUETOOTH_ERROR_CONTROLLER_UNKNOWN_REMOTE_DEVICE_ERROR,
+    SMP_BLUETOOTH_ERROR_CONTROLLER_NETWORK_ERROR,
+    SMP_BLUETOOTH_ERROR_CONTROLLER_INVALID_BLUETOOTH_ADAPTER_ERROR,
+    SMP_BLUETOOTH_ERROR_CONTROLLER_CONNECTION_ERROR,
+    SMP_BLUETOOTH_ERROR_CONTROLLER_REMOTE_HOST_CLOSED_ERROR,
+    SMP_BLUETOOTH_ERROR_CONTROLLER_AUTHORISATION_ERROR,
+
+    SMP_BLUETOOTH_ERROR_COUNT
+};
+
 smp_bluetooth::smp_bluetooth(QObject *parent)
 {
     Q_UNUSED(parent);
@@ -401,6 +419,7 @@ void smp_bluetooth::mcumgr_service_state_changed(QLowEnergyService::ServiceState
 void smp_bluetooth::errorz(QLowEnergyController::Error error)
 {
     bool disconnect_from_device = false;
+    int internal_error_code = SMP_BLUETOOTH_ERROR_NONE;
     QString err;
 
     switch (error)
@@ -412,30 +431,35 @@ void smp_bluetooth::errorz(QLowEnergyController::Error error)
         case QLowEnergyController::UnknownError:
         {
             disconnect_from_device = true;
+            internal_error_code = SMP_BLUETOOTH_ERROR_CONTROLLER_UNKNOWN_ERROR;
             err = "Unknown error";
             break;
         }
         case QLowEnergyController::UnknownRemoteDeviceError:
         {
             disconnect_from_device = true;
+            internal_error_code = SMP_BLUETOOTH_ERROR_CONTROLLER_UNKNOWN_REMOTE_DEVICE_ERROR;
             err = "Unknown remote device";
             break;
         }
         case QLowEnergyController::NetworkError:
         {
             disconnect_from_device = true;
+            internal_error_code = SMP_BLUETOOTH_ERROR_CONTROLLER_NETWORK_ERROR;
             err = "Network error";
             break;
         }
         case QLowEnergyController::InvalidBluetoothAdapterError:
         {
             disconnect_from_device = true;
-            err = "Invalud bluetooth adapter";
+            internal_error_code = SMP_BLUETOOTH_ERROR_CONTROLLER_INVALID_BLUETOOTH_ADAPTER_ERROR;
+            err = "Invalid bluetooth adapter";
             break;
         }
         case QLowEnergyController::ConnectionError:
         {
             disconnect_from_device = true;
+            internal_error_code = SMP_BLUETOOTH_ERROR_CONTROLLER_CONNECTION_ERROR;
             err = "Connection error";
             break;
         }
@@ -447,11 +471,14 @@ void smp_bluetooth::errorz(QLowEnergyController::Error error)
         case QLowEnergyController::RemoteHostClosedError:
         {
             disconnect_from_device = true;
+            internal_error_code = SMP_BLUETOOTH_ERROR_CONTROLLER_REMOTE_HOST_CLOSED_ERROR;
             err = "Remote host closed";
             break;
         }
         case QLowEnergyController::AuthorizationError:
         {
+            disconnect_from_device = true;
+            internal_error_code = SMP_BLUETOOTH_ERROR_CONTROLLER_AUTHORISATION_ERROR;
             err = "Authorisation error";
             break;
         }
@@ -468,6 +495,7 @@ void smp_bluetooth::errorz(QLowEnergyController::Error error)
 
     if (disconnect_from_device == true)
     {
+        emit smp_transport::error(internal_error_code);
         disconnect(true);
 
         if (device_connected == false)
@@ -567,6 +595,48 @@ void smp_bluetooth::mcumgr_service_error(QLowEnergyService::ServiceError error)
             bluetooth_window->set_status_text("Minimal MTU write failed, connection is unusable");
 #endif
         }
+    }
+    else if (error == QLowEnergyService::OperationError || error == QLowEnergyService::DescriptorWriteError || error == QLowEnergyService::UnknownError || error == QLowEnergyService::CharacteristicReadError || error == QLowEnergyService::DescriptorReadError)
+    {
+        int internal_error_code = SMP_BLUETOOTH_ERROR_NONE;
+        switch (error)
+        {
+            case QLowEnergyService::OperationError:
+            {
+                internal_error_code = SMP_BLUETOOTH_ERROR_SERVICE_OPERATION_ERROR;
+                break;
+            }
+            case QLowEnergyService::DescriptorWriteError:
+            {
+                internal_error_code = SMP_BLUETOOTH_ERROR_SERVICE_DESCRIPTOR_WRITE_ERROR;
+                break;
+            }
+            case QLowEnergyService::UnknownError:
+            {
+                internal_error_code = SMP_BLUETOOTH_ERROR_SERVICE_UNKNOWN_ERROR;
+                break;
+            }
+            case QLowEnergyService::CharacteristicReadError:
+            {
+                internal_error_code = SMP_BLUETOOTH_ERROR_SERVICE_CHARACTERISTIC_READ_ERROR;
+                break;
+            }
+            case QLowEnergyService::DescriptorReadError:
+            {
+                internal_error_code = SMP_BLUETOOTH_ERROR_SERVICE_DESCRIPTOR_READ_ERROR;
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        };
+
+        emit smp_transport::error(internal_error_code);
+    }
+    else if (error != QLowEnergyService::NoError)
+    {
+        log_warning() << "Unhandled Bluetooth low energy service error code: " << error;
     }
 }
 
@@ -775,4 +845,63 @@ int smp_bluetooth::set_connection_config(struct smp_bluetooth_config_t *configur
     bluetooth_config_set = true;
 
     return SMP_TRANSPORT_ERROR_OK;
+}
+
+QString smp_bluetooth::to_error_string(int error_code)
+{
+    switch (error_code)
+    {
+        case SMP_BLUETOOTH_ERROR_SERVICE_OPERATION_ERROR:
+        {
+            return "Bluetooth service operation error";
+        }
+        case SMP_BLUETOOTH_ERROR_SERVICE_DESCRIPTOR_WRITE_ERROR:
+        {
+            return "Bluetooth service descriptor write error";
+        }
+        case SMP_BLUETOOTH_ERROR_SERVICE_UNKNOWN_ERROR:
+        {
+            return "Bluetooth service unknown error";
+        }
+        case SMP_BLUETOOTH_ERROR_SERVICE_CHARACTERISTIC_READ_ERROR:
+        {
+            return "Bluetooth service characteristic read error";
+        }
+        case SMP_BLUETOOTH_ERROR_SERVICE_DESCRIPTOR_READ_ERROR:
+        {
+            return "Bluetooth service descriptor read error";
+        }
+        case SMP_BLUETOOTH_ERROR_CONTROLLER_UNKNOWN_ERROR:
+        {
+            return "Bluetooth controller unknown error";
+        }
+        case SMP_BLUETOOTH_ERROR_CONTROLLER_UNKNOWN_REMOTE_DEVICE_ERROR:
+        {
+            return "Bluetooth controller unknown remote device error";
+        }
+        case SMP_BLUETOOTH_ERROR_CONTROLLER_NETWORK_ERROR:
+        {
+            return "Bluetooth controller network error";
+        }
+        case SMP_BLUETOOTH_ERROR_CONTROLLER_INVALID_BLUETOOTH_ADAPTER_ERROR:
+        {
+            return "Bluetooth controller invalid bluetooth adapter error";
+        }
+        case SMP_BLUETOOTH_ERROR_CONTROLLER_CONNECTION_ERROR:
+        {
+            return "Bluetooth controller connection error";
+        }
+        case SMP_BLUETOOTH_ERROR_CONTROLLER_REMOTE_HOST_CLOSED_ERROR:
+        {
+            return "Bluetooth controller remote host closed error";
+        }
+        case SMP_BLUETOOTH_ERROR_CONTROLLER_AUTHORISATION_ERROR:
+        {
+            return "Bluetooth controller authorisation error";
+        }
+        default:
+        {
+            return "";
+        }
+    };
 }
