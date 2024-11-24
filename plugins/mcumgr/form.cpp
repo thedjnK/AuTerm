@@ -294,3 +294,8 @@ void Form::on_btn_error_lookup_clicked()
 {
 
 }
+
+void Form::on_btn_cancel_clicked()
+{
+
+}

@@ -88,15 +88,8 @@ void udp_setup::on_btn_connect_clicked()
         return;
     }
 
+    ui->btn_connect->setEnabled(false);
     emit connect_to_device(ui->edit_address->text(), ui->edit_port->value());
-
-    if (green_circle != nullptr)
-    {
-        ui->label_status_image->setPixmap(*green_circle);
-    }
-
-    ui->label_status->setText("Connected");
-    ui->btn_connect->setText("&Disconnect");
 
     if (ui->check_save_history->isChecked() == true)
     {
@@ -326,6 +319,35 @@ void udp_setup::set_logger(debug_logger *object)
     logger = object;
 }
 #endif
+
+void udp_setup::connected()
+{
+    if (green_circle != nullptr)
+    {
+        ui->label_status_image->setPixmap(*green_circle);
+    }
+
+    ui->label_status->setText("Connected");
+    ui->btn_connect->setText("&Disconnect");
+    ui->btn_connect->setEnabled(true);
+}
+
+void udp_setup::disconnected()
+{
+    if (red_circle != nullptr)
+    {
+        ui->label_status_image->setPixmap(*red_circle);
+    }
+
+    ui->label_status->setText("Not connected");
+    ui->btn_connect->setText("&Connect");
+    ui->btn_connect->setEnabled(true);
+}
+
+void udp_setup::set_status_text(QString status)
+{
+    ui->label_status->setText(status);
+}
 
 /******************************************************************************/
 // END OF FILE

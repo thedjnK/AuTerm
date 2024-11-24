@@ -53,6 +53,9 @@ public:
 #ifndef SKIPPLUGIN_LOGGER
     void set_logger(debug_logger *object);
 #endif
+    void connected();
+    void disconnected();
+    void set_status_text(QString status);
 
 private slots:
     void on_btn_connect_clicked();

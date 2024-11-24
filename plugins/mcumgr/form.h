@@ -72,6 +72,7 @@ private slots:
     void on_btn_custom_go_clicked();
     void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_error_lookup_clicked();
+    void on_btn_cancel_clicked();
 
 private:
     Ui::Form *ui;

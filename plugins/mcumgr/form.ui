@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>677</width>
     <height>404</height>
    </rect>
   </property>
@@ -178,6 +178,16 @@
           <widget class="QPushButton" name="btn_error_lookup">
            <property name="text">
             <string>Error lookup</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_cancel">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>&amp;Cancel</string>
            </property>
           </widget>
          </item>
@@ -3132,11 +3142,11 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="buttonGroup_5"/>
   <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup_6"/>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

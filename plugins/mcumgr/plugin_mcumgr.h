@@ -249,6 +249,7 @@ private slots:
     void on_btn_custom_go_clicked();
     void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_error_lookup_clicked();
+    void on_btn_cancel_clicked();
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -282,6 +283,7 @@ private:
     QRadioButton *radio_transport_lora;
     QPushButton *btn_transport_connect;
     QPushButton *btn_error_lookup;
+    QPushButton *btn_cancel;
     QSpacerItem *horizontalSpacer_6;
     QTabWidget *selector_group;
     QWidget *tab_IMG;
@@ -560,12 +562,12 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
+    QButtonGroup *buttonGroup_5;
     QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_4;
     QButtonGroup *buttonGroup_6;
-    QButtonGroup *buttonGroup_3;
     QButtonGroup *buttonGroup_2;
-    QButtonGroup *buttonGroup_5;
+    QButtonGroup *buttonGroup_3;
 ///AUTOGEN_END_OBJECTS
 
     //

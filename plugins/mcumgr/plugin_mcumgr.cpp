@@ -181,6 +181,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_7->addWidget(btn_error_lookup);
 
+    btn_cancel = new QPushButton(tab);
+    btn_cancel->setObjectName("btn_cancel");
+    btn_cancel->setEnabled(false);
+
+    horizontalLayout_7->addWidget(btn_cancel);
+
     horizontalSpacer_6 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_7->addItem(horizontalSpacer_6);
@@ -1871,6 +1877,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_lora->setText(QCoreApplication::translate("Form", "LoRaWAN", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
     btn_error_lookup->setText(QCoreApplication::translate("Form", "Error lookup", nullptr));
+    btn_cancel->setText(QCoreApplication::translate("Form", "&Cancel", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
     check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
     label_9->setText(QCoreApplication::translate("Form", "Reset:", nullptr));
@@ -2075,14 +2082,17 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     connect(udp_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+    connect(udp_transport, SIGNAL(error(int)), processor, SLOT(transport_disconnect(int)));
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH)
     connect(bluetooth_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+    connect(bluetooth_transport, SIGNAL(error(int)), processor, SLOT(transport_disconnect(int)));
 #endif
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_LORAWAN)
     connect(lora_transport, SIGNAL(receive_waiting(smp_message*)), processor, SLOT(message_received(smp_message*)));
+    connect(lora_transport, SIGNAL(error(int)), processor, SLOT(transport_disconnect(int)));
 #endif
 
     connect(smp_groups.fs_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
@@ -2169,6 +2179,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_custom_go, SIGNAL(clicked()), this, SLOT(on_btn_custom_go_clicked()));
     connect(tree_IMG_Slot_Info, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
     connect(btn_error_lookup, SIGNAL(clicked()), this, SLOT(on_btn_error_lookup_clicked()));
+    connect(btn_cancel, SIGNAL(clicked()), this, SLOT(on_btn_cancel_clicked()));
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -2274,6 +2285,7 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(parent_window, SIGNAL(plugin_serial_closed()), this, SLOT(serial_closed()));
 
     disconnect(processor, SLOT(message_received(smp_message*)));
+    disconnect(processor, SLOT(transport_disconnect(int)));
 
     disconnect(this, SLOT(status(uint8_t,group_status,QString)));
     disconnect(this, SLOT(progress(uint8_t,uint8_t)));
@@ -2344,6 +2356,7 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_btn_custom_go_clicked()));
     disconnect(this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
     disconnect(this, SLOT(on_btn_error_lookup_clicked()));
+    disconnect(this, SLOT(on_btn_cancel_clicked()));
 
     //Clean up GUI
     delete tab_2;
@@ -2540,6 +2553,7 @@ void plugin_mcumgr::serial_closed()
     mode = ACTION_IDLE;
     btn_transport_connect->setText("Open");
     uart_transport_locked = false;
+    btn_cancel->setEnabled(false);
 }
 
 //Form actions
@@ -2681,6 +2695,7 @@ void plugin_mcumgr::on_btn_FS_Go_clicked()
     if (started == true)
     {
         progress_FS_Complete->setValue(0);
+        btn_cancel->setEnabled(true);
     }
     else
     {
@@ -2879,6 +2894,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
     if (started == true)
     {
         progress_IMG_Complete->setValue(0);
+        btn_cancel->setEnabled(true);
     }
     else
     {
@@ -3043,7 +3059,11 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         }
     }
 
-    if (started == false)
+    if (started == true)
+    {
+        btn_cancel->setEnabled(true);
+    }
+    else
     {
         relase_transport();
     }
@@ -3092,7 +3112,11 @@ void plugin_mcumgr::on_btn_STAT_Go_clicked()
         }
     }
 
-    if (started == false)
+    if (started == true)
+    {
+        btn_cancel->setEnabled(true);
+    }
+    else
     {
         relase_transport();
     }
@@ -3769,6 +3793,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
     {
         mode = ACTION_IDLE;
         relase_transport();
+        btn_cancel->setEnabled(false);
 
         if (error_string == nullptr)
         {
@@ -4174,7 +4199,11 @@ void plugin_mcumgr::on_btn_settings_go_clicked()
         }
     }
 
-    if (started == false)
+    if (started == true)
+    {
+        btn_cancel->setEnabled(true);
+    }
+    else
     {
         relase_transport();
     }
@@ -4447,6 +4476,7 @@ void plugin_mcumgr::enter_pressed()
         edit_SHELL_Output->add_dat_in_text(data.append("\n").toUtf8());
         edit_SHELL_Output->update_display();
         lbl_SHELL_Status->setText("Shell execute command sent...");
+        btn_cancel->setEnabled(true);
     }
     else
     {
@@ -4476,7 +4506,11 @@ void plugin_mcumgr::on_btn_zephyr_go_clicked()
         }
     }
 
-    if (started == false)
+    if (started == true)
+    {
+        btn_cancel->setEnabled(true);
+    }
+    else
     {
         relase_transport();
     }
@@ -4571,6 +4605,7 @@ void plugin_mcumgr::on_btn_enum_go_clicked()
 
     if (started == true)
     {
+        btn_cancel->setEnabled(true);
     }
     else
     {
@@ -4749,7 +4784,6 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
     }
     else if (radio_custom_yaml->isChecked())
     {
-        //TODO
     }
     else if (radio_custom_cbor->isChecked())
     {
@@ -4759,12 +4793,14 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
 
     processor->set_custom_message(true);
     processor->send(tmp_message, transport->get_timeout(), transport->get_retries(), true);
+    btn_cancel->setEnabled(true);
 }
 
 void plugin_mcumgr::custom_message_callback(enum custom_message_callback_t type, smp_error_t *data)
 {
     mode = ACTION_IDLE;
     relase_transport();
+    btn_cancel->setEnabled(false);
 
     if (type == CUSTOM_MESSAGE_CALLBACK_OK)
     {
@@ -4821,6 +4857,11 @@ void plugin_mcumgr::set_group_transport_settings(smp_group *group, uint32_t time
 void plugin_mcumgr::on_btn_error_lookup_clicked()
 {
     error_lookup_form->show();
+}
+
+void plugin_mcumgr::on_btn_cancel_clicked()
+{
+    processor->cancel();
 }
 
 AutPlugin::PluginType plugin_mcumgr::plugin_type()

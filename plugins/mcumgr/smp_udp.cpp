@@ -163,12 +163,14 @@ smp_transport_error_t smp_udp::send(smp_message *message)
 void smp_udp::socket_connected()
 {
     socket_is_connected = true;
+    udp_window->connected();
     emit connected();
 }
 
 void smp_udp::socket_disconnected()
 {
     socket_is_connected = false;
+    udp_window->disconnected();
     emit disconnected();
 }
 
@@ -185,6 +187,8 @@ void smp_udp::socket_error(QAbstractSocket::SocketError error)
 {
 //    qDebug() << "error: " << error;
     emit smp_transport::error(((int)error) + 1);
+    udp_window->disconnected();
+    udp_window->set_status_text(to_error_string((int)error + 1));
 
     if (socket_is_connected == true)
     {
