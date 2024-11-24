@@ -283,8 +283,10 @@ private:
     QRadioButton *radio_transport_lora;
     QPushButton *btn_transport_connect;
     QPushButton *btn_error_lookup;
-    QPushButton *btn_cancel;
     QSpacerItem *horizontalSpacer_6;
+    QHBoxLayout *horizontalLayout_27;
+    QSpacerItem *horizontalSpacer_27;
+    QPushButton *btn_cancel;
     QTabWidget *selector_group;
     QWidget *tab_IMG;
     QGridLayout *gridLayout_3;
@@ -299,7 +301,7 @@ private:
     QHBoxLayout *horizontalLayout_5;
     QLineEdit *edit_IMG_Local;
     QToolButton *btn_IMG_Local;
-    QLabel *label_41;
+    QLabel *label_43;
     QHBoxLayout *horizontalLayout_4;
     QSpinBox *edit_IMG_Image;
     QRadioButton *radio_IMG_No_Action;
@@ -522,7 +524,7 @@ private:
     QRadioButton *radio_custom_read;
     QRadioButton *radio_custom_write;
     QFrame *line_5;
-    QLabel *label_411;
+    QLabel *label_41;
     QSpinBox *edit_custom_group;
     QFrame *line_6;
     QLabel *label_42;

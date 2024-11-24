@@ -102,7 +102,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout_2 = new QVBoxLayout(tab);
     verticalLayout_2->setSpacing(2);
     verticalLayout_2->setObjectName("verticalLayout_2");
-    verticalLayout_2->setContentsMargins(6, 6, 6, 6);
+    verticalLayout_2->setContentsMargins(3, 3, 3, 3);
     horizontalLayout_7 = new QHBoxLayout();
     horizontalLayout_7->setSpacing(2);
     horizontalLayout_7->setObjectName("horizontalLayout_7");
@@ -181,18 +181,30 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_7->addWidget(btn_error_lookup);
 
-    btn_cancel = new QPushButton(tab);
-    btn_cancel->setObjectName("btn_cancel");
-    btn_cancel->setEnabled(false);
-
-    horizontalLayout_7->addWidget(btn_cancel);
-
     horizontalSpacer_6 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_7->addItem(horizontalSpacer_6);
 
 
     verticalLayout_2->addLayout(horizontalLayout_7);
+
+    horizontalLayout_27 = new QHBoxLayout();
+    horizontalLayout_27->setSpacing(2);
+    horizontalLayout_27->setObjectName("horizontalLayout_27");
+    horizontalLayout_27->setContentsMargins(-1, 0, -1, -1);
+    horizontalSpacer_27 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_27->addItem(horizontalSpacer_27);
+
+    btn_cancel = new QPushButton(tab);
+    btn_cancel->setObjectName("btn_cancel");
+    btn_cancel->setEnabled(false);
+    btn_cancel->setMaximumSize(QSize(66, 16777215));
+
+    horizontalLayout_27->addWidget(btn_cancel);
+
+
+    verticalLayout_2->addLayout(horizontalLayout_27);
 
     selector_group = new QTabWidget(tab);
     selector_group->setObjectName("selector_group");
@@ -254,10 +266,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_4->addLayout(horizontalLayout_5, 0, 1, 1, 1);
 
-    label_41 = new QLabel(tab_IMG_Upload);
-    label_41->setObjectName("label_41");
+    label_43 = new QLabel(tab_IMG_Upload);
+    label_43->setObjectName("label_43");
 
-    gridLayout_4->addWidget(label_41, 0, 0, 1, 1);
+    gridLayout_4->addWidget(label_43, 0, 0, 1, 1);
 
     horizontalLayout_4 = new QHBoxLayout();
     horizontalLayout_4->setSpacing(2);
@@ -1509,10 +1521,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_28->addWidget(line_5);
 
-    label_411 = new QLabel(tab_custom);
-    label_411->setObjectName("label_411");
+    label_41 = new QLabel(tab_custom);
+    label_41->setObjectName("label_41");
 
-    horizontalLayout_28->addWidget(label_411);
+    horizontalLayout_28->addWidget(label_41);
 
     edit_custom_group = new QSpinBox(tab_custom);
     edit_custom_group->setObjectName("edit_custom_group");
@@ -1883,7 +1895,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_9->setText(QCoreApplication::translate("Form", "Reset:", nullptr));
     label_4->setText(QCoreApplication::translate("Form", "Image:", nullptr));
     btn_IMG_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
-    label_41->setText(QCoreApplication::translate("Form", "File:", nullptr));
+    label_43->setText(QCoreApplication::translate("Form", "File:", nullptr));
     radio_IMG_No_Action->setText(QCoreApplication::translate("Form", "No action", nullptr));
     radio_IMG_Test->setText(QCoreApplication::translate("Form", "Test", nullptr));
     radio_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
@@ -2037,7 +2049,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_40->setText(QCoreApplication::translate("Form", "Operation:", nullptr));
     radio_custom_read->setText(QCoreApplication::translate("Form", "Read", nullptr));
     radio_custom_write->setText(QCoreApplication::translate("Form", "Write", nullptr));
-    label_411->setText(QCoreApplication::translate("Form", "Group:", nullptr));
+    label_41->setText(QCoreApplication::translate("Form", "Group:", nullptr));
     label_42->setText(QCoreApplication::translate("Form", "Command:", nullptr));
     label_35->setText(QCoreApplication::translate("Form", "Send:", nullptr));
     label_36->setText(QCoreApplication::translate("Form", "Receive:", nullptr));
