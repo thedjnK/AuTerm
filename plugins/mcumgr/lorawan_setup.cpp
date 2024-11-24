@@ -260,7 +260,6 @@ void lorawan_setup::add_to_history()
     }
 
     ui->combo_history->addItem(display_data);
-    ui->combo_history->setCurrentIndex((ui->combo_history->count() - 1));
     this->saved_history.append(full_data);
 
     items = this->saved_history.count();
@@ -277,6 +276,7 @@ void lorawan_setup::add_to_history()
     }
 
     emit plugin_save_setting("mcumgr_lorawan_history", this->saved_history);
+    ui->combo_history->setCurrentIndex((ui->combo_history->count() - 1));
 }
 
 bool lorawan_setup::get_confirmed_downlinks()
@@ -369,6 +369,11 @@ void lorawan_setup::set_logger(debug_logger *object)
     logger = object;
 }
 #endif
+
+void lorawan_setup::set_status_text(QString status)
+{
+    ui->label_status_text->setText(status);
+}
 
 /******************************************************************************/
 // END OF FILE

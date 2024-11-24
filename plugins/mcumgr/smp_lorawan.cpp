@@ -46,6 +46,7 @@ smp_lorawan::smp_lorawan(QObject *parent)
     mqtt_is_connected = false;
     mqtt_is_ready = false;
     lorawan_config_set = false;
+    mqtt_disconnect_error_code = 0;
 
     QObject::connect(mqtt_client, SIGNAL(connected()), this, SLOT(mqtt_connected()));
     QObject::connect(mqtt_client, SIGNAL(disconnected()), this, SLOT(mqtt_disconnected()));
@@ -221,6 +222,7 @@ smp_transport_error_t smp_lorawan::send(smp_message *message)
 
 void smp_lorawan::connect_to_service(QString host, uint16_t port,  bool tls, QString username, QString password, QString topic)
 {
+    mqtt_disconnect_error_code = 0;
     mqtt_client->setHostname(host);
     mqtt_client->setPort(port);
     mqtt_client->setUsername(username);
@@ -292,6 +294,12 @@ void smp_lorawan::mqtt_state_changed(QMqttClient::ClientState state)
 #if defined(GUI_PRESENT)
             lorawan_window->set_connection_state(false);
 #endif
+            emit disconnected();
+            if (mqtt_disconnect_error_code != 0)
+            {
+                lorawan_window->set_status_text(to_error_string(mqtt_disconnect_error_code));
+                mqtt_disconnect_error_code = 0;
+            }
             return;
         }
         case QMqttClient::Connected:
@@ -330,7 +338,7 @@ void smp_lorawan::mqtt_error_changed(QMqttClient::ClientError error)
         }
         case QMqttClient::IdRejected:
         {
-            log_error() << "MQTT error: ID rejcted";
+            log_error() << "MQTT error: ID rejected";
             break;
         }
         case QMqttClient::ServerUnavailable:
@@ -375,8 +383,15 @@ void smp_lorawan::mqtt_error_changed(QMqttClient::ClientError error)
         }
     };
 
+    if (mqtt_client->state() != QMqttClient::Disconnected)
+    {
+        mqtt_client->disconnectFromHost();
+        mqtt_disconnect_error_code = error;
+    }
+
     mqtt_is_connected = false;
-    mqtt_client->disconnectFromHost();
+    emit smp_transport::error(error);
+    lorawan_window->set_status_text(to_error_string(error));
 }
 
 void smp_lorawan::mqtt_authentication_requested(const QMqttAuthenticationProperties &)
@@ -570,6 +585,57 @@ int smp_lorawan::set_connection_config(struct smp_lorawan_config_t *configuratio
     lorawan_config_set = true;
 
     return SMP_TRANSPORT_ERROR_OK;
+}
+
+QString smp_lorawan::to_error_string(int error_code)
+{
+    switch (error_code)
+    {
+        case QMqttClient::NoError:
+        {
+            return "";
+        }
+        case QMqttClient::InvalidProtocolVersion:
+        {
+            return "MQTT error: Invalid protocol version";
+        }
+        case QMqttClient::IdRejected:
+        {
+            return "MQTT error: ID rejected";
+        }
+        case QMqttClient::ServerUnavailable:
+        {
+            return "MQTT error: Server unavailable";
+        }
+        case QMqttClient::BadUsernameOrPassword:
+        {
+            return "MQTT error: Invalid username/password";
+        }
+        case QMqttClient::NotAuthorized:
+        {
+            return "MQTT error: Not authorised";
+        }
+        case QMqttClient::TransportInvalid:
+        {
+            return "MQTT error: Invalid transport";
+        }
+        case QMqttClient::ProtocolViolation:
+        {
+            return "MQTT error: Protocol violation";
+        }
+        case QMqttClient::UnknownError:
+        {
+            return "MQTT error: Unknown error";
+        }
+        case QMqttClient::Mqtt5SpecificError:
+        {
+            return "MQTT error: MQTT version 5 specific error";
+        }
+        default:
+        {
+            return "MQTT error: Unhandled error code";
+        }
+    };
 }
 
 /******************************************************************************/

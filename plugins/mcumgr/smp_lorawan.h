@@ -71,6 +71,7 @@ public:
     uint8_t get_retries() override;
     uint32_t get_timeout() override;
     int set_connection_config(struct smp_lorawan_config_t *configuration);
+    QString to_error_string(int error_code) override;
 
 private slots:
     void connect_to_service(QString host, uint16_t port, bool tls, QString username, QString password, QString topic);
@@ -98,6 +99,7 @@ private:
     bool mqtt_is_ready;
     smp_message received_data;
     QByteArray buffered_send_data;
+    int mqtt_disconnect_error_code;
 };
 
 #endif // SMP_LORAWAN_H

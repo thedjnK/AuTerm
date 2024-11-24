@@ -274,7 +274,6 @@ void udp_setup::add_to_history()
     }
 
     ui->combo_history->addItem(data);
-    ui->combo_history->setCurrentIndex((ui->combo_history->count() - 1));
     this->saved_history.append(data);
 
     items = this->saved_history.count();
@@ -296,6 +295,7 @@ void udp_setup::add_to_history()
     }
 
     emit plugin_save_setting("mcumgr_udp_history", this->saved_history);
+    ui->combo_history->setCurrentIndex((ui->combo_history->count() - 1));
 }
 
 void udp_setup::load_pixmaps()
