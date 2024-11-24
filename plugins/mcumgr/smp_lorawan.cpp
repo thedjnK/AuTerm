@@ -297,7 +297,9 @@ void smp_lorawan::mqtt_state_changed(QMqttClient::ClientState state)
             emit disconnected();
             if (mqtt_disconnect_error_code != 0)
             {
+#if defined(GUI_PRESENT)
                 lorawan_window->set_status_text(to_error_string(mqtt_disconnect_error_code));
+#endif
                 mqtt_disconnect_error_code = 0;
             }
             return;
@@ -391,7 +393,9 @@ void smp_lorawan::mqtt_error_changed(QMqttClient::ClientError error)
 
     mqtt_is_connected = false;
     emit smp_transport::error(error);
+#if defined(GUI_PRESENT)
     lorawan_window->set_status_text(to_error_string(error));
+#endif
 }
 
 void smp_lorawan::mqtt_authentication_requested(const QMqttAuthenticationProperties &)
