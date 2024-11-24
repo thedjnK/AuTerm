@@ -487,3 +487,125 @@ void smp_processor::set_custom_message(bool enabled)
 {
     custom_message = enabled;
 }
+
+void smp_processor::transport_disconnect(int error_code)
+{
+    uint16_t group;
+    uint8_t i = 0;
+
+    if (sender() != transport)
+    {
+        log_error() << "Non-active transport emitted error: " << sender() << ", code: " << error_code;
+        return;
+    }
+
+    if (!busy)
+    {
+        //No longer busy
+        return;
+    }
+
+    group = last_message_header->nh_group;
+
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+    group = ((group & 0xff) << 8) | ((group & 0xff00) >> 8);
+#endif
+
+    if (!custom_message)
+    {
+        //Search for the handler for this group
+        while (i < group_handlers.length())
+        {
+            if (group_handlers[i].group == group)
+            {
+                break;
+            }
+
+            ++i;
+        }
+
+        if (i == group_handlers.length())
+        {
+            //There is no registered handler for this group
+            log_error() << "No registered handler for group " << group << ", cannot send transport disconnected message.";
+            cleanup();
+        }
+        else
+        {
+            //Keep message pointer valid but cleanup so callback can send a message
+            smp_message *backup_message = last_message;
+            last_message = nullptr;
+            last_message_header = nullptr;
+
+            cleanup();
+            group_handlers[i].handler->transport_disconnected(backup_message, transport, error_code);
+
+            //Delete backup pointer
+            delete backup_message;
+        }
+    }
+    else
+    {
+        emit custom_message_callback(CUSTOM_MESSAGE_CALLBACK_TRANSPORT_DISCONNECTED, nullptr);
+
+        custom_message = false;
+    }
+}
+
+void smp_processor::cancel()
+{
+    uint16_t group;
+    uint8_t i = 0;
+
+    if (!busy)
+    {
+        //No longer busy
+        return;
+    }
+
+    group = last_message_header->nh_group;
+
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+    group = ((group & 0xff) << 8) | ((group & 0xff00) >> 8);
+#endif
+
+    if (!custom_message)
+    {
+        //Search for the handler for this group
+        while (i < group_handlers.length())
+        {
+            if (group_handlers[i].group == group)
+            {
+                break;
+            }
+
+            ++i;
+        }
+
+        if (i == group_handlers.length())
+        {
+            //There is no registered handler for this group
+            log_error() << "No registered handler for group " << group << ", cannot send cancelled message.";
+            cleanup();
+        }
+        else
+        {
+            //Keep message pointer valid but cleanup so callback can send a message
+            smp_message *backup_message = last_message;
+            last_message = nullptr;
+            last_message_header = nullptr;
+
+            cleanup();
+            group_handlers[i].handler->cancelled(backup_message);
+
+            //Delete backup pointer
+            delete backup_message;
+        }
+    }
+    else
+    {
+        emit custom_message_callback(CUSTOM_MESSAGE_CALLBACK_CANCELLED, nullptr);
+
+        custom_message = false;
+    }
+}

@@ -41,6 +41,8 @@ enum custom_message_callback_t {
     CUSTOM_MESSAGE_CALLBACK_OK,
     CUSTOM_MESSAGE_CALLBACK_ERROR,
     CUSTOM_MESSAGE_CALLBACK_TIMEOUT,
+    CUSTOM_MESSAGE_CALLBACK_TRANSPORT_DISCONNECTED,
+    CUSTOM_MESSAGE_CALLBACK_CANCELLED,
 
     CUSTOM_MESSAGE_CALLBACK_COUNT
 };
@@ -74,6 +76,7 @@ public:
 #endif
     void set_message_logging(bool enabled);
     void set_custom_message(bool enabled);
+    void cancel();
 
 private:
     void cleanup();
@@ -82,6 +85,7 @@ private:
 public slots:
     void message_timeout();
     void message_received(smp_message *message);
+    void transport_disconnect(int error_code);
 
 signals:
     void custom_message_callback(enum custom_message_callback_t type, smp_error_t *data);
