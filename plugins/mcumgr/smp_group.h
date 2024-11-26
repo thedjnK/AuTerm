@@ -24,6 +24,7 @@
 #define SMP_GROUP_H
 
 #include <QObject>
+#include <QStringBuilder>
 #include "smp_message.h"
 #include "smp_processor.h"
 #include "smp_error.h"

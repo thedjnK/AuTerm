@@ -27,6 +27,7 @@
 #include "smp_group_img_mgmt.h"
 #include <QFile>
 #include <QCryptographicHash>
+#include <cmath>
 #include "smp_message.h"
 
 /******************************************************************************/
