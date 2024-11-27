@@ -865,26 +865,22 @@ void smp_group_os_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group, 
         {
             //Response to MCUmgr buffer parameters
             QCborStreamReader cbor_reader(data);
-            uint32_t buffer_size;
-            uint32_t buffer_count;
-            bool good = parse_mcumgr_parameters_response(cbor_reader, &buffer_size, &buffer_count);
-
-            log_debug() << "buffer size: " << buffer_size << ", buffer count: " << buffer_count;
+            bool good = parse_mcumgr_parameters_response(cbor_reader, mcumgr_parameters_buffer_size, mcumgr_parameters_buffer_count);
+            log_debug() << "buffer size: " << *mcumgr_parameters_buffer_size << ", buffer count: " << *mcumgr_parameters_buffer_count;
 
             cleanup();
-            emit status(smp_user_data, STATUS_COMPLETE, QString("Buffer size: %1\nBuffer count: %2").arg(QString::number(buffer_size), QString::number(buffer_count)));
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (finished_mode == MODE_OS_APPLICATION_INFO && command == COMMAND_OS_APPLICATION_INFO)
         {
             //Response to OS/application info
             QCborStreamReader cbor_reader(data);
-            QString response;
-            bool good = parse_os_application_info_response(cbor_reader, &response);
+            bool good = parse_os_application_info_response(cbor_reader, os_application_info_response);
 
-            log_debug() << response;
+            log_debug() << *os_application_info_response;
 
             cleanup();
-            emit status(smp_user_data, STATUS_COMPLETE, response);
+            emit status(smp_user_data, STATUS_COMPLETE, nullptr);
         }
         else if (finished_mode == MODE_BOOTLOADER_INFO && command == COMMAND_BOOTLOADER_INFO)
         {
@@ -1063,13 +1059,15 @@ bool smp_group_os_mgmt::start_reset(bool force)
     return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
-bool smp_group_os_mgmt::start_mcumgr_parameters()
+bool smp_group_os_mgmt::start_mcumgr_parameters(uint32_t *buffer_size, uint32_t *buffer_count)
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_MCUMGR_PARAMETERS, 0);
     tmp_message->end_message();
 
     mode = MODE_MCUMGR_PARAMETERS;
+    mcumgr_parameters_buffer_size = buffer_size;
+    mcumgr_parameters_buffer_count = buffer_count;
 
     //	    qDebug() << "len: " << message.length();
 
@@ -1081,7 +1079,7 @@ bool smp_group_os_mgmt::start_mcumgr_parameters()
     return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
-bool smp_group_os_mgmt::start_os_application_info(QString format)
+bool smp_group_os_mgmt::start_os_application_info(QString format, QString *response)
 {
     smp_message *tmp_message = new smp_message();
     tmp_message->start_message(SMP_OP_READ, smp_version, SMP_GROUP_ID_OS, COMMAND_OS_APPLICATION_INFO, (format.isEmpty() == false ? 1 : 0));
@@ -1095,6 +1093,7 @@ bool smp_group_os_mgmt::start_os_application_info(QString format)
     tmp_message->end_message();
 
     mode = MODE_OS_APPLICATION_INFO;
+    os_application_info_response = response;
 
     //	    qDebug() << "len: " << message.length();
 
@@ -1259,9 +1258,12 @@ void smp_group_os_mgmt::cleanup()
     mode = MODE_IDLE;
     task_list = nullptr;
     memory_list = nullptr;
+    os_application_info_response = nullptr;
     bootloader_query_value.clear();
     bootloader_info_response = nullptr;
     rtc_get_date_time = nullptr;
+    mcumgr_parameters_buffer_size = nullptr;
+    mcumgr_parameters_buffer_count = nullptr;
 }
 
 /******************************************************************************/

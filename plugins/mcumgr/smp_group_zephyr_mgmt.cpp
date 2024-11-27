@@ -56,7 +56,7 @@ static const QStringList smp_error_values = QStringList() <<
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
-smp_group_zephyr_mgmt::smp_group_zephyr_mgmt(smp_processor *parent) : smp_group(parent, "SETTINGS", SMP_GROUP_ID_ZEPHYR, error_lookup, error_define_lookup)
+smp_group_zephyr_mgmt::smp_group_zephyr_mgmt(smp_processor *parent) : smp_group(parent, "ZEPHYR", SMP_GROUP_ID_ZEPHYR, error_lookup, error_define_lookup)
 {
     mode = MODE_IDLE;
 }

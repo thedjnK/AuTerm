@@ -72,8 +72,8 @@ public:
     bool start_task_stats(QList<task_list_t> *tasks);
     bool start_memory_pool(QList<memory_pool_t> *memory);
     bool start_reset(bool force);
-    bool start_mcumgr_parameters();
-    bool start_os_application_info(QString format);
+    bool start_mcumgr_parameters(uint32_t *buffer_size, uint32_t *buffer_count);
+    bool start_os_application_info(QString format, QString *response);
     bool start_date_time_get(QDateTime *date_time);
     bool start_date_time_set(QDateTime date_time);
     bool start_bootloader_info(QString query, QVariant *response);
@@ -97,9 +97,12 @@ private:
     //
     QList<task_list_t> *task_list;
     QList<memory_pool_t> *memory_list;
+    QString *os_application_info_response;
     QString bootloader_query_value;
     QVariant *bootloader_info_response;
     QDateTime *rtc_get_date_time;
+    uint32_t *mcumgr_parameters_buffer_size;
+    uint32_t *mcumgr_parameters_buffer_count;
 };
 
 #endif // SMP_GROUP_OS_MGMT_H
