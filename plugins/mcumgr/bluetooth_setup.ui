@@ -155,7 +155,10 @@
      <item>
       <widget class="QCheckBox" name="check_write_with_response">
        <property name="text">
-        <string>Write with response (reliable, slow)</string>
+        <string>Write with response (reliable)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
