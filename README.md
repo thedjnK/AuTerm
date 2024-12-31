@@ -51,7 +51,7 @@ Test release on Windows:
 
 ## Downloading
 
-Source code and pre-release test builds are provided.
+Source code and pre-release test builds are provided, builds can be downloaded from [the releases page](https://github.com/thedjnK/AuTerm/releases).
 
 ## Setup
 
@@ -59,20 +59,23 @@ Source code and pre-release test builds are provided.
 
 **Note:** Only 64-bit x86_64 Windows builds are officially provided, 32-bit x86 builds can be built from source.
 
+Release name: `AuTerm_test_Win_x64_<version>.7z`
+
 Download and open the 7zip file, extract the files to a folder on your computer and double click 'AuTerm.exe' to run AuTerm.
 
 The Visual Studio 2022 runtime files are required which are available on the [Microsoft site](https://aka.ms/vs/17/release/vc_redist.x64.exe).
 
 ### Linux
 
-
 #### x86
 
 **Note:** Only 64-bit x86_64 Linux builds are officially provided, 32-bit x86 builds can be built from source.
 
+Release name: `AuTerm_test_Lin_x64_<version>.tar.gz`
+
 Download the tar file and extract it's contents to a location on your computer, this can be done using a graphical utility or from the command line using:
 
-	tar xf AuTerm_<version>.tar.gz -C ~/
+	tar xf AuTerm_test_Lin_x64_<version>.tar.gz -C ~/
 
 Where '\~/' is the location of where you want it extracted to, '\~/' will extract to the home directory of your local user account). To launch AuTerm, either double click on the executable and click the 'run' button (if asked), or execute it from a terminal as so:
 
@@ -88,9 +91,11 @@ ARM versions must be built from source using Qt 6.x. Pre-compiled release versio
 
 **Note:** No support for this build/os is provided, no hardware is available for testing, it is built on github CI only. Use at own risk.
 
+Release name: `AuTerm_test_Mac_x64_arm64_<version>.tar.gz`
+
 Download the tar file and extract it's contents to a location on your computer, this can be done using a graphical utility or from the command line using:
 
-	tar xf AuTerm_<version>.tar.gz -C ~/
+	tar xf AuTerm_test_Mac_x64_arm64_<version>.tar.gz -C ~/
 
 Where '\~/' is the location of where you want it extracted to, '\~/' will extract to the home directory of your local user account). To launch AuTerm, either double click on the executable and click the 'run' button (if asked). It is possible that gatekeeper might prevent running of it until system security settings are changed.
 
