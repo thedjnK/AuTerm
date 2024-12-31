@@ -612,6 +612,7 @@ private:
     QList<image_state_t> images_list;
     QList<hash_checksum_t> supported_hash_checksum_list;
     QVariant bootloader_info_response;
+    QString os_info_response;
     QByteArray settings_read_response;
     QByteArray fs_hash_checksum_response;
     uint32_t fs_size_response;
@@ -621,6 +622,8 @@ private:
     bool uart_transport_locked;
     QDateTime rtc_time_date_response;
     smp_json *log_json;
+    uint32_t os_buffer_size;
+    uint32_t os_buffer_count;
 };
 
 #endif // PLUGIN_MCUMGR_H

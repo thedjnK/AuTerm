@@ -3036,7 +3036,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             mode = ACTION_OS_OS_APPLICATION_INFO;
             processor->set_transport(active_transport());
             set_group_transport_settings(smp_groups.os_mgmt);
-            started = smp_groups.os_mgmt->start_os_application_info(edit_OS_UName->text());
+            started = smp_groups.os_mgmt->start_os_application_info(edit_OS_UName->text(), &os_info_response);
 
             if (started == true)
             {
@@ -3049,7 +3049,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
             mode = ACTION_OS_MCUMGR_BUFFER;
             processor->set_transport(active_transport());
             set_group_transport_settings(smp_groups.os_mgmt);
-            started = smp_groups.os_mgmt->start_mcumgr_parameters();
+            started = smp_groups.os_mgmt->start_mcumgr_parameters(&os_buffer_size, &os_buffer_count);
 
             if (started == true)
             {
@@ -3472,13 +3472,13 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             else if (user_data == ACTION_OS_MCUMGR_BUFFER)
             {
                 edit_OS_Info_Output->clear();
-                edit_OS_Info_Output->appendPlainText(error_string);
+                edit_OS_Info_Output->appendPlainText(QString::number(os_buffer_count) % " buffers of " % QString::number(os_buffer_size) % " bytes each");
                 error_string = nullptr;
             }
             else if (user_data == ACTION_OS_OS_APPLICATION_INFO)
             {
                 edit_OS_Info_Output->clear();
-                edit_OS_Info_Output->appendPlainText(error_string);
+                edit_OS_Info_Output->appendPlainText(os_info_response);
                 error_string = nullptr;
             }
             else if (user_data == ACTION_OS_BOOTLOADER_INFO)
