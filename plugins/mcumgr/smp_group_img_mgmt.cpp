@@ -980,8 +980,8 @@ log_error() << "Going in circles...";
         tmp_message->writer()->append(this->file_upload_area);
         tmp_message->writer()->append("data");
 
-        //CBOR element header is 2 bytes with 1 byte end token
-        max_size = max_size - tmp_message->size() - 3;
+        //CBOR element header is 2 bytes with 1 byte end token for byte string data, have to include 1 byte header and 4 bytes data for 'data' element too
+        max_size = max_size - tmp_message->size() - 3 - 5;
 
         tmp_message->writer()->append(this->file_upload_data.mid(this->file_upload_area, max_size));
 

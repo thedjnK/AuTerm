@@ -109,10 +109,10 @@ public:
 
     bool check_message_before_send(smp_message *tmp_message)
     {
-        if (tmp_message->contents().length() > processor->max_message_data_size(smp_mtu))
+        if (tmp_message->data()->length() > processor->max_message_data_size(smp_mtu))
         {
             //Message is larger than the transport provides
-            QString response = QString("Message too large for transport, ") % QString::number(tmp_message->contents().length()) % " vs " % QString::number(processor->max_message_data_size(smp_mtu)) % " bytes";
+            QString response = QString("Message too large for transport, ") % QString::number(tmp_message->data()->length()) % " vs " % QString::number(processor->max_message_data_size(smp_mtu)) % " bytes";
 
             delete tmp_message;
             cleanup();

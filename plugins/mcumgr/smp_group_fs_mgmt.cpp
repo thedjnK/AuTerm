@@ -848,8 +848,8 @@ bool smp_group_fs_mgmt::upload_chunk()
     tmp_message->writer()->append(file_upload_area);
     tmp_message->writer()->append("data");
 
-    //CBOR element header is 2 bytes with 1 byte end token
-    max_size = max_size - tmp_message->size() - 3;
+    //CBOR element header is 2 bytes with 1 byte end token for byte string data, have to include 1 byte header and 4 bytes data for 'data' element too
+    max_size = max_size - tmp_message->size() - 3 - 5;
     remaining_file_size = local_file_size - local_file.pos();
     if (max_size > remaining_file_size)
     {
