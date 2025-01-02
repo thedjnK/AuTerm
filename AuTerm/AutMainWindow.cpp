@@ -474,8 +474,9 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 #ifdef QT_DEBUG
     .append(" [DEBUG BUILD]")
 #endif
+    .append(" [TEST/NON-OFFICIAL BUILD]")
     );
-    setWindowTitle(QString("AuTerm (v").append(UwVersion).append(")"));
+    setWindowTitle(QString("AuTerm (v").append(UwVersion).append(" - TEST/NON-OFFICIAL BUILD)"));
 
     //Create menu items
     gpMenu = new QMenu(this);
@@ -1035,6 +1036,25 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         }
     }
 #endif
+
+    //Test split terminal code
+    text_split_terminal = new AutScrollEdit();
+
+    //Enable custom context menu policy
+    text_split_terminal->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    //Connect key-press signals
+    connect(text_split_terminal, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
+    connect(text_split_terminal, SIGNAL(key_pressed(int,QChar)), this, SLOT(key_pressed(int,QChar)));
+
+    text_split_terminal->setPalette(ui->text_TermEditData->palette());
+    text_split_terminal->setFont(ui->text_TermEditData->font());
+    text_split_terminal->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
+
+    ui->splitterLayout_1->addWidget(text_split_terminal);
+    ui->splitterLayout_1->setCollapsible(0, false);
+    ui->splitterLayout_1->setStretchFactor(0, 7);
+    ui->splitterLayout_1->setStretchFactor(1, 3);
 }
 
 AutMainWindow::~AutMainWindow()
@@ -1098,6 +1118,12 @@ AutMainWindow::~AutMainWindow()
         gbPluginHideTerminalOutput = false;
         gbPluginRunning = false;
 #endif
+    }
+
+    if (text_split_terminal != nullptr)
+    {
+        delete text_split_terminal;
+        text_split_terminal = nullptr;
     }
 
     if (gbMainLogEnabled == true)
@@ -1883,7 +1909,7 @@ void AutMainWindow::enter_pressed()
         {
             if (gbLoopbackMode == false)
             {
-                QByteArray baTmpBA = ui->text_TermEditData->get_dat_out()->replace("\r", "\n").replace("\n", (ui->radio_LCR->isChecked() ? "\r" : ui->radio_LLF->isChecked() ? "\n" : ui->radio_LCRLF->isChecked() ? "\r\n" : "")).toUtf8();
+                QByteArray baTmpBA = ((AutScrollEdit *)this->sender())->get_dat_out()->replace("\r", "\n").replace("\n", (ui->radio_LCR->isChecked() ? "\r" : ui->radio_LLF->isChecked() ? "\n" : ui->radio_LCRLF->isChecked() ? "\r\n" : "")).toUtf8();
                 transport_write(baTmpBA);
                 gintQueuedTXBytes += baTmpBA.size();
 
@@ -1909,9 +1935,10 @@ void AutMainWindow::enter_pressed()
             if (ui->check_Echo->isChecked() == true)
             {
                 //Local echo
-                update_buffer(ui->text_TermEditData->get_dat_out()->toUtf8().append("\n"), false);
+                update_buffer(((AutScrollEdit *)this->sender())->get_dat_out()->toUtf8().append("\n"), false);
             }
-            ui->text_TermEditData->clear_dat_out();
+
+            ((AutScrollEdit *)this->sender())->clear_dat_out();
         }
     }
 }
@@ -5957,6 +5984,18 @@ bool AutMainWindow::plugin_type_supported(AutPlugin::PluginType type)
     };
 }
 #endif
+
+void AutMainWindow::on_check_split_terminal_stateChanged(int arg1)
+{
+    if (arg1 == 0)
+    {
+        ui->splitterLayout_1->widget(1)->hide();
+    }
+    else
+    {
+        ui->splitterLayout_1->widget(1)->show();
+    }
+}
 
 /******************************************************************************/
 // END OF FILE

@@ -343,6 +343,7 @@ private slots:
     void serial_port_reconnected(QString port);
     void on_check_reconnect_after_disconnect_toggled(bool checked);
 #endif
+    void on_check_split_terminal_stateChanged(int arg1);
 
 #ifndef SKIPPLUGINS
     void on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *);
@@ -543,6 +544,7 @@ private:
 #ifndef SKIPPLUGINS_TRANSPORT
     AutTransportPlugin *plugin_active_transport;
 #endif
+    AutScrollEdit *text_split_terminal;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *dragEvent);
