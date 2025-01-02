@@ -96,6 +96,10 @@
 #define transport_supports_data_terminal_ready() true
 #endif
 
+#ifdef SKIPSPLITTERMINAL
+#define open_menu_parent ui->text_TermEditData
+#endif
+
 /******************************************************************************/
 // Local Functions or Private Members
 /******************************************************************************/
@@ -445,6 +449,34 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     connect(ui->text_TermEditData, SIGNAL(key_pressed(int,QChar)), this, SLOT(key_pressed(int,QChar)));
     connect(ui->text_TermEditData, SIGNAL(vt100_send(QByteArray)), this, SLOT(vt100_send(QByteArray)));
 
+#ifndef SKIPSPLITTERMINAL
+    //Setup split terminal input
+    text_split_terminal = new AutScrollEdit();
+
+    //Enable custom context menu policy
+    text_split_terminal->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    //Copy main terminal palette
+    text_split_terminal->setPalette(ui->text_TermEditData->palette());
+
+    //Connect key-press signals
+    connect(text_split_terminal, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
+    connect(text_split_terminal, SIGNAL(key_pressed(int,QChar)), this, SLOT(key_pressed(int,QChar)));
+    connect(text_split_terminal, SIGNAL(vt100_send(QByteArray)), this, SLOT(vt100_send(QByteArray)));
+    connect(text_split_terminal, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(on_text_TermEditData_customContextMenuRequested(QPoint)));
+
+    //Setup splitter layout object
+    ui->splitterLayout_1->addWidget(text_split_terminal);
+    ui->splitterLayout_1->setCollapsible(0, false);
+    ui->splitterLayout_1->setStretchFactor(0, 7);
+    ui->splitterLayout_1->setStretchFactor(1, 3);
+
+    ui->check_split_terminal->setChecked(gpTermSettings->value("SplitTerminal", DefaultSplitTerminal).toBool());
+    on_check_split_terminal_toggled(ui->check_split_terminal->isChecked());
+#else
+    ui->check_split_terminal->deleteLater();
+#endif
+
     //Initialise popup message
     gpmErrorForm = new PopupMessage(this);
 
@@ -629,6 +661,9 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         QPalette palTmp = gpTermSettings->value("CustomPalette").value<QPalette>();
 
         ui->text_TermEditData->setPalette(palTmp);
+#ifndef SKIPSPLITTERMINAL
+        text_split_terminal->setPalette(palTmp);
+#endif
         ui->text_LogData->setPalette(palTmp);
 #ifndef SKIPSPEEDTEST
         ui->text_SpeedEditData->setPalette(palTmp);
@@ -642,6 +677,9 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 
     //Setup font
     ui->text_TermEditData->setFont(fntTmpFnt2);
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->setFont(fntTmpFnt2);
+#endif
     ui->text_LogData->setFont(fntTmpFnt2);
 #ifndef SKIPSPEEDTEST
     ui->text_SpeedEditData->setFont(fntTmpFnt2);
@@ -651,10 +689,16 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     QFontMetrics tmTmpFM(fntTmpFnt2);
     ui->text_SpeedEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
     ui->text_TermEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
+#endif
     ui->text_LogData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*8);
 
     //Setup the terminal scrollback buffer size
     ui->text_TermEditData->setup_scrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->setup_scrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
+#endif
 
     //Inform terminal what to do with VT100 control codes
     if (ui->radio_vt100_ignore->isChecked() == true)
@@ -1500,6 +1544,9 @@ void AutMainWindow::on_btn_TermClear_clicked()
 {
     //Clears the screen of the terminal tab
     ui->text_TermEditData->clear_dat_in();
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->clear_dat_in();
+#endif
 }
 
 void AutMainWindow::SerialRead()
@@ -1560,7 +1607,7 @@ void AutMainWindow::SerialRead()
 //            baDispData.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f");
 
             //Update display buffer
-            update_buffer(&baDispData, true);
+            update_buffer(&baDispData, true, false);
 
             if (gbLoopbackMode == true)
             {
@@ -1568,7 +1615,7 @@ void AutMainWindow::SerialRead()
                 transport_write(baOrigData);
                 gintQueuedTXBytes += baOrigData.length();
                 gpMainLog->WriteRawLogData(baOrigData);
-                update_buffer(&baDispData, false);
+                update_buffer(&baDispData, false, true);
             }
         }
 
@@ -1590,8 +1637,11 @@ void AutMainWindow::SerialRead()
 void AutMainWindow::on_text_TermEditData_customContextMenuRequested(const QPoint &pos)
 {
     //Creates the custom context menu
-    gpMenu->popup(ui->text_TermEditData->viewport()->mapToGlobal(pos));
-    ui->text_TermEditData->mbContextMenuOpen = true;
+    gpMenu->popup(((AutScrollEdit *)this->sender())->viewport()->mapToGlobal(pos));
+    ((AutScrollEdit *)this->sender())->mbContextMenuOpen = true;
+#ifndef SKIPSPLITTERMINAL
+    open_menu_parent = (AutScrollEdit *)this->sender();
+#endif
 }
 
 void AutMainWindow::MenuSelected(QAction* qaAction)
@@ -1605,7 +1655,7 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
         bool bTmpBool;
 
         //QString
-        unsigned int uiErrCode = ui->text_TermEditData->textCursor().selection().toPlainText().toUInt(&bTmpBool, 0);
+        unsigned int uiErrCode = open_menu_parent->textCursor().selection().toPlainText().toUInt(&bTmpBool, 0);
         if (bTmpBool == true)
         {
             //Converted
@@ -1613,7 +1663,7 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
         }
         else
         {
-            update_buffer("\nSelected text does not have a numeric value, cannot look up error code.\n", false);
+            update_buffer("\nSelected text does not have a numeric value, cannot look up error code.\n", false, true);
         }
     }
     else if (intItem == MenuActionLoopback && gbTermBusy == false && gbSpeedTestRunning == false)
@@ -1686,6 +1736,10 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
             QFontMetrics tmTmpFM(fntTmpFnt);
             ui->text_TermEditData->setFont(fntTmpFnt);
             ui->text_TermEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
+#ifndef SKIPSPLITTERMINAL
+            text_split_terminal->setFont(fntTmpFnt);
+            text_split_terminal->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
+#endif
             ui->text_LogData->setFont(fntTmpFnt);
             ui->text_LogData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
 #ifndef SKIPSPEEDTEST
@@ -1707,6 +1761,9 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
             //Update text colour
             palTmp.setColor(QPalette::Inactive, QPalette::Text, palTmp.color(QPalette::Active, QPalette::Text));
             ui->text_TermEditData->setPalette(palTmp);
+#ifndef SKIPSPLITTERMINAL
+            text_split_terminal->setPalette(palTmp);
+#endif
             ui->text_LogData->setPalette(palTmp);
 #ifndef SKIPSPEEDTEST
             ui->text_SpeedEditData->setPalette(palTmp);
@@ -1726,6 +1783,9 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
             //Update background colour
             palTmp.setColor(QPalette::Inactive, QPalette::Base, palTmp.color(QPalette::Active, QPalette::Base));
             ui->text_TermEditData->setPalette(palTmp);
+#ifndef SKIPSPLITTERMINAL
+            text_split_terminal->setPalette(palTmp);
+#endif
             ui->text_LogData->setPalette(palTmp);
 #ifndef SKIPSPEEDTEST
             ui->text_SpeedEditData->setPalette(palTmp);
@@ -1749,6 +1809,10 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
         QFontMetrics tmTmpFM(fntTmpFnt);
         ui->text_TermEditData->setFont(fntTmpFnt);
         ui->text_TermEditData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
+#ifndef SKIPSPLITTERMINAL
+        text_split_terminal->setFont(fntTmpFnt);
+        text_split_terminal->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
+#endif
         ui->text_LogData->setFont(fntTmpFnt);
         ui->text_LogData->setTabStopDistance(tmTmpFM.horizontalAdvance(" ")*6);
 #ifndef SKIPSPEEDTEST
@@ -1821,7 +1885,7 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
     else if (intItem == MenuActionClearDisplay)
     {
         //Clear display
-        ui->text_TermEditData->clear_dat_in();
+        open_menu_parent->clear_dat_in();
     }
     else if (intItem == MenuActionClearRxTx)
     {
@@ -1834,23 +1898,38 @@ void AutMainWindow::MenuSelected(QAction* qaAction)
     else if (intItem == MenuActionCopy)
     {
         //Copy selected data
-        QApplication::clipboard()->setText(ui->text_TermEditData->textCursor().selection().toPlainText());
+        QApplication::clipboard()->setText(open_menu_parent->textCursor().selection().toPlainText());
     }
     else if (intItem == MenuActionCopyAll)
     {
         //Copy all data
-        QApplication::clipboard()->setText(ui->text_TermEditData->toPlainText());
+        QApplication::clipboard()->setText(open_menu_parent->toPlainText());
     }
     else if (intItem == MenuActionPaste)
     {
         //Paste data from clipboard
+#ifndef SKIPSPLITTERMINAL
+        if (split_terminal_active == true)
+        {
+            text_split_terminal->add_dat_out_text(QApplication::clipboard()->text());
+        }
+        else
+        {
+            ui->text_TermEditData->add_dat_out_text(QApplication::clipboard()->text());
+        }
+#else
         ui->text_TermEditData->add_dat_out_text(QApplication::clipboard()->text());
+#endif
     }
     else if (intItem == MenuActionSelectAll)
     {
         //Select all text
-        ui->text_TermEditData->selectAll();
+        open_menu_parent->selectAll();
     }
+
+#ifndef SKIPSPLITTERMINAL
+    open_menu_parent = nullptr;
+#endif
 }
 
 void AutMainWindow::balloontriggered(QAction* qaAction)
@@ -1883,7 +1962,7 @@ void AutMainWindow::enter_pressed()
         {
             if (gbLoopbackMode == false)
             {
-                QByteArray baTmpBA = ui->text_TermEditData->get_dat_out()->replace("\r", "\n").replace("\n", (ui->radio_LCR->isChecked() ? "\r" : ui->radio_LLF->isChecked() ? "\n" : ui->radio_LCRLF->isChecked() ? "\r\n" : "")).toUtf8();
+                QByteArray baTmpBA = ((AutScrollEdit *)this->sender())->get_dat_out()->replace("\r", "\n").replace("\n", (ui->radio_LCR->isChecked() ? "\r" : ui->radio_LLF->isChecked() ? "\n" : ui->radio_LCRLF->isChecked() ? "\r\n" : "")).toUtf8();
                 transport_write(baTmpBA);
                 gintQueuedTXBytes += baTmpBA.size();
 
@@ -1903,15 +1982,16 @@ void AutMainWindow::enter_pressed()
             else if (gbLoopbackMode == true)
             {
                 //Loopback is enabled
-                update_buffer("\n[Cannot send: Loopback mode is enabled.]\n", false);
+                update_buffer("\n[Cannot send: Loopback mode is enabled.]\n", false, true);
             }
 
             if (ui->check_Echo->isChecked() == true)
             {
                 //Local echo
-                update_buffer(ui->text_TermEditData->get_dat_out()->toUtf8().append("\n"), false);
+                update_buffer(((AutScrollEdit *)this->sender())->get_dat_out()->toUtf8().append("\n"), false, true);
             }
-            ui->text_TermEditData->clear_dat_out();
+
+            ((AutScrollEdit *)this->sender())->clear_dat_out();
         }
     }
 }
@@ -1951,7 +2031,7 @@ void AutMainWindow::key_pressed(int nKey, QChar chrKeyValue)
                 //Echo mode on
                 if (nKey == Qt::Key_Enter || nKey == Qt::Key_Return)
                 {
-                    update_buffer("\n", false);
+                    update_buffer("\n", false, true);
                 }
             }
 
@@ -1978,12 +2058,12 @@ void AutMainWindow::key_pressed(int nKey, QChar chrKeyValue)
                 if (ui->check_ShowCLRF->isChecked() == true)
                 {
                     //Escape \t, \r and \n in addition to normal escaping
-                    update_buffer(baTmpBA.replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n").replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f"), false);
+                    update_buffer(baTmpBA.replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n").replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f"), false, true);
                 }
                 else
                 {
                     //Normal escaping
-                    update_buffer(baTmpBA.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f"), false);
+                    update_buffer(baTmpBA.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f"), false, true);
                 }
 
                 //Output to log file
@@ -1993,7 +2073,7 @@ void AutMainWindow::key_pressed(int nKey, QChar chrKeyValue)
         else if (gbLoopbackMode == true)
         {
             //Loopback is enabled
-            update_buffer("[Cannot send: Loopback mode is enabled.]\n", false);
+            update_buffer("[Cannot send: Loopback mode is enabled.]\n", false, true);
         }
     }
 }
@@ -2011,7 +2091,7 @@ void AutMainWindow::vt100_send(QByteArray code)
         else if (gbLoopbackMode == true)
         {
             //Loopback is enabled
-            update_buffer("[Cannot send: Loopback mode is enabled.]\n", false);
+            update_buffer("[Cannot send: Loopback mode is enabled.]\n", false, true);
         }
     }
 }
@@ -2222,6 +2302,9 @@ void AutMainWindow::OpenDevice(bool from_plugin)
                 gpmErrorForm->SetMessage(&strMessage);
                 gpmErrorForm->show();
                 ui->text_TermEditData->set_serial_open(false);
+#ifndef SKIPSPLITTERMINAL
+                text_split_terminal->set_serial_open(false);
+#endif
             }
         }
         else
@@ -2304,6 +2387,9 @@ void AutMainWindow::OpenDevice(bool from_plugin)
             gpmErrorForm->SetMessage(&strMessage);
             gpmErrorForm->show();
             ui->text_TermEditData->set_serial_open(false);
+#ifndef SKIPSPLITTERMINAL
+            text_split_terminal->set_serial_open(false);
+#endif
 
             plugin_active_transport = nullptr;
         }
@@ -2334,6 +2420,9 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 
         //Disable read-only mode
         ui->text_TermEditData->setReadOnly(false);
+#ifndef SKIPSPLITTERMINAL
+        text_split_terminal->setReadOnly(false);
+#endif
 
         //DTR
         if (transport_supports_data_terminal_ready() == true)
@@ -2432,9 +2521,23 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 
         //Notify scroll edit
         ui->text_TermEditData->set_serial_open(true);
+#ifndef SKIPSPLITTERMINAL
+        text_split_terminal->set_serial_open(true);
+#endif
 
         //Set focus to input text edit
+#ifndef SKIPSPLITTERMINAL
+        if (split_terminal_active == true)
+        {
+            text_split_terminal->setFocus();
+        }
+        else
+        {
+            ui->text_TermEditData->setFocus();
+        }
+#else
         ui->text_TermEditData->setFocus();
+#endif
 
         //Disable log options
         ui->edit_LogFile->setEnabled(false);
@@ -2540,6 +2643,9 @@ void AutMainWindow::on_check_Line_stateChanged()
 {
     //Line mode status changed
     ui->text_TermEditData->set_line_mode(ui->check_Line->isChecked());
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->set_line_mode(ui->check_Line->isChecked());
+#endif
 }
 
 void AutMainWindow::SerialError(QSerialPort::SerialPortError speErrorCode)
@@ -2568,6 +2674,9 @@ void AutMainWindow::SerialError(QSerialPort::SerialPortError speErrorCode)
         gpmErrorForm->SetMessage(&strMessage);
         gpmErrorForm->show();
         ui->text_TermEditData->set_serial_open(false);
+#ifndef SKIPSPLITTERMINAL
+        text_split_terminal->set_serial_open(false);
+#endif
 
         if (gspSerialPort.isOpen() == true)
         {
@@ -2679,6 +2788,9 @@ void AutMainWindow::SerialError(QSerialPort::SerialPortError speErrorCode)
 
         //Disable text entry
         ui->text_TermEditData->setReadOnly(true);
+#ifndef SKIPSPLITTERMINAL
+        text_split_terminal->setReadOnly(true);
+#endif
 
 #ifndef SKIPSERIALDETECT
         if (serial_detect_waiting == false)
@@ -2780,7 +2892,7 @@ void AutMainWindow::MessagePass(QByteArray baDataString, bool bEscapeString, boo
 //            baDataString.replace('\0', "\\00").replace("\x01", "\\01").replace("\x02", "\\02").replace("\x03", "\\03").replace("\x04", "\\04").replace("\x05", "\\05").replace("\x06", "\\06").replace("\x07", "\\07").replace("\x08", "\\08").replace("\x0b", "\\0B").replace("\x0c", "\\0C").replace("\x0e", "\\0E").replace("\x0f", "\\0F").replace("\x10", "\\10").replace("\x11", "\\11").replace("\x12", "\\12").replace("\x13", "\\13").replace("\x14", "\\14").replace("\x15", "\\15").replace("\x16", "\\16").replace("\x17", "\\17").replace("\x18", "\\18").replace("\x19", "\\19").replace("\x1a", "\\1a").replace("\x1b", "\\1b").replace("\x1c", "\\1c").replace("\x1d", "\\1d").replace("\x1e", "\\1e").replace("\x1f", "\\1f");
 
             //Output to display buffer
-            update_buffer(&baDataString, false);
+            update_buffer(&baDataString, false, true);
         }
 
         if (bEscapeString == false && bFromScripting == false)
@@ -2793,7 +2905,7 @@ void AutMainWindow::MessagePass(QByteArray baDataString, bool bEscapeString, boo
     else if (transport_isOpen() == true && gbLoopbackMode == true)
     {
         //Loopback is enabled
-        update_buffer("\n[Cannot send: Loopback mode is enabled.]\n", false);
+        update_buffer("\n[Cannot send: Loopback mode is enabled.]\n", false, true);
     }
 }
 
@@ -2810,10 +2922,10 @@ void AutMainWindow::LookupErrorCode(unsigned int intErrorCode)
     else
     {
         //Error file has not been loaded
-        update_buffer("\nUnable to lookup error code: error code file not loaded.\n", false);
+        update_buffer("\nUnable to lookup error code: error code file not loaded.\n", false, true);
     }
 #else
-    update_buffer("\nError code form support not enabled.\n", false);
+    update_buffer("\nError code form support not enabled.\n", false, true);
 #endif
 //    ui->text_TermEditData->moveCursor(QTextCursor::End);
 }
@@ -2856,7 +2968,7 @@ void AutMainWindow::SerialBytesWritten(qint64 intByteCount)
             else if (gintStreamBytesRead > gintStreamBytesProgress)
             {
                 //Progress output
-                update_buffer(QString("Streamed ").append(QString::number(gintStreamBytesRead)).append(" bytes (").append(QString::number(gintStreamBytesRead*100/gintStreamBytesSize)).append("%).\n").toUtf8(), false);
+                update_buffer(QString("Streamed ").append(QString::number(gintStreamBytesRead)).append(" bytes (").append(QString::number(gintStreamBytesRead*100/gintStreamBytesSize)).append("%).\n").toUtf8(), false, true);
                 gintStreamBytesProgress = gintStreamBytesProgress + StreamProgress;
             }
 
@@ -2911,13 +3023,13 @@ void AutMainWindow::FinishStream(bool bType)
     if (bType == true)
     {
         //Stream cancelled
-        update_buffer(QString("\nCancelled stream after ").append(QString::number(gintStreamBytesRead)).append(" bytes (").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds) [~").append(QString::number((gintStreamBytesRead/(1+gtmrStreamTimer.nsecsElapsed()/1000000000LL)))).append(" bytes/second].\n").toUtf8(), false);
+        update_buffer(QString("\nCancelled stream after ").append(QString::number(gintStreamBytesRead)).append(" bytes (").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds) [~").append(QString::number((gintStreamBytesRead/(1+gtmrStreamTimer.nsecsElapsed()/1000000000LL)))).append(" bytes/second].\n").toUtf8(), false, true);
         ui->statusBar->showMessage("File streaming cancelled.");
     }
     else
     {
         //Stream finished
-        update_buffer(QString("\nFinished streaming file, ").append(QString::number(gintStreamBytesRead)).append(" bytes sent in ").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds [~").append(QString::number((gintStreamBytesRead/(1+gtmrStreamTimer.nsecsElapsed()/1000000000LL)))).append(" bytes/second].\n").toUtf8(), false);
+        update_buffer(QString("\nFinished streaming file, ").append(QString::number(gintStreamBytesRead)).append(" bytes sent in ").append(QString::number(1+(gtmrStreamTimer.nsecsElapsed()/1000000000LL))).append(" seconds [~").append(QString::number((gintStreamBytesRead/(1+gtmrStreamTimer.nsecsElapsed()/1000000000LL)))).append(" bytes/second].\n").toUtf8(), false, true);
         ui->statusBar->showMessage("File streaming complete!");
     }
 
@@ -2936,9 +3048,32 @@ void AutMainWindow::UpdateReceiveText()
     //Updates the receive text buffer
     if (ui->selector_Tab->currentWidget() == ui->tab_Term)
     {
+#ifndef SKIPSPLITTERMINAL
+        if (display_buffers.length() > 0)
+        {
+            ui->text_TermEditData->add_display_data(&display_buffers);
+            display_buffers.clear();
+        }
+
+        if (display_buffers_outgoing.length() > 0)
+        {
+            if (split_terminal_active == true)
+            {
+                text_split_terminal->add_display_data(&display_buffers_outgoing);
+            }
+            else
+            {
+                ui->text_TermEditData->add_display_data(&display_buffers_outgoing);
+            }
+
+            display_buffers_outgoing.clear();
+        }
+#else
         ui->text_TermEditData->add_display_data(&display_buffers);
-        display_update_pending = false;
         display_buffers.clear();
+#endif
+
+        display_update_pending = false;
     }
     else
     {
@@ -3174,6 +3309,9 @@ void AutMainWindow::on_check_Echo_stateChanged(int)
 {
     //Local echo checkbox state changed
     ui->text_TermEditData->mbLocalEcho = ui->check_Echo->isChecked();
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->mbLocalEcho = ui->check_Echo->isChecked();
+#endif
 }
 
 void AutMainWindow::on_combo_PredefinedDevice_currentIndexChanged(int intIndex)
@@ -3283,6 +3421,10 @@ void AutMainWindow::ContextMenuClosed()
     //Right click context menu closed, send message to text edit object
     ui->text_TermEditData->mbContextMenuOpen = false;
     ui->text_TermEditData->update_display();
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->mbContextMenuOpen = false;
+    text_split_terminal->update_display();
+#endif
 }
 
 bool AutMainWindow::event(QEvent *evtEvent)
@@ -3290,7 +3432,18 @@ bool AutMainWindow::event(QEvent *evtEvent)
     if (evtEvent->type() == QEvent::WindowActivate && transport_isOpen() == true && ui->selector_Tab->currentIndex() == ui->selector_Tab->indexOf(ui->tab_Term))
     {
         //Focus on the terminal
+#ifndef SKIPSPLITTERMINAL
+        if (split_terminal_active == true)
+        {
+            text_split_terminal->setFocus();
+        }
+        else
+        {
+            ui->text_TermEditData->setFocus();
+        }
+#else
         ui->text_TermEditData->setFocus();
+#endif
     }
     return QMainWindow::event(evtEvent);
 }
@@ -3624,6 +3777,12 @@ void AutMainWindow::LoadSettings()
         {
             gpTermSettings->setValue("ScrollbackBufferSize", DefaultScrollbackBufferSize); //The number of lines in the terminal scrollback buffer
         }
+#ifndef SKIPSPLITTERMINAL
+        if (gpTermSettings->value("SplitTerminal").isNull())
+        {
+            gpTermSettings->setValue("SplitTerminal", DefaultSplitTerminal); //If split terminal mode is enabled
+        }
+#endif
         if (gpTermSettings->value("ConfigVersion").isNull() || gpTermSettings->value("ConfigVersion").toString() != UwVersion)
         {
             //Update configuration version
@@ -4911,13 +5070,13 @@ void AutMainWindow::SetLoopBackMode(bool bNewMode)
         if (gbLoopbackMode == true)
         {
             //Enabled
-            update_buffer("\n[Loopback Enabled]\n", false);
+            update_buffer("\n[Loopback Enabled]\n", false, true);
             gpMenu->actions().at(MenuActionLoopback)->setText("Disable Loopback (Rx->Tx)");
         }
         else
         {
             //Disabled
-            update_buffer("\n[Loopback Disabled]\n", false);
+            update_buffer("\n[Loopback Disabled]\n", false, true);
             gpMenu->actions().at(MenuActionLoopback)->setText("Enable Loopback (Rx->Tx)");
         }
 
@@ -5131,7 +5290,7 @@ void AutMainWindow::plugin_serial_transmit(QByteArray *data)
 
         if (gbPluginHideTerminalOutput == false && ui->check_Echo->isChecked())
         {
-            update_buffer(data, false);
+            update_buffer(data, false, true);
         }
     }
 }
@@ -5324,23 +5483,38 @@ void AutMainWindow::on_selector_Tab_currentChanged(int index)
     }
 }
 
-void AutMainWindow::update_buffer(QByteArray data, bool apply_formatting)
+void AutMainWindow::update_buffer(QByteArray data, bool apply_formatting, bool outgoing_buffer)
 {
-    update_buffer(&data, apply_formatting);
+    update_buffer(&data, apply_formatting, outgoing_buffer);
 }
 
-void AutMainWindow::update_buffer(QByteArray *data, bool apply_formatting)
+void AutMainWindow::update_buffer(QByteArray *data, bool apply_formatting, bool outgoing_buffer)
 {
-    if (display_buffers.length() > 0 && display_buffers.last().apply_formatting == apply_formatting)
+    display_buffer_list *display_buffer;
+
+#ifndef SKIPSPLITTERMINAL
+    if (outgoing_buffer == true && split_terminal_active == true)
     {
-        display_buffers.last().data.append(*data);
+        display_buffer = &display_buffers_outgoing;
+    }
+    else
+    {
+        display_buffer = &display_buffers;
+    }
+#else
+    display_buffer = &display_buffers;
+#endif
+
+    if (display_buffer->length() > 0 && display_buffer->last().apply_formatting == apply_formatting)
+    {
+        display_buffer->last().data.append(*data);
     }
     else
     {
         display_buffer_struct temp;
         temp.data = *data;
         temp.apply_formatting = apply_formatting;
-        display_buffers.append(temp);
+        display_buffer->append(temp);
     }
 
     if (!gtmrTextUpdateTimer.isActive())
@@ -5388,10 +5562,16 @@ void AutMainWindow::update_display_trimming()
     if (ui->check_trim->isChecked() == true)
     {
         ui->text_TermEditData->set_trim_settings(ui->spin_trim_threshold->value(), ui->spin_trim_size->value());
+#ifndef SKIPSPLITTERMINAL
+        text_split_terminal->set_trim_settings(ui->spin_trim_threshold->value(), ui->spin_trim_size->value());
+#endif
     }
     else
     {
         ui->text_TermEditData->set_trim_settings(0, 0);
+#ifndef SKIPSPLITTERMINAL
+        text_split_terminal->set_trim_settings(0, 0);
+#endif
     }
 }
 
@@ -5744,6 +5924,9 @@ void AutMainWindow::plugin_transport_error(int error)
     gpmErrorForm->SetMessage(&strMessage);
     gpmErrorForm->show();
     ui->text_TermEditData->set_serial_open(false);
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->set_serial_open(false);
+#endif
 
     if (gbStreamingFile == true)
     {
@@ -5837,6 +6020,9 @@ void AutMainWindow::plugin_transport_error(int error)
 
     //Disable text entry
     ui->text_TermEditData->setReadOnly(true);
+#ifndef SKIPSPLITTERMINAL
+    text_split_terminal->setReadOnly(true);
+#endif
 
 #ifndef SKIPSERIALDETECT
     if (serial_detect_waiting == false)
@@ -5955,6 +6141,32 @@ bool AutMainWindow::plugin_type_supported(AutPlugin::PluginType type)
         default:
             return false;
     };
+}
+#endif
+
+#ifndef SKIPSPLITTERMINAL
+void AutMainWindow::on_check_split_terminal_toggled(bool checked)
+{
+    if (checked == false)
+    {
+        ui->splitterLayout_1->widget(1)->hide();
+        split_terminal_active = false;
+    }
+    else
+    {
+        ui->splitterLayout_1->widget(1)->show();
+        split_terminal_active = (ui->splitterLayout_1->widget(1)->height() == 0 ? false : true);
+    }
+
+    gpTermSettings->setValue("SplitTerminal", checked);
+}
+
+void AutMainWindow::on_splitterLayout_1_splitterMoved(int pos, int index)
+{
+    Q_UNUSED(pos);
+    Q_UNUSED(index);
+
+    split_terminal_active = (ui->splitterLayout_1->widget(1)->height() == 0 ? false : true);
 }
 #endif
 

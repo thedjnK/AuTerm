@@ -25,6 +25,9 @@ QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 # Serial port detection not currently supported on mac
 macx: DEFINES += "SKIPSERIALDETECT"
 
+# Uncomment to exclude split terminal functionality
+#DEFINES += "SKIPSPLITTERMINAL"
+
 # Uncomment to disable plugin support
 #DEFINES += "SKIPPLUGINS"
 

@@ -130,6 +130,9 @@ const quint16 DefaultScrollbackBufferSize       = 32;    //(Unlisted option)
 const bool DefaultSaveSize                      = false;
 const bool DefaultOnlineUpdateCheck             = true;
 const bool DefaultReconnectAfterDisconnect      = false;
+#ifndef SKIPSPLITTERMINAL
+const bool DefaultSplitTerminal                 = false;
+#endif
 //Constants for URLs
 const QString URLLinuxNonRootSetup = "https://github.com/LairdCP/AuTerm/wiki/Granting-non-root-USB-device-access-(Linux)";
 const qint8 FilenameIndexScripting              = 0;
@@ -343,6 +346,10 @@ private slots:
     void serial_port_reconnected(QString port);
     void on_check_reconnect_after_disconnect_toggled(bool checked);
 #endif
+#ifndef SKIPSPLITTERMINAL
+    void on_check_split_terminal_toggled(bool checked);
+    void on_splitterLayout_1_splitterMoved(int pos, int index);
+#endif
 
 #ifndef SKIPPLUGINS
     void on_list_Plugin_Plugins_itemDoubleClicked(QListWidgetItem *);
@@ -394,8 +401,8 @@ private:
     bool is_newer(const QString *new_version, const QString *current_version);
 #endif
     void UpdateCustomisation(bool bDefault);
-    void update_buffer(QByteArray data, bool apply_formatting);
-    void update_buffer(QByteArray *data, bool apply_formatting);
+    void update_buffer(QByteArray data, bool apply_formatting, bool outgoing_buffer);
+    void update_buffer(QByteArray *data, bool apply_formatting, bool outgoing_buffer);
     void update_display_trimming();
 #ifndef SKIPPLUGINS_TRANSPORT
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -542,6 +549,12 @@ private:
 #endif
 #ifndef SKIPPLUGINS_TRANSPORT
     AutTransportPlugin *plugin_active_transport;
+#endif
+#ifndef SKIPSPLITTERMINAL
+    AutScrollEdit *text_split_terminal;
+    bool split_terminal_active; //True if split terminal mode is enabled and input terminal height is not 0
+    AutScrollEdit *open_menu_parent; //Used for knowing which terminal was right clicked for context menu
+    display_buffer_list display_buffers_outgoing; //List of pending data awaiting terminal display for outgoing split terminal
 #endif
 
 protected:
