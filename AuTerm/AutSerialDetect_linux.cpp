@@ -27,6 +27,7 @@
 #include "AutSerialDetect_linux.h"
 #include <QSerialPortInfo>
 #include <QWidget>
+#include <QDebug>
 
 /******************************************************************************/
 // Local Functions or Private Members
