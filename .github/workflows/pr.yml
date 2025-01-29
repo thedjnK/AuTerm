@@ -1,8 +1,8 @@
 name: PR assignment
 
 on:
-  pull_request:
-    types: [opened, edited, synchronize, reopened]
+  pull_request_target:
+    types: [opened, reopened]
 
 jobs:
   auto-assign:
@@ -12,7 +12,6 @@ jobs:
     if: github.repository == 'thedjnK/AuTerm'
     steps:
       - name: 'Auto-assign PR'
-        uses: pozil/auto-assign-issue@v2
+        uses: thedjnK/auto-assign-issue@712c8ebd726eb08705b4e3c6d180b9d3f4e2f2fa
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: thedjnK
