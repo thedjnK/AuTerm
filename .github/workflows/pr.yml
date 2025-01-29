@@ -2,17 +2,17 @@ name: PR assignment
 
 on:
   pull_request_target:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, reopened, edited, synchronize]
+
+permissions:
+  pull-requests: write
 
 jobs:
   auto-assign:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     if: github.repository == 'thedjnK/AuTerm'
     steps:
       - name: 'Auto-assign PR'
-        uses: pozil/auto-assign-issue@v2
+        uses: thedjnK/auto-assign-issue@95f82487ff6a42d36a4256f32fdc833f938cce72
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: thedjnK
