@@ -122,6 +122,10 @@ CONFIG(release, debug|release) {
                 win32-g++: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
                 else:win32:!win32-g++: PRE_TARGETDEPS += $$DESTDIR/plugin_mcumgr.lib
                 else: PRE_TARGETDEPS += $$DESTDIR/libplugin_mcumgr.a
+
+                contains(DEFINES, PLUGIN_MCUMGR_TRANSPORT_BLUETOOTH) {
+                    macx: QMAKE_INFO_PLIST = Info.plist
+                }
             }
         }
 
