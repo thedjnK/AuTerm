@@ -4911,10 +4911,9 @@ void plugin_mcumgr::update_img_state_table()
                 ++l;
             }
 
+            model_image_state.appendRow(table_entry);
             ++i;
         }
-
-        model_image_state.appendRow(table_entry);
     }
     else if (images_list.length() == 1)
     {
