@@ -78,6 +78,9 @@ AutScrollEdit::AutScrollEdit(QWidget *parent) : QPlainTextEdit(parent)
     had_dat_in_data = false;
     trim_threshold = 0;
     trim_size = 0;
+#ifndef SKIPSPLITTERMINAL
+    input_ignored = false;
+#endif
 
     mstrDatIn.reserve(out_buffer_size_default);
 
@@ -512,6 +515,13 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
     else if (event->type() == QEvent::KeyPress)
     {
         //Key has been pressed...
+#ifndef SKIPSPLITTERMINAL
+        if (input_ignored == true)
+        {
+            return true;
+        }
+#endif
+
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if ((keyEvent->modifiers() & Qt::ControlModifier) == Qt::ControlModifier)
         {
@@ -1430,6 +1440,18 @@ void AutScrollEdit::vt100_format_combine(vt100_format_code *original, vt100_form
         original->temp = merge->temp;
     }
 }
+
+#ifndef SKIPSPLITTERMINAL
+void AutScrollEdit::set_input_ignored(bool ignored)
+{
+    input_ignored = ignored;
+}
+
+bool AutScrollEdit::has_dat_out()
+{
+    return !mstrDatOut.isEmpty();
+}
+#endif
 
 /******************************************************************************/
 // END OF FILE

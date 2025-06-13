@@ -1,6 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
-** Copyright (C) 2023-2024 Jamie M.
+** Copyright (C) 2023-2025 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -379,6 +379,9 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     display_update_pending = false;
 #ifndef SKIPPLUGINS_TRANSPORT
     plugin_active_transport = nullptr;
+#endif
+#ifndef SKIPSPLITTERMINAL
+    split_terminal_option_changed = false;
 #endif
 
 #ifndef SKIPSPEEDTEST
@@ -5471,6 +5474,14 @@ void AutMainWindow::on_selector_Tab_currentChanged(int index)
 {
     if (index == ui->selector_Tab->indexOf(ui->tab_Term))
     {
+#ifndef SKIPSPLITTERMINAL
+        if (split_terminal_option_changed == true)
+        {
+            update_split_terminal_state();
+            split_terminal_option_changed = false;
+        }
+#endif
+
         if (display_update_pending == true)
         {
             UpdateReceiveText();
@@ -6151,14 +6162,20 @@ void AutMainWindow::on_check_split_terminal_toggled(bool checked)
     {
         ui->splitterLayout_1->widget(1)->hide();
         split_terminal_active = false;
+        ui->text_TermEditData->set_input_ignored(false);
     }
     else
     {
         ui->splitterLayout_1->widget(1)->show();
-        split_terminal_active = (ui->splitterLayout_1->widget(1)->height() == 0 ? false : true);
+        update_split_terminal_state();
     }
 
     gpTermSettings->setValue("SplitTerminal", checked);
+
+    if (ui->selector_Tab->currentIndex() != ui->selector_Tab->indexOf(ui->tab_Term))
+    {
+        split_terminal_option_changed = true;
+    }
 }
 
 void AutMainWindow::on_splitterLayout_1_splitterMoved(int pos, int index)
@@ -6166,7 +6183,18 @@ void AutMainWindow::on_splitterLayout_1_splitterMoved(int pos, int index)
     Q_UNUSED(pos);
     Q_UNUSED(index);
 
+    update_split_terminal_state();
+}
+
+void AutMainWindow::update_split_terminal_state()
+{
     split_terminal_active = (ui->splitterLayout_1->widget(1)->height() == 0 ? false : true);
+    ui->text_TermEditData->set_input_ignored((split_terminal_active == true ? true : false));
+
+    if (split_terminal_active == true && ui->text_TermEditData->has_dat_out() == true)
+    {
+        ui->text_TermEditData->clear_dat_out();
+    }
 }
 #endif
 

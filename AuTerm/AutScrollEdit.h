@@ -112,6 +112,10 @@ public:
     void set_serial_open(bool SerialOpen);
     void set_trim_settings(uint32_t threshold, uint32_t size);
     void set_vt100_mode(vt100_mode mode);
+#ifndef SKIPSPLITTERMINAL
+    void set_input_ignored(bool ignored);
+    bool has_dat_out();
+#endif
 
 protected:
     bool eventFilter(QObject *target, QEvent *event);
@@ -148,6 +152,9 @@ private:
     QTextCharFormat pre_dat_in_format_backup; //Backup of text format prior to dat in text being added
     uint32_t trim_threshold;
     uint32_t trim_size;
+#ifndef SKIPSPLITTERMINAL
+    bool input_ignored;
+#endif
 
 public:
     bool mbLocalEcho; //True if local echo is enabled

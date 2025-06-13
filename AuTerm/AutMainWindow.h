@@ -1,6 +1,6 @@
 /******************************************************************************
 ** Copyright (C) 2015-2022 Laird Connectivity
-** Copyright (C) 2023-2024 Jamie M.
+** Copyright (C) 2023-2025 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -349,6 +349,7 @@ private slots:
 #ifndef SKIPSPLITTERMINAL
     void on_check_split_terminal_toggled(bool checked);
     void on_splitterLayout_1_splitterMoved(int pos, int index);
+    void update_split_terminal_state();
 #endif
 
 #ifndef SKIPPLUGINS
@@ -555,6 +556,7 @@ private:
     bool split_terminal_active; //True if split terminal mode is enabled and input terminal height is not 0
     AutScrollEdit *open_menu_parent; //Used for knowing which terminal was right clicked for context menu
     display_buffer_list display_buffers_outgoing; //List of pending data awaiting terminal display for outgoing split terminal
+    bool split_terminal_option_changed; //True if the split terminal checkbox state has changed
 #endif
 
 protected:
