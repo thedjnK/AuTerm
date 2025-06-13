@@ -4787,12 +4787,11 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
     {
         QCborMap cbor_map = QCborMap::fromJsonObject(json_document->object());
 
+        tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), edit_custom_group->value(), edit_custom_command->value());
         cbor_map.toCborValue().toCbor(*tmp_message->writer());
+        tmp_message->end_message_no_end_map();
 
         delete(json_document);
-
-        tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), edit_custom_group->value(), edit_custom_command->value());
-        tmp_message->end_message_no_end_map();
     }
     else if (radio_custom_yaml->isChecked())
     {
