@@ -381,8 +381,11 @@ private:
     QTableWidget *table_OS_Memory;
     QWidget *tab_OS_Reset;
     QGridLayout *gridLayout_12;
-    QCheckBox *check_OS_Force_Reboot;
+    QLabel *label_44;
+    QSpinBox *edit_os_boot_mode;
     QSpacerItem *verticalSpacer_3;
+    QSpacerItem *horizontalSpacer_29;
+    QCheckBox *check_OS_Force_Reboot;
     QWidget *tab_os_datetime;
     QGridLayout *gridLayout_18;
     QSpacerItem *verticalSpacer_8;
@@ -564,12 +567,12 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup_5;
-    QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_4;
+    QButtonGroup *buttonGroup_5;
     QButtonGroup *buttonGroup_6;
-    QButtonGroup *buttonGroup_2;
+    QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_3;
+    QButtonGroup *buttonGroup_2;
 ///AUTOGEN_END_OBJECTS
 
     //

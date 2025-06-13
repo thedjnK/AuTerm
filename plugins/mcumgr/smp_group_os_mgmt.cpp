@@ -1035,15 +1035,21 @@ bool smp_group_os_mgmt::start_memory_pool(QList<memory_pool_t> *memory)
     return handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, true));
 }
 
-bool smp_group_os_mgmt::start_reset(bool force)
+bool smp_group_os_mgmt::start_reset(bool force, uint8_t boot_mode)
 {
     smp_message *tmp_message = new smp_message();
-    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_RESET, (force == true ? 1 : 0));
+    tmp_message->start_message(SMP_OP_WRITE, smp_version, SMP_GROUP_ID_OS, COMMAND_RESET, ((force == true ? 1 : 0) + (boot_mode > 0 ? 1 : 0)));
 
     if (force == true)
     {
         tmp_message->writer()->append("force");
         tmp_message->writer()->append(true);
+    }
+
+    if (boot_mode > 0)
+    {
+        tmp_message->writer()->append("boot_mode");
+        tmp_message->writer()->append(boot_mode);
     }
     tmp_message->end_message();
 

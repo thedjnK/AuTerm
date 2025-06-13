@@ -71,7 +71,7 @@ public:
     bool start_echo(QString data);
     bool start_task_stats(QList<task_list_t> *tasks);
     bool start_memory_pool(QList<memory_pool_t> *memory);
-    bool start_reset(bool force);
+    bool start_reset(bool force, uint8_t boot_mode);
     bool start_mcumgr_parameters(uint32_t *buffer_size, uint32_t *buffer_count);
     bool start_os_application_info(QString format, QString *response);
     bool start_date_time_get(QDateTime *date_time);

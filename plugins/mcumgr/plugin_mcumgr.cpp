@@ -698,14 +698,29 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tab_OS_Reset->setObjectName("tab_OS_Reset");
     gridLayout_12 = new QGridLayout(tab_OS_Reset);
     gridLayout_12->setObjectName("gridLayout_12");
-    check_OS_Force_Reboot = new QCheckBox(tab_OS_Reset);
-    check_OS_Force_Reboot->setObjectName("check_OS_Force_Reboot");
+    label_44 = new QLabel(tab_OS_Reset);
+    label_44->setObjectName("label_44");
 
-    gridLayout_12->addWidget(check_OS_Force_Reboot, 0, 0, 1, 1);
+    gridLayout_12->addWidget(label_44, 1, 0, 1, 1);
+
+    edit_os_boot_mode = new QSpinBox(tab_OS_Reset);
+    edit_os_boot_mode->setObjectName("edit_os_boot_mode");
+    edit_os_boot_mode->setMaximum(255);
+
+    gridLayout_12->addWidget(edit_os_boot_mode, 1, 1, 1, 1);
 
     verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
-    gridLayout_12->addItem(verticalSpacer_3, 1, 0, 1, 1);
+    gridLayout_12->addItem(verticalSpacer_3, 2, 0, 1, 1);
+
+    horizontalSpacer_29 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    gridLayout_12->addItem(horizontalSpacer_29, 1, 2, 1, 1);
+
+    check_OS_Force_Reboot = new QCheckBox(tab_OS_Reset);
+    check_OS_Force_Reboot->setObjectName("check_OS_Force_Reboot");
+
+    gridLayout_12->addWidget(check_OS_Force_Reboot, 0, 0, 1, 3);
 
     selector_OS->addTab(tab_OS_Reset, QString());
     tab_os_datetime = new QWidget();
@@ -844,23 +859,23 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_20 = new QLabel(tab_OS_Bootloader);
     label_20->setObjectName("label_20");
 
-    formLayout_2->setWidget(0, QFormLayout::LabelRole, label_20);
+    formLayout_2->setWidget(0, QFormLayout::ItemRole::LabelRole, label_20);
 
     edit_os_bootloader_query = new QLineEdit(tab_OS_Bootloader);
     edit_os_bootloader_query->setObjectName("edit_os_bootloader_query");
 
-    formLayout_2->setWidget(0, QFormLayout::FieldRole, edit_os_bootloader_query);
+    formLayout_2->setWidget(0, QFormLayout::ItemRole::FieldRole, edit_os_bootloader_query);
 
     label_21 = new QLabel(tab_OS_Bootloader);
     label_21->setObjectName("label_21");
 
-    formLayout_2->setWidget(1, QFormLayout::LabelRole, label_21);
+    formLayout_2->setWidget(1, QFormLayout::ItemRole::LabelRole, label_21);
 
     edit_os_bootloader_response = new QLineEdit(tab_OS_Bootloader);
     edit_os_bootloader_response->setObjectName("edit_os_bootloader_response");
     edit_os_bootloader_response->setReadOnly(true);
 
-    formLayout_2->setWidget(1, QFormLayout::FieldRole, edit_os_bootloader_response);
+    formLayout_2->setWidget(1, QFormLayout::ItemRole::FieldRole, edit_os_bootloader_response);
 
     selector_OS->addTab(tab_OS_Bootloader, QString());
 
@@ -966,26 +981,26 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_SHELL_Output->setObjectName("edit_SHELL_Output");
     QPalette palette;
     QBrush brush(QColor(255, 255, 255, 255));
-    brush.setStyle(Qt::SolidPattern);
-    palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
-    palette.setBrush(QPalette::Active, QPalette::Text, brush);
+    brush.setStyle(Qt::BrushStyle::SolidPattern);
+    palette.setBrush(QPalette::ColorGroup::Active, QPalette::ColorRole::WindowText, brush);
+    palette.setBrush(QPalette::ColorGroup::Active, QPalette::ColorRole::Text, brush);
     QBrush brush1(QColor(0, 0, 0, 255));
-    brush1.setStyle(Qt::SolidPattern);
-    palette.setBrush(QPalette::Active, QPalette::Base, brush1);
+    brush1.setStyle(Qt::BrushStyle::SolidPattern);
+    palette.setBrush(QPalette::ColorGroup::Active, QPalette::ColorRole::Base, brush1);
     QBrush brush2(QColor(255, 255, 255, 128));
-    brush2.setStyle(Qt::SolidPattern);
+    brush2.setStyle(Qt::BrushStyle::SolidPattern);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-    palette.setBrush(QPalette::Active, QPalette::PlaceholderText, brush2);
+    palette.setBrush(QPalette::ColorGroup::Active, QPalette::ColorRole::PlaceholderText, brush2);
 #endif
-    palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
-    palette.setBrush(QPalette::Inactive, QPalette::Text, brush);
-    palette.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+    palette.setBrush(QPalette::ColorGroup::Inactive, QPalette::ColorRole::WindowText, brush);
+    palette.setBrush(QPalette::ColorGroup::Inactive, QPalette::ColorRole::Text, brush);
+    palette.setBrush(QPalette::ColorGroup::Inactive, QPalette::ColorRole::Base, brush1);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-    palette.setBrush(QPalette::Inactive, QPalette::PlaceholderText, brush2);
+    palette.setBrush(QPalette::ColorGroup::Inactive, QPalette::ColorRole::PlaceholderText, brush2);
 #endif
-    palette.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+    palette.setBrush(QPalette::ColorGroup::Disabled, QPalette::ColorRole::Base, brush1);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-    palette.setBrush(QPalette::Disabled, QPalette::PlaceholderText, brush2);
+    palette.setBrush(QPalette::ColorGroup::Disabled, QPalette::ColorRole::PlaceholderText, brush2);
 #endif
     edit_SHELL_Output->setPalette(palette);
     edit_SHELL_Output->setUndoRedoEnabled(false);
@@ -1431,7 +1446,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_38 = new QLabel(tab_custom);
     label_38->setObjectName("label_38");
 
-    formLayout_3->setWidget(0, QFormLayout::LabelRole, label_38);
+    formLayout_3->setWidget(0, QFormLayout::ItemRole::LabelRole, label_38);
 
     horizontalLayout_26 = new QHBoxLayout();
     horizontalLayout_26->setSpacing(2);
@@ -1490,12 +1505,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_26->addItem(horizontalSpacer_26);
 
 
-    formLayout_3->setLayout(0, QFormLayout::FieldRole, horizontalLayout_26);
+    formLayout_3->setLayout(0, QFormLayout::ItemRole::FieldRole, horizontalLayout_26);
 
     label_40 = new QLabel(tab_custom);
     label_40->setObjectName("label_40");
 
-    formLayout_3->setWidget(1, QFormLayout::LabelRole, label_40);
+    formLayout_3->setWidget(1, QFormLayout::ItemRole::LabelRole, label_40);
 
     horizontalLayout_28 = new QHBoxLayout();
     horizontalLayout_28->setObjectName("horizontalLayout_28");
@@ -1558,36 +1573,36 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_28->addItem(horizontalSpacer_28);
 
 
-    formLayout_3->setLayout(1, QFormLayout::FieldRole, horizontalLayout_28);
+    formLayout_3->setLayout(1, QFormLayout::ItemRole::FieldRole, horizontalLayout_28);
 
     label_35 = new QLabel(tab_custom);
     label_35->setObjectName("label_35");
 
-    formLayout_3->setWidget(2, QFormLayout::LabelRole, label_35);
+    formLayout_3->setWidget(2, QFormLayout::ItemRole::LabelRole, label_35);
 
     edit_custom_send = new QPlainTextEdit(tab_custom);
     edit_custom_send->setObjectName("edit_custom_send");
     edit_custom_send->setUndoRedoEnabled(false);
     edit_custom_send->setReadOnly(true);
 
-    formLayout_3->setWidget(2, QFormLayout::FieldRole, edit_custom_send);
+    formLayout_3->setWidget(2, QFormLayout::ItemRole::FieldRole, edit_custom_send);
 
     label_36 = new QLabel(tab_custom);
     label_36->setObjectName("label_36");
 
-    formLayout_3->setWidget(3, QFormLayout::LabelRole, label_36);
+    formLayout_3->setWidget(3, QFormLayout::ItemRole::LabelRole, label_36);
 
     edit_custom_receive = new QPlainTextEdit(tab_custom);
     edit_custom_receive->setObjectName("edit_custom_receive");
     edit_custom_receive->setUndoRedoEnabled(false);
     edit_custom_receive->setReadOnly(true);
 
-    formLayout_3->setWidget(3, QFormLayout::FieldRole, edit_custom_receive);
+    formLayout_3->setWidget(3, QFormLayout::ItemRole::FieldRole, edit_custom_receive);
 
     label_37 = new QLabel(tab_custom);
     label_37->setObjectName("label_37");
 
-    formLayout_3->setWidget(4, QFormLayout::LabelRole, label_37);
+    formLayout_3->setWidget(4, QFormLayout::ItemRole::LabelRole, label_37);
 
     horizontalLayout_25 = new QHBoxLayout();
     horizontalLayout_25->setSpacing(2);
@@ -1633,7 +1648,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_25->addItem(horizontalSpacer_25);
 
 
-    formLayout_3->setLayout(4, QFormLayout::FieldRole, horizontalLayout_25);
+    formLayout_3->setLayout(4, QFormLayout::ItemRole::FieldRole, horizontalLayout_25);
 
 
     verticalLayout_5->addLayout(formLayout_3);
@@ -1685,24 +1700,24 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_7 = new QLabel(verticalLayoutWidget);
     label_7->setObjectName("label_7");
 
-    formLayout->setWidget(0, QFormLayout::LabelRole, label_7);
+    formLayout->setWidget(0, QFormLayout::ItemRole::LabelRole, label_7);
 
     edit_IMG_Preview_Hash = new QLineEdit(verticalLayoutWidget);
     edit_IMG_Preview_Hash->setObjectName("edit_IMG_Preview_Hash");
     edit_IMG_Preview_Hash->setReadOnly(true);
 
-    formLayout->setWidget(0, QFormLayout::FieldRole, edit_IMG_Preview_Hash);
+    formLayout->setWidget(0, QFormLayout::ItemRole::FieldRole, edit_IMG_Preview_Hash);
 
     label_8 = new QLabel(verticalLayoutWidget);
     label_8->setObjectName("label_8");
 
-    formLayout->setWidget(1, QFormLayout::LabelRole, label_8);
+    formLayout->setWidget(1, QFormLayout::ItemRole::LabelRole, label_8);
 
     edit_IMG_Preview_Version = new QLineEdit(verticalLayoutWidget);
     edit_IMG_Preview_Version->setObjectName("edit_IMG_Preview_Version");
     edit_IMG_Preview_Version->setReadOnly(true);
 
-    formLayout->setWidget(1, QFormLayout::FieldRole, edit_IMG_Preview_Version);
+    formLayout->setWidget(1, QFormLayout::ItemRole::FieldRole, edit_IMG_Preview_Version);
 
 
     verticalLayout->addLayout(formLayout);
@@ -1960,6 +1975,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QTableWidgetItem *___qtablewidgetitem11 = table_OS_Memory->horizontalHeaderItem(3);
     ___qtablewidgetitem11->setText(QCoreApplication::translate("Form", "Minimum", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Memory), QCoreApplication::translate("Form", "Memory", nullptr));
+    label_44->setText(QCoreApplication::translate("Form", "Boot mode:", nullptr));
     check_OS_Force_Reboot->setText(QCoreApplication::translate("Form", "Force reboot", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Reset), QCoreApplication::translate("Form", "Reset", nullptr));
     radio_os_datetime_get->setText(QCoreApplication::translate("Form", "Get", nullptr));
@@ -2980,7 +2996,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         mode = ACTION_OS_RESET;
         processor->set_transport(active_transport());
         set_group_transport_settings(smp_groups.os_mgmt);
-        started = smp_groups.os_mgmt->start_reset(check_OS_Force_Reboot->isChecked());
+        started = smp_groups.os_mgmt->start_reset(check_OS_Force_Reboot->isChecked(), edit_os_boot_mode->value());
 
         if (started == true)
         {
@@ -3230,7 +3246,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     mode = ACTION_OS_UPLOAD_RESET;
                     processor->set_transport(active_transport());
                     set_group_transport_settings(smp_groups.os_mgmt);
-                    bool started = smp_groups.os_mgmt->start_reset(false);
+                    bool started = smp_groups.os_mgmt->start_reset(false, 0);
 //todo: check status
 
                     log_debug() << "do reset";
@@ -3339,7 +3355,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                     mode = ACTION_OS_UPLOAD_RESET;
                     processor->set_transport(active_transport());
                     set_group_transport_settings(smp_groups.os_mgmt);
-                    bool started = smp_groups.os_mgmt->start_reset(false);
+                    bool started = smp_groups.os_mgmt->start_reset(false, 0);
                     //todo: check status
 
                     log_debug() << "do reset";
