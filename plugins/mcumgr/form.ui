@@ -266,7 +266,7 @@
            <item row="0" column="0">
             <widget class="QTabWidget" name="selector_img">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="tab_IMG_Upload">
               <attribute name="title">
@@ -3200,9 +3200,9 @@
  <buttongroups>
   <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

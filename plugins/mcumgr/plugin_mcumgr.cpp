@@ -3774,7 +3774,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
         }
         else if (user_data == ACTION_ENUM_SINGLE)
         {
-            edit_Enum_Count->setText(QString("ID: ").append(QString::number(enum_single_id)).append(", end: ").append(QString::number(enum_single_end)));
+            edit_Enum_Group_ID->setText(QString::number(enum_single_id));
+            edit_Enum_Group_Additional->setChecked(!enum_single_end);
         }
         else if (user_data == ACTION_ENUM_DETAILS)
         {
