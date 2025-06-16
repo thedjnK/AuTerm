@@ -302,6 +302,7 @@ private slots:
     void on_text_EditData_textChanged();
     void on_combo_LogFile_currentIndexChanged(int);
     void on_btn_ReloadLog_clicked();
+    void update_window_title(bool transport_closing);
 #ifndef SKIPERRORCODEFORM
     void on_btn_Error_clicked();
 #endif
@@ -429,6 +430,7 @@ private:
     QSerialPort::PinoutSignals transport_pinoutSignals();
     QString transport_error_to_error_string(int error);
     QString transport_name() const;
+    QString transport_display_name() const;
     bool transport_supports_break() const;
     bool transport_supports_request_to_send() const;
     bool transport_supports_data_terminal_ready() const;

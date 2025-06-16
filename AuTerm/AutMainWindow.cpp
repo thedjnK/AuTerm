@@ -510,7 +510,6 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     .append(" [DEBUG BUILD]")
 #endif
     );
-    setWindowTitle(QString("AuTerm (v").append(UwVersion).append(")"));
 
     //Create menu items
     gpMenu = new QMenu(this);
@@ -642,11 +641,13 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
         //System tray enabled and available on system, set it up with contect menu/icon and show it
         gpSysTray = new QSystemTrayIcon;
         gpSysTray->setContextMenu(gpBalloonMenu);
-        gpSysTray->setToolTip(QString("AuTerm v").append(UwVersion));
         gpSysTray->setIcon(QIcon(*gpUw16Pixmap));
         gpSysTray->show();
         gbSysTrayEnabled = true;
     }
+
+    //Show initial window title/status icon text
+    update_window_title(false);
 
     //Load last directory path
     gstrLastFilename[FilenameIndexScripting] = gpTermSettings->value("LastScriptFileDirectory", "").toString();
@@ -2265,12 +2266,6 @@ void AutMainWindow::OpenDevice(bool from_plugin)
                 //Successful
                 port_opened = true;
 
-                //Update tooltip of system tray
-                if (gbSysTrayEnabled == true)
-                {
-                    gpSysTray->setToolTip(QString("AuTerm v").append(UwVersion).append(" (").append(ui->combo_COM->currentText()).append(")"));
-                }
-
                 //Flow control
                 if (ui->combo_Handshake->currentIndex() == 1)
                 {
@@ -2347,12 +2342,6 @@ void AutMainWindow::OpenDevice(bool from_plugin)
             //Successful
             port_opened = true;
 
-            //Update tooltip of system tray
-            if (gbSysTrayEnabled == true)
-            {
-                gpSysTray->setToolTip(QString("AuTerm v") % UwVersion % " (" % plugin_active_transport->transport_name() % ":" % plugin_active_transport->connection_display_name() % ")");
-            }
-
 //TODO
             //Flow control
 #if 0
@@ -2426,6 +2415,9 @@ void AutMainWindow::OpenDevice(bool from_plugin)
 #ifndef SKIPSPLITTERMINAL
         text_split_terminal->setReadOnly(false);
 #endif
+
+        //Update window title/status icon text
+        update_window_title(false);
 
         //DTR
         if (transport_supports_data_terminal_ready() == true)
@@ -2813,6 +2805,9 @@ void AutMainWindow::SerialError(QSerialPort::SerialPortError speErrorCode)
 
         //Update images
         UpdateImages();
+
+        //Update window title/status icon text
+        update_window_title(true);
 
         //Close log file if open
         if (gpMainLog->IsLogOpen() == true)
@@ -3472,11 +3467,8 @@ void AutMainWindow::SerialPortClosing()
     }
 #endif
 
-    //Update tooltip of system tray
-    if (gbSysTrayEnabled == true)
-    {
-        gpSysTray->setToolTip(QString("AuTerm v").append(UwVersion));
-    }
+    //Update window title/status icon text
+    update_window_title(true);
 
 #ifndef SKIPPLUGINS
     emit plugin_serial_about_to_close();
@@ -5156,34 +5148,7 @@ void AutMainWindow::resizeEvent(QResizeEvent *)
 
 void AutMainWindow::on_edit_Title_textEdited(const QString &)
 {
-    QString strWindowTitle = QString("AuTerm (v").append(UwVersion).append(")");
-    if (ui->edit_Title->text().length() > 0)
-    {
-        //Append custom text to window title
-        strWindowTitle.append(" ").append(ui->edit_Title->text());
-    }
-    setWindowTitle(strWindowTitle);
-
-    if (gpTermSettings->value("SysTrayIcon", DefaultSysTrayIcon).toBool() == true && QSystemTrayIcon::isSystemTrayAvailable())
-    {
-        //Also update system tray icon text
-        if (transport_isOpen())
-        {
-            strWindowTitle = QString("AuTerm v").append(UwVersion).append(" (").append(ui->combo_COM->currentText()).append(")");
-        }
-        else
-        {
-            strWindowTitle = QString("AuTerm v").append(UwVersion);
-        }
-
-        if (ui->edit_Title->text().length() > 0)
-        {
-            //Append custom text to window title
-            strWindowTitle.append(": ").append(ui->edit_Title->text());
-        }
-
-        gpSysTray->setToolTip(strWindowTitle);
-    }
+    update_window_title(false);
 }
 
 #ifndef SKIPPLUGINS
@@ -5883,6 +5848,16 @@ QString AutMainWindow::transport_name() const
     return plugin_active_transport->transport_name();
 }
 
+QString AutMainWindow::transport_display_name() const
+{
+    if (plugin_active_transport == nullptr)
+    {
+        return gspSerialPort.portName();
+    }
+
+    return plugin_active_transport->connection_display_name();
+}
+
 bool AutMainWindow::transport_supports_break() const
 {
     if (plugin_active_transport == nullptr)
@@ -6054,6 +6029,9 @@ void AutMainWindow::plugin_transport_error(int error)
     //Update images
     UpdateImages();
 
+    //Update window title/status icon text
+    update_window_title(false);
+
     //Close log file if open
     if (gpMainLog->IsLogOpen() == true)
     {
@@ -6197,6 +6175,29 @@ void AutMainWindow::update_split_terminal_state()
     }
 }
 #endif
+
+void AutMainWindow::update_window_title(bool transport_closing)
+{
+    QString strWindowTitle = "AuTerm (v" % UwVersion % ")";
+
+    if (transport_closing == false && transport_isOpen()) {
+        strWindowTitle.append(" [" % transport_display_name() % "]");
+    }
+
+    if (ui->edit_Title->text().length() > 0)
+    {
+        //Append custom text to window title
+        strWindowTitle.append(" " % ui->edit_Title->text());
+    }
+
+    setWindowTitle(strWindowTitle);
+
+    if (gpTermSettings->value("SysTrayIcon", DefaultSysTrayIcon).toBool() == true && QSystemTrayIcon::isSystemTrayAvailable())
+    {
+        //Also update system tray icon text
+        gpSysTray->setToolTip(strWindowTitle);
+    }
+}
 
 /******************************************************************************/
 // END OF FILE
