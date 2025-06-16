@@ -2569,7 +2569,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="edit_Enum_Group_Additional">
+              <widget class="QCheckBox" name="check_Enum_Group_Additional">
                <property name="enabled">
                 <bool>true</bool>
                </property>
@@ -3339,7 +3339,7 @@
   <tabstop>edit_Enum_Count</tabstop>
   <tabstop>edit_Enum_Index</tabstop>
   <tabstop>edit_Enum_Group_ID</tabstop>
-  <tabstop>edit_Enum_Group_Additional</tabstop>
+  <tabstop>check_Enum_Group_Additional</tabstop>
   <tabstop>table_Enum_List_Details</tabstop>
   <tabstop>btn_enum_go</tabstop>
   <tabstop>radio_custom_custom</tabstop>

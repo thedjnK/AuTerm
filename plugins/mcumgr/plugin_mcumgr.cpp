@@ -1375,13 +1375,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_23->addWidget(edit_Enum_Group_ID);
 
-    edit_Enum_Group_Additional = new QCheckBox(tab_Enum);
-    edit_Enum_Group_Additional->setObjectName("edit_Enum_Group_Additional");
-    edit_Enum_Group_Additional->setEnabled(true);
-    edit_Enum_Group_Additional->setCheckable(true);
-    edit_Enum_Group_Additional->setChecked(false);
+    check_Enum_Group_Additional = new QCheckBox(tab_Enum);
+    check_Enum_Group_Additional->setObjectName("check_Enum_Group_Additional");
+    check_Enum_Group_Additional->setEnabled(true);
+    check_Enum_Group_Additional->setCheckable(true);
+    check_Enum_Group_Additional->setChecked(false);
 
-    horizontalLayout_23->addWidget(edit_Enum_Group_Additional);
+    horizontalLayout_23->addWidget(check_Enum_Group_Additional);
 
     horizontalSpacer_22 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
@@ -1863,8 +1863,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(radio_Enum_Details, edit_Enum_Count);
     QWidget::setTabOrder(edit_Enum_Count, edit_Enum_Index);
     QWidget::setTabOrder(edit_Enum_Index, edit_Enum_Group_ID);
-    QWidget::setTabOrder(edit_Enum_Group_ID, edit_Enum_Group_Additional);
-    QWidget::setTabOrder(edit_Enum_Group_Additional, table_Enum_List_Details);
+    QWidget::setTabOrder(edit_Enum_Group_ID, check_Enum_Group_Additional);
+    QWidget::setTabOrder(check_Enum_Group_Additional, table_Enum_List_Details);
     QWidget::setTabOrder(table_Enum_List_Details, btn_enum_go);
     QWidget::setTabOrder(btn_enum_go, radio_custom_custom);
     QWidget::setTabOrder(radio_custom_custom, radio_custom_logging);
@@ -2045,7 +2045,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_32->setText(QCoreApplication::translate("Form", "Count:", nullptr));
     label_33->setText(QCoreApplication::translate("Form", "Index:", nullptr));
     label_34->setText(QCoreApplication::translate("Form", "Group ID:", nullptr));
-    edit_Enum_Group_Additional->setText(QCoreApplication::translate("Form", "Additional groups", nullptr));
+    check_Enum_Group_Additional->setText(QCoreApplication::translate("Form", "Additional groups", nullptr));
     QTableWidgetItem *___qtablewidgetitem14 = table_Enum_List_Details->horizontalHeaderItem(0);
     ___qtablewidgetitem14->setText(QCoreApplication::translate("Form", "ID", nullptr));
     QTableWidgetItem *___qtablewidgetitem15 = table_Enum_List_Details->horizontalHeaderItem(1);
@@ -2230,6 +2230,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     check_IMG_Preview_Pending->installEventFilter(this);
     check_IMG_Preview_Bootable->installEventFilter(this);
     check_IMG_Preview_Permanent->installEventFilter(this);
+    check_Enum_Group_Additional->installEventFilter(this);
 
     //Make shell response text edit have a monospace font
     QFont monospace_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -3784,7 +3785,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             else if (user_data == ACTION_ENUM_SINGLE)
             {
                 edit_Enum_Group_ID->setText(QString::number(enum_single_id));
-                edit_Enum_Group_Additional->setChecked(!enum_single_end);
+                check_Enum_Group_Additional->setChecked(!enum_single_end);
             }
             else if (user_data == ACTION_ENUM_DETAILS)
             {

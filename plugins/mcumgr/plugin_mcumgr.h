@@ -501,7 +501,7 @@ private:
     QFrame *line_3;
     QLabel *label_34;
     QLineEdit *edit_Enum_Group_ID;
-    QCheckBox *edit_Enum_Group_Additional;
+    QCheckBox *check_Enum_Group_Additional;
     QSpacerItem *horizontalSpacer_22;
     QTableWidget *table_Enum_List_Details;
     QLabel *lbl_enum_status;
