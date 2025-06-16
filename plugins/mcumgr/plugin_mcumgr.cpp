@@ -3720,8 +3720,13 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
         log_debug() << "zephyr sender";
         label_status = lbl_zephyr_status;
 
-        if (user_data == ACTION_ZEPHYR_STORAGE_ERASE)
+        if (status == STATUS_COMPLETE)
         {
+            log_debug() << "complete";
+
+            if (user_data == ACTION_ZEPHYR_STORAGE_ERASE)
+            {
+            }
         }
     }
     else if (sender() == smp_groups.enum_mgmt)
@@ -3729,92 +3734,97 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
         log_debug() << "enum sender";
         label_status = lbl_enum_status;
 
-        if (user_data == ACTION_ENUM_COUNT)
+        if (status == STATUS_COMPLETE)
         {
-            edit_Enum_Count->setText(QString::number(enum_count));
-        }
-        else if (user_data == ACTION_ENUM_LIST)
-        {
-            uint16_t i = 0;
-            uint16_t l = table_Enum_List_Details->rowCount();
+            log_debug() << "complete";
 
-            table_Enum_List_Details->setSortingEnabled(false);
-
-            while (i < enum_groups.length())
+            if (user_data == ACTION_ENUM_COUNT)
             {
-                if (i >= l)
-                {
-                    table_Enum_List_Details->insertRow(i);
-
-                    QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(enum_groups[i]));
-                    QTableWidgetItem *row_name = new QTableWidgetItem("");
-                    QTableWidgetItem *row_handlers = new QTableWidgetItem("");
-
-                    table_Enum_List_Details->setItem(i, 0, row_id);
-                    table_Enum_List_Details->setItem(i, 1, row_name);
-                    table_Enum_List_Details->setItem(i, 2, row_handlers);
-                }
-                else
-                {
-                    table_Enum_List_Details->item(i, 0)->setText(QString::number(enum_groups[i]));
-                    table_Enum_List_Details->item(i, 1)->setText("");
-                    table_Enum_List_Details->item(i, 2)->setText("");
-                }
-
-                ++i;
+                edit_Enum_Count->setText(QString::number(enum_count));
             }
-
-            while (i < l)
+            else if (user_data == ACTION_ENUM_LIST)
             {
-                table_Enum_List_Details->removeRow((table_Enum_List_Details->rowCount() - 1));
-                ++i;
-            }
+                uint16_t i = 0;
+                uint16_t l = table_Enum_List_Details->rowCount();
 
-            table_Enum_List_Details->setSortingEnabled(true);
-        }
-        else if (user_data == ACTION_ENUM_SINGLE)
-        {
-            edit_Enum_Group_ID->setText(QString::number(enum_single_id));
-            edit_Enum_Group_Additional->setChecked(!enum_single_end);
-        }
-        else if (user_data == ACTION_ENUM_DETAILS)
-        {
-            uint16_t i = 0;
-            uint16_t l = table_Enum_List_Details->rowCount();
+                table_Enum_List_Details->setSortingEnabled(false);
 
-            table_Enum_List_Details->setSortingEnabled(false);
-
-            while (i < enum_details.length())
-            {
-                if (i >= l)
+                while (i < enum_groups.length())
                 {
-                    table_Enum_List_Details->insertRow(i);
+                    if (i >= l)
+                    {
+                        table_Enum_List_Details->insertRow(i);
 
-                    QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(enum_details[i].id));
-                    QTableWidgetItem *row_name = new QTableWidgetItem(enum_details[i].name);
-                    QTableWidgetItem *row_handlers = new QTableWidgetItem(QString::number(enum_details[i].handlers));
+                        QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(enum_groups[i]));
+                        QTableWidgetItem *row_name = new QTableWidgetItem("");
+                        QTableWidgetItem *row_handlers = new QTableWidgetItem("");
 
-                    table_Enum_List_Details->setItem(i, 0, row_id);
-                    table_Enum_List_Details->setItem(i, 1, row_name);
-                    table_Enum_List_Details->setItem(i, 2, row_handlers);
-                }
-                else
-                {
-                    table_Enum_List_Details->item(i, 0)->setText(QString::number(enum_details[i].id));
-                    table_Enum_List_Details->item(i, 1)->setText(enum_details[i].name);
-                    table_Enum_List_Details->item(i, 2)->setText(QString::number(enum_details[i].handlers));
+                        table_Enum_List_Details->setItem(i, 0, row_id);
+                        table_Enum_List_Details->setItem(i, 1, row_name);
+                        table_Enum_List_Details->setItem(i, 2, row_handlers);
+                    }
+                    else
+                    {
+                        table_Enum_List_Details->item(i, 0)->setText(QString::number(enum_groups[i]));
+                        table_Enum_List_Details->item(i, 1)->setText("");
+                        table_Enum_List_Details->item(i, 2)->setText("");
+                    }
+
+                    ++i;
                 }
 
-                ++i;
-            }
+                while (i < l)
+                {
+                    table_Enum_List_Details->removeRow((table_Enum_List_Details->rowCount() - 1));
+                    ++i;
+                }
 
-            while (i < l)
+                table_Enum_List_Details->setSortingEnabled(true);
+            }
+            else if (user_data == ACTION_ENUM_SINGLE)
             {
-                table_Enum_List_Details->removeRow((table_Enum_List_Details->rowCount() - 1));
-                ++i;
+                edit_Enum_Group_ID->setText(QString::number(enum_single_id));
+                edit_Enum_Group_Additional->setChecked(!enum_single_end);
             }
+            else if (user_data == ACTION_ENUM_DETAILS)
+            {
+                uint16_t i = 0;
+                uint16_t l = table_Enum_List_Details->rowCount();
 
-            table_Enum_List_Details->setSortingEnabled(true);
+                table_Enum_List_Details->setSortingEnabled(false);
+
+                while (i < enum_details.length())
+                {
+                    if (i >= l)
+                    {
+                        table_Enum_List_Details->insertRow(i);
+
+                        QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(enum_details[i].id));
+                        QTableWidgetItem *row_name = new QTableWidgetItem(enum_details[i].name);
+                        QTableWidgetItem *row_handlers = new QTableWidgetItem(QString::number(enum_details[i].handlers));
+
+                        table_Enum_List_Details->setItem(i, 0, row_id);
+                        table_Enum_List_Details->setItem(i, 1, row_name);
+                        table_Enum_List_Details->setItem(i, 2, row_handlers);
+                    }
+                    else
+                    {
+                        table_Enum_List_Details->item(i, 0)->setText(QString::number(enum_details[i].id));
+                        table_Enum_List_Details->item(i, 1)->setText(enum_details[i].name);
+                        table_Enum_List_Details->item(i, 2)->setText(QString::number(enum_details[i].handlers));
+                    }
+
+                    ++i;
+                }
+
+                while (i < l)
+                {
+                    table_Enum_List_Details->removeRow((table_Enum_List_Details->rowCount() - 1));
+                    ++i;
+                }
+
+                table_Enum_List_Details->setSortingEnabled(true);
+            }
         }
     }
 
