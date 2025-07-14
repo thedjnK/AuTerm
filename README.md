@@ -8,6 +8,8 @@ Note that AuTerm is currently in the process of being developed for an initial r
 
 AuTerm is a cross-platform terminal utility, designed for communicating with embedded devices and systems (with a primary focus on Zephyr devices, but supports any device be it embedded or not), created in Qt 6 (and supporting Qt 5, though Qt 6 is recommended).
 
+If looking for a command-line interface MCUmgr tool then see [qtmgmt](https://github.com/thedjnK/qtmgmt) which uses the MCUmgr library from AuTerm.
+
 ## Features
 
 * Serial port support
