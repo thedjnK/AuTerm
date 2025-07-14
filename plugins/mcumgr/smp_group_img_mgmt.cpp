@@ -996,7 +996,7 @@ log_error() << "Going in circles...";
             return;
         }
 
-        handle_transport_error(processor->send(tmp_message, smp_timeout, smp_retries, (this->file_upload_area == 0 ? true : false)));
+        handle_transport_error(processor->send(tmp_message, (this->file_upload_area == 0 ? upload_initial_timeout : smp_timeout), smp_retries, (this->file_upload_area == 0 ? true : false)));
     }
     else
     {
@@ -1225,7 +1225,7 @@ bool smp_group_img_mgmt::start_image_set(QByteArray *hash, bool confirm, QList<i
 //    lbl_IMG_Status->setText(QString("Marking image ").append(radio_IMG_Test->isChecked() ? "for test." : "as confirmed."));
 }
 
-bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash)
+bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash, uint32_t first_packet_timeout)
 {
     //Upload
     QFile file(filename);
@@ -1260,6 +1260,7 @@ bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, 
     this->file_upload_area = 0;
     this->upgrade_only = upgrade;
     this->upload_tmr.start();
+    this->upload_initial_timeout = first_packet_timeout;
 
     file_upload(nullptr);
 
@@ -1269,6 +1270,11 @@ bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, 
     }
 
     return true;
+}
+
+bool smp_group_img_mgmt::start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash)
+{
+    return start_firmware_update(image, filename, upgrade, image_hash, smp_timeout);
 }
 
 bool smp_group_img_mgmt::start_image_erase(uint8_t slot)

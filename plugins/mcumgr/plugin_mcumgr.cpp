@@ -2832,7 +2832,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
             mode = ACTION_IMG_UPLOAD;
             processor->set_transport(active_transport());
             set_group_transport_settings(smp_groups.img_mgmt);
-            started = smp_groups.img_mgmt->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash);
+            started = smp_groups.img_mgmt->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash, timeout_erase_ms);
 
             if (started == true)
             {
@@ -2911,7 +2911,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         //Slot info
         mode = ACTION_IMG_IMAGE_SLOT_INFO;
         processor->set_transport(active_transport());
-        set_group_transport_settings(smp_groups.img_mgmt, timeout_erase_ms);
+        set_group_transport_settings(smp_groups.img_mgmt);
         started = smp_groups.img_mgmt->start_image_slot_info(&img_slot_details);
 
         if (started == true)

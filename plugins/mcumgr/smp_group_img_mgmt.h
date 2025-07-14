@@ -101,6 +101,7 @@ public:
     bool start_image_get(QList<image_state_t> *images);
     bool start_image_set(QByteArray *hash, bool confirm, QList<image_state_t> *images);
     bool start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash);
+    bool start_firmware_update(uint8_t image, QString filename, bool upgrade, QByteArray *image_hash, uint32_t first_packet_timeout);
     bool start_image_erase(uint8_t slot);
     bool start_image_slot_info(QList<slot_info_t> *images);
 
@@ -131,6 +132,7 @@ private:
     image_endian_t upload_endian;
     bool upgrade_only;
     uint8_t upload_repeated_parts;
+    uint32_t upload_initial_timeout;
     QList<image_state_t> *host_images;
     QList<slot_info_t> *host_slots;
     image_state_t image_state_buffer;
