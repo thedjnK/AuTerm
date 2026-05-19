@@ -504,6 +504,7 @@ void smp_group_settings_mgmt::cleanup()
 {
     mode = MODE_IDLE;
     return_value = nullptr;
+    processor->cancel();
 }
 
 /******************************************************************************/

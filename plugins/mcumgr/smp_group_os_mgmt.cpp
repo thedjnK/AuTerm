@@ -1270,6 +1270,7 @@ void smp_group_os_mgmt::cleanup()
     rtc_get_date_time = nullptr;
     mcumgr_parameters_buffer_size = nullptr;
     mcumgr_parameters_buffer_count = nullptr;
+    processor->cancel();
 }
 
 /******************************************************************************/

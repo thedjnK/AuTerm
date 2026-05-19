@@ -1398,6 +1398,7 @@ void smp_group_img_mgmt::cleanup()
     upload_repeated_parts = 0;
     host_images = nullptr;
     host_slots = nullptr;
+    processor->cancel();
 }
 
 /******************************************************************************/

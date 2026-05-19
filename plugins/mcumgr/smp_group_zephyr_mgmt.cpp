@@ -208,6 +208,7 @@ bool smp_group_zephyr_mgmt::error_define_lookup(int32_t rc, QString *error)
 void smp_group_zephyr_mgmt::cleanup()
 {
     mode = MODE_IDLE;
+    processor->cancel();
 }
 
 /******************************************************************************/

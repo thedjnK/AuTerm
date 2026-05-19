@@ -323,6 +323,7 @@ void smp_group_shell_mgmt::cleanup()
 {
     mode = MODE_IDLE;
     return_ret = nullptr;
+    processor->cancel();
 }
 
 /******************************************************************************/

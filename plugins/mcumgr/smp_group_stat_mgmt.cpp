@@ -434,6 +434,7 @@ void smp_group_stat_mgmt::cleanup()
     mode = MODE_IDLE;
     stat_object = nullptr;
     group_object = nullptr;
+    processor->cancel();
 }
 
 /******************************************************************************/

@@ -789,6 +789,7 @@ void smp_group_enum_mgmt::cleanup()
     group_single_end = nullptr;
     groups_details = nullptr;
     groups_details_fields_present = nullptr;
+    processor->cancel();
 }
 
 /******************************************************************************/

@@ -1125,6 +1125,7 @@ void smp_group_fs_mgmt::cleanup()
     hash_checksum_object = nullptr;
     hash_checksum_result_object = nullptr;
     file_size_object = nullptr;
+    processor->cancel();
 }
 
 /******************************************************************************/
