@@ -73,12 +73,6 @@ struct slot_info_t {
 /******************************************************************************/
 // Enum typedefs
 /******************************************************************************/
-enum img_mgmt_upload_match : uint8_t {
-    MATCH_NOT_PRESENT = 0,
-    MATCH_FAILED,
-    MATCH_PASSED
-};
-
 //Indicates the endianess of the image, if it matches the host PC or is opposite (or unknown)
 enum image_endian_t {
     ENDIAN_BIG,
@@ -118,7 +112,7 @@ private:
     static bool error_define_lookup(int32_t rc, QString *error);
     bool extract_header(QByteArray *file_data, image_endian_t *endian);
     bool extract_hash(QByteArray *file_data, QByteArray *hash);
-    bool parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match);
+    bool parse_upload_response(QCborStreamReader &reader, int64_t *new_off, bool *match);
     bool parse_state_response(QCborStreamReader &reader, QString array_name);
     bool parse_slot_info_response(QCborStreamReader &reader, QList<slot_info_t> *images, struct slot_info_t *image_data, struct slot_info_slots_t *slot_data);
     void file_upload(QByteArray *message);

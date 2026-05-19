@@ -328,7 +328,7 @@ bool smp_group_img_mgmt::extract_hash(QByteArray *file_data, QByteArray *hash)
     return hash_found;
 }
 
-bool smp_group_img_mgmt::parse_upload_response(QCborStreamReader &reader, int64_t *new_off, img_mgmt_upload_match *match)
+bool smp_group_img_mgmt::parse_upload_response(QCborStreamReader &reader, int64_t *new_off, bool *match)
 {
     QString key = "";
     bool keyset = true;
@@ -354,11 +354,7 @@ bool smp_group_img_mgmt::parse_upload_response(QCborStreamReader &reader, int64_
 
                     if (match_value == true)
                     {
-                        *match = MATCH_FAILED;
-                    }
-                    else
-                    {
-                        *match = MATCH_PASSED;
+                        *match = true;
                     }
                 }
 
@@ -834,7 +830,7 @@ void smp_group_img_mgmt::file_upload(QByteArray *message)
 
     if (message != nullptr)
     {
-        img_mgmt_upload_match match = MATCH_NOT_PRESENT;
+        bool match = false;
         QCborStreamReader cbor_reader(*message);
         good = parse_upload_response(cbor_reader, &off, &match);
 
