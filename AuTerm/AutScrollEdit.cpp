@@ -1044,6 +1044,8 @@ void AutScrollEdit::update_display()
                 bShiftEnd = true;
                 uiCurrentSize = mintPrevTextSize;
             }
+
+            this->textCursor().setPosition(0);
         }
 
         //Slider not held down, update
