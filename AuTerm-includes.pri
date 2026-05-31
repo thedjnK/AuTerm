@@ -60,6 +60,11 @@ DEFINES += "SKIPPLUGIN_TRANSPORT_ECHO"
             # Requires qtnetwork
             DEFINES += "PLUGIN_MCUMGR_TRANSPORT_UDP"
 
+	    qtHaveModule(dtls) {
+		# Requires qtnetwork and qdtls
+		DEFINES += "PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS"
+	    }
+
             qtHaveModule(mqtt) {
                 # Requires qtnetwork and qtmqtt
 #                DEFINES += "PLUGIN_MCUMGR_TRANSPORT_LORAWAN"

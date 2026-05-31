@@ -32,13 +32,22 @@
 /******************************************************************************/
 smp_udp::smp_udp(QObject *parent)
 {
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    QSslConfiguration dtls_config;
+#endif
+
     Q_UNUSED(parent);
 
 #if defined(GUI_PRESENT)
     main_window = plugin_mcumgr::get_main_window();
     udp_window = new udp_setup(main_window);
 
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    QObject::connect(udp_window, SIGNAL(connect_to_device(QString,uint16_t,bool)), this, SLOT(connect_to_device(QString,uint16_t,bool)));
+#else
     QObject::connect(udp_window, SIGNAL(connect_to_device(QString,uint16_t)), this, SLOT(connect_to_device(QString,uint16_t)));
+#endif
+
     QObject::connect(udp_window, SIGNAL(disconnect_from_device()), this, SLOT(disconnect_from_device()));
     QObject::connect(udp_window, SIGNAL(is_connected(bool*)), this, SLOT(is_connected(bool*)));
     QObject::connect(udp_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
@@ -47,8 +56,18 @@ smp_udp::smp_udp(QObject *parent)
 #endif
 
     socket = new QUdpSocket(this);
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    dtls_socket = new QDtls(QSslSocket::SslClientMode, this);
+#endif
     socket_is_connected = false;
     udp_config_set = false;
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    dtls_config = QSslConfiguration::defaultDtlsConfiguration();
+    dtls_config.setDtlsCookieVerificationEnabled(false);
+    dtls_config.setPeerVerifyMode(QSslSocket::VerifyNone);
+    dtls_socket->setDtlsConfiguration(dtls_config);
+#endif
 
     QObject::connect(socket, SIGNAL(connected()), this, SLOT(socket_connected()));
     QObject::connect(socket, SIGNAL(disconnected()), this, SLOT(socket_disconnected()));
@@ -56,6 +75,10 @@ smp_udp::smp_udp(QObject *parent)
     QObject::connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(socket_bytes_written(qint64)));
     QObject::connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(socket_error(QAbstractSocket::SocketError)));
     QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(socket_readyread()));
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    QObject::connect(dtls_socket, SIGNAL(pskRequired(QSslPreSharedKeyAuthenticator*)), this, SLOT(socket_dtls_psk_required(QSslPreSharedKeyAuthenticator*)));
+    QObject::connect(dtls_socket, SIGNAL(handshakeTimeout()), this, SLOT(socket_dtls_timeout()));
+#endif
 }
 
 smp_udp::~smp_udp()
@@ -64,9 +87,20 @@ smp_udp::~smp_udp()
     QObject::disconnect(this, SLOT(socket_disconnected()));
     QObject::disconnect(this, SLOT(socket_readyread()));
 
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    QObject::disconnect(this, SLOT(socket_dtls_psk_required(QSslPreSharedKeyAuthenticator*)));
+    QObject::disconnect(this, SLOT(socket_dtls_timeout()));
+#endif
+
 #if defined(GUI_PRESENT)
     QObject::disconnect(this, SLOT(is_connected(bool*)));
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    QObject::disconnect(this, SLOT(connect_to_device(QString,uint16_t,bool)));
+#else
     QObject::disconnect(this, SLOT(connect_to_device(QString,uint16_t)));
+#endif
+
     QObject::disconnect(this, SLOT(disconnect_from_device()));
     QObject::disconnect(udp_window, SIGNAL(plugin_save_setting(QString,QVariant)), main_window, SLOT(plugin_save_setting(QString,QVariant)));
     QObject::disconnect(udp_window, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), main_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
@@ -75,6 +109,13 @@ smp_udp::~smp_udp()
 
     if (socket_is_connected == true)
     {
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+        if (this->dtls == true)
+        {
+            dtls_socket->shutdown(socket);
+        }
+#endif
+
         socket->disconnectFromHost();
         socket_is_connected = false;
     }
@@ -102,7 +143,11 @@ int smp_udp::connect(void)
         return SMP_TRANSPORT_ERROR_INVALID_CONFIGURATION;
     }
 
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    connect_to_device(udp_config.hostname, udp_config.port, udp_config.dtls);
+#else
     connect_to_device(udp_config.hostname, udp_config.port);
+#endif
 
     return SMP_TRANSPORT_ERROR_OK;
 }
@@ -115,6 +160,13 @@ int smp_udp::disconnect(bool force)
     {
         return SMP_TRANSPORT_ERROR_NOT_CONNECTED;
     }
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    if (this->dtls == true)
+    {
+        dtls_socket->shutdown(socket);
+    }
+#endif
 
     socket->disconnectFromHost();
     socket_is_connected = false;
@@ -155,7 +207,16 @@ smp_transport_error_t smp_udp::send(smp_message *message)
         return SMP_TRANSPORT_ERROR_NOT_CONNECTED;
     }
 
-    socket->write(*message->data());
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    if (this->dtls == true)
+    {
+        dtls_socket->writeDatagramEncrypted(socket, *message->data());
+    }
+    else
+#endif
+    {
+        socket->write(*message->data());
+    }
 
     return SMP_TRANSPORT_ERROR_OK;
 }
@@ -166,7 +227,32 @@ void smp_udp::socket_connected()
 #if defined(GUI_PRESENT)
     udp_window->connected();
 #endif
-    emit connected();
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    if (this->dtls == true)
+    {
+        if (!dtls_socket->doHandshake(socket))
+        {
+            log_error() << "UDP DTLS handshake failure: " << dtls_socket->dtlsErrorString();
+        }
+        else
+        {
+            if (dtls_socket->handshakeState() == QDtls::HandshakeComplete)
+            {
+                log_debug() << "UDP DTLS handshake complete";
+                emit connected();
+            }
+            else
+            {
+                log_debug() << "UDP DTLS handshake in progress";
+            }
+        }
+    }
+    else
+#endif
+    {
+        emit connected();
+    }
 }
 
 void smp_udp::socket_disconnected()
@@ -196,9 +282,19 @@ void smp_udp::socket_error(QAbstractSocket::SocketError error)
     udp_window->set_status_text(to_error_string((int)error + 1));
 #endif
 
+    log_error() << "UDP socket error: " << error;
+
     if (socket_is_connected == true)
     {
         socket_is_connected = false;
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+        if (this->dtls == true)
+        {
+            dtls_socket->shutdown(socket);
+        }
+#endif
+
         socket->disconnectFromHost();
     }
 }
@@ -207,8 +303,50 @@ void smp_udp::socket_readyread()
 {
     while (socket->hasPendingDatagrams())
     {
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
         QNetworkDatagram datagram = socket->receiveDatagram();
-        received_data.append(datagram.data());
+
+        if (dtls_socket->isConnectionEncrypted())
+        {
+            const QByteArray plainText = dtls_socket->decryptDatagram(socket, datagram.data());
+
+            if (plainText.size() > 0)
+            {
+                received_data.append(plainText);
+            }
+            else if (dtls_socket->dtlsError() == QDtlsError::RemoteClosedConnectionError)
+            {
+                socket->close();
+                return;
+            }
+        }
+        else
+        {
+            if (dtls == true)
+            {
+                if (!dtls_socket->doHandshake(socket))
+                {
+                    log_error() << "UDP DTLS handshake failure: " << dtls_socket->dtlsErrorString();
+                }
+                else
+                {
+                    if (dtls_socket->handshakeState() == QDtls::HandshakeComplete)
+                    {
+                        log_debug() << "UDP DTLS handshake complete";
+                        emit connected();
+                    }
+                    else
+                    {
+                        log_debug() << "UDP DTLS handshake in progress";
+                    }
+                }
+
+                return;
+            }
+
+            received_data.append(datagram.data());
+        }
+#endif
 
         //Check if there is a full packet
         if (received_data.is_valid() == true)
@@ -219,9 +357,29 @@ void smp_udp::socket_readyread()
     }
 }
 
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+void smp_udp::connect_to_device(QString host, uint16_t port, bool dtls)
+#else
 void smp_udp::connect_to_device(QString host, uint16_t port)
+#endif
 {
-    socket->connectToHost(host, port);
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    this->dtls = dtls;
+
+    if (dtls == true)
+    {
+        QHostAddress remoteAddress;
+        remoteAddress.setAddress(host);
+        dtls_socket->setPeer(remoteAddress, port);
+        socket->connectToHost(host, port);
+    }
+    else
+    {
+#endif
+        socket->connectToHost(host, port);
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    }
+#endif
     //TODO: need to alert parent
 }
 
@@ -255,6 +413,9 @@ int smp_udp::set_connection_config(struct smp_udp_config_t *configuration)
 
     udp_config.hostname = configuration->hostname;
     udp_config.port = configuration->port;
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    udp_config.dtls = configuration->dtls;
+#endif
     udp_config_set = true;
 
     return SMP_TRANSPORT_ERROR_OK;
@@ -373,6 +534,20 @@ QString smp_udp::to_error_string(int error_code)
         }
     };
 }
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+void smp_udp::socket_dtls_psk_required(QSslPreSharedKeyAuthenticator *todo)
+{
+    //TODO
+    log_debug() << "";
+}
+
+void smp_udp::socket_dtls_timeout()
+{
+    //TODO
+    log_debug() << "";
+}
+#endif
 
 /******************************************************************************/
 // END OF FILE

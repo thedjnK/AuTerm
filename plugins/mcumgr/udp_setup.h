@@ -65,7 +65,11 @@ private slots:
     void on_combo_history_currentIndexChanged(int index);
 
 signals:
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    void connect_to_device(QString host, uint16_t port, bool dtls);
+#else
     void connect_to_device(QString host, uint16_t port);
+#endif
     void disconnect_from_device();
     void is_connected(bool *connected);
     void plugin_save_setting(QString name, QVariant data);

@@ -51,6 +51,10 @@ udp_setup::udp_setup(QWidget *parent) :
 {
     ui->setupUi(this);
 
+#if !defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    ui->check_dtls->deleteLater();
+#endif
+
     //Always appear in front of AuTerm window
     this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
 
@@ -89,7 +93,12 @@ void udp_setup::on_btn_connect_clicked()
     }
 
     ui->btn_connect->setEnabled(false);
+
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    emit connect_to_device(ui->edit_address->text(), ui->edit_port->value(), ui->check_dtls->isChecked());
+#else
     emit connect_to_device(ui->edit_address->text(), ui->edit_port->value());
+#endif
 
     if (ui->check_save_history->isChecked() == true)
     {

@@ -32,6 +32,9 @@
 #include "udp_setup.h"
 #endif
 #include <QUdpSocket>
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+#include <QDtls>
+#endif
 
 /******************************************************************************/
 // Forward declaration of Class, Struct & Unions
@@ -39,6 +42,9 @@
 struct smp_udp_config_t {
     QString hostname;
     uint16_t port;
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    bool dtls;
+#endif
 };
 
 /******************************************************************************/
@@ -64,7 +70,11 @@ public:
     QString to_error_string(int error_code) override;
 
 private slots:
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    void connect_to_device(QString host, uint16_t port, bool dtls);
+#else
     void connect_to_device(QString host, uint16_t port);
+#endif
     void disconnect_from_device();
     void is_connected(bool *connected);
     void socket_connected();
@@ -73,6 +83,10 @@ private slots:
     void socket_bytes_written(qint64 written);
     void socket_error(QAbstractSocket::SocketError error);
     void socket_readyread();
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    void socket_dtls_psk_required(QSslPreSharedKeyAuthenticator *todo);
+    void socket_dtls_timeout();
+#endif
 
 private:
 #if defined(GUI_PRESENT)
@@ -82,6 +96,10 @@ private:
     struct smp_udp_config_t udp_config;
     bool udp_config_set;
     QUdpSocket *socket;
+#if defined(PLUGIN_MCUMGR_TRANSPORT_UDP_DTLS)
+    QDtls *dtls_socket;
+    bool dtls;
+#endif
     bool socket_is_connected;
     smp_message received_data;
 };
