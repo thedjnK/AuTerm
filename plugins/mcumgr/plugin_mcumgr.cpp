@@ -192,6 +192,17 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_27->setSpacing(2);
     horizontalLayout_27->setObjectName("horizontalLayout_27");
     horizontalLayout_27->setContentsMargins(-1, 0, -1, -1);
+    check_transport_uart_raw = new QCheckBox(tab);
+    check_transport_uart_raw->setObjectName("check_transport_uart_raw");
+
+    horizontalLayout_27->addWidget(check_transport_uart_raw);
+
+    check_transport_uart_show_transfer = new QCheckBox(tab);
+    check_transport_uart_show_transfer->setObjectName("check_transport_uart_show_transfer");
+    check_transport_uart_show_transfer->setChecked(true);
+
+    horizontalLayout_27->addWidget(check_transport_uart_show_transfer);
+
     horizontalSpacer_27 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_27->addItem(horizontalSpacer_27);
@@ -442,48 +453,112 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_2->setSpacing(2);
     gridLayout_2->setObjectName("gridLayout_2");
     gridLayout_2->setContentsMargins(6, 6, 6, 6);
-    label_28 = new QLabel(tab_FS);
-    label_28->setObjectName("label_28");
-
-    gridLayout_2->addWidget(label_28, 3, 0, 1, 1);
-
-    lbl_FS_Status = new QLabel(tab_FS);
-    lbl_FS_Status->setObjectName("lbl_FS_Status");
-
-    gridLayout_2->addWidget(lbl_FS_Status, 8, 0, 1, 2);
-
-    label_29 = new QLabel(tab_FS);
-    label_29->setObjectName("label_29");
-
-    gridLayout_2->addWidget(label_29, 4, 0, 1, 1);
-
     label_2 = new QLabel(tab_FS);
     label_2->setObjectName("label_2");
 
-    gridLayout_2->addWidget(label_2, 0, 0, 1, 1);
-
-    progress_FS_Complete = new QProgressBar(tab_FS);
-    progress_FS_Complete->setObjectName("progress_FS_Complete");
-    progress_FS_Complete->setValue(0);
-
-    gridLayout_2->addWidget(progress_FS_Complete, 6, 0, 1, 3);
-
-    btn_FS_Local = new QToolButton(tab_FS);
-    btn_FS_Local->setObjectName("btn_FS_Local");
-
-    gridLayout_2->addWidget(btn_FS_Local, 0, 2, 1, 1);
-
-    label_3 = new QLabel(tab_FS);
-    label_3->setObjectName("label_3");
-
-    gridLayout_2->addWidget(label_3, 1, 0, 1, 1);
+    gridLayout_2->addWidget(label_2, 2, 0, 1, 1);
 
     combo_FS_type = new QComboBox(tab_FS);
     combo_FS_type->setObjectName("combo_FS_type");
     combo_FS_type->setEnabled(false);
     combo_FS_type->setEditable(true);
 
-    gridLayout_2->addWidget(combo_FS_type, 2, 1, 1, 2);
+    gridLayout_2->addWidget(combo_FS_type, 4, 1, 1, 2);
+
+    progress_FS_Complete = new QProgressBar(tab_FS);
+    progress_FS_Complete->setObjectName("progress_FS_Complete");
+    progress_FS_Complete->setValue(0);
+
+    gridLayout_2->addWidget(progress_FS_Complete, 8, 0, 1, 3);
+
+    label_3 = new QLabel(tab_FS);
+    label_3->setObjectName("label_3");
+
+    gridLayout_2->addWidget(label_3, 3, 0, 1, 1);
+
+    label_19 = new QLabel(tab_FS);
+    label_19->setObjectName("label_19");
+
+    gridLayout_2->addWidget(label_19, 4, 0, 1, 1);
+
+    label_28 = new QLabel(tab_FS);
+    label_28->setObjectName("label_28");
+
+    gridLayout_2->addWidget(label_28, 5, 0, 1, 1);
+
+    edit_FS_Size = new QLineEdit(tab_FS);
+    edit_FS_Size->setObjectName("edit_FS_Size");
+    edit_FS_Size->setEnabled(false);
+    edit_FS_Size->setMaximumSize(QSize(80, 16777215));
+    edit_FS_Size->setReadOnly(true);
+
+    gridLayout_2->addWidget(edit_FS_Size, 6, 1, 1, 1);
+
+    horizontalLayout_2 = new QHBoxLayout();
+    horizontalLayout_2->setSpacing(2);
+    horizontalLayout_2->setObjectName("horizontalLayout_2");
+    horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
+    horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_2->addItem(horizontalSpacer);
+
+    btn_FS_Go = new QPushButton(tab_FS);
+    btn_FS_Go->setObjectName("btn_FS_Go");
+
+    horizontalLayout_2->addWidget(btn_FS_Go);
+
+    horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_2->addItem(horizontalSpacer_2);
+
+
+    gridLayout_2->addLayout(horizontalLayout_2, 11, 0, 1, 3);
+
+    edit_FS_Local = new QLineEdit(tab_FS);
+    edit_FS_Local->setObjectName("edit_FS_Local");
+
+    gridLayout_2->addWidget(edit_FS_Local, 2, 1, 1, 1);
+
+    lbl_FS_Status = new QLabel(tab_FS);
+    lbl_FS_Status->setObjectName("lbl_FS_Status");
+
+    gridLayout_2->addWidget(lbl_FS_Status, 10, 0, 1, 2);
+
+    label_29 = new QLabel(tab_FS);
+    label_29->setObjectName("label_29");
+
+    gridLayout_2->addWidget(label_29, 6, 0, 1, 1);
+
+    edit_FS_Result = new QLineEdit(tab_FS);
+    edit_FS_Result->setObjectName("edit_FS_Result");
+    edit_FS_Result->setEnabled(false);
+    edit_FS_Result->setReadOnly(true);
+
+    gridLayout_2->addWidget(edit_FS_Result, 5, 1, 1, 2);
+
+    edit_FS_Remote = new QLineEdit(tab_FS);
+    edit_FS_Remote->setObjectName("edit_FS_Remote");
+
+    gridLayout_2->addWidget(edit_FS_Remote, 3, 1, 1, 2);
+
+    btn_FS_Local = new QToolButton(tab_FS);
+    btn_FS_Local->setObjectName("btn_FS_Local");
+
+    gridLayout_2->addWidget(btn_FS_Local, 2, 2, 1, 1);
+
+    verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+    gridLayout_2->addItem(verticalSpacer_6, 9, 0, 1, 1);
+
+    label_45 = new QLabel(tab_FS);
+    label_45->setObjectName("label_45");
+    QSizePolicy sizePolicy(QSizePolicy::Policy::Maximum, QSizePolicy::Policy::Preferred);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(label_45->sizePolicy().hasHeightForWidth());
+    label_45->setSizePolicy(sizePolicy);
+
+    gridLayout_2->addWidget(label_45, 1, 0, 1, 1);
 
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setSpacing(2);
@@ -514,62 +589,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout->addWidget(radio_FS_Hash_Checksum_Types);
 
+    horizontalSpacer_32 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-    gridLayout_2->addLayout(horizontalLayout, 5, 0, 1, 3);
-
-    label_19 = new QLabel(tab_FS);
-    label_19->setObjectName("label_19");
-
-    gridLayout_2->addWidget(label_19, 2, 0, 1, 1);
-
-    edit_FS_Remote = new QLineEdit(tab_FS);
-    edit_FS_Remote->setObjectName("edit_FS_Remote");
-
-    gridLayout_2->addWidget(edit_FS_Remote, 1, 1, 1, 2);
-
-    horizontalLayout_2 = new QHBoxLayout();
-    horizontalLayout_2->setSpacing(2);
-    horizontalLayout_2->setObjectName("horizontalLayout_2");
-    horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
-    horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-    horizontalLayout_2->addItem(horizontalSpacer);
-
-    btn_FS_Go = new QPushButton(tab_FS);
-    btn_FS_Go->setObjectName("btn_FS_Go");
-
-    horizontalLayout_2->addWidget(btn_FS_Go);
-
-    horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-    horizontalLayout_2->addItem(horizontalSpacer_2);
+    horizontalLayout->addItem(horizontalSpacer_32);
 
 
-    gridLayout_2->addLayout(horizontalLayout_2, 9, 0, 1, 3);
-
-    verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-    gridLayout_2->addItem(verticalSpacer_6, 7, 0, 1, 1);
-
-    edit_FS_Local = new QLineEdit(tab_FS);
-    edit_FS_Local->setObjectName("edit_FS_Local");
-
-    gridLayout_2->addWidget(edit_FS_Local, 0, 1, 1, 1);
-
-    edit_FS_Result = new QLineEdit(tab_FS);
-    edit_FS_Result->setObjectName("edit_FS_Result");
-    edit_FS_Result->setEnabled(false);
-    edit_FS_Result->setReadOnly(true);
-
-    gridLayout_2->addWidget(edit_FS_Result, 3, 1, 1, 2);
-
-    edit_FS_Size = new QLineEdit(tab_FS);
-    edit_FS_Size->setObjectName("edit_FS_Size");
-    edit_FS_Size->setEnabled(false);
-    edit_FS_Size->setMaximumSize(QSize(80, 16777215));
-    edit_FS_Size->setReadOnly(true);
-
-    gridLayout_2->addWidget(edit_FS_Size, 4, 1, 1, 1);
+    gridLayout_2->addLayout(horizontalLayout, 1, 1, 1, 2);
 
     selector_group->addTab(tab_FS, QString());
     tab_OS = new QWidget();
@@ -729,15 +754,24 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_18->setSpacing(2);
     gridLayout_18->setObjectName("gridLayout_18");
     gridLayout_18->setContentsMargins(6, 6, 6, 6);
-    verticalSpacer_8 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-    gridLayout_18->addItem(verticalSpacer_8, 5, 1, 1, 1);
-
     combo_os_datetime_timezone = new QComboBox(tab_os_datetime);
     combo_os_datetime_timezone->setObjectName("combo_os_datetime_timezone");
     combo_os_datetime_timezone->setEnabled(false);
 
-    gridLayout_18->addWidget(combo_os_datetime_timezone, 1, 1, 1, 1);
+    gridLayout_18->addWidget(combo_os_datetime_timezone, 2, 1, 1, 1);
+
+    check_os_datetime_use_pc_date_time = new QCheckBox(tab_os_datetime);
+    check_os_datetime_use_pc_date_time->setObjectName("check_os_datetime_use_pc_date_time");
+    check_os_datetime_use_pc_date_time->setEnabled(false);
+    check_os_datetime_use_pc_date_time->setChecked(true);
+
+    gridLayout_18->addWidget(check_os_datetime_use_pc_date_time, 3, 1, 1, 1);
+
+    label_30 = new QLabel(tab_os_datetime);
+    label_30->setObjectName("label_30");
+    label_30->setMaximumSize(QSize(100, 16777215));
+
+    gridLayout_18->addWidget(label_30, 2, 0, 1, 1);
 
     horizontalLayout_19 = new QHBoxLayout();
     horizontalLayout_19->setSpacing(2);
@@ -754,24 +788,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_19->addWidget(radio_os_datetime_set);
 
-    horizontalSpacer_15 = new QSpacerItem(40, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+    horizontalSpacer_15 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
     horizontalLayout_19->addItem(horizontalSpacer_15);
 
 
-    gridLayout_18->addLayout(horizontalLayout_19, 3, 0, 1, 2);
-
-    label_13 = new QLabel(tab_os_datetime);
-    label_13->setObjectName("label_13");
-    label_13->setMaximumSize(QSize(80, 16777215));
-
-    gridLayout_18->addWidget(label_13, 0, 0, 1, 1);
-
-    label_31 = new QLabel(tab_os_datetime);
-    label_31->setObjectName("label_31");
-    label_31->setMaximumSize(QSize(100, 16777215));
-
-    gridLayout_18->addWidget(label_31, 2, 0, 1, 1);
+    gridLayout_18->addLayout(horizontalLayout_19, 0, 1, 1, 1);
 
     edit_os_datetime_date_time = new QDateTimeEdit(tab_os_datetime);
     edit_os_datetime_date_time->setObjectName("edit_os_datetime_date_time");
@@ -785,20 +807,33 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_os_datetime_date_time->setCalendarPopup(true);
     edit_os_datetime_date_time->setTimeSpec(Qt::TimeSpec::LocalTime);
 
-    gridLayout_18->addWidget(edit_os_datetime_date_time, 0, 1, 1, 1);
+    gridLayout_18->addWidget(edit_os_datetime_date_time, 1, 1, 1, 1);
 
-    label_30 = new QLabel(tab_os_datetime);
-    label_30->setObjectName("label_30");
-    label_30->setMaximumSize(QSize(100, 16777215));
+    horizontalSpacer_37 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-    gridLayout_18->addWidget(label_30, 1, 0, 1, 1);
+    gridLayout_18->addItem(horizontalSpacer_37, 3, 2, 1, 1);
 
-    check_os_datetime_use_pc_date_time = new QCheckBox(tab_os_datetime);
-    check_os_datetime_use_pc_date_time->setObjectName("check_os_datetime_use_pc_date_time");
-    check_os_datetime_use_pc_date_time->setEnabled(false);
-    check_os_datetime_use_pc_date_time->setChecked(true);
+    label_48 = new QLabel(tab_os_datetime);
+    label_48->setObjectName("label_48");
+    label_48->setMaximumSize(QSize(80, 16777215));
 
-    gridLayout_18->addWidget(check_os_datetime_use_pc_date_time, 2, 1, 1, 1);
+    gridLayout_18->addWidget(label_48, 0, 0, 1, 1);
+
+    label_13 = new QLabel(tab_os_datetime);
+    label_13->setObjectName("label_13");
+    label_13->setMaximumSize(QSize(80, 16777215));
+
+    gridLayout_18->addWidget(label_13, 1, 0, 1, 1);
+
+    label_31 = new QLabel(tab_os_datetime);
+    label_31->setObjectName("label_31");
+    label_31->setMaximumSize(QSize(100, 16777215));
+
+    gridLayout_18->addWidget(label_31, 3, 0, 1, 1);
+
+    verticalSpacer_8 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+    gridLayout_18->addItem(verticalSpacer_8, 6, 1, 1, 1);
 
     selector_OS->addTab(tab_os_datetime, QString());
     tab_OS_Info = new QWidget();
@@ -806,17 +841,34 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_13 = new QGridLayout(tab_OS_Info);
     gridLayout_13->setSpacing(2);
     gridLayout_13->setObjectName("gridLayout_13");
-    label_17 = new QLabel(tab_OS_Info);
-    label_17->setObjectName("label_17");
-
-    gridLayout_13->addWidget(label_17, 0, 0, 1, 1);
-
     edit_OS_UName = new QLineEdit(tab_OS_Info);
     edit_OS_UName->setObjectName("edit_OS_UName");
     edit_OS_UName->setEnabled(false);
     edit_OS_UName->setReadOnly(false);
 
-    gridLayout_13->addWidget(edit_OS_UName, 0, 1, 1, 1);
+    gridLayout_13->addWidget(edit_OS_UName, 1, 1, 1, 1);
+
+    label_17 = new QLabel(tab_OS_Info);
+    label_17->setObjectName("label_17");
+
+    gridLayout_13->addWidget(label_17, 1, 0, 1, 1);
+
+    edit_OS_Info_Output = new QPlainTextEdit(tab_OS_Info);
+    edit_OS_Info_Output->setObjectName("edit_OS_Info_Output");
+    edit_OS_Info_Output->setUndoRedoEnabled(false);
+    edit_OS_Info_Output->setReadOnly(true);
+
+    gridLayout_13->addWidget(edit_OS_Info_Output, 3, 1, 1, 1);
+
+    label_18 = new QLabel(tab_OS_Info);
+    label_18->setObjectName("label_18");
+
+    gridLayout_13->addWidget(label_18, 3, 0, 1, 1);
+
+    label_47 = new QLabel(tab_OS_Info);
+    label_47->setObjectName("label_47");
+
+    gridLayout_13->addWidget(label_47, 0, 0, 1, 1);
 
     horizontalLayout_10 = new QHBoxLayout();
     horizontalLayout_10->setSpacing(2);
@@ -832,20 +884,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_10->addWidget(radio_OS_uname);
 
+    horizontalSpacer_34 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-    gridLayout_13->addLayout(horizontalLayout_10, 1, 0, 1, 2);
+    horizontalLayout_10->addItem(horizontalSpacer_34);
 
-    label_18 = new QLabel(tab_OS_Info);
-    label_18->setObjectName("label_18");
 
-    gridLayout_13->addWidget(label_18, 2, 0, 1, 1);
-
-    edit_OS_Info_Output = new QPlainTextEdit(tab_OS_Info);
-    edit_OS_Info_Output->setObjectName("edit_OS_Info_Output");
-    edit_OS_Info_Output->setUndoRedoEnabled(false);
-    edit_OS_Info_Output->setReadOnly(true);
-
-    gridLayout_13->addWidget(edit_OS_Info_Output, 2, 1, 1, 1);
+    gridLayout_13->addLayout(horizontalLayout_10, 0, 1, 1, 1);
 
     selector_OS->addTab(tab_OS_Info, QString());
     tab_OS_Bootloader = new QWidget();
@@ -1064,29 +1108,18 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_15->setSpacing(2);
     gridLayout_15->setObjectName("gridLayout_15");
     gridLayout_15->setContentsMargins(6, 6, 6, 6);
-    edit_settings_key = new QLineEdit(tab_Settings);
-    edit_settings_key->setObjectName("edit_settings_key");
+    edit_settings_value = new QLineEdit(tab_Settings);
+    edit_settings_value->setObjectName("edit_settings_value");
+    edit_settings_value->setReadOnly(true);
 
-    gridLayout_15->addWidget(edit_settings_key, 0, 2, 1, 1);
+    gridLayout_15->addWidget(edit_settings_value, 2, 2, 1, 1);
 
-    label_22 = new QLabel(tab_Settings);
-    label_22->setObjectName("label_22");
+    edit_settings_decoded = new QLineEdit(tab_Settings);
+    edit_settings_decoded->setObjectName("edit_settings_decoded");
+    edit_settings_decoded->setEnabled(false);
+    edit_settings_decoded->setReadOnly(true);
 
-    gridLayout_15->addWidget(label_22, 3, 0, 1, 1);
-
-    lbl_settings_status = new QLabel(tab_Settings);
-    lbl_settings_status->setObjectName("lbl_settings_status");
-
-    gridLayout_15->addWidget(lbl_settings_status, 10, 0, 1, 3);
-
-    verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-    gridLayout_15->addItem(verticalSpacer_5, 9, 0, 1, 1);
-
-    label_26 = new QLabel(tab_Settings);
-    label_26->setObjectName("label_26");
-
-    gridLayout_15->addWidget(label_26, 8, 0, 1, 1);
+    gridLayout_15->addWidget(edit_settings_decoded, 9, 2, 1, 1);
 
     horizontalLayout_16 = new QHBoxLayout();
     horizontalLayout_16->setSpacing(2);
@@ -1113,18 +1146,34 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_16->addWidget(radio_settings_decimal);
 
+    horizontalSpacer_35 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-    gridLayout_15->addLayout(horizontalLayout_16, 6, 2, 1, 1);
+    horizontalLayout_16->addItem(horizontalSpacer_35);
 
-    label_23 = new QLabel(tab_Settings);
-    label_23->setObjectName("label_23");
 
-    gridLayout_15->addWidget(label_23, 0, 0, 1, 1);
+    gridLayout_15->addLayout(horizontalLayout_16, 7, 2, 1, 1);
 
-    label_24 = new QLabel(tab_Settings);
-    label_24->setObjectName("label_24");
+    horizontalLayout_12 = new QHBoxLayout();
+    horizontalLayout_12->setSpacing(2);
+    horizontalLayout_12->setObjectName("horizontalLayout_12");
+    check_settings_big_endian = new QCheckBox(tab_Settings);
+    check_settings_big_endian->setObjectName("check_settings_big_endian");
+    check_settings_big_endian->setEnabled(false);
 
-    gridLayout_15->addWidget(label_24, 1, 0, 1, 1);
+    horizontalLayout_12->addWidget(check_settings_big_endian);
+
+    check_settings_signed_decimal_value = new QCheckBox(tab_Settings);
+    check_settings_signed_decimal_value->setObjectName("check_settings_signed_decimal_value");
+    check_settings_signed_decimal_value->setEnabled(false);
+
+    horizontalLayout_12->addWidget(check_settings_signed_decimal_value);
+
+    horizontalSpacer_36 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_12->addItem(horizontalSpacer_36);
+
+
+    gridLayout_15->addLayout(horizontalLayout_12, 8, 2, 1, 1);
 
     horizontalLayout_15 = new QHBoxLayout();
     horizontalLayout_15->setSpacing(2);
@@ -1143,35 +1192,59 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_15->addItem(horizontalSpacer_11);
 
 
-    gridLayout_15->addLayout(horizontalLayout_15, 11, 0, 1, 3);
+    gridLayout_15->addLayout(horizontalLayout_15, 12, 0, 1, 3);
 
-    label_25 = new QLabel(tab_Settings);
-    label_25->setObjectName("label_25");
+    edit_settings_key = new QLineEdit(tab_Settings);
+    edit_settings_key->setObjectName("edit_settings_key");
 
-    gridLayout_15->addWidget(label_25, 6, 0, 1, 1);
+    gridLayout_15->addWidget(edit_settings_key, 1, 2, 1, 1);
 
-    horizontalLayout_12 = new QHBoxLayout();
-    horizontalLayout_12->setSpacing(2);
-    horizontalLayout_12->setObjectName("horizontalLayout_12");
-    check_settings_big_endian = new QCheckBox(tab_Settings);
-    check_settings_big_endian->setObjectName("check_settings_big_endian");
-    check_settings_big_endian->setEnabled(false);
+    label_22 = new QLabel(tab_Settings);
+    label_22->setObjectName("label_22");
 
-    horizontalLayout_12->addWidget(check_settings_big_endian);
+    gridLayout_15->addWidget(label_22, 0, 0, 1, 1);
 
-    check_settings_signed_decimal_value = new QCheckBox(tab_Settings);
-    check_settings_signed_decimal_value->setObjectName("check_settings_signed_decimal_value");
-    check_settings_signed_decimal_value->setEnabled(false);
+    verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
-    horizontalLayout_12->addWidget(check_settings_signed_decimal_value);
+    gridLayout_15->addItem(verticalSpacer_5, 10, 0, 1, 1);
 
+    label_23 = new QLabel(tab_Settings);
+    label_23->setObjectName("label_23");
 
-    gridLayout_15->addLayout(horizontalLayout_12, 7, 2, 1, 1);
+    gridLayout_15->addWidget(label_23, 1, 0, 1, 1);
+
+    label_26 = new QLabel(tab_Settings);
+    label_26->setObjectName("label_26");
+
+    gridLayout_15->addWidget(label_26, 9, 0, 1, 1);
+
+    label_24 = new QLabel(tab_Settings);
+    label_24->setObjectName("label_24");
+
+    gridLayout_15->addWidget(label_24, 2, 0, 1, 1);
 
     label_27 = new QLabel(tab_Settings);
     label_27->setObjectName("label_27");
 
-    gridLayout_15->addWidget(label_27, 7, 0, 1, 1);
+    gridLayout_15->addWidget(label_27, 8, 0, 1, 1);
+
+    line_2 = new QFrame(tab_Settings);
+    line_2->setObjectName("line_2");
+    line_2->setLineWidth(1);
+    line_2->setFrameShape(QFrame::Shape::VLine);
+    line_2->setFrameShadow(QFrame::Shadow::Sunken);
+
+    gridLayout_15->addWidget(line_2, 5, 0, 2, 3);
+
+    label_25 = new QLabel(tab_Settings);
+    label_25->setObjectName("label_25");
+
+    gridLayout_15->addWidget(label_25, 7, 0, 1, 1);
+
+    lbl_settings_status = new QLabel(tab_Settings);
+    lbl_settings_status->setObjectName("lbl_settings_status");
+
+    gridLayout_15->addWidget(lbl_settings_status, 11, 0, 1, 3);
 
     horizontalLayout_11 = new QHBoxLayout();
     horizontalLayout_11->setSpacing(2);
@@ -1215,29 +1288,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_11->addWidget(radio_settings_save);
 
+    horizontalSpacer_33 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-    gridLayout_15->addLayout(horizontalLayout_11, 3, 2, 1, 1);
+    horizontalLayout_11->addItem(horizontalSpacer_33);
 
-    edit_settings_value = new QLineEdit(tab_Settings);
-    edit_settings_value->setObjectName("edit_settings_value");
-    edit_settings_value->setReadOnly(true);
 
-    gridLayout_15->addWidget(edit_settings_value, 1, 2, 1, 1);
-
-    edit_settings_decoded = new QLineEdit(tab_Settings);
-    edit_settings_decoded->setObjectName("edit_settings_decoded");
-    edit_settings_decoded->setEnabled(false);
-    edit_settings_decoded->setReadOnly(true);
-
-    gridLayout_15->addWidget(edit_settings_decoded, 8, 2, 1, 1);
-
-    line_2 = new QFrame(tab_Settings);
-    line_2->setObjectName("line_2");
-    line_2->setLineWidth(1);
-    line_2->setFrameShape(QFrame::Shape::VLine);
-    line_2->setFrameShadow(QFrame::Shadow::Sunken);
-
-    gridLayout_15->addWidget(line_2, 4, 0, 2, 3);
+    gridLayout_15->addLayout(horizontalLayout_11, 0, 2, 1, 1);
 
     selector_group->addTab(tab_Settings, QString());
     tab_zephyr = new QWidget();
@@ -1302,7 +1358,15 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout_3->setObjectName("verticalLayout_3");
     verticalLayout_3->setContentsMargins(6, 6, 6, 6);
     horizontalLayout_21 = new QHBoxLayout();
+    horizontalLayout_21->setSpacing(2);
     horizontalLayout_21->setObjectName("horizontalLayout_21");
+    label_46 = new QLabel(tab_Enum);
+    label_46->setObjectName("label_46");
+    sizePolicy.setHeightForWidth(label_46->sizePolicy().hasHeightForWidth());
+    label_46->setSizePolicy(sizePolicy);
+
+    horizontalLayout_21->addWidget(label_46);
+
     radio_Enum_Count = new QRadioButton(tab_Enum);
     radio_Enum_Count->setObjectName("radio_Enum_Count");
     radio_Enum_Count->setChecked(true);
@@ -1324,10 +1388,15 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_21->addWidget(radio_Enum_Details);
 
+    horizontalSpacer_31 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_21->addItem(horizontalSpacer_31);
+
 
     verticalLayout_3->addLayout(horizontalLayout_21);
 
     horizontalLayout_22 = new QHBoxLayout();
+    horizontalLayout_22->setSpacing(2);
     horizontalLayout_22->setObjectName("horizontalLayout_22");
     label_32 = new QLabel(tab_Enum);
     label_32->setObjectName("label_32");
@@ -1336,14 +1405,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     edit_Enum_Count = new QLineEdit(tab_Enum);
     edit_Enum_Count->setObjectName("edit_Enum_Count");
+    edit_Enum_Count->setMaximumSize(QSize(100, 16777215));
     edit_Enum_Count->setReadOnly(true);
 
     horizontalLayout_22->addWidget(edit_Enum_Count);
+
+    horizontalSpacer_30 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_22->addItem(horizontalSpacer_30);
 
 
     verticalLayout_3->addLayout(horizontalLayout_22);
 
     horizontalLayout_23 = new QHBoxLayout();
+    horizontalLayout_23->setSpacing(2);
     horizontalLayout_23->setObjectName("horizontalLayout_23");
     label_33 = new QLabel(tab_Enum);
     label_33->setObjectName("label_33");
@@ -1904,6 +1979,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_transport_lora->setText(QCoreApplication::translate("Form", "LoRaWAN", nullptr));
     btn_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
     btn_error_lookup->setText(QCoreApplication::translate("Form", "Error lookup", nullptr));
+#if QT_CONFIG(tooltip)
+    check_transport_uart_raw->setToolTip(QCoreApplication::translate("Form", "If checked, will use the raw UART transport, otherwise uses SMP over console", nullptr));
+#endif // QT_CONFIG(tooltip)
+    check_transport_uart_raw->setText(QCoreApplication::translate("Form", "Raw transport", nullptr));
+#if QT_CONFIG(tooltip)
+    check_transport_uart_show_transfer->setToolTip(QCoreApplication::translate("Form", "<html><head/><body><p>Will show incoming and outgoing packets in terminal view. Note: will also hide non-MCUmgr traffic that appears during a transfer. It is not recommended to enable this when the raw UART transport is used due to being binary data.</p></body></html>", nullptr));
+#endif // QT_CONFIG(tooltip)
+    check_transport_uart_show_transfer->setText(QCoreApplication::translate("Form", "Show transfer", nullptr));
     btn_cancel->setText(QCoreApplication::translate("Form", "&Cancel", nullptr));
     label_6->setText(QCoreApplication::translate("Form", "Progress:", nullptr));
     check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
@@ -1930,19 +2013,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_IMG_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_IMG_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     selector_group->setTabText(selector_group->indexOf(tab_IMG), QCoreApplication::translate("Form", "Img", nullptr));
+    label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
+    label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
+    label_19->setText(QCoreApplication::translate("Form", "Type:", nullptr));
     label_28->setText(QCoreApplication::translate("Form", "Hash/Checksum:", nullptr));
+    btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_FS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     label_29->setText(QCoreApplication::translate("Form", "File size:", nullptr));
-    label_2->setText(QCoreApplication::translate("Form", "Local file:", nullptr));
     btn_FS_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
-    label_3->setText(QCoreApplication::translate("Form", "Device file:", nullptr));
+    label_45->setText(QCoreApplication::translate("Form", "Mode: ", nullptr));
     radio_FS_Upload->setText(QCoreApplication::translate("Form", "Upload", nullptr));
     radio_FS_Download->setText(QCoreApplication::translate("Form", "Download", nullptr));
     radio_FS_Size->setText(QCoreApplication::translate("Form", "Size", nullptr));
     radio_FS_HashChecksum->setText(QCoreApplication::translate("Form", "Hash/checksum", nullptr));
     radio_FS_Hash_Checksum_Types->setText(QCoreApplication::translate("Form", "Types", nullptr));
-    label_19->setText(QCoreApplication::translate("Form", "Type:", nullptr));
-    btn_FS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     selector_group->setTabText(selector_group->indexOf(tab_FS), QCoreApplication::translate("Form", "FS", nullptr));
     btn_OS_Go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     lbl_OS_Status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
@@ -1978,18 +2062,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_44->setText(QCoreApplication::translate("Form", "Boot mode:", nullptr));
     check_OS_Force_Reboot->setText(QCoreApplication::translate("Form", "Force reboot", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Reset), QCoreApplication::translate("Form", "Reset", nullptr));
-    radio_os_datetime_get->setText(QCoreApplication::translate("Form", "Get", nullptr));
-    radio_os_datetime_set->setText(QCoreApplication::translate("Form", "Set", nullptr));
+    check_os_datetime_use_pc_date_time->setText(QCoreApplication::translate("Form", "Use PC date and time", nullptr));
+    label_30->setText(QCoreApplication::translate("Form", "Timezone:", nullptr));
+    radio_os_datetime_get->setText(QCoreApplication::translate("Form", "Get date/time", nullptr));
+    radio_os_datetime_set->setText(QCoreApplication::translate("Form", "Set date/time", nullptr));
+    edit_os_datetime_date_time->setDisplayFormat(QCoreApplication::translate("Form", "yyyy-MM-dd HH:mm:ss t", nullptr));
+    label_48->setText(QCoreApplication::translate("Form", "Action:", nullptr));
     label_13->setText(QCoreApplication::translate("Form", "Date/time:", nullptr));
     label_31->setText(QCoreApplication::translate("Form", "Sync:", nullptr));
-    edit_os_datetime_date_time->setDisplayFormat(QCoreApplication::translate("Form", "yyyy-MM-dd HH:mm:ss t", nullptr));
-    label_30->setText(QCoreApplication::translate("Form", "Timezone:", nullptr));
-    check_os_datetime_use_pc_date_time->setText(QCoreApplication::translate("Form", "Use PC date and time", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_os_datetime), QCoreApplication::translate("Form", "Date/time", nullptr));
     label_17->setText(QCoreApplication::translate("Form", "uname:", nullptr));
+    label_18->setText(QCoreApplication::translate("Form", "Output:", nullptr));
+    label_47->setText(QCoreApplication::translate("Form", "Action:", nullptr));
     radio_OS_Buffer_Info->setText(QCoreApplication::translate("Form", "Buffer info", nullptr));
     radio_OS_uname->setText(QCoreApplication::translate("Form", "uname", nullptr));
-    label_18->setText(QCoreApplication::translate("Form", "Output:", nullptr));
     selector_OS->setTabText(selector_OS->indexOf(tab_OS_Info), QCoreApplication::translate("Form", "Info", nullptr));
     label_20->setText(QCoreApplication::translate("Form", "Query (blank for bootloader):", nullptr));
     edit_os_bootloader_query->setPlaceholderText(QCoreApplication::translate("Form", "Bootloader", nullptr));
@@ -2013,19 +2099,19 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     check_shell_vt100_decoding->setText(QCoreApplication::translate("Form", "VT100 decoding", nullptr));
     check_shel_unescape_strings->setText(QCoreApplication::translate("Form", "Un-escape strings", nullptr));
     selector_group->setTabText(selector_group->indexOf(tab_Shell), QCoreApplication::translate("Form", "Shell", nullptr));
-    label_22->setText(QCoreApplication::translate("Form", "Action:", nullptr));
-    lbl_settings_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
-    label_26->setText(QCoreApplication::translate("Form", "Decoded:", nullptr));
     radio_settings_none->setText(QCoreApplication::translate("Form", "None", nullptr));
     radio_settings_text->setText(QCoreApplication::translate("Form", "Text", nullptr));
     radio_settings_decimal->setText(QCoreApplication::translate("Form", "Decimal", nullptr));
-    label_23->setText(QCoreApplication::translate("Form", "Key:", nullptr));
-    label_24->setText(QCoreApplication::translate("Form", "Hex value:", nullptr));
-    btn_settings_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
-    label_25->setText(QCoreApplication::translate("Form", "Decode:", nullptr));
     check_settings_big_endian->setText(QCoreApplication::translate("Form", "Big endian", nullptr));
     check_settings_signed_decimal_value->setText(QCoreApplication::translate("Form", "Signed decimal value", nullptr));
+    btn_settings_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    label_22->setText(QCoreApplication::translate("Form", "Action:", nullptr));
+    label_23->setText(QCoreApplication::translate("Form", "Key:", nullptr));
+    label_26->setText(QCoreApplication::translate("Form", "Decoded:", nullptr));
+    label_24->setText(QCoreApplication::translate("Form", "Hex value:", nullptr));
     label_27->setText(QCoreApplication::translate("Form", "Decimals:", nullptr));
+    label_25->setText(QCoreApplication::translate("Form", "Decode:", nullptr));
+    lbl_settings_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     radio_settings_read->setText(QCoreApplication::translate("Form", "Read", nullptr));
     radio_settings_write->setText(QCoreApplication::translate("Form", "Write", nullptr));
     radio_settings_delete->setText(QCoreApplication::translate("Form", "Delete", nullptr));
@@ -2038,6 +2124,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     tabWidget_4->setTabText(tabWidget_4->indexOf(tab_zephyr_storage_erase), QCoreApplication::translate("Form", "Storage Erase", nullptr));
     lbl_zephyr_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     selector_group->setTabText(selector_group->indexOf(tab_zephyr), QCoreApplication::translate("Form", "Zephyr", nullptr));
+    label_46->setText(QCoreApplication::translate("Form", "Action: ", nullptr));
     radio_Enum_Count->setText(QCoreApplication::translate("Form", "Count", nullptr));
     radio_Enum_List->setText(QCoreApplication::translate("Form", "List", nullptr));
     radio_Enum_Single->setText(QCoreApplication::translate("Form", "Single", nullptr));
@@ -3969,6 +4056,9 @@ void plugin_mcumgr::on_radio_transport_uart_toggled(bool checked)
         close_transport_windows();
         show_transport_open_status();
     }
+
+    check_transport_uart_raw->setEnabled(checked);
+    check_transport_uart_show_transfer->setEnabled(checked);
 }
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
@@ -4045,11 +4135,12 @@ bool plugin_mcumgr::claim_transport(QLabel *status)
 
     if (active_transport() == uart_transport)
     {
-        emit plugin_set_status(true, false, &successful);
+        emit plugin_set_status(true, !check_transport_uart_show_transfer->isChecked(), &successful);
 
         if (successful == true)
         {
             uart_transport_locked = true;
+            uart_transport->set_raw_mode(check_transport_uart_raw->isChecked());
         }
         else
         {

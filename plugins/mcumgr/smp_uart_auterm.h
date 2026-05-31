@@ -37,6 +37,7 @@ public:
     ~smp_uart_auterm();
     smp_transport_error_t send(smp_message *message) override;
     uint16_t max_message_data_size(uint16_t mtu) override;
+    void set_raw_mode(bool raw);
 
 private:
     void data_received(QByteArray *message);
@@ -49,12 +50,14 @@ public slots:
 
 private:
     QByteArray SerialData;
+    smp_message received_data;
     QByteArray SMPBuffer;
     QByteArray SMPBufferActualData;
     bool SMPWaitingForContinuation = false;
     const QByteArray smp_first_header = QByteArrayLiteral("\x06\x09");
     const QByteArray smp_continuation_header = QByteArrayLiteral("\x04\x14");
     uint16_t waiting_packet_length = 0;
+    bool raw_mode = false;
 };
 
 #endif // SMP_UART_AUTERM_H

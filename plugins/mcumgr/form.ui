@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>594</width>
     <height>398</height>
    </rect>
   </property>
@@ -204,6 +204,29 @@
          <property name="topMargin">
           <number>0</number>
          </property>
+         <item>
+          <widget class="QCheckBox" name="check_transport_uart_raw">
+           <property name="toolTip">
+            <string>If checked, will use the raw UART transport, otherwise uses SMP over console</string>
+           </property>
+           <property name="text">
+            <string>Raw transport</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="check_transport_uart_show_transfer">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will show incoming and outgoing packets in terminal view. Note: will also hide non-MCUmgr traffic that appears during a transfer. It is not recommended to enable this when the raw UART transport is used due to being binary data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Show transfer</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item>
           <spacer name="horizontalSpacer_27">
            <property name="orientation">
@@ -3363,11 +3386,11 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_5"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_5"/>
  </buttongroups>
 </ui>

@@ -47,6 +47,19 @@ void smp_uart_auterm::data_received(QByteArray *message)
 
 void smp_uart_auterm::serial_read(QByteArray *rec_data)
 {
+    if (this->raw_mode == true)
+    {
+        received_data.append(*rec_data);
+
+        if (received_data.is_valid())
+        {
+            emit receive_waiting(&received_data);
+            received_data.clear();
+        }
+
+        return;
+    }
+
     SerialData.append(*rec_data);
 
     //Search for SMP packets
@@ -195,6 +208,13 @@ smp_transport_error_t smp_uart_auterm::send(smp_message *message)
 {
     //127 bytes = 3 + base 64 message
     //base64 = 4 bytes output per 3 byte input
+
+    if (this->raw_mode == true)
+    {
+        emit serial_write(message->data());
+        return SMP_TRANSPORT_ERROR_OK;
+    }
+
     QByteArray output;
     uint16_t size = message->size();
     size += 2;
@@ -246,6 +266,8 @@ end:
 
 uint16_t smp_uart_auterm::max_message_data_size(uint16_t mtu)
 {
+    return mtu - 8;
+
     float available_mtu = mtu;
     int packets = ceil(available_mtu / 124.0);
 
@@ -269,4 +291,9 @@ uint16_t smp_uart_auterm::max_message_data_size(uint16_t mtu)
     }
 
     return (uint16_t)available_mtu;
+}
+
+void smp_uart_auterm::set_raw_mode(bool raw)
+{
+    raw_mode = raw;
 }
