@@ -750,7 +750,7 @@ bool smp_group_os_mgmt::parse_date_time_response(QCborStreamReader &reader, QDat
                     else if (key == "datetime")
                     {
                         //TODO: check validity
-                        *date_time = QDateTime::fromString(data, Qt::ISODate);
+                        *date_time = QDateTime::fromString(data, Qt::ISODateWithMs);
                     }
                 }
 
