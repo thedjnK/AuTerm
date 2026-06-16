@@ -2276,7 +2276,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(check_settings_signed_decimal_value, SIGNAL(toggled(bool)), this, SLOT(on_check_settings_signed_decimal_value_toggled(bool)));
     connect(edit_SHELL_Output, SIGNAL(enter_pressed()), this, SLOT(enter_pressed()));
     connect(btn_zephyr_go, SIGNAL(clicked()), this, SLOT(on_btn_zephyr_go_clicked()));
-    connect(btn_zephyr_go, SIGNAL(clicked()), this, SLOT(on_btn_zephyr_go_clicked()));
     connect(check_os_datetime_use_pc_date_time, SIGNAL(toggled(bool)), this, SLOT(on_check_os_datetime_use_pc_date_time_toggled(bool)));
     connect(radio_os_datetime_get, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_datetime_get_toggled(bool)));
     connect(radio_os_datetime_set, SIGNAL(toggled(bool)), this, SLOT(on_radio_os_datetime_set_toggled(bool)));
