@@ -209,6 +209,9 @@ smp_transport_error_t smp_uart_auterm::send(smp_message *message)
     //127 bytes = 3 + base 64 message
     //base64 = 4 bytes output per 3 byte input
 
+    //Clear buffers in case there was a partial receive previously
+    cancel();
+
     if (this->raw_mode == true)
     {
         emit serial_write(message->data());
@@ -296,4 +299,14 @@ uint16_t smp_uart_auterm::max_message_data_size(uint16_t mtu)
 void smp_uart_auterm::set_raw_mode(bool raw)
 {
     raw_mode = raw;
+}
+
+void smp_uart_auterm::cancel()
+{
+    this->SerialData.clear();
+    this->received_data.clear();
+    this->SMPBuffer.clear();
+    this->SMPBufferActualData.clear();
+    this->SMPWaitingForContinuation = false;
+    this->waiting_packet_length = 0;
 }

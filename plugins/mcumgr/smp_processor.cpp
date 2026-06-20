@@ -569,6 +569,8 @@ void smp_processor::cancel()
     group = ((group & 0xff) << 8) | ((group & 0xff00) >> 8);
 #endif
 
+    transport->cancel();
+
     if (!custom_message)
     {
         //Search for the handler for this group

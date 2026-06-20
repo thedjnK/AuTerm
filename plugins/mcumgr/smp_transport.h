@@ -108,6 +108,11 @@ public:
         return "";
     }
 
+    virtual void cancel()
+    {
+        //Used when an operation is cancelled, e.g. clear buffers
+    }
+
 signals:
     void connected();
     void disconnected();

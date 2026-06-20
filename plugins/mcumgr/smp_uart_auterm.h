@@ -38,6 +38,7 @@ public:
     smp_transport_error_t send(smp_message *message) override;
     uint16_t max_message_data_size(uint16_t mtu) override;
     void set_raw_mode(bool raw);
+    void cancel() override;
 
 private:
     void data_received(QByteArray *message);
