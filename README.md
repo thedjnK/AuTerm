@@ -32,10 +32,10 @@ If looking for a command-line interface MCUmgr tool then see [qtmgmt](https://gi
   - Zephyr basic management group support
   - Enumeration management group support
   - Custom command support using JSON or CBOR
-  - UART transport support
+  - UART transport (SMP over console and raw UART) support
   - Bluetooth transport support (supporting write with and without response modes)
-  - UDP transport support
-  - LoRaWAN (TTS via MQTT) transport support
+  - UDP transport (UDP and DTLS) support
+  - LoRaWAN transport (TTS via MQTT) support
 * Logger plugin
 * NUS (Nordic UART Service) transport plugin
 
