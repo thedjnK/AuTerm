@@ -5007,7 +5007,7 @@ void plugin_mcumgr::update_img_state_table()
 {
     QStandardItem *table_entry;
 
-    if (images_list.length() > 1)
+    if (images_list.length() > 1 || (images_list.length() == 1 && images_list[0].image > 0))
     {
         //Multiple images
         uint8_t i = 0;
