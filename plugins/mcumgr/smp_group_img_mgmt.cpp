@@ -1009,7 +1009,7 @@ void smp_group_img_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group,
     if (mode == MODE_IDLE)
     {
         log_error() << "Unexpected response, not busy";
-        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, img mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_IMG)
     {

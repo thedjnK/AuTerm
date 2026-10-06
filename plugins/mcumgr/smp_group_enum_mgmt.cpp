@@ -450,12 +450,12 @@ void smp_group_enum_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t group
     if (mode == MODE_IDLE)
     {
         log_error() << "Unexpected response, not busy";
-        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, shell mgmt not busy");
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, enum mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_ENUM)
     {
         log_error() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_ENUM;
-        emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not img mgmt");
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not enum mgmt");
     }
     else
     {

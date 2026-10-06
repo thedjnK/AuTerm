@@ -69,12 +69,12 @@ void smp_group_zephyr_mgmt::receive_ok(uint8_t version, uint8_t op, uint16_t gro
     if (mode == MODE_IDLE)
     {
         log_error() << "Unexpected response, not busy";
-        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, settings mgmt not busy");
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected response, zephyr mgmt not busy");
     }
     else if (group != SMP_GROUP_ID_ZEPHYR)
     {
         log_error() << "Unexpected group " << group << ", not " << SMP_GROUP_ID_ZEPHYR;
-        emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not settings mgmt");
+        emit status(smp_user_data, STATUS_ERROR, "Unexpected group, not zephyr mgmt");
     }
     else
     {
