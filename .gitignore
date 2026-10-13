@@ -2,3 +2,8 @@ build
 release
 debug
 *.user
+*.o
+moc_*
+Makefile
+*.so
+ui_*
