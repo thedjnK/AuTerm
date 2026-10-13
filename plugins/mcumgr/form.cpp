@@ -270,11 +270,6 @@ void Form::on_btn_custom_copy_both_clicked()
 
 }
 
-void Form::on_btn_custom_clear_clicked()
-{
-
-}
-
 void Form::on_edit_custom_indent_valueChanged(int arg1)
 {
 
@@ -296,6 +291,21 @@ void Form::on_btn_error_lookup_clicked()
 }
 
 void Form::on_btn_cancel_clicked()
+{
+
+}
+
+void Form::on_btn_custom_clear_send_clicked()
+{
+
+}
+
+void Form::on_btn_custom_clear_receive_clicked()
+{
+
+}
+
+void Form::on_btn_custom_clear_both_clicked()
 {
 
 }

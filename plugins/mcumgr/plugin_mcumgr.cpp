@@ -1714,10 +1714,20 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_25->addWidget(btn_custom_copy_both);
 
-    btn_custom_clear = new QPushButton(tab_custom);
-    btn_custom_clear->setObjectName("btn_custom_clear");
+    btn_custom_clear_send = new QPushButton(tab_custom);
+    btn_custom_clear_send->setObjectName("btn_custom_clear_send");
 
-    horizontalLayout_25->addWidget(btn_custom_clear);
+    horizontalLayout_25->addWidget(btn_custom_clear_send);
+
+    btn_custom_clear_receive = new QPushButton(tab_custom);
+    btn_custom_clear_receive->setObjectName("btn_custom_clear_receive");
+
+    horizontalLayout_25->addWidget(btn_custom_clear_receive);
+
+    btn_custom_clear_both = new QPushButton(tab_custom);
+    btn_custom_clear_both->setObjectName("btn_custom_clear_both");
+
+    horizontalLayout_25->addWidget(btn_custom_clear_both);
 
     horizontalSpacer_25 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
@@ -1957,8 +1967,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(edit_custom_indent, btn_custom_copy_send);
     QWidget::setTabOrder(btn_custom_copy_send, btn_custom_copy_receive);
     QWidget::setTabOrder(btn_custom_copy_receive, btn_custom_copy_both);
-    QWidget::setTabOrder(btn_custom_copy_both, btn_custom_clear);
-    QWidget::setTabOrder(btn_custom_clear, btn_custom_go);
+    QWidget::setTabOrder(btn_custom_copy_both, btn_custom_clear_both);
+    QWidget::setTabOrder(btn_custom_clear_both, btn_custom_go);
 
 //    retranslateUi(Form);
 
@@ -2161,7 +2171,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     btn_custom_copy_send->setText(QCoreApplication::translate("Form", "Copy send", nullptr));
     btn_custom_copy_receive->setText(QCoreApplication::translate("Form", "Copy receive", nullptr));
     btn_custom_copy_both->setText(QCoreApplication::translate("Form", "Copy both", nullptr));
-    btn_custom_clear->setText(QCoreApplication::translate("Form", "Clear", nullptr));
+    btn_custom_clear_send->setText(QCoreApplication::translate("Form", "Clear send", nullptr));
+    btn_custom_clear_receive->setText(QCoreApplication::translate("Form", "Clear receive", nullptr));
+    btn_custom_clear_both->setText(QCoreApplication::translate("Form", "Clear both", nullptr));
     lbl_custom_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_custom_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     selector_group->setTabText(selector_group->indexOf(tab_custom), QCoreApplication::translate("Form", "Custom", nullptr));
@@ -2289,7 +2301,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_custom_copy_send, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_send_clicked()));
     connect(btn_custom_copy_receive, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_receive_clicked()));
     connect(btn_custom_copy_both, SIGNAL(clicked()), this, SLOT(on_btn_custom_copy_both_clicked()));
-    connect(btn_custom_clear, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_clicked()));
+    connect(btn_custom_clear_send, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_send_clicked()));
+    connect(btn_custom_clear_receive, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_receive_clicked()));
+    connect(btn_custom_clear_both, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_both_clicked()));
     connect(edit_custom_indent, SIGNAL(valueChanged(int)), this, SLOT(on_edit_custom_indent_valueChanged(int)));
     connect(btn_custom_go, SIGNAL(clicked()), this, SLOT(on_btn_custom_go_clicked()));
     connect(tree_IMG_Slot_Info, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
@@ -2467,7 +2481,9 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_btn_custom_copy_send_clicked()));
     disconnect(this, SLOT(on_btn_custom_copy_receive_clicked()));
     disconnect(this, SLOT(on_btn_custom_copy_both_clicked()));
-    disconnect(this, SLOT(on_btn_custom_clear_clicked()));
+    disconnect(this, SLOT(on_btn_custom_clear_send_clicked()));
+    disconnect(this, SLOT(on_btn_custom_clear_receive_clicked()));
+    disconnect(this, SLOT(on_btn_custom_clear_both_clicked()));
     disconnect(this, SLOT(on_edit_custom_indent_valueChanged(int)));
     disconnect(this, SLOT(on_btn_custom_go_clicked()));
     disconnect(this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
@@ -4830,7 +4846,17 @@ void plugin_mcumgr::on_btn_custom_copy_both_clicked()
     QApplication::clipboard()->setText(QString(edit_custom_send->toPlainText()).append("\n").append(edit_custom_receive->toPlainText()));
 }
 
-void plugin_mcumgr::on_btn_custom_clear_clicked()
+void plugin_mcumgr::on_btn_custom_clear_send_clicked()
+{
+    edit_custom_send->clear();
+}
+
+void plugin_mcumgr::on_btn_custom_clear_receive_clicked()
+{
+    edit_custom_receive->clear();
+}
+
+void plugin_mcumgr::on_btn_custom_clear_both_clicked()
 {
     edit_custom_send->clear();
     edit_custom_receive->clear();

@@ -244,7 +244,9 @@ private slots:
     void on_btn_custom_copy_send_clicked();
     void on_btn_custom_copy_receive_clicked();
     void on_btn_custom_copy_both_clicked();
-    void on_btn_custom_clear_clicked();
+    void on_btn_custom_clear_send_clicked();
+    void on_btn_custom_clear_receive_clicked();
+    void on_btn_custom_clear_both_clicked();
     void on_edit_custom_indent_valueChanged(int value);
     void on_btn_custom_go_clicked();
     void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
@@ -558,7 +560,9 @@ private:
     QPushButton *btn_custom_copy_send;
     QPushButton *btn_custom_copy_receive;
     QPushButton *btn_custom_copy_both;
-    QPushButton *btn_custom_clear;
+    QPushButton *btn_custom_clear_send;
+    QPushButton *btn_custom_clear_receive;
+    QPushButton *btn_custom_clear_both;
     QSpacerItem *horizontalSpacer_25;
     QLabel *lbl_custom_status;
     QHBoxLayout *horizontalLayout_24;

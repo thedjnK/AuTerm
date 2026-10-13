@@ -3038,9 +3038,23 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="btn_custom_clear">
+                <widget class="QPushButton" name="btn_custom_clear_send">
                  <property name="text">
-                  <string>Clear</string>
+                  <string>Clear send</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_custom_clear_receive">
+                 <property name="text">
+                  <string>Clear receive</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btn_custom_clear_both">
+                 <property name="text">
+                  <string>Clear both</string>
                  </property>
                 </widget>
                </item>
@@ -3384,7 +3398,7 @@
   <tabstop>btn_custom_copy_send</tabstop>
   <tabstop>btn_custom_copy_receive</tabstop>
   <tabstop>btn_custom_copy_both</tabstop>
-  <tabstop>btn_custom_clear</tabstop>
+  <tabstop>btn_custom_clear_both</tabstop>
   <tabstop>btn_custom_go</tabstop>
  </tabstops>
  <resources/>
