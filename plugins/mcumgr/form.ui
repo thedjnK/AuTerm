@@ -450,7 +450,11 @@
                 <number>2</number>
                </property>
                <item row="0" column="0">
-                <widget class="QColumnView" name="colview_IMG_Images"/>
+                <widget class="QColumnView" name="colview_IMG_Images">
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_6">

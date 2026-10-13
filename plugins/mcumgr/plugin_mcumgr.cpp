@@ -323,6 +323,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_5->setContentsMargins(6, 6, 6, 6);
     colview_IMG_Images = new QColumnView(tab_IMG_Images);
     colview_IMG_Images->setObjectName("colview_IMG_Images");
+    colview_IMG_Images->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
 
     gridLayout_5->addWidget(colview_IMG_Images, 0, 0, 1, 1);
 
@@ -2308,7 +2309,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_SHELL_Output->set_vt100_mode(VT100_MODE_DECODE);
 
     colview_IMG_Images->setModel(&model_image_state);
-    colview_IMG_Images->setColumnWidths(QList<int>() << 50 << 50 << 460);
+    colview_IMG_Images->setColumnWidths(QList<int>() << 40 << 40 << 480);
 
     check_IMG_Preview_Confirmed->setChecked(true);
     check_IMG_Preview_Confirmed->installEventFilter(this);
