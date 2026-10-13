@@ -1441,6 +1441,18 @@
                <string>Info</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_13">
+               <property name="leftMargin">
+                <number>6</number>
+               </property>
+               <property name="topMargin">
+                <number>6</number>
+               </property>
+               <property name="rightMargin">
+                <number>6</number>
+               </property>
+               <property name="bottomMargin">
+                <number>6</number>
+               </property>
                <property name="spacing">
                 <number>2</number>
                </property>
@@ -2846,6 +2858,9 @@
              </item>
              <item row="1" column="1">
               <layout class="QHBoxLayout" name="horizontalLayout_28">
+               <property name="spacing">
+                <number>2</number>
+               </property>
                <item>
                 <widget class="QRadioButton" name="radio_custom_read">
                  <property name="text">

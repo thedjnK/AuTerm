@@ -842,6 +842,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     gridLayout_13 = new QGridLayout(tab_OS_Info);
     gridLayout_13->setSpacing(2);
     gridLayout_13->setObjectName("gridLayout_13");
+    gridLayout_13->setContentsMargins(6, 6, 6, 6);
     edit_OS_UName = new QLineEdit(tab_OS_Info);
     edit_OS_UName->setObjectName("edit_OS_UName");
     edit_OS_UName->setEnabled(false);
@@ -1589,6 +1590,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     formLayout_3->setWidget(1, QFormLayout::ItemRole::LabelRole, label_40);
 
     horizontalLayout_28 = new QHBoxLayout();
+    horizontalLayout_28->setSpacing(2);
     horizontalLayout_28->setObjectName("horizontalLayout_28");
     radio_custom_read = new QRadioButton(tab_custom);
     buttonGroup_6 = new QButtonGroup(tab_custom);
