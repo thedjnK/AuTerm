@@ -307,11 +307,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_4 = new QHBoxLayout();
     horizontalLayout_4->setSpacing(2);
     horizontalLayout_4->setObjectName("horizontalLayout_4");
-    edit_IMG_Image = new QSpinBox(tab_IMG_Upload);
-    edit_IMG_Image->setObjectName("edit_IMG_Image");
-    edit_IMG_Image->setMaximumSize(QSize(60, 16777215));
+    spin_img_image = new QSpinBox(tab_IMG_Upload);
+    spin_img_image->setObjectName("spin_img_image");
+    spin_img_image->setMaximumSize(QSize(60, 16777215));
 
-    horizontalLayout_4->addWidget(edit_IMG_Image);
+    horizontalLayout_4->addWidget(spin_img_image);
 
     radio_IMG_No_Action = new QRadioButton(tab_IMG_Upload);
     radio_IMG_No_Action->setObjectName("radio_IMG_No_Action");
@@ -409,12 +409,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_10->addItem(horizontalSpacer_9, 0, 2, 1, 1);
 
-    edit_IMG_Erase_Slot = new QSpinBox(tab_IMG_Erase);
-    edit_IMG_Erase_Slot->setObjectName("edit_IMG_Erase_Slot");
-    edit_IMG_Erase_Slot->setMinimumSize(QSize(40, 0));
-    edit_IMG_Erase_Slot->setMaximumSize(QSize(16777215, 16777215));
+    spin_img_erase_slot = new QSpinBox(tab_IMG_Erase);
+    spin_img_erase_slot->setObjectName("spin_img_erase_slot");
+    spin_img_erase_slot->setMinimumSize(QSize(40, 0));
+    spin_img_erase_slot->setMaximumSize(QSize(16777215, 16777215));
 
-    gridLayout_10->addWidget(edit_IMG_Erase_Slot, 0, 1, 1, 1);
+    gridLayout_10->addWidget(spin_img_erase_slot, 0, 1, 1, 1);
 
     verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
@@ -751,11 +751,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     gridLayout_12->addWidget(label_44, 1, 0, 1, 1);
 
-    edit_os_boot_mode = new QSpinBox(tab_OS_Reset);
-    edit_os_boot_mode->setObjectName("edit_os_boot_mode");
-    edit_os_boot_mode->setMaximum(255);
+    spin_os_boot_mode = new QSpinBox(tab_OS_Reset);
+    spin_os_boot_mode->setObjectName("spin_os_boot_mode");
+    spin_os_boot_mode->setMaximum(255);
 
-    gridLayout_12->addWidget(edit_os_boot_mode, 1, 1, 1, 1);
+    gridLayout_12->addWidget(spin_os_boot_mode, 1, 1, 1, 1);
 
     verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
@@ -1449,11 +1449,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_23->addWidget(label_33);
 
-    edit_Enum_Index = new QSpinBox(tab_Enum);
-    edit_Enum_Index->setObjectName("edit_Enum_Index");
-    edit_Enum_Index->setMinimumSize(QSize(60, 0));
+    spin_enum_index = new QSpinBox(tab_Enum);
+    spin_enum_index->setObjectName("spin_enum_index");
+    spin_enum_index->setMinimumSize(QSize(60, 0));
 
-    horizontalLayout_23->addWidget(edit_Enum_Index);
+    horizontalLayout_23->addWidget(spin_enum_index);
 
     line_3 = new QFrame(tab_Enum);
     line_3->setObjectName("line_3");
@@ -1667,16 +1667,16 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_39->addWidget(label_66);
 
-    edit_transport_udp_port = new QSpinBox(tab1);
-    edit_transport_udp_port->setObjectName("edit_transport_udp_port");
-    edit_transport_udp_port->setEnabled(false);
-    edit_transport_udp_port->setMinimumSize(QSize(60, 0));
-    edit_transport_udp_port->setMaximumSize(QSize(70, 16777215));
-    edit_transport_udp_port->setMinimum(1);
-    edit_transport_udp_port->setMaximum(65535);
-    edit_transport_udp_port->setValue(1337);
+    spin_transport_udp_port = new QSpinBox(tab1);
+    spin_transport_udp_port->setObjectName("spin_transport_udp_port");
+    spin_transport_udp_port->setEnabled(false);
+    spin_transport_udp_port->setMinimumSize(QSize(60, 0));
+    spin_transport_udp_port->setMaximumSize(QSize(70, 16777215));
+    spin_transport_udp_port->setMinimum(1);
+    spin_transport_udp_port->setMaximum(65535);
+    spin_transport_udp_port->setValue(1337);
 
-    horizontalLayout_39->addWidget(edit_transport_udp_port);
+    horizontalLayout_39->addWidget(spin_transport_udp_port);
 
 
     formLayout_8->setLayout(4, QFormLayout::FieldRole, horizontalLayout_39);
@@ -2016,13 +2016,13 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_28->addWidget(label_41);
 
-    edit_custom_group = new QSpinBox(tab_custom);
-    edit_custom_group->setObjectName("edit_custom_group");
-    edit_custom_group->setMinimumSize(QSize(60, 0));
-    edit_custom_group->setMaximumSize(QSize(16777215, 16777215));
-    edit_custom_group->setMaximum(65535);
+    spin_custom_group = new QSpinBox(tab_custom);
+    spin_custom_group->setObjectName("spin_custom_group");
+    spin_custom_group->setMinimumSize(QSize(60, 0));
+    spin_custom_group->setMaximumSize(QSize(16777215, 16777215));
+    spin_custom_group->setMaximum(65535);
 
-    horizontalLayout_28->addWidget(edit_custom_group);
+    horizontalLayout_28->addWidget(spin_custom_group);
 
     line_6 = new QFrame(tab_custom);
     line_6->setObjectName("line_6");
@@ -2036,12 +2036,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     horizontalLayout_28->addWidget(label_42);
 
-    edit_custom_command = new QSpinBox(tab_custom);
-    edit_custom_command->setObjectName("edit_custom_command");
-    edit_custom_command->setMinimumSize(QSize(50, 0));
-    edit_custom_command->setMaximum(255);
+    spin_custom_command = new QSpinBox(tab_custom);
+    spin_custom_command->setObjectName("spin_custom_command");
+    spin_custom_command->setMinimumSize(QSize(50, 0));
+    spin_custom_command->setMaximum(255);
 
-    horizontalLayout_28->addWidget(edit_custom_command);
+    horizontalLayout_28->addWidget(spin_custom_command);
 
     horizontalSpacer_28 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
@@ -2082,14 +2082,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_25 = new QHBoxLayout();
     horizontalLayout_25->setSpacing(2);
     horizontalLayout_25->setObjectName("horizontalLayout_25");
-    edit_custom_indent = new QSpinBox(tab_custom);
-    edit_custom_indent->setObjectName("edit_custom_indent");
-    edit_custom_indent->setMinimumSize(QSize(40, 0));
-    edit_custom_indent->setMinimum(1);
-    edit_custom_indent->setMaximum(16);
-    edit_custom_indent->setValue(4);
+    spin_custom_indent = new QSpinBox(tab_custom);
+    spin_custom_indent->setObjectName("spin_custom_indent");
+    spin_custom_indent->setMinimumSize(QSize(40, 0));
+    spin_custom_indent->setMinimum(1);
+    spin_custom_indent->setMaximum(16);
+    spin_custom_indent->setValue(4);
 
-    horizontalLayout_25->addWidget(edit_custom_indent);
+    horizontalLayout_25->addWidget(spin_custom_indent);
 
     line_4 = new QFrame(tab_custom);
     line_4->setObjectName("line_4");
@@ -2263,8 +2263,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(selector_group, selector_img);
     QWidget::setTabOrder(selector_img, edit_IMG_Local);
     QWidget::setTabOrder(edit_IMG_Local, btn_IMG_Local);
-    QWidget::setTabOrder(btn_IMG_Local, edit_IMG_Image);
-    QWidget::setTabOrder(edit_IMG_Image, radio_IMG_No_Action);
+    QWidget::setTabOrder(btn_IMG_Local, spin_img_image);
+    QWidget::setTabOrder(spin_img_image, radio_IMG_No_Action);
     QWidget::setTabOrder(radio_IMG_No_Action, radio_IMG_Test);
     QWidget::setTabOrder(radio_IMG_Test, radio_IMG_Confirm);
     QWidget::setTabOrder(radio_IMG_Confirm, check_IMG_Reset);
@@ -2281,8 +2281,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(radio_IMG_Get, radio_IMG_Set);
     QWidget::setTabOrder(radio_IMG_Set, radio_img_images_erase);
     QWidget::setTabOrder(radio_img_images_erase, check_IMG_Confirm);
-    QWidget::setTabOrder(check_IMG_Confirm, edit_IMG_Erase_Slot);
-    QWidget::setTabOrder(edit_IMG_Erase_Slot, tree_IMG_Slot_Info);
+    QWidget::setTabOrder(check_IMG_Confirm, spin_img_erase_slot);
+    QWidget::setTabOrder(spin_img_erase_slot, tree_IMG_Slot_Info);
     QWidget::setTabOrder(tree_IMG_Slot_Info, btn_IMG_Go);
     QWidget::setTabOrder(btn_IMG_Go, edit_FS_Local);
     QWidget::setTabOrder(edit_FS_Local, btn_FS_Local);
@@ -2346,8 +2346,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(radio_Enum_List, radio_Enum_Single);
     QWidget::setTabOrder(radio_Enum_Single, radio_Enum_Details);
     QWidget::setTabOrder(radio_Enum_Details, edit_Enum_Count);
-    QWidget::setTabOrder(edit_Enum_Count, edit_Enum_Index);
-    QWidget::setTabOrder(edit_Enum_Index, edit_Enum_Group_ID);
+    QWidget::setTabOrder(edit_Enum_Count, spin_enum_index);
+    QWidget::setTabOrder(spin_enum_index, edit_Enum_Group_ID);
     QWidget::setTabOrder(edit_Enum_Group_ID, check_Enum_Group_Additional);
     QWidget::setTabOrder(check_Enum_Group_Additional, table_Enum_List_Details);
     QWidget::setTabOrder(table_Enum_List_Details, btn_enum_go);
@@ -2358,12 +2358,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     QWidget::setTabOrder(radio_custom_yaml, radio_custom_cbor);
     QWidget::setTabOrder(radio_custom_cbor, radio_custom_read);
     QWidget::setTabOrder(radio_custom_read, radio_custom_write);
-    QWidget::setTabOrder(radio_custom_write, edit_custom_group);
-    QWidget::setTabOrder(edit_custom_group, edit_custom_command);
-    QWidget::setTabOrder(edit_custom_command, edit_custom_send);
+    QWidget::setTabOrder(radio_custom_write, spin_custom_group);
+    QWidget::setTabOrder(spin_custom_group, spin_custom_command);
+    QWidget::setTabOrder(spin_custom_command, edit_custom_send);
     QWidget::setTabOrder(edit_custom_send, edit_custom_receive);
-    QWidget::setTabOrder(edit_custom_receive, edit_custom_indent);
-    QWidget::setTabOrder(edit_custom_indent, btn_custom_copy_send);
+    QWidget::setTabOrder(edit_custom_receive, spin_custom_indent);
+    QWidget::setTabOrder(spin_custom_indent, btn_custom_copy_send);
     QWidget::setTabOrder(btn_custom_copy_send, btn_custom_copy_receive);
     QWidget::setTabOrder(btn_custom_copy_receive, btn_custom_copy_both);
     QWidget::setTabOrder(btn_custom_copy_both, btn_custom_clear_both);
@@ -2754,7 +2754,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_custom_clear_send, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_send_clicked()));
     connect(btn_custom_clear_receive, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_receive_clicked()));
     connect(btn_custom_clear_both, SIGNAL(clicked()), this, SLOT(on_btn_custom_clear_both_clicked()));
-    connect(edit_custom_indent, SIGNAL(valueChanged(int)), this, SLOT(on_edit_custom_indent_valueChanged(int)));
+    connect(spin_custom_indent, SIGNAL(valueChanged(int)), this, SLOT(on_spin_custom_indent_valueChanged(int)));
     connect(btn_custom_go, SIGNAL(clicked()), this, SLOT(on_btn_custom_go_clicked()));
     connect(tree_IMG_Slot_Info, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
     connect(btn_error_lookup, SIGNAL(clicked()), this, SLOT(on_btn_error_lookup_clicked()));
@@ -2947,7 +2947,7 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_btn_custom_clear_send_clicked()));
     disconnect(this, SLOT(on_btn_custom_clear_receive_clicked()));
     disconnect(this, SLOT(on_btn_custom_clear_both_clicked()));
-    disconnect(this, SLOT(on_edit_custom_indent_valueChanged(int)));
+    disconnect(this, SLOT(on_spin_custom_indent_valueChanged(int)));
     disconnect(this, SLOT(on_btn_custom_go_clicked()));
     disconnect(this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
     disconnect(this, SLOT(on_btn_error_lookup_clicked()));
@@ -3422,7 +3422,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
             mode = ACTION_IMG_UPLOAD;
             processor->set_transport(active_transport());
             set_group_transport_settings(smp_groups.img_mgmt);
-            started = smp_groups.img_mgmt->start_firmware_update(edit_IMG_Image->value(), edit_IMG_Local->text(), false, &upload_hash, timeout_erase_ms);
+            started = smp_groups.img_mgmt->start_firmware_update(spin_img_image->value(), edit_IMG_Local->text(), false, &upload_hash, timeout_erase_ms);
 
             if (started == true)
             {
@@ -3493,7 +3493,7 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         mode = ACTION_IMG_IMAGE_ERASE;
         processor->set_transport(active_transport());
         set_group_transport_settings(smp_groups.img_mgmt, timeout_erase_ms);
-        started = smp_groups.img_mgmt->start_image_erase(edit_IMG_Erase_Slot->value());
+        started = smp_groups.img_mgmt->start_image_erase(spin_img_erase_slot->value());
 
         if (started == true)
         {
@@ -3591,7 +3591,7 @@ void plugin_mcumgr::on_btn_OS_Go_clicked()
         mode = ACTION_OS_RESET;
         processor->set_transport(active_transport());
         set_group_transport_settings(smp_groups.os_mgmt);
-        started = smp_groups.os_mgmt->start_reset(check_OS_Force_Reboot->isChecked(), edit_os_boot_mode->value());
+        started = smp_groups.os_mgmt->start_reset(check_OS_Force_Reboot->isChecked(), spin_os_boot_mode->value());
 
         if (started == true)
         {
@@ -5536,7 +5536,7 @@ void plugin_mcumgr::on_btn_enum_go_clicked()
         mode = ACTION_ENUM_SINGLE;
         processor->set_transport(active_transport());
         set_group_transport_settings(smp_groups.enum_mgmt);
-        started = smp_groups.enum_mgmt->start_enum_single(edit_Enum_Index->value(), &enum_single_id, &enum_single_end);
+        started = smp_groups.enum_mgmt->start_enum_single(spin_enum_index->value(), &enum_single_id, &enum_single_end);
 
         if (started == true)
         {
@@ -5575,8 +5575,8 @@ void plugin_mcumgr::on_radio_custom_custom_toggled(bool checked)
 
     radio_custom_read->setEnabled(true);
     radio_custom_write->setEnabled(true);
-    edit_custom_group->setReadOnly(false);
-    edit_custom_command->setReadOnly(false);
+    spin_custom_group->setReadOnly(false);
+    spin_custom_command->setReadOnly(false);
     edit_custom_send->setReadOnly(false);
     btn_custom_go->setEnabled(true);
 
@@ -5592,8 +5592,8 @@ void plugin_mcumgr::on_radio_custom_logging_toggled(bool checked)
 
     radio_custom_read->setEnabled(false);
     radio_custom_write->setEnabled(false);
-    edit_custom_group->setReadOnly(true);
-    edit_custom_command->setReadOnly(true);
+    spin_custom_group->setReadOnly(true);
+    spin_custom_command->setReadOnly(true);
     edit_custom_send->setReadOnly(true);
     btn_custom_go->setEnabled(false);
 
@@ -5668,7 +5668,7 @@ void plugin_mcumgr::on_btn_custom_clear_both_clicked()
     edit_custom_receive->clear();
 }
 
-void plugin_mcumgr::on_edit_custom_indent_valueChanged(int value)
+void plugin_mcumgr::on_spin_custom_indent_valueChanged(int value)
 {
     log_json->set_indent(value);
 }
@@ -5738,7 +5738,7 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
     {
         QCborMap cbor_map = QCborMap::fromJsonObject(json_document->object());
 
-        tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), edit_custom_group->value(), edit_custom_command->value());
+        tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), spin_custom_group->value(), spin_custom_command->value());
         cbor_map.toCborValue().toCbor(*tmp_message->writer());
         tmp_message->end_message_no_end_map();
 
@@ -5749,7 +5749,7 @@ void plugin_mcumgr::on_btn_custom_go_clicked()
     }
     else if (radio_custom_cbor->isChecked())
     {
-        tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), edit_custom_group->value(), edit_custom_command->value());
+        tmp_message->start_message_no_start_map((radio_custom_read->isChecked() ? SMP_OP_READ : SMP_OP_WRITE), (check_V2_Protocol->isChecked() ? 1 : 0), spin_custom_group->value(), spin_custom_command->value());
         tmp_message->end_custom_message(QByteArray::fromHex(edit_custom_send->toPlainText().toUtf8()));
     }
 
@@ -5797,7 +5797,7 @@ void plugin_mcumgr::on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *ite
 {
     if (!item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).isEmpty())
     {
-        edit_IMG_Image->setValue(item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).toUInt());
+        spin_img_image->setValue(item->text(TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID).toUInt());
         selector_img->setCurrentIndex(selector_img->indexOf(tab_IMG_Upload));
     }
 }
@@ -5959,12 +5959,12 @@ void plugin_mcumgr::on_combo_transport_standard_transport_currentIndexChanged(in
     if (radio_transport_connect->isChecked())
     {
         edit_transport_udp_address->setEnabled(visible);
-        edit_transport_udp_port->setEnabled(visible);
+        spin_transport_udp_port->setEnabled(visible);
     }
     else
     {
         edit_transport_udp_address->setEnabled(false);
-        edit_transport_udp_port->setEnabled(false);
+        spin_transport_udp_port->setEnabled(false);
     }
 }
 
@@ -6071,7 +6071,7 @@ void plugin_mcumgr::on_btn_transport_go_clicked()
         else if (combo_transport_standard_transport->currentIndex() == TRANSPORT_CONNECTION_TYPE_UDP_IPV4 || combo_transport_standard_transport->currentIndex() == TRANSPORT_CONNECTION_TYPE_UDP_IPV6)
         {
             transport_config.insert("address", edit_transport_udp_address->text());
-            transport_config.insert("port", edit_transport_udp_port->value());
+            transport_config.insert("port", spin_transport_udp_port->value());
         }
 
         started = smp_groups.transport_mgmt->start_connect(combo_transport_standard_transport->currentIndex(), &transport_config);

@@ -383,7 +383,7 @@
                   <number>2</number>
                  </property>
                  <item>
-                  <widget class="QSpinBox" name="edit_IMG_Image">
+                  <widget class="QSpinBox" name="spin_img_image">
                    <property name="maximumSize">
                     <size>
                      <width>60</width>
@@ -562,7 +562,7 @@
                 </spacer>
                </item>
                <item row="0" column="1">
-                <widget class="QSpinBox" name="edit_IMG_Erase_Slot">
+                <widget class="QSpinBox" name="spin_img_erase_slot">
                  <property name="minimumSize">
                   <size>
                    <width>40</width>
@@ -1195,7 +1195,7 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QSpinBox" name="edit_os_boot_mode">
+                <widget class="QSpinBox" name="spin_os_boot_mode">
                  <property name="maximum">
                   <number>255</number>
                  </property>
@@ -2578,7 +2578,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="edit_Enum_Index">
+              <widget class="QSpinBox" name="spin_enum_index">
                <property name="minimumSize">
                 <size>
                  <width>60</width>
@@ -2992,7 +2992,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="edit_transport_udp_port">
+                  <widget class="QSpinBox" name="spin_transport_udp_port">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
@@ -3077,7 +3077,10 @@
                     </sizepolicy>
                    </property>
                    <property name="inputMask">
-                    <string>HH-HH-HH-HH-HH-HH</string>
+                    <string>HH:HH:HH:HH:HH:HH</string>
+                   </property>
+                   <property name="text">
+                    <string>:::::</string>
                    </property>
                    <property name="maxLength">
                     <number>17</number>
@@ -3591,7 +3594,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="edit_custom_group">
+                <widget class="QSpinBox" name="spin_custom_group">
                  <property name="minimumSize">
                   <size>
                    <width>60</width>
@@ -3624,7 +3627,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="edit_custom_command">
+                <widget class="QSpinBox" name="spin_custom_command">
                  <property name="minimumSize">
                   <size>
                    <width>50</width>
@@ -3698,7 +3701,7 @@
                 <number>2</number>
                </property>
                <item>
-                <widget class="QSpinBox" name="edit_custom_indent">
+                <widget class="QSpinBox" name="spin_custom_indent">
                  <property name="minimumSize">
                   <size>
                    <width>40</width>
@@ -4002,7 +4005,7 @@
   <tabstop>selector_img</tabstop>
   <tabstop>edit_IMG_Local</tabstop>
   <tabstop>btn_IMG_Local</tabstop>
-  <tabstop>edit_IMG_Image</tabstop>
+  <tabstop>spin_img_image</tabstop>
   <tabstop>radio_IMG_No_Action</tabstop>
   <tabstop>radio_IMG_Test</tabstop>
   <tabstop>radio_IMG_Confirm</tabstop>
@@ -4020,7 +4023,7 @@
   <tabstop>radio_IMG_Set</tabstop>
   <tabstop>radio_img_images_erase</tabstop>
   <tabstop>check_IMG_Confirm</tabstop>
-  <tabstop>edit_IMG_Erase_Slot</tabstop>
+  <tabstop>spin_img_erase_slot</tabstop>
   <tabstop>tree_IMG_Slot_Info</tabstop>
   <tabstop>btn_IMG_Go</tabstop>
   <tabstop>edit_FS_Local</tabstop>
@@ -4085,7 +4088,7 @@
   <tabstop>radio_Enum_Single</tabstop>
   <tabstop>radio_Enum_Details</tabstop>
   <tabstop>edit_Enum_Count</tabstop>
-  <tabstop>edit_Enum_Index</tabstop>
+  <tabstop>spin_enum_index</tabstop>
   <tabstop>edit_Enum_Group_ID</tabstop>
   <tabstop>check_Enum_Group_Additional</tabstop>
   <tabstop>table_Enum_List_Details</tabstop>
@@ -4097,11 +4100,11 @@
   <tabstop>radio_custom_cbor</tabstop>
   <tabstop>radio_custom_read</tabstop>
   <tabstop>radio_custom_write</tabstop>
-  <tabstop>edit_custom_group</tabstop>
-  <tabstop>edit_custom_command</tabstop>
+  <tabstop>spin_custom_group</tabstop>
+  <tabstop>spin_custom_command</tabstop>
   <tabstop>edit_custom_send</tabstop>
   <tabstop>edit_custom_receive</tabstop>
-  <tabstop>edit_custom_indent</tabstop>
+  <tabstop>spin_custom_indent</tabstop>
   <tabstop>btn_custom_copy_send</tabstop>
   <tabstop>btn_custom_copy_receive</tabstop>
   <tabstop>btn_custom_copy_both</tabstop>

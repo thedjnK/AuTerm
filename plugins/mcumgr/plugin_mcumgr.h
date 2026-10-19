@@ -256,7 +256,7 @@ private slots:
     void on_btn_custom_clear_send_clicked();
     void on_btn_custom_clear_receive_clicked();
     void on_btn_custom_clear_both_clicked();
-    void on_edit_custom_indent_valueChanged(int value);
+    void on_spin_custom_indent_valueChanged(int value);
     void on_btn_custom_go_clicked();
     void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_error_lookup_clicked();
@@ -320,7 +320,7 @@ private:
     QToolButton *btn_IMG_Local;
     QLabel *label_43;
     QHBoxLayout *horizontalLayout_4;
-    QSpinBox *edit_IMG_Image;
+    QSpinBox *spin_img_image;
     QRadioButton *radio_IMG_No_Action;
     QRadioButton *radio_IMG_Test;
     QRadioButton *radio_IMG_Confirm;
@@ -340,7 +340,7 @@ private:
     QGridLayout *gridLayout_10;
     QLabel *label_14;
     QSpacerItem *horizontalSpacer_9;
-    QSpinBox *edit_IMG_Erase_Slot;
+    QSpinBox *spin_img_erase_slot;
     QSpacerItem *verticalSpacer_2;
     QWidget *tab_IMG_Slots;
     QVBoxLayout *verticalLayout_6;
@@ -401,7 +401,7 @@ private:
     QWidget *tab_OS_Reset;
     QGridLayout *gridLayout_12;
     QLabel *label_44;
-    QSpinBox *edit_os_boot_mode;
+    QSpinBox *spin_os_boot_mode;
     QSpacerItem *verticalSpacer_3;
     QSpacerItem *horizontalSpacer_29;
     QCheckBox *check_OS_Force_Reboot;
@@ -526,7 +526,7 @@ private:
     QSpacerItem *horizontalSpacer_30;
     QHBoxLayout *horizontalLayout_23;
     QLabel *label_33;
-    QSpinBox *edit_Enum_Index;
+    QSpinBox *spin_enum_index;
     QFrame *line_3;
     QLabel *label_34;
     QLineEdit *edit_Enum_Group_ID;
@@ -559,7 +559,7 @@ private:
     QHBoxLayout *horizontalLayout_39;
     QLineEdit *edit_transport_udp_address;
     QLabel *label_66;
-    QSpinBox *edit_transport_udp_port;
+    QSpinBox *spin_transport_udp_port;
     QLabel *label_67;
     QHBoxLayout *horizontalLayout_40;
     QComboBox *combo_transport_bluetooth_address_type;
@@ -610,10 +610,10 @@ private:
     QRadioButton *radio_custom_write;
     QFrame *line_5;
     QLabel *label_41;
-    QSpinBox *edit_custom_group;
+    QSpinBox *spin_custom_group;
     QFrame *line_6;
     QLabel *label_42;
-    QSpinBox *edit_custom_command;
+    QSpinBox *spin_custom_command;
     QSpacerItem *horizontalSpacer_28;
     QLabel *label_35;
     QPlainTextEdit *edit_custom_send;
@@ -621,7 +621,7 @@ private:
     QPlainTextEdit *edit_custom_receive;
     QLabel *label_37;
     QHBoxLayout *horizontalLayout_25;
-    QSpinBox *edit_custom_indent;
+    QSpinBox *spin_custom_indent;
     QFrame *line_4;
     QPushButton *btn_custom_copy_send;
     QPushButton *btn_custom_copy_receive;
