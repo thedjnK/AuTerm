@@ -4429,11 +4429,15 @@ void plugin_mcumgr::on_radio_settings_decimal_toggled(bool toggled)
 
 void plugin_mcumgr::on_check_settings_big_endian_toggled(bool toggled)
 {
+    Q_UNUSED(toggled);
+
     (void)update_settings_display();
 }
 
 void plugin_mcumgr::on_check_settings_signed_decimal_value_toggled(bool toggled)
 {
+    Q_UNUSED(toggled);
+
     (void)update_settings_display();
 }
 
