@@ -149,3 +149,7 @@ void smp_error::register_error_lookup_function(uint16_t group, smp_group *group_
 
     lookup_functions.append(error_list_entry);
 }
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

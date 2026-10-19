@@ -313,3 +313,7 @@ void smp_uart_auterm::cancel()
     this->SMPWaitingForContinuation = false;
     this->waiting_packet_length = 0;
 }
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

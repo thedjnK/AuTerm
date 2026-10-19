@@ -108,3 +108,7 @@ void error_lookup::on_radio_smp_error_code_toggled(bool checked)
         ui->combo_group->setEnabled(false);
     }
 }
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/

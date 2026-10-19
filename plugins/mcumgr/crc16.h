@@ -32,3 +32,7 @@ uint16_t crc16(const QByteArray *src, size_t i, size_t len, uint16_t polynomial,
                uint16_t initial_value, bool pad);
 
 #endif // CRC16_H
+
+/******************************************************************************/
+// END OF FILE
+/******************************************************************************/
