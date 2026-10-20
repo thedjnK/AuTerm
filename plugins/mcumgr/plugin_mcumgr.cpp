@@ -3501,6 +3501,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 uint16_t l = table_OS_Memory->rowCount();
 
                 table_OS_Memory->setSortingEnabled(false);
+                table_OS_Memory->setUpdatesEnabled(false);
 
                 while (i < memory_list.length())
                 {
@@ -3536,6 +3537,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 }
 
                 table_OS_Memory->setSortingEnabled(true);
+                table_OS_Memory->setUpdatesEnabled(true);
+                table_OS_Memory->clearSelection();
+                table_OS_Memory->update();
             }
             else if (user_data == ACTION_OS_TASK_STATS)
             {
@@ -3543,6 +3547,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 uint16_t l = table_OS_Tasks->rowCount();
 
                 table_OS_Tasks->setSortingEnabled(false);
+                table_OS_Tasks->setUpdatesEnabled(false);
 
                 while (i < task_list.length())
                 {
@@ -3590,6 +3595,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 }
 
                 table_OS_Tasks->setSortingEnabled(true);
+                table_OS_Tasks->setUpdatesEnabled(true);
+                table_OS_Tasks->clearSelection();
+                table_OS_Tasks->update();
             }
             else if (user_data == ACTION_OS_MCUMGR_BUFFER)
             {
@@ -3718,6 +3726,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 uint16_t l = table_STAT_Values->rowCount();
 
                 table_STAT_Values->setSortingEnabled(false);
+                table_STAT_Values->setUpdatesEnabled(false);
 
                 while (i < stat_list.length())
                 {
@@ -3748,6 +3757,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 }
 
                 table_STAT_Values->setSortingEnabled(true);
+                table_STAT_Values->setUpdatesEnabled(true);
+                table_STAT_Values->clearSelection();
+                table_STAT_Values->update();
             }
             else if (user_data == ACTION_STAT_LIST_GROUPS)
             {
@@ -3854,6 +3866,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 uint16_t l = table_Enum_List_Details->rowCount();
 
                 table_Enum_List_Details->setSortingEnabled(false);
+                table_Enum_List_Details->setUpdatesEnabled(false);
 
                 while (i < enum_groups.length())
                 {
@@ -3886,6 +3899,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 }
 
                 table_Enum_List_Details->setSortingEnabled(true);
+                table_Enum_List_Details->setUpdatesEnabled(true);
+                table_Enum_List_Details->clearSelection();
+                table_Enum_List_Details->update();
             }
             else if (user_data == ACTION_ENUM_SINGLE)
             {
@@ -3898,6 +3914,7 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 uint16_t l = table_Enum_List_Details->rowCount();
 
                 table_Enum_List_Details->setSortingEnabled(false);
+                table_Enum_List_Details->setUpdatesEnabled(false);
 
                 while (i < enum_details.length())
                 {
@@ -3930,6 +3947,9 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                 }
 
                 table_Enum_List_Details->setSortingEnabled(true);
+                table_Enum_List_Details->setUpdatesEnabled(true);
+                table_Enum_List_Details->clearSelection();
+                table_Enum_List_Details->update();
             }
         }
     }
