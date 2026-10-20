@@ -2950,7 +2950,11 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
         //Image list
         if (radio_IMG_Get->isChecked())
         {
-            colview_IMG_Images->previewWidget()->hide();
+            if (colview_IMG_Images->previewWidget() == verticalLayoutWidget)
+            {
+                colview_IMG_Images->previewWidget()->hide();
+            }
+
             model_image_state.clear();
             images_list.clear();
             mode = ACTION_IMG_IMAGE_LIST;
