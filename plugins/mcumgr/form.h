@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTreeWidgetItem>
+#include <QAbstractButton>
 
 namespace Ui {
 class Form;
@@ -75,6 +76,10 @@ private slots:
     void on_btn_custom_clear_send_clicked();
     void on_btn_custom_clear_receive_clicked();
     void on_btn_custom_clear_both_clicked();
+    void on_combo_transport_standard_transport_currentIndexChanged(int index);
+    void on_buttonGroup_7_buttonClicked(QAbstractButton*);
+    void on_btn_transport_go_clicked();
+    void on_table_transport_output_cellDoubleClicked(int row, int column);
 
 private:
     Ui::Form *ui;

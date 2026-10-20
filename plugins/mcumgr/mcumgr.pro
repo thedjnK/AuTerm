@@ -28,6 +28,7 @@ SOURCES += \
     smp_group_settings_mgmt.cpp \
     smp_group_shell_mgmt.cpp \
     smp_group_stat_mgmt.cpp \
+    smp_group_transport_mgmt.cpp \
     smp_group_zephyr_mgmt.cpp \
     smp_json.cpp \
     smp_message.cpp \
@@ -51,6 +52,7 @@ HEADERS += \
     smp_group_settings_mgmt.h \
     smp_group_shell_mgmt.h \
     smp_group_stat_mgmt.h \
+    smp_group_transport_mgmt.h \
     smp_group_zephyr_mgmt.h \
     smp_json.h \
     smp_message.h \

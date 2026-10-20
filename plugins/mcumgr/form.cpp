@@ -309,3 +309,23 @@ void Form::on_btn_custom_clear_both_clicked()
 {
 
 }
+
+void Form::on_combo_transport_standard_transport_currentIndexChanged(int index)
+{
+
+}
+
+void Form::on_buttonGroup_7_buttonClicked(QAbstractButton*)
+{
+
+}
+
+void Form::on_btn_transport_go_clicked()
+{
+
+}
+
+void Form::on_table_transport_output_cellDoubleClicked(int row, int column)
+{
+
+}

@@ -142,6 +142,13 @@ enum mcumgr_action_t {
     ACTION_ENUM_SINGLE,
     ACTION_ENUM_DETAILS,
 
+    ACTION_TRANSPORT_CONNECT,
+    ACTION_TRANSPORT_DISCONNECT,
+    ACTION_TRANSPORT_STATUS,
+    ACTION_TRANSPORT_LIST,
+    ACTION_TRANSPORT_TRANSPORT_MODES,
+    ACTION_TRANSPORT_TRANSPORT_CONFIG_DETAILS,
+
     ACTION_CUSTOM,
 };
 
@@ -254,6 +261,10 @@ private slots:
     void on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_btn_error_lookup_clicked();
     void on_btn_cancel_clicked();
+    void on_combo_transport_standard_transport_currentIndexChanged(int index);
+    void on_buttonGroup_7_buttonClicked(QAbstractButton *button);
+    void on_btn_transport_go_clicked();
+    void on_table_transport_output_cellDoubleClicked(int row, int column);
 
 private:
     bool handleStream_shell(QCborStreamReader &reader, int32_t *new_rc, int32_t *new_ret, QString *new_data);
@@ -527,6 +538,59 @@ private:
     QSpacerItem *horizontalSpacer_16;
     QPushButton *btn_enum_go;
     QSpacerItem *horizontalSpacer_21;
+    QWidget *tab_transport;
+    QFormLayout *formLayout_10;
+    QTabWidget *tabWidget_3;
+    QWidget *tab1;
+    QFormLayout *formLayout_8;
+    QLabel *label_62;
+    QComboBox *combo_transport_standard_transport;
+    QLabel *label_63;
+    QHBoxLayout *horizontalLayout_38;
+    QRadioButton *radio_transport_standard_disconnect_current_transport;
+    QRadioButton *radio_transport_standard_disconnect_all_transports;
+    QRadioButton *radio_transport_standard_disconnect_specific_transport;
+    QFrame *line_15;
+    QRadioButton *radio_transport_standard_disconnect_incoming;
+    QRadioButton *radio_transport_standard_disconnect_outgoing;
+    QLabel *label_64;
+    QComboBox *combo_transport_standard_mode;
+    QLabel *label_65;
+    QHBoxLayout *horizontalLayout_39;
+    QLineEdit *edit_transport_udp_address;
+    QLabel *label_66;
+    QSpinBox *edit_transport_udp_port;
+    QLabel *label_67;
+    QHBoxLayout *horizontalLayout_40;
+    QComboBox *combo_transport_bluetooth_address_type;
+    QLineEdit *edit_transport_bluetooth_address;
+    QFrame *line_16;
+    QCheckBox *check_transport_bluetooth_le_coded_phy;
+    QLabel *label_71;
+    QHBoxLayout *horizontalLayout_44;
+    QLabel *label_72;
+    QLineEdit *edit_transport_supported;
+    QFrame *line_17;
+    QLabel *label_73;
+    QLineEdit *edit_transport_active;
+    QFrame *line_18;
+    QCheckBox *check_transport_transport_bridged;
+    QSpacerItem *horizontalSpacer_39;
+    QHBoxLayout *horizontalLayout_45;
+    QRadioButton *radio_transport_connect;
+    QRadioButton *radio_transport_disconnect;
+    QRadioButton *radio_transport_status;
+    QRadioButton *radio_transport_list;
+    QRadioButton *radio_transport_modes;
+    QRadioButton *radio_transport_config_details;
+    QFrame *line_19;
+    QSpacerItem *verticalSpacer_9;
+    QLabel *lbl_transport_status_text;
+    QHBoxLayout *horizontalLayout_31;
+    QSpacerItem *horizontalSpacer_38;
+    QPushButton *btn_transport_go;
+    QSpacerItem *horizontalSpacer_40;
+    QTableWidget *table_transport_output;
     QWidget *tab_custom;
     QVBoxLayout *verticalLayout_5;
     QFormLayout *formLayout_3;
@@ -587,38 +651,25 @@ private:
     QCheckBox *check_IMG_Preview_Permanent;
     QPushButton *btn_IMG_Preview_Copy;
     QSpacerItem *verticalSpacer;
-    QButtonGroup *buttonGroup;
+    QButtonGroup *buttonGroup_6;
+    QButtonGroup *buttonGroup_7;
     QButtonGroup *buttonGroup_4;
     QButtonGroup *buttonGroup_3;
-    QButtonGroup *buttonGroup_6;
+    QButtonGroup *buttonGroup_9;
     QButtonGroup *buttonGroup_2;
+    QButtonGroup *buttonGroup;
+    QButtonGroup *buttonGroup_8;
     QButtonGroup *buttonGroup_5;
 ///AUTOGEN_END_OBJECTS
 
     //
     QByteArray upload_hash;
     mcumgr_action_t mode;
-    int parent_row;
-    int parent_column;
-    int child_row;
-    int child_column;
-    QList<task_list_t> task_list;
-    QList<memory_pool_t> memory_list;
-    int32_t shell_rc;
-    QStringList group_list;
-    QList<stat_value_t> stat_list;
-    QStandardItemModel model_image_state;
     error_lookup *error_lookup_form;
     smp_processor *processor;
     smp_group_array smp_groups;
     class smp_uart_auterm *uart_transport;
-    uint16_t enum_count;
-    QList<uint16_t> enum_groups;
-    uint16_t enum_single_id;
-    bool enum_single_end;
-    QList<enum_details_t> enum_details;
-    enum_fields_present_t enum_details_present_fields;
-    QList<slot_info_t> img_slot_details;
+    bool uart_transport_locked;
 
 #if defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
     class smp_udp *udp_transport;
@@ -632,21 +683,58 @@ private:
     class smp_lorawan *lora_transport;
 #endif
 
-    QList<image_state_t> images_list;
-    QList<hash_checksum_t> supported_hash_checksum_list;
-    QVariant bootloader_info_response;
-    QString os_info_response;
-    QByteArray settings_read_response;
-    QByteArray fs_hash_checksum_response;
-    uint32_t fs_size_response;
 #ifndef SKIPPLUGIN_LOGGER
     debug_logger *logger;
 #endif
-    bool uart_transport_locked;
+
+    //Shell management
+    int32_t shell_rc;
+
+    //Statistics management
+    QStringList group_list;
+    QList<stat_value_t> stat_list;
+
+    //Enmumeration management
+    uint16_t enum_count;
+    QList<uint16_t> enum_groups;
+    uint16_t enum_single_id;
+    bool enum_single_end;
+    QList<enum_details_t> enum_details;
+    enum_fields_present_t enum_details_present_fields;
+
+    //Image management
+    int parent_row;
+    int parent_column;
+    int child_row;
+    int child_column;
+    QStandardItemModel model_image_state;
+    QList<image_state_t> images_list;
+    QList<slot_info_t> img_slot_details;
+
+    //FS management
+    QList<hash_checksum_t> supported_hash_checksum_list;
+    QByteArray fs_hash_checksum_response;
+    uint32_t fs_size_response;
+
+    //OS management
+    QList<task_list_t> task_list;
+    QList<memory_pool_t> memory_list;
+    QVariant bootloader_info_response;
+    QString os_info_response;
     QDateTime rtc_time_date_response;
     smp_json *log_json;
     uint32_t os_buffer_size;
     uint32_t os_buffer_count;
+
+    //Settings management
+    QByteArray settings_read_response;
+
+    //Transport management
+    uint8_t transport_table_data_type;
+    transport_status_t bridge_status_response;
+    QList<transport_transports_t> transport_transports_response;
+    QList<transport_modes_t> transport_modes_response;
+    QList<transport_config_details_t> transport_config_details_response;
 };
 
 #endif // PLUGIN_MCUMGR_H

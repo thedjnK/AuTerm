@@ -41,6 +41,9 @@ $Replacement2 = array(
 	array('buttonGroup_4 = new QButtonGroup(Form);', 'buttonGroup_4 = new QButtonGroup(tab_custom);', 0),
 	array('buttonGroup_5 = new QButtonGroup(Form);', 'buttonGroup_5 = new QButtonGroup(tab_custom);', 0),
 	array('buttonGroup_6 = new QButtonGroup(Form);', 'buttonGroup_6 = new QButtonGroup(tab_custom);', 0),
+	array('buttonGroup_7 = new QButtonGroup(Form);', 'buttonGroup_7 = new QButtonGroup(tab_transport);', 0),
+	array('buttonGroup_8 = new QButtonGroup(Form);', 'buttonGroup_8 = new QButtonGroup(tab_transport);', 0),
+	array('buttonGroup_9 = new QButtonGroup(Form);', 'buttonGroup_9 = new QButtonGroup(tab_transport);', 0),
 );
 
 $Replacement3 = array(

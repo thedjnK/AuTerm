@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2021-2025 Jamie M.
+** Copyright (C) 2021-2026 Jamie M.
 **
 ** Project: AuTerm
 **
@@ -32,10 +32,31 @@
 
 static const uint16_t timeout_erase_ms = 14000;
 
+#define TRANSPORT_MANAGEMENT_BLUETOOTH_CONFIGURATION_ROW 3
+#define TRANSPORT_MANAGEMENT_UDP_CONFIGURATION_ROW 4
+
 enum tree_img_slot_info_columns {
     TREE_IMG_SLOT_INFO_COLUMN_IMAGE_SLOT,
     TREE_IMG_SLOT_INFO_COLUMN_SIZE,
     TREE_IMG_SLOT_INFO_COLUMN_UPLOAD_ID,
+};
+
+enum transport_connection_type_t {
+    TRANSPORT_CONNECTION_TYPE_UART,
+    TRANSPORT_CONNECTION_TYPE_RAW_UART,
+    TRANSPORT_CONNECTION_TYPE_BLUETOOTH_LOW_ENERGY,
+    TRANSPORT_CONNECTION_TYPE_SHELL,
+    TRANSPORT_CONNECTION_TYPE_UDP_IPV4,
+    TRANSPORT_CONNECTION_TYPE_UDP_IPV6,
+    TRANSPORT_CONNECTION_TYPE_LORAWAN,
+    TRANSPORT_CONNECTION_TYPE_SPI,
+};
+
+enum transport_table_output_t {
+    TRANSPORT_TABLE_OUTPUT_NONE,
+    TRANSPORT_TABLE_OUTPUT_LIST,
+    TRANSPORT_TABLE_OUTPUT_MODES,
+    TRANSPORT_TABLE_OUTPUT_CONFIG_DETAILS,
 };
 
 static QMainWindow *parent_window;
@@ -70,6 +91,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.stat_mgmt = new smp_group_stat_mgmt(processor);
     smp_groups.zephyr_mgmt = new smp_group_zephyr_mgmt(processor);
     smp_groups.enum_mgmt = new smp_group_enum_mgmt(processor);
+    smp_groups.transport_mgmt = new smp_group_transport_mgmt(processor);
     error_lookup_form = new error_lookup(parent_window, &smp_groups);
 
     processor->set_json(log_json);
@@ -905,23 +927,23 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_20 = new QLabel(tab_OS_Bootloader);
     label_20->setObjectName("label_20");
 
-    formLayout_2->setWidget(0, QFormLayout::ItemRole::LabelRole, label_20);
+    formLayout_2->setWidget(0, QFormLayout::LabelRole, label_20);
 
     edit_os_bootloader_query = new QLineEdit(tab_OS_Bootloader);
     edit_os_bootloader_query->setObjectName("edit_os_bootloader_query");
 
-    formLayout_2->setWidget(0, QFormLayout::ItemRole::FieldRole, edit_os_bootloader_query);
+    formLayout_2->setWidget(0, QFormLayout::FieldRole, edit_os_bootloader_query);
 
     label_21 = new QLabel(tab_OS_Bootloader);
     label_21->setObjectName("label_21");
 
-    formLayout_2->setWidget(1, QFormLayout::ItemRole::LabelRole, label_21);
+    formLayout_2->setWidget(1, QFormLayout::LabelRole, label_21);
 
     edit_os_bootloader_response = new QLineEdit(tab_OS_Bootloader);
     edit_os_bootloader_response->setObjectName("edit_os_bootloader_response");
     edit_os_bootloader_response->setReadOnly(true);
 
-    formLayout_2->setWidget(1, QFormLayout::ItemRole::FieldRole, edit_os_bootloader_response);
+    formLayout_2->setWidget(1, QFormLayout::FieldRole, edit_os_bootloader_response);
 
     selector_OS->addTab(tab_OS_Bootloader, QString());
 
@@ -1027,26 +1049,26 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_SHELL_Output->setObjectName("edit_SHELL_Output");
     QPalette palette;
     QBrush brush(QColor(255, 255, 255, 255));
-    brush.setStyle(Qt::BrushStyle::SolidPattern);
-    palette.setBrush(QPalette::ColorGroup::Active, QPalette::ColorRole::WindowText, brush);
-    palette.setBrush(QPalette::ColorGroup::Active, QPalette::ColorRole::Text, brush);
+    brush.setStyle(Qt::SolidPattern);
+    palette.setBrush(QPalette::Active, QPalette::WindowText, brush);
+    palette.setBrush(QPalette::Active, QPalette::Text, brush);
     QBrush brush1(QColor(0, 0, 0, 255));
-    brush1.setStyle(Qt::BrushStyle::SolidPattern);
-    palette.setBrush(QPalette::ColorGroup::Active, QPalette::ColorRole::Base, brush1);
+    brush1.setStyle(Qt::SolidPattern);
+    palette.setBrush(QPalette::Active, QPalette::Base, brush1);
     QBrush brush2(QColor(255, 255, 255, 128));
-    brush2.setStyle(Qt::BrushStyle::SolidPattern);
+    brush2.setStyle(Qt::SolidPattern);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-    palette.setBrush(QPalette::ColorGroup::Active, QPalette::ColorRole::PlaceholderText, brush2);
+    palette.setBrush(QPalette::Active, QPalette::PlaceholderText, brush2);
 #endif
-    palette.setBrush(QPalette::ColorGroup::Inactive, QPalette::ColorRole::WindowText, brush);
-    palette.setBrush(QPalette::ColorGroup::Inactive, QPalette::ColorRole::Text, brush);
-    palette.setBrush(QPalette::ColorGroup::Inactive, QPalette::ColorRole::Base, brush1);
+    palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+    palette.setBrush(QPalette::Inactive, QPalette::Text, brush);
+    palette.setBrush(QPalette::Inactive, QPalette::Base, brush1);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-    palette.setBrush(QPalette::ColorGroup::Inactive, QPalette::ColorRole::PlaceholderText, brush2);
+    palette.setBrush(QPalette::Inactive, QPalette::PlaceholderText, brush2);
 #endif
-    palette.setBrush(QPalette::ColorGroup::Disabled, QPalette::ColorRole::Base, brush1);
+    palette.setBrush(QPalette::Disabled, QPalette::Base, brush1);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-    palette.setBrush(QPalette::ColorGroup::Disabled, QPalette::ColorRole::PlaceholderText, brush2);
+    palette.setBrush(QPalette::Disabled, QPalette::PlaceholderText, brush2);
 #endif
     edit_SHELL_Output->setPalette(palette);
     edit_SHELL_Output->setUndoRedoEnabled(false);
@@ -1510,6 +1532,381 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     verticalLayout_3->addLayout(horizontalLayout_20);
 
     selector_group->addTab(tab_Enum, QString());
+    tab_transport = new QWidget();
+    tab_transport->setObjectName("tab_transport");
+    formLayout_10 = new QFormLayout(tab_transport);
+    formLayout_10->setObjectName("formLayout_10");
+    formLayout_10->setHorizontalSpacing(2);
+    formLayout_10->setVerticalSpacing(2);
+    formLayout_10->setContentsMargins(6, 6, 6, 6);
+    tabWidget_3 = new QTabWidget(tab_transport);
+    tabWidget_3->setObjectName("tabWidget_3");
+    QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+    sizePolicy1.setHeightForWidth(tabWidget_3->sizePolicy().hasHeightForWidth());
+    tabWidget_3->setSizePolicy(sizePolicy1);
+    tab1 = new QWidget();
+    tab1->setObjectName("tab1");
+    formLayout_8 = new QFormLayout(tab1);
+    formLayout_8->setObjectName("formLayout_8");
+    formLayout_8->setHorizontalSpacing(2);
+    formLayout_8->setVerticalSpacing(2);
+    formLayout_8->setContentsMargins(6, 6, 6, 4);
+    label_62 = new QLabel(tab1);
+    label_62->setObjectName("label_62");
+
+    formLayout_8->setWidget(0, QFormLayout::LabelRole, label_62);
+
+    combo_transport_standard_transport = new QComboBox(tab1);
+    combo_transport_standard_transport->addItem(QString());
+    combo_transport_standard_transport->addItem(QString());
+    combo_transport_standard_transport->addItem(QString());
+    combo_transport_standard_transport->addItem(QString());
+    combo_transport_standard_transport->addItem(QString());
+    combo_transport_standard_transport->addItem(QString());
+    combo_transport_standard_transport->addItem(QString());
+    combo_transport_standard_transport->addItem(QString());
+    combo_transport_standard_transport->setObjectName("combo_transport_standard_transport");
+    combo_transport_standard_transport->setEnabled(true);
+    combo_transport_standard_transport->setEditable(false);
+
+    formLayout_8->setWidget(0, QFormLayout::FieldRole, combo_transport_standard_transport);
+
+    label_63 = new QLabel(tab1);
+    label_63->setObjectName("label_63");
+
+    formLayout_8->setWidget(1, QFormLayout::LabelRole, label_63);
+
+    horizontalLayout_38 = new QHBoxLayout();
+    horizontalLayout_38->setSpacing(2);
+    horizontalLayout_38->setObjectName("horizontalLayout_38");
+    horizontalLayout_38->setContentsMargins(-1, 0, -1, -1);
+    radio_transport_standard_disconnect_current_transport = new QRadioButton(tab1);
+    buttonGroup_8 = new QButtonGroup(tab_transport);
+    buttonGroup_8->setObjectName("buttonGroup_8");
+    buttonGroup_8->addButton(radio_transport_standard_disconnect_current_transport);
+    radio_transport_standard_disconnect_current_transport->setObjectName("radio_transport_standard_disconnect_current_transport");
+    radio_transport_standard_disconnect_current_transport->setEnabled(false);
+    radio_transport_standard_disconnect_current_transport->setChecked(true);
+
+    horizontalLayout_38->addWidget(radio_transport_standard_disconnect_current_transport);
+
+    radio_transport_standard_disconnect_all_transports = new QRadioButton(tab1);
+    buttonGroup_8->addButton(radio_transport_standard_disconnect_all_transports);
+    radio_transport_standard_disconnect_all_transports->setObjectName("radio_transport_standard_disconnect_all_transports");
+    radio_transport_standard_disconnect_all_transports->setEnabled(false);
+
+    horizontalLayout_38->addWidget(radio_transport_standard_disconnect_all_transports);
+
+    radio_transport_standard_disconnect_specific_transport = new QRadioButton(tab1);
+    buttonGroup_8->addButton(radio_transport_standard_disconnect_specific_transport);
+    radio_transport_standard_disconnect_specific_transport->setObjectName("radio_transport_standard_disconnect_specific_transport");
+    radio_transport_standard_disconnect_specific_transport->setEnabled(false);
+
+    horizontalLayout_38->addWidget(radio_transport_standard_disconnect_specific_transport);
+
+    line_15 = new QFrame(tab1);
+    line_15->setObjectName("line_15");
+    line_15->setFrameShape(QFrame::Shape::VLine);
+    line_15->setFrameShadow(QFrame::Shadow::Sunken);
+
+    horizontalLayout_38->addWidget(line_15);
+
+    radio_transport_standard_disconnect_incoming = new QRadioButton(tab1);
+    buttonGroup_9 = new QButtonGroup(tab_transport);
+    buttonGroup_9->setObjectName("buttonGroup_9");
+    buttonGroup_9->addButton(radio_transport_standard_disconnect_incoming);
+    radio_transport_standard_disconnect_incoming->setObjectName("radio_transport_standard_disconnect_incoming");
+    radio_transport_standard_disconnect_incoming->setEnabled(false);
+    radio_transport_standard_disconnect_incoming->setChecked(true);
+
+    horizontalLayout_38->addWidget(radio_transport_standard_disconnect_incoming);
+
+    radio_transport_standard_disconnect_outgoing = new QRadioButton(tab1);
+    buttonGroup_9->addButton(radio_transport_standard_disconnect_outgoing);
+    radio_transport_standard_disconnect_outgoing->setObjectName("radio_transport_standard_disconnect_outgoing");
+    radio_transport_standard_disconnect_outgoing->setEnabled(false);
+
+    horizontalLayout_38->addWidget(radio_transport_standard_disconnect_outgoing);
+
+
+    formLayout_8->setLayout(1, QFormLayout::FieldRole, horizontalLayout_38);
+
+    label_64 = new QLabel(tab1);
+    label_64->setObjectName("label_64");
+
+    formLayout_8->setWidget(2, QFormLayout::LabelRole, label_64);
+
+    combo_transport_standard_mode = new QComboBox(tab1);
+    combo_transport_standard_mode->addItem(QString());
+    combo_transport_standard_mode->setObjectName("combo_transport_standard_mode");
+    combo_transport_standard_mode->setEnabled(false);
+    combo_transport_standard_mode->setEditable(false);
+
+    formLayout_8->setWidget(2, QFormLayout::FieldRole, combo_transport_standard_mode);
+
+    label_65 = new QLabel(tab1);
+    label_65->setObjectName("label_65");
+
+    formLayout_8->setWidget(4, QFormLayout::LabelRole, label_65);
+
+    horizontalLayout_39 = new QHBoxLayout();
+    horizontalLayout_39->setSpacing(2);
+    horizontalLayout_39->setObjectName("horizontalLayout_39");
+    horizontalLayout_39->setContentsMargins(-1, 0, -1, -1);
+    edit_transport_udp_address = new QLineEdit(tab1);
+    edit_transport_udp_address->setObjectName("edit_transport_udp_address");
+    edit_transport_udp_address->setEnabled(false);
+    edit_transport_udp_address->setMaxLength(45);
+
+    horizontalLayout_39->addWidget(edit_transport_udp_address);
+
+    label_66 = new QLabel(tab1);
+    label_66->setObjectName("label_66");
+
+    horizontalLayout_39->addWidget(label_66);
+
+    edit_transport_udp_port = new QSpinBox(tab1);
+    edit_transport_udp_port->setObjectName("edit_transport_udp_port");
+    edit_transport_udp_port->setEnabled(false);
+    edit_transport_udp_port->setMinimumSize(QSize(60, 0));
+    edit_transport_udp_port->setMaximumSize(QSize(70, 16777215));
+    edit_transport_udp_port->setMinimum(1);
+    edit_transport_udp_port->setMaximum(65535);
+    edit_transport_udp_port->setValue(1337);
+
+    horizontalLayout_39->addWidget(edit_transport_udp_port);
+
+
+    formLayout_8->setLayout(4, QFormLayout::FieldRole, horizontalLayout_39);
+
+    label_67 = new QLabel(tab1);
+    label_67->setObjectName("label_67");
+
+    formLayout_8->setWidget(3, QFormLayout::LabelRole, label_67);
+
+    horizontalLayout_40 = new QHBoxLayout();
+    horizontalLayout_40->setSpacing(2);
+    horizontalLayout_40->setObjectName("horizontalLayout_40");
+    horizontalLayout_40->setContentsMargins(-1, 0, -1, -1);
+    combo_transport_bluetooth_address_type = new QComboBox(tab1);
+    combo_transport_bluetooth_address_type->addItem(QString());
+    combo_transport_bluetooth_address_type->addItem(QString());
+    combo_transport_bluetooth_address_type->setObjectName("combo_transport_bluetooth_address_type");
+    combo_transport_bluetooth_address_type->setEnabled(false);
+    QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+    sizePolicy2.setHorizontalStretch(0);
+    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setHeightForWidth(combo_transport_bluetooth_address_type->sizePolicy().hasHeightForWidth());
+    combo_transport_bluetooth_address_type->setSizePolicy(sizePolicy2);
+    combo_transport_bluetooth_address_type->setMinimumSize(QSize(100, 0));
+
+    horizontalLayout_40->addWidget(combo_transport_bluetooth_address_type);
+
+    edit_transport_bluetooth_address = new QLineEdit(tab1);
+    edit_transport_bluetooth_address->setObjectName("edit_transport_bluetooth_address");
+    edit_transport_bluetooth_address->setEnabled(false);
+    QSizePolicy sizePolicy3(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+    sizePolicy3.setHorizontalStretch(0);
+    sizePolicy3.setVerticalStretch(0);
+    sizePolicy3.setHeightForWidth(edit_transport_bluetooth_address->sizePolicy().hasHeightForWidth());
+    edit_transport_bluetooth_address->setSizePolicy(sizePolicy3);
+    edit_transport_bluetooth_address->setMaxLength(17);
+    edit_transport_bluetooth_address->setFrame(true);
+
+    horizontalLayout_40->addWidget(edit_transport_bluetooth_address);
+
+    line_16 = new QFrame(tab1);
+    line_16->setObjectName("line_16");
+    line_16->setFrameShape(QFrame::Shape::VLine);
+    line_16->setFrameShadow(QFrame::Shadow::Sunken);
+
+    horizontalLayout_40->addWidget(line_16);
+
+    check_transport_bluetooth_le_coded_phy = new QCheckBox(tab1);
+    check_transport_bluetooth_le_coded_phy->setObjectName("check_transport_bluetooth_le_coded_phy");
+    check_transport_bluetooth_le_coded_phy->setEnabled(false);
+    check_transport_bluetooth_le_coded_phy->setChecked(false);
+
+    horizontalLayout_40->addWidget(check_transport_bluetooth_le_coded_phy);
+
+
+    formLayout_8->setLayout(3, QFormLayout::FieldRole, horizontalLayout_40);
+
+    tabWidget_3->addTab(tab1, QString());
+
+    formLayout_10->setWidget(0, QFormLayout::SpanningRole, tabWidget_3);
+
+    label_71 = new QLabel(tab_transport);
+    label_71->setObjectName("label_71");
+
+    formLayout_10->setWidget(1, QFormLayout::LabelRole, label_71);
+
+    horizontalLayout_44 = new QHBoxLayout();
+    horizontalLayout_44->setSpacing(2);
+    horizontalLayout_44->setObjectName("horizontalLayout_44");
+    label_72 = new QLabel(tab_transport);
+    label_72->setObjectName("label_72");
+
+    horizontalLayout_44->addWidget(label_72);
+
+    edit_transport_supported = new QLineEdit(tab_transport);
+    edit_transport_supported->setObjectName("edit_transport_supported");
+    QSizePolicy sizePolicy4(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
+    sizePolicy4.setHorizontalStretch(0);
+    sizePolicy4.setVerticalStretch(0);
+    sizePolicy4.setHeightForWidth(edit_transport_supported->sizePolicy().hasHeightForWidth());
+    edit_transport_supported->setSizePolicy(sizePolicy4);
+    edit_transport_supported->setMinimumSize(QSize(20, 0));
+    edit_transport_supported->setMaximumSize(QSize(60, 16777215));
+    edit_transport_supported->setMaxLength(4);
+    edit_transport_supported->setReadOnly(true);
+
+    horizontalLayout_44->addWidget(edit_transport_supported);
+
+    line_17 = new QFrame(tab_transport);
+    line_17->setObjectName("line_17");
+    line_17->setFrameShape(QFrame::Shape::VLine);
+    line_17->setFrameShadow(QFrame::Shadow::Sunken);
+
+    horizontalLayout_44->addWidget(line_17);
+
+    label_73 = new QLabel(tab_transport);
+    label_73->setObjectName("label_73");
+
+    horizontalLayout_44->addWidget(label_73);
+
+    edit_transport_active = new QLineEdit(tab_transport);
+    edit_transport_active->setObjectName("edit_transport_active");
+    sizePolicy4.setHeightForWidth(edit_transport_active->sizePolicy().hasHeightForWidth());
+    edit_transport_active->setSizePolicy(sizePolicy4);
+    edit_transport_active->setMinimumSize(QSize(20, 0));
+    edit_transport_active->setMaximumSize(QSize(60, 16777215));
+    edit_transport_active->setMaxLength(4);
+    edit_transport_active->setReadOnly(true);
+
+    horizontalLayout_44->addWidget(edit_transport_active);
+
+    line_18 = new QFrame(tab_transport);
+    line_18->setObjectName("line_18");
+    line_18->setFrameShape(QFrame::Shape::VLine);
+    line_18->setFrameShadow(QFrame::Shadow::Sunken);
+
+    horizontalLayout_44->addWidget(line_18);
+
+    check_transport_transport_bridged = new QCheckBox(tab_transport);
+    check_transport_transport_bridged->setObjectName("check_transport_transport_bridged");
+    check_transport_transport_bridged->setEnabled(true);
+
+    horizontalLayout_44->addWidget(check_transport_transport_bridged);
+
+    horizontalSpacer_39 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_44->addItem(horizontalSpacer_39);
+
+
+    formLayout_10->setLayout(1, QFormLayout::FieldRole, horizontalLayout_44);
+
+    horizontalLayout_45 = new QHBoxLayout();
+    horizontalLayout_45->setSpacing(2);
+    horizontalLayout_45->setObjectName("horizontalLayout_45");
+    horizontalLayout_45->setContentsMargins(-1, 0, -1, -1);
+    radio_transport_connect = new QRadioButton(tab_transport);
+    buttonGroup_7 = new QButtonGroup(tab_transport);
+    buttonGroup_7->setObjectName("buttonGroup_7");
+    buttonGroup_7->addButton(radio_transport_connect);
+    radio_transport_connect->setObjectName("radio_transport_connect");
+    radio_transport_connect->setChecked(true);
+
+    horizontalLayout_45->addWidget(radio_transport_connect);
+
+    radio_transport_disconnect = new QRadioButton(tab_transport);
+    buttonGroup_7->addButton(radio_transport_disconnect);
+    radio_transport_disconnect->setObjectName("radio_transport_disconnect");
+
+    horizontalLayout_45->addWidget(radio_transport_disconnect);
+
+    radio_transport_status = new QRadioButton(tab_transport);
+    buttonGroup_7->addButton(radio_transport_status);
+    radio_transport_status->setObjectName("radio_transport_status");
+
+    horizontalLayout_45->addWidget(radio_transport_status);
+
+    radio_transport_list = new QRadioButton(tab_transport);
+    buttonGroup_7->addButton(radio_transport_list);
+    radio_transport_list->setObjectName("radio_transport_list");
+
+    horizontalLayout_45->addWidget(radio_transport_list);
+
+    radio_transport_modes = new QRadioButton(tab_transport);
+    buttonGroup_7->addButton(radio_transport_modes);
+    radio_transport_modes->setObjectName("radio_transport_modes");
+
+    horizontalLayout_45->addWidget(radio_transport_modes);
+
+    radio_transport_config_details = new QRadioButton(tab_transport);
+    buttonGroup_7->addButton(radio_transport_config_details);
+    radio_transport_config_details->setObjectName("radio_transport_config_details");
+
+    horizontalLayout_45->addWidget(radio_transport_config_details);
+
+
+    formLayout_10->setLayout(2, QFormLayout::SpanningRole, horizontalLayout_45);
+
+    line_19 = new QFrame(tab_transport);
+    line_19->setObjectName("line_19");
+    line_19->setFrameShape(QFrame::Shape::HLine);
+    line_19->setFrameShadow(QFrame::Shadow::Sunken);
+
+    formLayout_10->setWidget(3, QFormLayout::SpanningRole, line_19);
+
+    verticalSpacer_9 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+    formLayout_10->setItem(5, QFormLayout::LabelRole, verticalSpacer_9);
+
+    lbl_transport_status_text = new QLabel(tab_transport);
+    lbl_transport_status_text->setObjectName("lbl_transport_status_text");
+    QSizePolicy sizePolicy5(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+    sizePolicy5.setHorizontalStretch(0);
+    sizePolicy5.setVerticalStretch(0);
+    sizePolicy5.setHeightForWidth(lbl_transport_status_text->sizePolicy().hasHeightForWidth());
+    lbl_transport_status_text->setSizePolicy(sizePolicy5);
+
+    formLayout_10->setWidget(6, QFormLayout::SpanningRole, lbl_transport_status_text);
+
+    horizontalLayout_31 = new QHBoxLayout();
+    horizontalLayout_31->setSpacing(2);
+    horizontalLayout_31->setObjectName("horizontalLayout_31");
+    horizontalLayout_31->setContentsMargins(0, 0, -1, -1);
+    horizontalSpacer_38 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_31->addItem(horizontalSpacer_38);
+
+    btn_transport_go = new QPushButton(tab_transport);
+    btn_transport_go->setObjectName("btn_transport_go");
+
+    horizontalLayout_31->addWidget(btn_transport_go);
+
+    horizontalSpacer_40 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+    horizontalLayout_31->addItem(horizontalSpacer_40);
+
+
+    formLayout_10->setLayout(7, QFormLayout::SpanningRole, horizontalLayout_31);
+
+    table_transport_output = new QTableWidget(tab_transport);
+    table_transport_output->setObjectName("table_transport_output");
+    table_transport_output->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+    table_transport_output->setDragDropOverwriteMode(true);
+    table_transport_output->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    table_transport_output->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+    table_transport_output->setSortingEnabled(true);
+    table_transport_output->setCornerButtonEnabled(false);
+
+    formLayout_10->setWidget(4, QFormLayout::SpanningRole, table_transport_output);
+
+    selector_group->addTab(tab_transport, QString());
     tab_custom = new QWidget();
     tab_custom->setObjectName("tab_custom");
     verticalLayout_5 = new QVBoxLayout(tab_custom);
@@ -1523,7 +1920,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_38 = new QLabel(tab_custom);
     label_38->setObjectName("label_38");
 
-    formLayout_3->setWidget(0, QFormLayout::ItemRole::LabelRole, label_38);
+    formLayout_3->setWidget(0, QFormLayout::LabelRole, label_38);
 
     horizontalLayout_26 = new QHBoxLayout();
     horizontalLayout_26->setSpacing(2);
@@ -1582,12 +1979,12 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_26->addItem(horizontalSpacer_26);
 
 
-    formLayout_3->setLayout(0, QFormLayout::ItemRole::FieldRole, horizontalLayout_26);
+    formLayout_3->setLayout(0, QFormLayout::FieldRole, horizontalLayout_26);
 
     label_40 = new QLabel(tab_custom);
     label_40->setObjectName("label_40");
 
-    formLayout_3->setWidget(1, QFormLayout::ItemRole::LabelRole, label_40);
+    formLayout_3->setWidget(1, QFormLayout::LabelRole, label_40);
 
     horizontalLayout_28 = new QHBoxLayout();
     horizontalLayout_28->setSpacing(2);
@@ -1651,36 +2048,36 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_28->addItem(horizontalSpacer_28);
 
 
-    formLayout_3->setLayout(1, QFormLayout::ItemRole::FieldRole, horizontalLayout_28);
+    formLayout_3->setLayout(1, QFormLayout::FieldRole, horizontalLayout_28);
 
     label_35 = new QLabel(tab_custom);
     label_35->setObjectName("label_35");
 
-    formLayout_3->setWidget(2, QFormLayout::ItemRole::LabelRole, label_35);
+    formLayout_3->setWidget(2, QFormLayout::LabelRole, label_35);
 
     edit_custom_send = new QPlainTextEdit(tab_custom);
     edit_custom_send->setObjectName("edit_custom_send");
     edit_custom_send->setUndoRedoEnabled(false);
-    edit_custom_send->setReadOnly(true);
+    edit_custom_send->setReadOnly(false);
 
-    formLayout_3->setWidget(2, QFormLayout::ItemRole::FieldRole, edit_custom_send);
+    formLayout_3->setWidget(2, QFormLayout::FieldRole, edit_custom_send);
 
     label_36 = new QLabel(tab_custom);
     label_36->setObjectName("label_36");
 
-    formLayout_3->setWidget(3, QFormLayout::ItemRole::LabelRole, label_36);
+    formLayout_3->setWidget(3, QFormLayout::LabelRole, label_36);
 
     edit_custom_receive = new QPlainTextEdit(tab_custom);
     edit_custom_receive->setObjectName("edit_custom_receive");
     edit_custom_receive->setUndoRedoEnabled(false);
     edit_custom_receive->setReadOnly(true);
 
-    formLayout_3->setWidget(3, QFormLayout::ItemRole::FieldRole, edit_custom_receive);
+    formLayout_3->setWidget(3, QFormLayout::FieldRole, edit_custom_receive);
 
     label_37 = new QLabel(tab_custom);
     label_37->setObjectName("label_37");
 
-    formLayout_3->setWidget(4, QFormLayout::ItemRole::LabelRole, label_37);
+    formLayout_3->setWidget(4, QFormLayout::LabelRole, label_37);
 
     horizontalLayout_25 = new QHBoxLayout();
     horizontalLayout_25->setSpacing(2);
@@ -1736,7 +2133,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     horizontalLayout_25->addItem(horizontalSpacer_25);
 
 
-    formLayout_3->setLayout(4, QFormLayout::ItemRole::FieldRole, horizontalLayout_25);
+    formLayout_3->setLayout(4, QFormLayout::FieldRole, horizontalLayout_25);
 
 
     verticalLayout_5->addLayout(formLayout_3);
@@ -1788,24 +2185,24 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     label_7 = new QLabel(verticalLayoutWidget);
     label_7->setObjectName("label_7");
 
-    formLayout->setWidget(0, QFormLayout::ItemRole::LabelRole, label_7);
+    formLayout->setWidget(0, QFormLayout::LabelRole, label_7);
 
     edit_IMG_Preview_Hash = new QLineEdit(verticalLayoutWidget);
     edit_IMG_Preview_Hash->setObjectName("edit_IMG_Preview_Hash");
     edit_IMG_Preview_Hash->setReadOnly(true);
 
-    formLayout->setWidget(0, QFormLayout::ItemRole::FieldRole, edit_IMG_Preview_Hash);
+    formLayout->setWidget(0, QFormLayout::FieldRole, edit_IMG_Preview_Hash);
 
     label_8 = new QLabel(verticalLayoutWidget);
     label_8->setObjectName("label_8");
 
-    formLayout->setWidget(1, QFormLayout::ItemRole::LabelRole, label_8);
+    formLayout->setWidget(1, QFormLayout::LabelRole, label_8);
 
     edit_IMG_Preview_Version = new QLineEdit(verticalLayoutWidget);
     edit_IMG_Preview_Version->setObjectName("edit_IMG_Preview_Version");
     edit_IMG_Preview_Version->setReadOnly(true);
 
-    formLayout->setWidget(1, QFormLayout::ItemRole::FieldRole, edit_IMG_Preview_Version);
+    formLayout->setWidget(1, QFormLayout::FieldRole, edit_IMG_Preview_Version);
 
 
     verticalLayout->addLayout(formLayout);
@@ -1979,6 +2376,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     selector_img->setCurrentIndex(0);
     selector_OS->setCurrentIndex(0);
     tabWidget_4->setCurrentIndex(0);
+    tabWidget_3->setCurrentIndex(0);
 ///AUTOGEN_END_INIT
 
     //retranslate code
@@ -2005,6 +2403,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     check_IMG_Reset->setText(QCoreApplication::translate("Form", "After upload", nullptr));
     label_9->setText(QCoreApplication::translate("Form", "Reset:", nullptr));
     label_4->setText(QCoreApplication::translate("Form", "Image:", nullptr));
+    edit_IMG_Local->setText(QString());
     btn_IMG_Local->setText(QCoreApplication::translate("Form", "...", nullptr));
     label_43->setText(QCoreApplication::translate("Form", "File:", nullptr));
     radio_IMG_No_Action->setText(QCoreApplication::translate("Form", "No action", nullptr));
@@ -2155,6 +2554,50 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     lbl_enum_status->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
     btn_enum_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
     selector_group->setTabText(selector_group->indexOf(tab_Enum), QCoreApplication::translate("Form", "Enum", nullptr));
+    label_62->setText(QCoreApplication::translate("Form", "Transport:", nullptr));
+    combo_transport_standard_transport->setItemText(0, QCoreApplication::translate("Form", "UART", nullptr));
+    combo_transport_standard_transport->setItemText(1, QCoreApplication::translate("Form", "Raw UART", nullptr));
+    combo_transport_standard_transport->setItemText(2, QCoreApplication::translate("Form", "Bluetooth Low Energy", nullptr));
+    combo_transport_standard_transport->setItemText(3, QCoreApplication::translate("Form", "Shell", nullptr));
+    combo_transport_standard_transport->setItemText(4, QCoreApplication::translate("Form", "UDP (IPv4)", nullptr));
+    combo_transport_standard_transport->setItemText(5, QCoreApplication::translate("Form", "UDP (IPv6)", nullptr));
+    combo_transport_standard_transport->setItemText(6, QCoreApplication::translate("Form", "LoRaWAN", nullptr));
+    combo_transport_standard_transport->setItemText(7, QCoreApplication::translate("Form", "SPI", nullptr));
+
+    label_63->setText(QCoreApplication::translate("Form", "Disconnect: ", nullptr));
+    radio_transport_standard_disconnect_current_transport->setText(QCoreApplication::translate("Form", "Current transport", nullptr));
+    radio_transport_standard_disconnect_all_transports->setText(QCoreApplication::translate("Form", "All", nullptr));
+    radio_transport_standard_disconnect_specific_transport->setText(QCoreApplication::translate("Form", "Specific", nullptr));
+    radio_transport_standard_disconnect_incoming->setText(QCoreApplication::translate("Form", "Incoming", nullptr));
+    radio_transport_standard_disconnect_outgoing->setText(QCoreApplication::translate("Form", "Outgoing", nullptr));
+    label_64->setText(QCoreApplication::translate("Form", "Mode:", nullptr));
+    combo_transport_standard_mode->setItemText(0, QCoreApplication::translate("Form", "0", nullptr));
+
+    label_65->setText(QCoreApplication::translate("Form", "UDP:", nullptr));
+    edit_transport_udp_address->setPlaceholderText(QCoreApplication::translate("Form", "IP address", nullptr));
+    label_66->setText(QCoreApplication::translate("Form", ":", nullptr));
+    label_67->setText(QCoreApplication::translate("Form", "Bluetooth:", nullptr));
+    combo_transport_bluetooth_address_type->setItemText(0, QCoreApplication::translate("Form", "Public (0x00)", nullptr));
+    combo_transport_bluetooth_address_type->setItemText(1, QCoreApplication::translate("Form", "Private (0x01)", nullptr));
+
+    edit_transport_bluetooth_address->setInputMask(QCoreApplication::translate("Form", "HH:HH:HH:HH:HH:HH", nullptr));
+    edit_transport_bluetooth_address->setText(QCoreApplication::translate("Form", ":::::", nullptr));
+    edit_transport_bluetooth_address->setPlaceholderText(QCoreApplication::translate("Form", "Bluetooth address", nullptr));
+    check_transport_bluetooth_le_coded_phy->setText(QCoreApplication::translate("Form", "LE coded PHY", nullptr));
+    tabWidget_3->setTabText(tabWidget_3->indexOf(tab1), QCoreApplication::translate("Form", "Standard transports", nullptr));
+    label_71->setText(QCoreApplication::translate("Form", "Bridge status:", nullptr));
+    label_72->setText(QCoreApplication::translate("Form", "Supported:", nullptr));
+    label_73->setText(QCoreApplication::translate("Form", "Active:", nullptr));
+    check_transport_transport_bridged->setText(QCoreApplication::translate("Form", "Current transport bridged", nullptr));
+    radio_transport_connect->setText(QCoreApplication::translate("Form", "Connect", nullptr));
+    radio_transport_disconnect->setText(QCoreApplication::translate("Form", "Disconnect", nullptr));
+    radio_transport_status->setText(QCoreApplication::translate("Form", "Status", nullptr));
+    radio_transport_list->setText(QCoreApplication::translate("Form", "List", nullptr));
+    radio_transport_modes->setText(QCoreApplication::translate("Form", "Modes", nullptr));
+    radio_transport_config_details->setText(QCoreApplication::translate("Form", "Config details", nullptr));
+    lbl_transport_status_text->setText(QCoreApplication::translate("Form", "[Status]", nullptr));
+    btn_transport_go->setText(QCoreApplication::translate("Form", "Go", nullptr));
+    selector_group->setTabText(selector_group->indexOf(tab_transport), QCoreApplication::translate("Form", "Transport", nullptr));
     label_38->setText(QCoreApplication::translate("Form", "Mode:", nullptr));
     radio_custom_custom->setText(QCoreApplication::translate("Form", "Custom command", nullptr));
     radio_custom_logging->setText(QCoreApplication::translate("Form", "Logging", nullptr));
@@ -2242,6 +2685,8 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(smp_groups.zephyr_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
     connect(smp_groups.enum_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
     connect(smp_groups.enum_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
+    connect(smp_groups.transport_mgmt, SIGNAL(status(uint8_t,group_status,QString)), this, SLOT(status(uint8_t,group_status,QString)));
+    connect(smp_groups.transport_mgmt, SIGNAL(progress(uint8_t,uint8_t)), this, SLOT(progress(uint8_t,uint8_t)));
 
     connect(processor, SIGNAL(custom_message_callback(custom_message_callback_t,smp_error_t*)), this, SLOT(custom_message_callback(custom_message_callback_t,smp_error_t*)));
 
@@ -2314,6 +2759,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(tree_IMG_Slot_Info, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
     connect(btn_error_lookup, SIGNAL(clicked()), this, SLOT(on_btn_error_lookup_clicked()));
     connect(btn_cancel, SIGNAL(clicked()), this, SLOT(on_btn_cancel_clicked()));
+    connect(combo_transport_standard_transport, SIGNAL(currentIndexChanged(int)), this, SLOT(on_combo_transport_standard_transport_currentIndexChanged(int)));
+    connect(buttonGroup_7, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(on_buttonGroup_7_buttonClicked(QAbstractButton*)));
+    connect(btn_transport_go, SIGNAL(clicked(bool)), this, SLOT(on_btn_transport_go_clicked()));
+    connect(table_transport_output, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(on_table_transport_output_cellDoubleClicked(int,int)));
 
     //Use monospace font for shell
     QFont shell_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -2330,13 +2779,14 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     colview_IMG_Images->setModel(&model_image_state);
     colview_IMG_Images->setColumnWidths(QList<int>() << 40 << 40 << 480);
 
-    check_IMG_Preview_Confirmed->setChecked(true);
+    //Checkboxes do not support being read only which leads to them being disabled and hard to read, therefore use an event filter to prevent them from changing state and keep them in the enabled theme instead
     check_IMG_Preview_Confirmed->installEventFilter(this);
     check_IMG_Preview_Active->installEventFilter(this);
     check_IMG_Preview_Pending->installEventFilter(this);
     check_IMG_Preview_Bootable->installEventFilter(this);
     check_IMG_Preview_Permanent->installEventFilter(this);
     check_Enum_Group_Additional->installEventFilter(this);
+    check_transport_transport_bridged->installEventFilter(this);
 
     //Make shell response text edit have a monospace font
     QFont monospace_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -2367,6 +2817,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     smp_groups.stat_mgmt->set_logger(logger);
     smp_groups.zephyr_mgmt->set_logger(logger);
     smp_groups.enum_mgmt->set_logger(logger);
+    smp_groups.transport_mgmt->set_logger(logger);
 #endif
 
     edit_SHELL_Output->set_serial_open(true);
@@ -2388,6 +2839,10 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     //Sort slot info table in ascending (natural) order
     tree_IMG_Slot_Info->sortByColumn(0, Qt::AscendingOrder);
+
+    transport_table_data_type = TRANSPORT_TABLE_OUTPUT_NONE;
+    table_transport_output->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    on_combo_transport_standard_transport_currentIndexChanged(combo_transport_standard_transport->currentIndex());
 
     //Remove non-supported transports
 #if !defined(PLUGIN_MCUMGR_TRANSPORT_UDP)
@@ -2497,6 +2952,10 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_tree_IMG_Slot_Info_itemDoubleClicked(QTreeWidgetItem*,int)));
     disconnect(this, SLOT(on_btn_error_lookup_clicked()));
     disconnect(this, SLOT(on_btn_cancel_clicked()));
+    disconnect(this, SLOT(on_combo_transport_standard_transport_currentIndexChanged(int)));
+    disconnect(this, SLOT(on_buttonGroup_7_buttonClicked(QAbstractButton*)));
+    disconnect(this, SLOT(on_btn_transport_go_clicked()));
+    disconnect(this, SLOT(on_table_transport_output_cellDoubleClicked(int,int)));
 
     //Clean up GUI
     delete tab_2;
@@ -2514,6 +2973,7 @@ plugin_mcumgr::~plugin_mcumgr()
 #endif
 
     delete error_lookup_form;
+    delete smp_groups.transport_mgmt;
     delete smp_groups.enum_mgmt;
     delete smp_groups.zephyr_mgmt;
     delete smp_groups.stat_mgmt;
@@ -2680,10 +3140,21 @@ void plugin_mcumgr::serial_closed()
         case ACTION_ENUM_LIST:
         case ACTION_ENUM_SINGLE:
         case ACTION_ENUM_DETAILS:
-            {
-                smp_groups.enum_mgmt->cancel();
-                break;
-            }
+        {
+            smp_groups.enum_mgmt->cancel();
+            break;
+        }
+
+        case ACTION_TRANSPORT_CONNECT:
+        case ACTION_TRANSPORT_DISCONNECT:
+        case ACTION_TRANSPORT_STATUS:
+        case ACTION_TRANSPORT_LIST:
+        case ACTION_TRANSPORT_TRANSPORT_MODES:
+        case ACTION_TRANSPORT_TRANSPORT_CONFIG_DETAILS:
+        {
+            smp_groups.transport_mgmt->cancel();
+            break;
+        }
 
         default:
         {
@@ -3971,6 +4442,297 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
             }
         }
     }
+    else if (sender() == smp_groups.transport_mgmt)
+    {
+        log_debug() << "transport sender";
+        label_status = lbl_transport_status_text;
+
+        if (status == STATUS_COMPLETE)
+        {
+            log_debug() << "complete";
+
+            if (user_data == ACTION_TRANSPORT_CONNECT)
+            {
+            }
+            else if (user_data == ACTION_TRANSPORT_DISCONNECT)
+            {
+            }
+            else if (user_data == ACTION_TRANSPORT_STATUS)
+            {
+                edit_transport_supported->setText(QString::number(bridge_status_response.supported));
+                edit_transport_active->setText(QString::number(bridge_status_response.active));
+                check_transport_transport_bridged->setChecked(bridge_status_response.bridged);
+            }
+            else if (user_data == ACTION_TRANSPORT_LIST)
+            {
+                uint16_t i = 0;
+                uint16_t l = table_transport_output->columnCount();
+
+                table_transport_output->setSortingEnabled(false);
+                table_transport_output->setUpdatesEnabled(false);
+
+                if (transport_table_data_type != TRANSPORT_TABLE_OUTPUT_LIST)
+                {
+                    while (l < 2)
+                    {
+                        QTableWidgetItem *column_header = new QTableWidgetItem();
+                        table_transport_output->insertColumn(l);
+                        table_transport_output->setHorizontalHeaderItem(l, column_header);
+                        ++l;
+                    }
+
+                    while (l >= 2)
+                    {
+                        table_transport_output->removeColumn(l);
+                        --l;
+                    }
+
+                    table_transport_output->horizontalHeaderItem(0)->setText("ID");
+                    table_transport_output->horizontalHeaderItem(1)->setText("Name");
+                }
+
+                i = 0;
+                l = table_transport_output->rowCount();
+
+                while (i < transport_transports_response.length())
+                {
+                    if (i >= l)
+                    {
+                        table_transport_output->insertRow(i);
+
+                        QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(transport_transports_response[i].id));
+                        QTableWidgetItem *row_name = new QTableWidgetItem(transport_transports_response[i].name);
+
+                        table_transport_output->setItem(i, 0, row_id);
+                        table_transport_output->setItem(i, 1, row_name);
+                    }
+                    else
+                    {
+                        uint8_t q = 0;
+
+                        while (q < 2)
+                        {
+                            if (table_transport_output->item(i, q) == NULL)
+                            {
+                                QTableWidgetItem *row_id = new QTableWidgetItem();
+                                table_transport_output->setItem(i, q, row_id);
+                            }
+
+                            ++q;
+                        }
+
+                        while (q < 4)
+                        {
+                            if (table_transport_output->item(i, q) != NULL)
+                            {
+                                delete table_transport_output->item(i, q);
+                                table_transport_output->removeCellWidget(i, q);
+                            }
+
+                            ++q;
+                        }
+
+                        table_transport_output->item(i, 0)->setText(QString::number(transport_transports_response[i].id));
+                        table_transport_output->item(i, 1)->setText(transport_transports_response[i].name);
+                    }
+
+                    ++i;
+                }
+
+                while (i < l)
+                {
+                    table_transport_output->removeRow((table_transport_output->rowCount() - 1));
+                    ++i;
+                }
+
+                table_transport_output->setSortingEnabled(true);
+                table_transport_output->setUpdatesEnabled(true);
+                table_transport_output->clearSelection();
+                table_transport_output->update();
+                transport_table_data_type = TRANSPORT_TABLE_OUTPUT_LIST;
+            }
+            else if (user_data == ACTION_TRANSPORT_TRANSPORT_MODES)
+            {
+                uint16_t i = 0;
+                uint16_t l = table_transport_output->columnCount();
+
+                table_transport_output->setSortingEnabled(false);
+                table_transport_output->setUpdatesEnabled(false);
+
+                if (transport_table_data_type != TRANSPORT_TABLE_OUTPUT_MODES)
+                {
+                    while (l < 4)
+                    {
+                        QTableWidgetItem *column_header = new QTableWidgetItem();
+                        table_transport_output->insertColumn(l);
+                        table_transport_output->setHorizontalHeaderItem(l, column_header);
+                        ++l;
+                    }
+
+                    table_transport_output->horizontalHeaderItem(0)->setText("ID");
+                    table_transport_output->horizontalHeaderItem(1)->setText("Description");
+                    table_transport_output->horizontalHeaderItem(2)->setText("Incoming supported");
+                    table_transport_output->horizontalHeaderItem(3)->setText("Outgoing supported");
+                }
+
+                i = 0;
+                l = table_transport_output->rowCount();
+
+
+                while (i < transport_modes_response.length())
+                {
+                    if (i >= l)
+                    {
+                        table_transport_output->insertRow(i);
+
+                        QTableWidgetItem *row_id = new QTableWidgetItem(QString::number(transport_modes_response[i].id));
+                        QTableWidgetItem *row_name = new QTableWidgetItem(transport_modes_response[i].description);
+                        QTableWidgetItem *row_incoming_supported = new QTableWidgetItem();
+                        QTableWidgetItem *row_outgoing_supported = new QTableWidgetItem();
+
+                        row_incoming_supported->setFlags(row_incoming_supported->flags() & ~Qt::ItemIsUserCheckable);
+                        row_outgoing_supported->setFlags(row_outgoing_supported->flags() & ~Qt::ItemIsUserCheckable);
+                        row_incoming_supported->setCheckState(transport_modes_response[i].incoming ? Qt::Checked : Qt::Unchecked);
+                        row_outgoing_supported->setCheckState(transport_modes_response[i].outgoing ? Qt::Checked : Qt::Unchecked);
+
+                        table_transport_output->setItem(i, 0, row_id);
+                        table_transport_output->setItem(i, 1, row_name);
+                        table_transport_output->setItem(i, 2, row_incoming_supported);
+                        table_transport_output->setItem(i, 3, row_outgoing_supported);
+                    }
+                    else
+                    {
+                        uint8_t q = 0;
+
+                        while (q < 4)
+                        {
+                            if (table_transport_output->item(i, q) == NULL)
+                            {
+                                QTableWidgetItem *row_id = new QTableWidgetItem();
+                                table_transport_output->setItem(i, q, row_id);
+                            }
+
+                            ++q;
+                        }
+
+                        table_transport_output->item(i, 0)->setText(QString::number(transport_modes_response[i].id));
+                        table_transport_output->item(i, 1)->setText(transport_modes_response[i].description);
+                        table_transport_output->item(i, 2)->setCheckState(transport_modes_response[i].incoming ? Qt::Checked : Qt::Unchecked);
+                        table_transport_output->item(i, 3)->setCheckState(transport_modes_response[i].outgoing ? Qt::Checked : Qt::Unchecked);
+                    }
+
+                    ++i;
+                }
+
+                while (i < l)
+                {
+                    table_transport_output->removeRow((table_transport_output->rowCount() - 1));
+                    ++i;
+                }
+
+                table_transport_output->setSortingEnabled(true);
+                table_transport_output->setUpdatesEnabled(true);
+                table_transport_output->clearSelection();
+                table_transport_output->update();
+                transport_table_data_type = TRANSPORT_TABLE_OUTPUT_MODES;
+            }
+            else if (user_data == ACTION_TRANSPORT_TRANSPORT_CONFIG_DETAILS)
+            {
+                uint16_t i = 0;
+                uint16_t l = table_transport_output->columnCount();
+
+                table_transport_output->setSortingEnabled(false);
+                table_transport_output->setUpdatesEnabled(false);
+
+                if (transport_table_data_type != TRANSPORT_TABLE_OUTPUT_CONFIG_DETAILS)
+                {
+                    while (l < 3)
+                    {
+                        QTableWidgetItem *column_header = new QTableWidgetItem();
+                        table_transport_output->insertColumn(l);
+                        table_transport_output->setHorizontalHeaderItem(l, column_header);
+                        ++l;
+                    }
+
+                    while (l >= 3)
+                    {
+                        table_transport_output->removeColumn(l);
+                        --l;
+                    }
+
+                    table_transport_output->horizontalHeaderItem(0)->setText("Name");
+                    table_transport_output->horizontalHeaderItem(1)->setText("Type");
+                    table_transport_output->horizontalHeaderItem(2)->setText("Required");
+                }
+
+                i = 0;
+                l = table_transport_output->rowCount();
+
+                while (i < transport_config_details_response.length())
+                {
+                    if (i >= l)
+                    {
+                        table_transport_output->insertRow(i);
+
+                        QTableWidgetItem *row_name = new QTableWidgetItem(transport_config_details_response[i].name);
+                        QTableWidgetItem *row_type = new QTableWidgetItem(smp_group_transport_mgmt::config_type_to_string(transport_config_details_response[i].type, NULL) % " (" % QString::number(transport_config_details_response[i].type) % ")");
+                        QTableWidgetItem *row_required = new QTableWidgetItem();
+
+                        row_required->setFlags(row_required->flags() & ~Qt::ItemIsUserCheckable);
+                        row_required->setCheckState(transport_config_details_response[i].required ? Qt::Checked : Qt::Unchecked);
+
+                        table_transport_output->setItem(i, 0, row_name);
+                        table_transport_output->setItem(i, 1, row_type);
+                        table_transport_output->setItem(i, 2, row_required);
+                    }
+                    else
+                    {
+                        uint8_t q = 0;
+
+                        while (q < 3)
+                        {
+                            if (table_transport_output->item(i, q) == NULL)
+                            {
+                                QTableWidgetItem *row = new QTableWidgetItem();
+                                table_transport_output->setItem(i, q, row);
+                            }
+
+                            ++q;
+                        }
+
+                        while (q >= 3)
+                        {
+                            if (table_transport_output->item(i, q) != NULL)
+                            {
+                                delete table_transport_output->item(i, q);
+                                table_transport_output->removeCellWidget(i, q);
+                            }
+
+                            ++q;
+                        }
+
+                        table_transport_output->item(i, 0)->setText(transport_config_details_response[i].name);
+                        table_transport_output->item(i, 1)->setText(smp_group_transport_mgmt::config_type_to_string(transport_config_details_response[i].type, NULL) % " (" % QString::number(transport_config_details_response[i].type) % ")");
+                        table_transport_output->item(i, 2)->setCheckState(transport_config_details_response[i].required ? Qt::Checked : Qt::Unchecked);
+                    }
+
+                    ++i;
+                }
+
+                while (i < l)
+                {
+                    table_transport_output->removeRow((table_transport_output->rowCount() - 1));
+                    ++i;
+                }
+
+                table_transport_output->setSortingEnabled(true);
+                table_transport_output->setUpdatesEnabled(true);
+                table_transport_output->clearSelection();
+                table_transport_output->update();
+                transport_table_data_type = TRANSPORT_TABLE_OUTPUT_CONFIG_DETAILS;
+            }
+        }
+    }
 
     if (finished == true)
     {
@@ -5121,5 +5883,318 @@ void plugin_mcumgr::update_img_state_table()
         }
 
         model_image_state.appendRow(table_entry);
+    }
+}
+
+void plugin_mcumgr::on_combo_transport_standard_transport_currentIndexChanged(int index)
+{
+    bool visible;
+
+    if (radio_transport_connect->isChecked())
+    {
+        switch (index)
+        {
+            case TRANSPORT_CONNECTION_TYPE_UART:
+            case TRANSPORT_CONNECTION_TYPE_RAW_UART:
+            {
+                combo_transport_standard_mode->setEnabled(false);
+                btn_transport_go->setEnabled(true);
+                break;
+            }
+            case TRANSPORT_CONNECTION_TYPE_BLUETOOTH_LOW_ENERGY:
+            {
+                btn_transport_go->setEnabled(true);
+                break;
+            }
+            case TRANSPORT_CONNECTION_TYPE_SHELL:
+            {
+                combo_transport_standard_mode->setEnabled(false);
+                btn_transport_go->setEnabled(false);
+                break;
+            }
+            case TRANSPORT_CONNECTION_TYPE_UDP_IPV4:
+            case TRANSPORT_CONNECTION_TYPE_UDP_IPV6:
+            {
+                btn_transport_go->setEnabled(true);
+                break;
+            }
+            case TRANSPORT_CONNECTION_TYPE_LORAWAN:
+            {
+                combo_transport_standard_mode->setEnabled(false);
+                btn_transport_go->setEnabled(false);
+                break;
+            }
+            case TRANSPORT_CONNECTION_TYPE_SPI:
+            {
+                btn_transport_go->setEnabled(false);
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        };
+    }
+
+    //Hide/show Bluetooth/UDP rows
+    visible = (index == TRANSPORT_CONNECTION_TYPE_BLUETOOTH_LOW_ENERGY);
+    formLayout_8->setRowVisible(TRANSPORT_MANAGEMENT_BLUETOOTH_CONFIGURATION_ROW, visible);
+
+    if (radio_transport_connect->isChecked())
+    {
+        combo_transport_bluetooth_address_type->setEnabled(visible);
+        edit_transport_bluetooth_address->setEnabled(visible);
+        check_transport_bluetooth_le_coded_phy->setEnabled(visible);
+    }
+    else
+    {
+        combo_transport_bluetooth_address_type->setEnabled(false);
+        edit_transport_bluetooth_address->setEnabled(false);
+        check_transport_bluetooth_le_coded_phy->setEnabled(false);
+    }
+
+    visible = (index == TRANSPORT_CONNECTION_TYPE_UDP_IPV4 || index == TRANSPORT_CONNECTION_TYPE_UDP_IPV6);
+    formLayout_8->setRowVisible(TRANSPORT_MANAGEMENT_UDP_CONFIGURATION_ROW, visible);
+
+    if (radio_transport_connect->isChecked())
+    {
+        edit_transport_udp_address->setEnabled(visible);
+        edit_transport_udp_port->setEnabled(visible);
+    }
+    else
+    {
+        edit_transport_udp_address->setEnabled(false);
+        edit_transport_udp_port->setEnabled(false);
+    }
+}
+
+void plugin_mcumgr::on_buttonGroup_7_buttonClicked(QAbstractButton *button)
+{
+    QRadioButton *radio_button_selected = static_cast<QRadioButton*>(button);
+
+    if (radio_button_selected == radio_transport_connect)
+    {
+        radio_transport_standard_disconnect_all_transports->setEnabled(false);
+        radio_transport_standard_disconnect_current_transport->setEnabled(false);
+        radio_transport_standard_disconnect_specific_transport->setEnabled(false);
+        radio_transport_standard_disconnect_incoming->setEnabled(false);
+        radio_transport_standard_disconnect_outgoing->setEnabled(false);
+        combo_transport_standard_transport->setEnabled(true);
+        combo_transport_standard_mode->setEnabled(false);
+        on_combo_transport_standard_transport_currentIndexChanged(combo_transport_standard_transport->currentIndex());
+    }
+    else if (radio_button_selected == radio_transport_disconnect)
+    {
+        radio_transport_standard_disconnect_all_transports->setEnabled(true);
+        radio_transport_standard_disconnect_current_transport->setEnabled(true);
+        radio_transport_standard_disconnect_specific_transport->setEnabled(true);
+        radio_transport_standard_disconnect_incoming->setEnabled(true);
+        radio_transport_standard_disconnect_outgoing->setEnabled(true);
+        combo_transport_standard_transport->setEnabled(true);
+        combo_transport_standard_mode->setEnabled(false);
+        btn_transport_go->setEnabled(true);
+    }
+    else if (radio_button_selected == radio_transport_status)
+    {
+        radio_transport_standard_disconnect_all_transports->setEnabled(false);
+        radio_transport_standard_disconnect_current_transport->setEnabled(false);
+        radio_transport_standard_disconnect_specific_transport->setEnabled(false);
+        radio_transport_standard_disconnect_incoming->setEnabled(false);
+        radio_transport_standard_disconnect_outgoing->setEnabled(false);
+        combo_transport_standard_transport->setEnabled(false);
+        combo_transport_standard_mode->setEnabled(false);
+        btn_transport_go->setEnabled(true);
+    }
+    else if (radio_button_selected == radio_transport_list)
+    {
+        radio_transport_standard_disconnect_all_transports->setEnabled(false);
+        radio_transport_standard_disconnect_current_transport->setEnabled(false);
+        radio_transport_standard_disconnect_specific_transport->setEnabled(false);
+        radio_transport_standard_disconnect_incoming->setEnabled(false);
+        radio_transport_standard_disconnect_outgoing->setEnabled(false);
+        combo_transport_standard_transport->setEnabled(false);
+        combo_transport_standard_mode->setEnabled(false);
+        btn_transport_go->setEnabled(true);
+    }
+    else if (radio_button_selected == radio_transport_modes)
+    {
+        radio_transport_standard_disconnect_all_transports->setEnabled(false);
+        radio_transport_standard_disconnect_current_transport->setEnabled(false);
+        radio_transport_standard_disconnect_specific_transport->setEnabled(false);
+        radio_transport_standard_disconnect_incoming->setEnabled(false);
+        radio_transport_standard_disconnect_outgoing->setEnabled(false);
+        combo_transport_standard_transport->setEnabled(true);
+        combo_transport_standard_mode->setEnabled(false);
+        btn_transport_go->setEnabled(true);
+    }
+    else if (radio_button_selected == radio_transport_config_details)
+    {
+        radio_transport_standard_disconnect_all_transports->setEnabled(false);
+        radio_transport_standard_disconnect_current_transport->setEnabled(false);
+        radio_transport_standard_disconnect_specific_transport->setEnabled(false);
+        radio_transport_standard_disconnect_incoming->setEnabled(false);
+        radio_transport_standard_disconnect_outgoing->setEnabled(false);
+        combo_transport_standard_transport->setEnabled(true);
+        combo_transport_standard_mode->setEnabled(true);
+        btn_transport_go->setEnabled(true);
+    }
+
+    on_combo_transport_standard_transport_currentIndexChanged(combo_transport_standard_transport->currentIndex());
+}
+
+void plugin_mcumgr::on_btn_transport_go_clicked()
+{
+    bool started = false;
+
+    if (claim_transport(lbl_transport_status_text) == false)
+    {
+        return;
+    }
+
+    if (radio_transport_connect->isChecked())
+    {
+        mode = ACTION_TRANSPORT_CONNECT;
+        processor->set_transport(active_transport());
+        set_group_transport_settings(smp_groups.transport_mgmt);
+        transport_connect_params_t transport_config;
+
+        if (combo_transport_standard_transport->currentIndex() == TRANSPORT_CONNECTION_TYPE_BLUETOOTH_LOW_ENERGY)
+        {
+            transport_config.insert("address_type", combo_transport_bluetooth_address_type->currentIndex());
+            transport_config.insert("address", edit_transport_bluetooth_address->text());
+
+            if (check_transport_bluetooth_le_coded_phy->isChecked())
+            {
+                transport_config.insert("le_coded", true);
+            }
+        }
+        else if (combo_transport_standard_transport->currentIndex() == TRANSPORT_CONNECTION_TYPE_UDP_IPV4 || combo_transport_standard_transport->currentIndex() == TRANSPORT_CONNECTION_TYPE_UDP_IPV6)
+        {
+            transport_config.insert("address", edit_transport_udp_address->text());
+            transport_config.insert("port", edit_transport_udp_port->value());
+        }
+
+        started = smp_groups.transport_mgmt->start_connect(combo_transport_standard_transport->currentIndex(), &transport_config);
+
+        if (started == true)
+        {
+            lbl_transport_status_text->setText("Bridge connect command sent...");
+        }
+        else
+        {
+            lbl_transport_status_text->setText("??");
+        }
+
+        if (started == true)
+        {
+            btn_cancel->setEnabled(true);
+        }
+        else
+        {
+            relase_transport();
+        }
+    }
+    else if (radio_transport_disconnect->isChecked())
+    {
+        mode = ACTION_TRANSPORT_DISCONNECT;
+        processor->set_transport(active_transport());
+        set_group_transport_settings(smp_groups.transport_mgmt);
+        started = smp_groups.transport_mgmt->start_disconnect(combo_transport_standard_transport->currentIndex());
+
+        if (started == true)
+        {
+            lbl_transport_status_text->setText("Bridge disconnect command sent...");
+        }
+
+        if (started == true)
+        {
+            btn_cancel->setEnabled(true);
+        }
+        else
+        {
+            relase_transport();
+        }
+    }
+    else if (radio_transport_status->isChecked())
+    {
+        mode = ACTION_TRANSPORT_STATUS;
+        processor->set_transport(active_transport());
+        set_group_transport_settings(smp_groups.transport_mgmt);
+        started = smp_groups.transport_mgmt->start_status(&bridge_status_response);
+
+        if (started == true)
+        {
+            lbl_transport_status_text->setText("Bridge status command sent...");
+        }
+    }
+    else if (radio_transport_list->isChecked())
+    {
+        mode = ACTION_TRANSPORT_LIST;
+        processor->set_transport(active_transport());
+        set_group_transport_settings(smp_groups.transport_mgmt);
+        started = smp_groups.transport_mgmt->start_list_transports(&transport_transports_response);
+
+        if (started == true)
+        {
+            lbl_transport_status_text->setText("Bridge list command sent...");
+        }
+    }
+    else if (radio_transport_modes->isChecked())
+    {
+        mode = ACTION_TRANSPORT_TRANSPORT_MODES;
+        processor->set_transport(active_transport());
+        set_group_transport_settings(smp_groups.transport_mgmt);
+        started = smp_groups.transport_mgmt->start_details(combo_transport_standard_transport->currentIndex(), &transport_modes_response);
+
+        if (started == true)
+        {
+            lbl_transport_status_text->setText("Bridge details command sent...");
+        }
+    }
+    else if (radio_transport_config_details->isChecked())
+    {
+        mode = ACTION_TRANSPORT_TRANSPORT_CONFIG_DETAILS;
+        processor->set_transport(active_transport());
+        set_group_transport_settings(smp_groups.transport_mgmt);
+        started = smp_groups.transport_mgmt->start_config_details(combo_transport_standard_transport->currentIndex(), combo_transport_standard_mode->currentIndex(), &transport_config_details_response);
+
+        if (started == true)
+        {
+            lbl_transport_status_text->setText("Bridge config details command sent...");
+        }
+    }
+
+    if (started == true)
+    {
+        btn_cancel->setEnabled(true);
+    }
+    else
+    {
+        relase_transport();
+    }
+}
+
+void plugin_mcumgr::on_table_transport_output_cellDoubleClicked(int row, int column)
+{
+    uint16_t index;
+    Q_UNUSED(column);
+
+    if (transport_table_data_type == TRANSPORT_TABLE_OUTPUT_LIST)
+    {
+        index = table_transport_output->item(row, 0)->text().toUInt();
+
+        if (index < combo_transport_standard_transport->count())
+        {
+            combo_transport_standard_transport->setCurrentIndex(index);
+        }
+    }
+    else if (transport_table_data_type == TRANSPORT_TABLE_OUTPUT_MODES)
+    {
+        index = table_transport_output->item(row, 0)->text().toUInt();
+
+        if (index < combo_transport_standard_mode->count())
+        {
+            combo_transport_standard_mode->setCurrentIndex(index);
+        }
     }
 }
