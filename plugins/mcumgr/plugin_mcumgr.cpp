@@ -1898,9 +1898,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     table_transport_output = new QTableWidget(tab_transport);
     table_transport_output->setObjectName("table_transport_output");
     table_transport_output->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-    table_transport_output->setDragDropOverwriteMode(true);
-    table_transport_output->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-    table_transport_output->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+    table_transport_output->setProperty("showDropIndicator", QVariant(false));
+    table_transport_output->setDragDropOverwriteMode(false);
+    table_transport_output->setAlternatingRowColors(true);
+    table_transport_output->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
+    table_transport_output->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
     table_transport_output->setSortingEnabled(true);
     table_transport_output->setCornerButtonEnabled(false);
 
@@ -4595,10 +4597,10 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                         QTableWidgetItem *row_incoming_supported = new QTableWidgetItem();
                         QTableWidgetItem *row_outgoing_supported = new QTableWidgetItem();
 
-                        row_incoming_supported->setFlags(row_incoming_supported->flags() & ~Qt::ItemIsUserCheckable);
-                        row_outgoing_supported->setFlags(row_outgoing_supported->flags() & ~Qt::ItemIsUserCheckable);
                         row_incoming_supported->setCheckState(transport_modes_response[i].incoming ? Qt::Checked : Qt::Unchecked);
                         row_outgoing_supported->setCheckState(transport_modes_response[i].outgoing ? Qt::Checked : Qt::Unchecked);
+                        row_incoming_supported->setFlags(row_incoming_supported->flags() & ~Qt::ItemIsUserCheckable);
+                        row_outgoing_supported->setFlags(row_outgoing_supported->flags() & ~Qt::ItemIsUserCheckable);
 
                         table_transport_output->setItem(i, 0, row_id);
                         table_transport_output->setItem(i, 1, row_name);
@@ -4683,8 +4685,8 @@ void plugin_mcumgr::status(uint8_t user_data, group_status status, QString error
                         QTableWidgetItem *row_type = new QTableWidgetItem(smp_group_transport_mgmt::config_type_to_string(transport_config_details_response[i].type, NULL) % " (" % QString::number(transport_config_details_response[i].type) % ")");
                         QTableWidgetItem *row_required = new QTableWidgetItem();
 
-                        row_required->setFlags(row_required->flags() & ~Qt::ItemIsUserCheckable);
                         row_required->setCheckState(transport_config_details_response[i].required ? Qt::Checked : Qt::Unchecked);
+                        row_required->setFlags(row_required->flags() & ~Qt::ItemIsUserCheckable);
 
                         table_transport_output->setItem(i, 0, row_name);
                         table_transport_output->setItem(i, 1, row_type);
