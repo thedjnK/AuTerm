@@ -2840,6 +2840,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     //Sort slot info table in ascending (natural) order
     tree_IMG_Slot_Info->sortByColumn(0, Qt::AscendingOrder);
 
+    table_Enum_List_Details->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    table_OS_Memory->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    table_OS_Tasks->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    table_STAT_Values->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
     transport_table_data_type = TRANSPORT_TABLE_OUTPUT_NONE;
     table_transport_output->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     on_combo_transport_standard_transport_currentIndexChanged(combo_transport_standard_transport->currentIndex());
