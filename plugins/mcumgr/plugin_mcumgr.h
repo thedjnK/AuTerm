@@ -168,6 +168,8 @@ signals:
     void plugin_to_hex(QByteArray *data);
     void plugin_serial_open_close(uint8_t mode);
     void plugin_serial_is_open(bool *open);
+    void plugin_save_setting(QString name, QVariant data);
+    void plugin_load_setting(QString name, QVariant *data, bool *found);
 
 private slots:
     void serial_receive(QByteArray *data);

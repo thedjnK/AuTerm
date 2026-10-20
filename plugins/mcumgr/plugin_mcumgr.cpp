@@ -2245,6 +2245,9 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
 
     connect(processor, SIGNAL(custom_message_callback(custom_message_callback_t,smp_error_t*)), this, SLOT(custom_message_callback(custom_message_callback_t,smp_error_t*)));
 
+    connect(this, SIGNAL(plugin_save_setting(QString,QVariant)), parent_window, SLOT(plugin_save_setting(QString,QVariant)));
+    connect(this, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), parent_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
+
     //Form signals
     connect(btn_FS_Local, SIGNAL(clicked()), this, SLOT(on_btn_FS_Local_clicked()));
     connect(btn_FS_Go, SIGNAL(clicked()), this, SLOT(on_btn_FS_Go_clicked()));
@@ -2424,6 +2427,9 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SIGNAL(custom_log(bool,QString*)));
 
     disconnect(this, SLOT(custom_message_callback(custom_message_callback_t,smp_error_t*)));
+
+    disconnect(this, SIGNAL(plugin_save_setting(QString,QVariant)), parent_window, SLOT(plugin_save_setting(QString,QVariant)));
+    disconnect(this, SIGNAL(plugin_load_setting(QString,QVariant*,bool*)), parent_window, SLOT(plugin_load_setting(QString,QVariant*,bool*)));
 
     //Form signals
     disconnect(this, SLOT(on_btn_FS_Local_clicked()));
@@ -2694,21 +2700,29 @@ void plugin_mcumgr::serial_closed()
 void plugin_mcumgr::on_btn_FS_Local_clicked()
 {
     QString filename;
+    QVariant data;
+    bool found = false;
+
+    emit plugin_load_setting("mcumgr_fs_mgmt_last_path", &data, &found);
+
+    if (found == true && data.typeId() == QMetaType::QString)
+    {
+        filename = data.toString();
+    }
 
     if (radio_FS_Upload->isChecked())
     {
-        //TODO: load path
-        filename = QFileDialog::getOpenFileName(parent_window, "Select source file for transfer", "", "All Files (*)");
+        filename = QFileDialog::getOpenFileName(parent_window, "Select source file for transfer", filename, "All Files (*)");
     }
     else
     {
-        //TODO: load path
-        filename = QFileDialog::getSaveFileName(parent_window, "Select target file for transfer", "", "All Files (*)");
+        filename = QFileDialog::getSaveFileName(parent_window, "Select target file for transfer", filename, "All Files (*)");
     }
 
     if (!filename.isEmpty())
     {
         edit_FS_Local->setText(filename);
+        emit plugin_save_setting("mcumgr_fs_mgmt_last_path", filename);
     }
 }
 
