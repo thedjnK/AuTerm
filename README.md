@@ -31,6 +31,7 @@ If looking for a command-line interface MCUmgr tool then see [qtmgmt](https://gi
   - Settings management group support
   - Zephyr basic management group support
   - Enumeration management group support
+  - Transport management group support
   - Custom command support using JSON or CBOR
   - UART transport (SMP over console and raw UART) support
   - Bluetooth transport support (supporting write with and without response modes)
