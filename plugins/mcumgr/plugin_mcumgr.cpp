@@ -2705,7 +2705,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(radio_FS_Hash_Checksum_Types, SIGNAL(toggled(bool)), this, SLOT(on_radio_FS_Hash_Checksum_Types_toggled(bool)));
     connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
-    connect(radio_IMG_No_Action, SIGNAL(toggled(bool)), this, SLOT(on_radio_IMG_No_Action_toggled(bool)));
     connect(btn_IMG_Preview_Copy, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Preview_Copy_clicked()));
     connect(btn_OS_Go, SIGNAL(clicked()), this, SLOT(on_btn_OS_Go_clicked()));
     connect(btn_STAT_Go, SIGNAL(clicked()), this, SLOT(on_btn_STAT_Go_clicked()));
@@ -2906,7 +2905,6 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_radio_FS_Hash_Checksum_Types_toggled(bool)));
     disconnect(this, SLOT(on_btn_IMG_Local_clicked()));
     disconnect(this, SLOT(on_btn_IMG_Go_clicked()));
-    disconnect(this, SLOT(on_radio_IMG_No_Action_toggled(bool)));
     disconnect(this, SLOT(on_btn_IMG_Preview_Copy_clicked()));
     disconnect(this, SLOT(on_btn_OS_Go_clicked()));
     disconnect(this, SLOT(on_btn_STAT_Go_clicked()));
@@ -3533,10 +3531,6 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
     {
         relase_transport();
     }
-}
-
-void plugin_mcumgr::on_radio_IMG_No_Action_toggled(bool checked)
-{
 }
 
 void plugin_mcumgr::on_btn_IMG_Preview_Copy_clicked()

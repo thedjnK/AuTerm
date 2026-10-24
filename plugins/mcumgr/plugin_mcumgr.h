@@ -206,7 +206,6 @@ private slots:
     void on_radio_FS_Hash_Checksum_Types_toggled(bool checked);
     void on_btn_IMG_Local_clicked();
     void on_btn_IMG_Go_clicked();
-    void on_radio_IMG_No_Action_toggled(bool checked);
     void on_btn_IMG_Preview_Copy_clicked();
     void on_btn_OS_Go_clicked();
     void on_btn_STAT_Go_clicked();
