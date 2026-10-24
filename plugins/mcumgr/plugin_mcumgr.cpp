@@ -2853,11 +2853,6 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
         }
     }
 
-    //Setup widths of enum mgmt table
-    table_Enum_List_Details->setColumnWidth(0, 80);
-    table_Enum_List_Details->setColumnWidth(1, 300);
-    table_Enum_List_Details->setColumnWidth(2, 80);
-
     //Sort slot info table in ascending (natural) order
     tree_IMG_Slot_Info->sortByColumn(0, Qt::AscendingOrder);
 
