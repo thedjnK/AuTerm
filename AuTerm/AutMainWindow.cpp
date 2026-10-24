@@ -320,7 +320,7 @@ AutMainWindow::AutMainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::
     }
 
     //Fix mac's resize
-    resize(740, 400);
+    resize(740, 440);
 
     //Disable viewing files externally for mac
     ui->btn_EditExternal->setEnabled(false);
