@@ -2778,8 +2778,11 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     edit_SHELL_Output->set_line_mode(true);
     edit_SHELL_Output->set_vt100_mode(VT100_MODE_DECODE);
 
+    //Calculate the maximum size of the image list view, this is based on a SHA256 hash, assuming a mix of characters with width of 3 and 1, it should be slightly larger than the data size (for SHA512, users will just need to scroll)
+    QFontMetrics image_font_metrics(edit_IMG_Preview_Hash->font());
+
     colview_IMG_Images->setModel(&model_image_state);
-    colview_IMG_Images->setColumnWidths(QList<int>() << 40 << 40 << 480);
+    colview_IMG_Images->setColumnWidths(QList<int>() << 40 << 40 << (label_8->width() + (image_font_metrics.horizontalAdvance("31") * 32)));
 
     //Checkboxes do not support being read only which leads to them being disabled and hard to read, therefore use an event filter to prevent them from changing state and keep them in the enabled theme instead
     check_IMG_Preview_Confirmed->installEventFilter(this);
@@ -3783,6 +3786,9 @@ void plugin_mcumgr::on_colview_IMG_Images_updatePreviewWidget(const QModelIndex 
         if (colview_IMG_Images->previewWidget() != verticalLayoutWidget)
         {
             colview_IMG_Images->setPreviewWidget(verticalLayoutWidget);
+
+            //Fix issue with vertical layout always having an extra gap. Whilst the window dimensions might be changed, that would only be increasing the height, not decreasing it
+            verticalLayoutWidget->setMaximumHeight(colview_IMG_Images->viewport()->height() - colview_IMG_Images->horizontalScrollBar()->height());
         }
         else
         {
