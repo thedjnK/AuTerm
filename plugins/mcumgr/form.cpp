@@ -329,3 +329,8 @@ void Form::on_table_transport_output_cellDoubleClicked(int row, int column)
 {
 
 }
+
+void Form::on_btn_img_copy_all_slot_data_clicked()
+{
+
+}

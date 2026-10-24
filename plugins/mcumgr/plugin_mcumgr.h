@@ -207,6 +207,7 @@ private slots:
     void on_btn_IMG_Local_clicked();
     void on_btn_IMG_Go_clicked();
     void on_btn_IMG_Preview_Copy_clicked();
+    void on_btn_img_copy_all_slot_data_clicked();
     void on_btn_OS_Go_clicked();
     void on_btn_STAT_Go_clicked();
     void on_btn_SHELL_Clear_clicked();
@@ -334,6 +335,8 @@ private:
     QRadioButton *radio_img_images_erase;
     QFrame *line;
     QCheckBox *check_IMG_Confirm;
+    QFrame *line_10;
+    QPushButton *btn_img_copy_all_slot_data;
     QSpacerItem *horizontalSpacer_5;
     QWidget *tab_IMG_Erase;
     QGridLayout *gridLayout_10;

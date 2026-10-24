@@ -520,6 +520,23 @@
                   </widget>
                  </item>
                  <item>
+                  <widget class="Line" name="line_10">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_img_copy_all_slot_data">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Copy all image/slot data</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <spacer name="horizontalSpacer_5">
                    <property name="orientation">
                     <enum>Qt::Orientation::Horizontal</enum>
@@ -3968,7 +3985,7 @@
         <item>
          <widget class="QPushButton" name="btn_IMG_Preview_Copy">
           <property name="text">
-           <string>Copy</string>
+           <string>Copy slot data</string>
           </property>
          </widget>
         </item>

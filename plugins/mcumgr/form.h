@@ -80,6 +80,7 @@ private slots:
     void on_buttonGroup_7_buttonClicked(QAbstractButton*);
     void on_btn_transport_go_clicked();
     void on_table_transport_output_cellDoubleClicked(int row, int column);
+    void on_btn_img_copy_all_slot_data_clicked();
 
 private:
     Ui::Form *ui;

@@ -61,6 +61,8 @@ enum transport_table_output_t {
 
 static QMainWindow *parent_window;
 
+#define INDENT_TEXT "    "
+
 void plugin_mcumgr::setup(QMainWindow *main_window)
 {
     parent_window = main_window;
@@ -387,6 +389,19 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     check_IMG_Confirm->setEnabled(false);
 
     horizontalLayout_6->addWidget(check_IMG_Confirm);
+
+    line_10 = new QFrame(tab_IMG_Images);
+    line_10->setObjectName("line_10");
+    line_10->setFrameShape(QFrame::Shape::VLine);
+    line_10->setFrameShadow(QFrame::Shadow::Sunken);
+
+    horizontalLayout_6->addWidget(line_10);
+
+    btn_img_copy_all_slot_data = new QPushButton(tab_IMG_Images);
+    btn_img_copy_all_slot_data->setObjectName("btn_img_copy_all_slot_data");
+    btn_img_copy_all_slot_data->setEnabled(false);
+
+    horizontalLayout_6->addWidget(btn_img_copy_all_slot_data);
 
     horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
@@ -2417,6 +2432,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     radio_IMG_Set->setText(QCoreApplication::translate("Form", "Set", nullptr));
     radio_img_images_erase->setText(QCoreApplication::translate("Form", "Erase", nullptr));
     check_IMG_Confirm->setText(QCoreApplication::translate("Form", "Confirm", nullptr));
+    btn_img_copy_all_slot_data->setText(QCoreApplication::translate("Form", "Copy all image/slot data", nullptr));
     selector_img->setTabText(selector_img->indexOf(tab_IMG_Images), QCoreApplication::translate("Form", "Images", nullptr));
     label_14->setText(QCoreApplication::translate("Form", "Slot:", nullptr));
     selector_img->setTabText(selector_img->indexOf(tab_IMG_Erase), QCoreApplication::translate("Form", "Erase", nullptr));
@@ -2632,7 +2648,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     check_IMG_Preview_Pending->setText(QCoreApplication::translate("Form", "Pending", nullptr));
     check_IMG_Preview_Bootable->setText(QCoreApplication::translate("Form", "Bootable", nullptr));
     check_IMG_Preview_Permanent->setText(QCoreApplication::translate("Form", "Permanent", nullptr));
-    btn_IMG_Preview_Copy->setText(QCoreApplication::translate("Form", "Copy", nullptr));
+    btn_IMG_Preview_Copy->setText(QCoreApplication::translate("Form", "Copy slot data", nullptr));
 //    tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("Form", "Page", nullptr));
 ///AUTOGEN_END_TRANSLATE
 
@@ -2706,6 +2722,7 @@ void plugin_mcumgr::setup(QMainWindow *main_window)
     connect(btn_IMG_Local, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Local_clicked()));
     connect(btn_IMG_Go, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Go_clicked()));
     connect(btn_IMG_Preview_Copy, SIGNAL(clicked()), this, SLOT(on_btn_IMG_Preview_Copy_clicked()));
+    connect(btn_img_copy_all_slot_data, SIGNAL(clicked()), this, SLOT(on_btn_img_copy_all_slot_data_clicked()));
     connect(btn_OS_Go, SIGNAL(clicked()), this, SLOT(on_btn_OS_Go_clicked()));
     connect(btn_STAT_Go, SIGNAL(clicked()), this, SLOT(on_btn_STAT_Go_clicked()));
     connect(btn_SHELL_Clear, SIGNAL(clicked()), this, SLOT(on_btn_SHELL_Clear_clicked()));
@@ -2906,6 +2923,7 @@ plugin_mcumgr::~plugin_mcumgr()
     disconnect(this, SLOT(on_btn_IMG_Local_clicked()));
     disconnect(this, SLOT(on_btn_IMG_Go_clicked()));
     disconnect(this, SLOT(on_btn_IMG_Preview_Copy_clicked()));
+    disconnect(this, SLOT(on_btn_img_copy_all_slot_data_clicked()));
     disconnect(this, SLOT(on_btn_OS_Go_clicked()));
     disconnect(this, SLOT(on_btn_STAT_Go_clicked()));
     disconnect(this, SLOT(on_btn_SHELL_Clear_clicked()));
@@ -3535,6 +3553,134 @@ void plugin_mcumgr::on_btn_IMG_Go_clicked()
 
 void plugin_mcumgr::on_btn_IMG_Preview_Copy_clicked()
 {
+    uint8_t i = model_image_state.itemFromIndex(colview_IMG_Images->currentIndex())->parent()->data().toUInt();
+    uint8_t l = model_image_state.itemFromIndex(colview_IMG_Images->currentIndex())->data().toUInt();
+
+    if (images_list.length() > i && images_list[i].slot_list.length() > l)
+    {
+        QString output;
+        QByteArray escaped_hash = images_list[i].slot_list[l].hash;
+
+        emit plugin_to_hex(&escaped_hash);
+
+        if (images_list[i].image_set)
+        {
+            output.append("Image " % QString::number(images_list[i].image));
+        }
+        else
+        {
+            output.append("Image (assumed) " % QString::number(i));
+        }
+
+        output.append("\r\n" INDENT_TEXT "Slot " % QString::number(images_list[i].slot_list[l].slot) % "\r\n" INDENT_TEXT INDENT_TEXT "Hash: " % escaped_hash % "\r\n" INDENT_TEXT INDENT_TEXT "Version: " % images_list[i].slot_list[l].version);
+
+        if (images_list[i].slot_list[l].active)
+        {
+            output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Active");
+        }
+
+        if (images_list[i].slot_list[l].bootable)
+        {
+            output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Bootable");
+        }
+
+        if (images_list[i].slot_list[l].confirmed)
+        {
+            output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Confirmed");
+        }
+
+        if (images_list[i].slot_list[l].pending)
+        {
+            output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Pending");
+        }
+
+        if (images_list[i].slot_list[l].permanent)
+        {
+            output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Permanent");
+        }
+
+        QApplication::clipboard()->setText(output);
+    }
+}
+
+void plugin_mcumgr::on_btn_img_copy_all_slot_data_clicked()
+{
+    QString output;
+    uint8_t i = 0;
+
+    if (images_list.length() == 0)
+    {
+        return;
+    }
+
+    while (i < images_list.length())
+    {
+        uint8_t l = 0;
+
+        if (images_list[i].slot_list.length() == 0)
+        {
+            continue;
+        }
+
+        if (i > 0)
+        {
+            output.append("\r\n\r\n");
+        }
+
+        if (images_list[i].image_set)
+        {
+            output.append("Image " % QString::number(images_list[i].image));
+        }
+        else
+        {
+            output.append("Image (assumed " % QString::number(i) % ")");
+        }
+
+        while (l < images_list[i].slot_list.length())
+        {
+            QByteArray escaped_hash = images_list[i].slot_list[l].hash;
+
+            emit plugin_to_hex(&escaped_hash);
+
+            if (l > 0)
+            {
+                output.append("\r\n");
+            }
+
+            output.append("\r\n" INDENT_TEXT "Slot " % QString::number(images_list[i].slot_list[l].slot) % "\r\n" INDENT_TEXT INDENT_TEXT "Hash: " % escaped_hash % "\r\n" INDENT_TEXT INDENT_TEXT "Version: " % images_list[i].slot_list[l].version);
+
+            if (images_list[i].slot_list[l].active)
+            {
+                output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Active");
+            }
+
+            if (images_list[i].slot_list[l].bootable)
+            {
+                output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Bootable");
+            }
+
+            if (images_list[i].slot_list[l].confirmed)
+            {
+                output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Confirmed");
+            }
+
+            if (images_list[i].slot_list[l].pending)
+            {
+                output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Pending");
+            }
+
+            if (images_list[i].slot_list[l].permanent)
+            {
+                output.append("\r\n" INDENT_TEXT INDENT_TEXT "- Permanent");
+            }
+
+            ++l;
+        }
+
+        ++i;
+    }
+
+    QApplication::clipboard()->setText(output);
 }
 
 void plugin_mcumgr::on_btn_OS_Go_clicked()
@@ -5891,6 +6037,8 @@ void plugin_mcumgr::update_img_state_table()
 
         model_image_state.appendRow(table_entry);
     }
+
+    btn_img_copy_all_slot_data->setEnabled(images_list.length() > 0);
 }
 
 void plugin_mcumgr::on_combo_transport_standard_transport_currentIndexChanged(int index)
