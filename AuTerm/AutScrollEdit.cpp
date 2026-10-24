@@ -532,6 +532,12 @@ bool AutScrollEdit::eventFilter(QObject *target, QEvent *event)
                 QApplication::clipboard()->setText(this->textCursor().selection().toPlainText());
                 return true;
             }
+            else if (QKeySequence(keyEvent->key() | Qt::ControlModifier) == QKeySequence::Copy && !mbLocalEcho)
+            {
+                //When echo mode is disabled, we must manually copy to clipboard as it will bypass normal handling to prevent text showing
+                QApplication::clipboard()->setText(this->textCursor().selection().toPlainText());
+                return true;
+            }
         }
 
         dat_out_updated = true;
